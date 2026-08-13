@@ -1,157 +1,144 @@
 [
   {
-    "v": 1,
-    "name": "SS-MIS Clothing Sales Management System (v1)",
+    "v": 2,
+    "name": "SS-MIS Clothing Sales Management API",
     "folders": [
       {
-        "v": 1,
-        "name": "0. System Health & Status",
+        "v": 2,
+        "name": "0. System Health",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "Check API v1 Health & Version",
             "endpoint": "http://127.0.0.1:8000/api/v1/status",
+            "name": "Check API v1 Health",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true}
             ],
-            "body": {
-              "contentType": "application/json",
-              "body": ""
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
-            }
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           }
         ]
       },
       {
-        "v": 1,
-        "name": "1. Authentication & Session",
+        "v": 2,
+        "name": "1. Authentication",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "Admin Login",
             "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+            "name": "Admin Login",
             "method": "POST",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Content-Type", "value": "application/json", "active": true}
             ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
             "body": {
               "contentType": "application/json",
               "body": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123456\"\n}"
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
             }
           },
           {
             "v": 1,
-            "name": "Manager Login",
             "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+            "name": "Manager Login",
             "method": "POST",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Content-Type", "value": "application/json", "active": true}
             ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
             "body": {
               "contentType": "application/json",
               "body": "{\n  \"username\": \"manager\",\n  \"password\": \"Manager@123456\"\n}"
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
             }
           },
           {
             "v": 1,
-            "name": "Cashier Login",
             "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+            "name": "Cashier Login",
             "method": "POST",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Content-Type", "value": "application/json", "active": true}
             ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
             "body": {
               "contentType": "application/json",
               "body": "{\n  \"username\": \"cashier\",\n  \"password\": \"Cashier@123456\"\n}"
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
             }
           },
           {
             "v": 1,
-            "name": "Get Authenticated Profile (me)",
             "endpoint": "http://127.0.0.1:8000/api/v1/auth/me",
+            "name": "Get Current Profile (me)",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {
-              "contentType": "application/json",
-              "body": ""
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
-            }
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           },
           {
             "v": 1,
-            "name": "Logout Session",
             "endpoint": "http://127.0.0.1:8000/api/v1/auth/logout",
+            "name": "Logout Session",
             "method": "POST",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {
-              "contentType": "application/json",
-              "body": ""
-            },
-            "auth": {
-              "authType": "none",
-              "authActive": true
-            }
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           }
         ]
       },
       {
-        "v": 1,
+        "v": 2,
         "name": "2. Categories",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "List All Categories",
             "endpoint": "http://127.0.0.1:8000/api/v1/categories",
+            "name": "List All Categories",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           },
           {
             "v": 1,
-            "name": "Create Category (Manager/Admin)",
             "endpoint": "http://127.0.0.1:8000/api/v1/categories",
+            "name": "Create Category (Manager/Admin)",
             "method": "POST",
             "params": [],
             "headers": [
@@ -159,23 +146,25 @@
               {"key": "Content-Type", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
             "body": {
               "contentType": "application/json",
               "body": "{\n  \"category_name\": \"Footwear & Shoes\",\n  \"description\": \"Sneakers, boots, and casual shoes\"\n}"
-            },
-            "auth": {"authType": "none", "authActive": true}
+            }
           }
         ]
       },
       {
-        "v": 1,
+        "v": 2,
         "name": "3. POS Sales & Checkout",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "POS Checkout Receipt",
             "endpoint": "http://127.0.0.1:8000/api/v1/sales/checkout",
+            "name": "POS Checkout Receipt",
             "method": "POST",
             "params": [],
             "headers": [
@@ -183,90 +172,121 @@
               {"key": "Content-Type", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
             "body": {
               "contentType": "application/json",
               "body": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 50.00,\n  \"overall_discount\": 0.00\n}"
-            },
-            "auth": {"authType": "none", "authActive": true}
+            }
           },
           {
             "v": 1,
-            "name": "Get Sales History",
             "endpoint": "http://127.0.0.1:8000/api/v1/sales",
+            "name": "Get Sales History",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
+          },
+          {
+            "v": 1,
+            "endpoint": "http://127.0.0.1:8000/api/v1/sales/1/void",
+            "name": "Void Sale Invoice (Manager/Admin)",
+            "method": "POST",
+            "params": [],
+            "headers": [
+              {"key": "Accept", "value": "application/json", "active": true},
+              {"key": "Content-Type", "value": "application/json", "active": true},
+              {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"reason\": \"Customer requested cancellation and refund\"\n}"
+            }
           }
         ]
       },
       {
-        "v": 1,
+        "v": 2,
         "name": "4. Products & Inventory",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "List All Products",
             "endpoint": "http://127.0.0.1:8000/api/v1/products",
+            "name": "List All Products",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           },
           {
             "v": 1,
-            "name": "Get Low Stock Alerts",
             "endpoint": "http://127.0.0.1:8000/api/v1/variants/low-stock",
+            "name": "Get Low Stock Alerts",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           },
           {
             "v": 1,
-            "name": "Lookup Barcode / SKU",
             "endpoint": "http://127.0.0.1:8000/api/v1/variants/barcode/8850001001001",
+            "name": "Lookup Barcode / SKU",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           }
         ]
       },
       {
-        "v": 1,
+        "v": 2,
         "name": "5. Security Audit Logs",
         "folders": [],
         "requests": [
           {
             "v": 1,
-            "name": "Get Audit Logs",
             "endpoint": "http://127.0.0.1:8000/api/v1/audit-logs",
+            "name": "List Audit Logs",
             "method": "GET",
             "params": [],
             "headers": [
               {"key": "Accept", "value": "application/json", "active": true},
               {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
             ],
-            "body": {"contentType": "application/json", "body": ""},
-            "auth": {"authType": "none", "authActive": true}
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {"authType": "none", "authActive": true},
+            "body": {"contentType": "application/json", "body": ""}
           }
         ]
       }
