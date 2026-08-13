@@ -1,15 +1,15 @@
 {
   "info": {
     "name": "SS-MIS Clothing Sales Management System (v1 API)",
-    "description": "Comprehensive, production-ready API testing collection for SS-MIS Backend Web API.",
+    "description": "Primary Postman Collection (v2.1.0) containing all 56 API endpoints for SS-MIS Backend Web API with pre-filled test payloads.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "01. Authentication & System Status",
+      "name": "01. Auth & System Status",
       "item": [
         {
-          "name": "Check API v1 Status",
+          "name": "Check API v1 Health & Version",
           "request": {
             "method": "GET",
             "header": [
@@ -77,6 +77,27 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"cashier\",\n  \"password\": \"Cashier@123456\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Staff Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"staff\",\n  \"password\": \"Staff@123456\"\n}"
             },
             "url": {
               "raw": "http://127.0.0.1:8000/api/v1/auth/login",
@@ -544,7 +565,7 @@
           }
         },
         {
-          "name": "Register Employee",
+          "name": "Register Employee Account",
           "request": {
             "method": "POST",
             "header": [
@@ -583,7 +604,7 @@
           }
         },
         {
-          "name": "Update Employee",
+          "name": "Update Employee Role & Profile",
           "request": {
             "method": "PUT",
             "header": [
