@@ -1,0 +1,59 @@
+{
+  "v": 1,
+  "name": "SS-MIS Web API (v1)",
+  "folders": [
+    {
+      "v": 1,
+      "name": "System Status",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Check API v1 Status",
+          "endpoint": "http://127.0.0.1:8000/api/v1/status",
+          "method": "GET",
+          "headers": [
+            {
+              "key": "Accept",
+              "value": "application/json",
+              "active": true
+            }
+          ],
+          "params": [],
+          "body": {
+            "contentType": "application/json",
+            "body": ""
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "Auth & User",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Get Current User Profile",
+          "endpoint": "http://127.0.0.1:8000/api/user",
+          "method": "GET",
+          "headers": [
+            {
+              "key": "Accept",
+              "value": "application/json",
+              "active": true
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer <<YOUR_SANCTUM_TOKEN>>",
+              "active": true
+            }
+          ],
+          "params": [],
+          "body": {
+            "contentType": "application/json",
+            "body": ""
+          }
+        }
+      ]
+    }
+  ]
+}
