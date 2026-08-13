@@ -1,181 +1,239 @@
 ---
 name: ssmis-db-schema
-description: Authoritative ER diagram and database schema definition for Store Stock & Point-of-Sale Information System (SS-MIS). Defines tables for CATEGORY, PRODUCT, CLOTHING_SIZE, COLOR, PRODUCT_VARIANT, SUPPLIER, EMPLOYEE, CUSTOMER, PURCHASE_HEADER, PURCHASE_DETAIL, SALE_HEADER, SALE_DETAIL, PAYMENT, and STOCK_MOVEMENT along with primary keys, foreign keys, constraints, and relationships. Use this skill whenever writing, designing, migrating, or querying database models, tables, relationships, or API endpoints for SS-MIS.
+description: Authoritative ER diagram and database schema definition for Store Stock & Point-of-Sale Information System (SS-MIS). Defines tables for STORE, CATEGORY, PRODUCT, CLOTHING_SIZE, COLOR, PRODUCT_VARIANT, SUPPLIER, EMPLOYEE, CUSTOMER, PURCHASE_HEADER, PURCHASE_DETAIL, SALE_HEADER, SALE_DETAIL, PAYMENT, and STOCK_MOVEMENT along with primary keys, foreign keys, constraints, and relationships. Use this skill whenever writing, designing, migrating, or querying database models, tables, relationships, or API endpoints for SS-MIS.
 ---
 
-# SS-MIS Database Schema & Entity-Relationship (ER) Diagram
+# SS-MIS Database Schema & Entity-Relationship (ER) Diagram (Standard Enterprise SQL)
 
-Authoritative reference for the database tables, fields, constraints, and relationships for the Store Stock & Point-of-Sale Information System (SS-MIS).
+Authoritative reference for the database tables, data types, constraints, and relationships for the Store Stock & Point-of-Sale Information System (SS-MIS).
 
-## Entity-Relationship Diagram
+Designed according to **worldwide enterprise SQL standards**, incorporating:
+- Standard ANSI SQL types (`DECIMAL(12,2)`, `BIGINT`, `VARCHAR`, `TIMESTAMPTZ`, `BOOLEAN`).
+- Financial accuracy for POS transactions using exact fixed-point decimal arithmetic.
+- Soft delete support (`deleted_at`) for audit compliance and historical integrity.
+- Multi-store / multi-branch readiness (`store_id`).
+- Barcode / EAN scanner integration (`barcode`).
+- Comprehensive audit timestamps (`created_at`, `updated_at`, `deleted_at`).
+- Detailed stock movements with pre/post balance audit trail (`stock_before`, `stock_after`).
+
+## Entity-Relationship Diagram (Mermaid)
 
 ```mermaid
 erDiagram
 
-    CATEGORY ||--o{ PRODUCT : contains
+    STORE ||--o{ EMPLOYEE : employs
+    STORE ||--o{ STOCK_MOVEMENT : holds
+
+    CATEGORY ||--o{ PRODUCT : categorizes
     PRODUCT ||--o{ PRODUCT_VARIANT : has
-    CLOTHING_SIZE ||--o{ PRODUCT_VARIANT : defines
-    COLOR ||--o{ PRODUCT_VARIANT : defines
+    CLOTHING_SIZE ||--o{ PRODUCT_VARIANT : sizes
+    COLOR ||--o{ PRODUCT_VARIANT : colors
 
     SUPPLIER ||--o{ PURCHASE_HEADER : supplies
     EMPLOYEE ||--o{ PURCHASE_HEADER : creates
     PURCHASE_HEADER ||--|{ PURCHASE_DETAIL : contains
     PRODUCT_VARIANT ||--o{ PURCHASE_DETAIL : purchased
 
-    CUSTOMER ||--o{ SALE_HEADER : makes
+    CUSTOMER ||--o{ SALE_HEADER : places
     EMPLOYEE ||--o{ SALE_HEADER : processes
     SALE_HEADER ||--|{ SALE_DETAIL : contains
     PRODUCT_VARIANT ||--o{ SALE_DETAIL : sold
 
-    SALE_HEADER ||--o{ PAYMENT : receives
+    SALE_HEADER ||--o{ PAYMENT : settles
 
     PRODUCT_VARIANT ||--o{ STOCK_MOVEMENT : tracks
 
 
+    STORE {
+        BIGINT store_id PK
+        VARCHAR store_name
+        VARCHAR code UK
+        VARCHAR tax_id
+        VARCHAR phone
+        VARCHAR email
+        TEXT address
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
     CATEGORY {
-        NUMBER category_id PK
-        VARCHAR2 category_name UK
-        VARCHAR2 description
+        BIGINT category_id PK
+        VARCHAR category_name UK
+        VARCHAR slug UK
+        TEXT description
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     PRODUCT {
-        NUMBER product_id PK
-        NUMBER category_id FK
-        VARCHAR2 product_name
-        VARCHAR2 brand
-        VARCHAR2 description
-        VARCHAR2 status
+        BIGINT product_id PK
+        BIGINT category_id FK
+        VARCHAR product_name
+        VARCHAR brand
+        TEXT description
+        VARCHAR status
         TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     CLOTHING_SIZE {
-        NUMBER size_id PK
-        VARCHAR2 size_name UK
-        VARCHAR2 description
+        BIGINT size_id PK
+        VARCHAR size_code UK
+        VARCHAR size_name
+        TEXT description
     }
 
     COLOR {
-        NUMBER color_id PK
-        VARCHAR2 color_name UK
-        VARCHAR2 description
+        BIGINT color_id PK
+        VARCHAR color_code UK
+        VARCHAR color_name
+        VARCHAR hex_code
     }
 
     PRODUCT_VARIANT {
-        NUMBER variant_id PK
-        NUMBER product_id FK
-        NUMBER size_id FK
-        NUMBER color_id FK
-        VARCHAR2 sku UK
-        NUMBER cost_price
-        NUMBER sale_price
-        NUMBER quantity
-        NUMBER reorder_level
+        BIGINT variant_id PK
+        BIGINT product_id FK
+        BIGINT size_id FK
+        BIGINT color_id FK
+        VARCHAR sku UK
+        VARCHAR barcode UK
+        DECIMAL cost_price
+        DECIMAL sale_price
+        DECIMAL wholesale_price
+        INT stock_quantity
+        INT reorder_level
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     SUPPLIER {
-        NUMBER supplier_id PK
-        VARCHAR2 supplier_name
-        VARCHAR2 phone
-        VARCHAR2 email
-        VARCHAR2 address
-        VARCHAR2 status
+        BIGINT supplier_id PK
+        VARCHAR supplier_name
+        VARCHAR contact_name
+        VARCHAR phone
+        VARCHAR email
+        TEXT address
+        VARCHAR tax_id
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     EMPLOYEE {
-        NUMBER employee_id PK
-        VARCHAR2 employee_name
-        VARCHAR2 gender
-        VARCHAR2 phone
-        VARCHAR2 email
-        VARCHAR2 position
-        VARCHAR2 username UK
-        VARCHAR2 password_hash
-        VARCHAR2 status
+        BIGINT employee_id PK
+        BIGINT store_id FK
+        VARCHAR employee_name
+        VARCHAR gender
+        VARCHAR phone
+        VARCHAR email
+        VARCHAR position
+        VARCHAR username UK
+        VARCHAR password_hash
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     CUSTOMER {
-        NUMBER customer_id PK
-        VARCHAR2 customer_name
-        VARCHAR2 gender
-        VARCHAR2 phone
-        VARCHAR2 email
-        VARCHAR2 address
+        BIGINT customer_id PK
+        VARCHAR customer_name
+        VARCHAR gender
+        VARCHAR phone UK
+        VARCHAR email
+        TEXT address
+        INT loyalty_points
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
     }
 
     PURCHASE_HEADER {
-        NUMBER purchase_id PK
-        NUMBER supplier_id FK
-        NUMBER employee_id FK
+        BIGINT purchase_id PK
+        VARCHAR reference_no UK
+        BIGINT supplier_id FK
+        BIGINT employee_id FK
+        BIGINT store_id FK
         TIMESTAMP purchase_date
-        NUMBER total_amount
-        VARCHAR2 status
+        DECIMAL total_amount
+        DECIMAL tax_amount
+        DECIMAL grand_total
+        VARCHAR status
+        TEXT notes
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     PURCHASE_DETAIL {
-        NUMBER purchase_detail_id PK
-        NUMBER purchase_id FK
-        NUMBER variant_id FK
-        NUMBER quantity
-        NUMBER cost_price
-        NUMBER sub_total
+        BIGINT purchase_detail_id PK
+        BIGINT purchase_id FK
+        BIGINT variant_id FK
+        INT quantity
+        DECIMAL unit_cost
+        DECIMAL sub_total
     }
 
     SALE_HEADER {
-        NUMBER sale_id PK
-        NUMBER customer_id FK
-        NUMBER employee_id FK
+        BIGINT sale_id PK
+        VARCHAR invoice_no UK
+        BIGINT store_id FK
+        BIGINT customer_id FK
+        BIGINT employee_id FK
         TIMESTAMP sale_date
-        NUMBER total_amount
-        NUMBER discount
-        NUMBER grand_total
-        VARCHAR2 status
+        DECIMAL sub_total
+        DECIMAL discount_amount
+        DECIMAL tax_amount
+        DECIMAL grand_total
+        VARCHAR payment_status
+        VARCHAR status
+        TEXT notes
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     SALE_DETAIL {
-        NUMBER sale_detail_id PK
-        NUMBER sale_id FK
-        NUMBER variant_id FK
-        NUMBER quantity
-        NUMBER unit_price
-        NUMBER discount
-        NUMBER sub_total
+        BIGINT sale_detail_id PK
+        BIGINT sale_id FK
+        BIGINT variant_id FK
+        INT quantity
+        DECIMAL unit_price
+        DECIMAL discount_amount
+        DECIMAL sub_total
     }
 
     PAYMENT {
-        NUMBER payment_id PK
-        NUMBER sale_id FK
+        BIGINT payment_id PK
+        BIGINT sale_id FK
         TIMESTAMP payment_date
-        NUMBER amount
-        VARCHAR2 payment_method
-        VARCHAR2 payment_status
-        VARCHAR2 reference_number
+        DECIMAL amount
+        DECIMAL amount_tendered
+        DECIMAL change_due
+        VARCHAR payment_method
+        VARCHAR payment_status
+        VARCHAR transaction_ref
+        TIMESTAMP created_at
     }
 
     STOCK_MOVEMENT {
-        NUMBER movement_id PK
-        NUMBER variant_id FK
-        VARCHAR2 movement_type
-        NUMBER quantity
+        BIGINT movement_id PK
+        BIGINT store_id FK
+        BIGINT variant_id FK
+        VARCHAR movement_type
+        INT quantity
+        INT stock_before
+        INT stock_after
         TIMESTAMP movement_date
-        VARCHAR2 reference_type
-        NUMBER reference_id
-        VARCHAR2 note
+        VARCHAR reference_type
+        BIGINT reference_id
+        TEXT note
+        BIGINT created_by FK
+        TIMESTAMP created_at
     }
 ```
-
-## Entities Summary
-
-1. **CATEGORY**: Product category classification (`category_id`, `category_name`, `description`).
-2. **PRODUCT**: Base product catalog (`product_id`, `category_id`, `product_name`, `brand`, `description`, `status`, `created_at`).
-3. **CLOTHING_SIZE**: Size master data (`size_id`, `size_name`, `description`).
-4. **COLOR**: Color master data (`color_id`, `color_name`, `description`).
-5. **PRODUCT_VARIANT**: Specific product SKU variant (`variant_id`, `product_id`, `size_id`, `color_id`, `sku`, `cost_price`, `sale_price`, `quantity`, `reorder_level`).
-6. **SUPPLIER**: Supplier directory (`supplier_id`, `supplier_name`, `phone`, `email`, `address`, `status`).
-7. **EMPLOYEE**: Employee & system user directory (`employee_id`, `employee_name`, `gender`, `phone`, `email`, `position`, `username`, `password_hash`, `status`).
-8. **CUSTOMER**: Customer directory (`customer_id`, `customer_name`, `gender`, `phone`, `email`, `address`).
-9. **PURCHASE_HEADER**: Supplier purchase orders (`purchase_id`, `supplier_id`, `employee_id`, `purchase_date`, `total_amount`, `status`).
-10. **PURCHASE_DETAIL**: Items inside purchase order (`purchase_detail_id`, `purchase_id`, `variant_id`, `quantity`, `cost_price`, `sub_total`).
-11. **SALE_HEADER**: POS sale transactions (`sale_id`, `customer_id`, `employee_id`, `sale_date`, `total_amount`, `discount`, `grand_total`, `status`).
-12. **SALE_DETAIL**: Line items in sale transaction (`sale_detail_id`, `sale_id`, `variant_id`, `quantity`, `unit_price`, `discount`, `sub_total`).
-13. **PAYMENT**: Payment transaction details (`payment_id`, `sale_id`, `payment_date`, `amount`, `payment_method`, `payment_status`, `reference_number`).
-14. **STOCK_MOVEMENT**: Inventory audit log (`movement_id`, `variant_id`, `movement_type`, `quantity`, `movement_date`, `reference_type`, `reference_id`, `note`).
