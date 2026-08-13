@@ -1,0 +1,60 @@
+
+Build the **Clothing Sales Management System API only** using **Oracle Database**, based on the provided database skill and normalized entity design.
+
+Create a clean RESTful API with CRUD for all core entities, authentication for employees, product/variant inventory, purchases, sales, payments, and stock movements.
+ use all skill file, make this project professinal , 
+Follow the database relationships, constraints, naming conventions, validation, transaction handling, and Oracle SQL standards from the skill file.
+
+**API only. No frontend, UI, or client application.** check all . 
+security first. 
+Review and build the API with strict production-level conditions.
+
+Implement:
+
+* **RBAC:** `ADMIN`, `MANAGER`, `CASHIER`, `STAFF`
+* **Authentication:** secure login, hashed passwords, token expiration, logout/revocation
+* **Authorization:** every endpoint must verify the user's role and permissions
+* **Resource ownership:** users must not access or modify resources outside their permission scope
+* **Validation:** validate all request inputs, IDs, quantities, prices, status values, and foreign keys
+* **Audit Log:** record login, logout, create, update, delete, sale, purchase, payment, stock adjustment, role/permission changes
+* **Audit fields:** user, action, entity, entity ID, timestamp, IP address, user agent, old value, new value
+* **Transaction Safety:** sales, purchases, payments, and stock changes must use database transactions and rollback on failure
+* **Inventory Protection:** prevent negative stock, unauthorized stock modification, and inconsistent stock movements
+* **Business Rules:** prevent invalid status transitions, duplicate SKU, duplicate product variants, invalid payments, and unauthorized cancellation/refund
+* **Security:** rate limiting, secure headers, CORS policy, SQL injection protection, sensitive-data protection, and no plaintext passwords
+* **Error Handling:** consistent API error format; never expose database errors, passwords, tokens, or internal stack traces
+* **API Versioning:** use `/api/v1/...`
+* **Logging:** application errors and security events must be logged separately from business audit logs
+* **Soft Delete:** use only where appropriate; never destroy important financial or audit history
+* **Database Integrity:** enforce PK, FK, UNIQUE, NOT NULL, CHECK constraints and indexes
+* **Testing:** include authentication, authorization, validation, transaction rollback, RBAC, audit logging, and security tests
+
+Before considering the API complete, perform a **security and integrity audit** and identify any missing permission, validation, transaction, audit, or business-rule conditions.
+
+
+# API Security, RBAC & Audit Conditions Prompt
+
+Review and build the API with strict production-level conditions.
+
+Implement:
+
+* **RBAC:** `ADMIN`, `MANAGER`, `CASHIER`, `STAFF`
+* **Authentication:** secure login, hashed passwords, token expiration, logout/revocation
+* **Authorization:** every endpoint must verify the user's role and permissions
+* **Resource ownership:** users must not access or modify resources outside their permission scope
+* **Validation:** validate all request inputs, IDs, quantities, prices, status values, and foreign keys
+* **Audit Log:** record login, logout, create, update, delete, sale, purchase, payment, stock adjustment, role/permission changes
+* **Audit fields:** user, action, entity, entity ID, timestamp, IP address, user agent, old value, new value
+* **Transaction Safety:** sales, purchases, payments, and stock changes must use database transactions and rollback on failure
+* **Inventory Protection:** prevent negative stock, unauthorized stock modification, and inconsistent stock movements
+* **Business Rules:** prevent invalid status transitions, duplicate SKU, duplicate product variants, invalid payments, and unauthorized cancellation/refund
+* **Security:** rate limiting, secure headers, CORS policy, SQL injection protection, sensitive-data protection, and no plaintext passwords
+* **Error Handling:** consistent API error format; never expose database errors, passwords, tokens, or internal stack traces
+* **API Versioning:** use `/api/v1/...`
+* **Logging:** application errors and security events must be logged separately from business audit logs
+* **Soft Delete:** use only where appropriate; never destroy important financial or audit history
+* **Database Integrity:** enforce PK, FK, UNIQUE, NOT NULL, CHECK constraints and indexes
+* **Testing:** include authentication, authorization, validation, transaction rollback, RBAC, audit logging, and security tests
+
+Before considering the API complete, perform a **security and integrity audit** and identify any missing permission, validation, transaction, audit, or business-rule conditions.
+

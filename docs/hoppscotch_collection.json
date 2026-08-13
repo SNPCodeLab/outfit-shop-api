@@ -1,57 +1,131 @@
 {
   "v": 1,
-  "name": "SS-MIS Web API (v1)",
+  "name": "SS-MIS Clothing Sales Management API (v1)",
   "folders": [
     {
       "v": 1,
-      "name": "System Status",
+      "name": "1. Authentication",
       "requests": [
         {
           "v": 1,
-          "name": "Check API v1 Status",
-          "endpoint": "http://127.0.0.1:8000/api/v1/status",
-          "method": "GET",
+          "name": "Admin Login",
+          "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+          "method": "POST",
           "headers": [
-            {
-              "key": "Accept",
-              "value": "application/json",
-              "active": true
-            }
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true}
           ],
-          "params": [],
           "body": {
             "contentType": "application/json",
-            "body": ""
+            "body": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123456\"\n}"
           }
+        },
+        {
+          "v": 1,
+          "name": "Cashier Login",
+          "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"username\": \"cashier\",\n  \"password\": \"Cashier@123456\"\n}"
+          }
+        },
+        {
+          "v": 1,
+          "name": "Get Authenticated Profile",
+          "endpoint": "http://127.0.0.1:8000/api/v1/auth/me",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
         }
       ]
     },
     {
       "v": 1,
-      "name": "Auth & User",
+      "name": "2. POS & Sales",
       "requests": [
         {
           "v": 1,
-          "name": "Get Current User Profile",
-          "endpoint": "http://127.0.0.1:8000/api/user",
-          "method": "GET",
+          "name": "POS Checkout Receipt",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales/checkout",
+          "method": "POST",
           "headers": [
-            {
-              "key": "Accept",
-              "value": "application/json",
-              "active": true
-            },
-            {
-              "key": "Authorization",
-              "value": "Bearer <<YOUR_SANCTUM_TOKEN>>",
-              "active": true
-            }
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
           ],
-          "params": [],
           "body": {
             "contentType": "application/json",
-            "body": ""
+            "body": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 50.00,\n  \"overall_discount\": 0.00\n}"
           }
+        },
+        {
+          "v": 1,
+          "name": "Get Sales History",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "3. Products & Inventory",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Get Products Catalog",
+          "endpoint": "http://127.0.0.1:8000/api/v1/products",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Get Low Stock Items",
+          "endpoint": "http://127.0.0.1:8000/api/v1/variants/low-stock",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Lookup Barcode",
+          "endpoint": "http://127.0.0.1:8000/api/v1/variants/barcode/8850001001001",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "4. Audit Logs (Manager/Admin)",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Get System Audit Trail",
+          "endpoint": "http://127.0.0.1:8000/api/v1/audit-logs",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
         }
       ]
     }
