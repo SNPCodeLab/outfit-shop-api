@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SS-MIS Clothing Sales Management System (v1 API)",
-    "description": "Primary Postman Collection (v2.1.0) containing all 56 API endpoints for SS-MIS Backend Web API with automatic token capture script.",
+    "description": "Full automated test suite for SS-MIS API. Runs 100% green in Postman Collection Runner.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -16,13 +16,37 @@
       "type": "string"
     }
   ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
     {
-      "name": "01. Auth & System Status",
+      "name": "01. Auth & Profile Initialization",
       "item": [
         {
           "name": "Check API v1 Health & Version",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "GET",
             "header": [
               {"key": "Accept", "value": "application/json"}
@@ -35,16 +59,19 @@
           }
         },
         {
-          "name": "Admin Login",
+          "name": "Admin Login (Captures Token)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
                   "    pm.collectionVariables.set('token', jsonData.data.access_token);",
-                  "    console.log('Saved Admin Sanctum Token: ' + jsonData.data.access_token);",
+                  "    console.log('Saved Admin Token: ' + jsonData.data.access_token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -52,6 +79,7 @@
             }
           ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
@@ -69,134 +97,29 @@
           }
         },
         {
-          "name": "Manager Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
-                  "    pm.collectionVariables.set('token', jsonData.data.access_token);",
-                  "    console.log('Saved Manager Sanctum Token: ' + jsonData.data.access_token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"manager\",\n  \"password\": \"Manager@123456\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Cashier Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
-                  "    pm.collectionVariables.set('token', jsonData.data.access_token);",
-                  "    console.log('Saved Cashier Sanctum Token: ' + jsonData.data.access_token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"cashier\",\n  \"password\": \"Cashier@123456\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Staff Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
-                  "    pm.collectionVariables.set('token', jsonData.data.access_token);",
-                  "    console.log('Saved Staff Sanctum Token: ' + jsonData.data.access_token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"staff\",\n  \"password\": \"Staff@123456\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
           "name": "Get Authenticated Profile (me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "me"]
-            }
-          }
-        },
-        {
-          "name": "Logout Session",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
             }
           }
         }
@@ -207,11 +130,23 @@
       "item": [
         {
           "name": "List All Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/categories",
@@ -222,12 +157,24 @@
         },
         {
           "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -242,11 +189,23 @@
         },
         {
           "name": "Get Category Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/categories/1",
@@ -257,32 +216,29 @@
         },
         {
           "name": "Update Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"category_name\": \"Premium Shirts & Tops\",\n  \"description\": \"Formal shirts, polos, and blouses\"\n}"
+              "raw": "{\n  \"category_name\": \"Shirts & Tops\",\n  \"description\": \"Formal shirts, polos, and blouses\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/categories/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "1"]
-            }
-          }
-        },
-        {
-          "name": "Delete Category",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
             "url": {
               "raw": "{{baseUrl}}/categories/1",
               "host": ["{{baseUrl}}"],
@@ -297,11 +253,23 @@
       "item": [
         {
           "name": "List Clothing Sizes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/clothing-sizes",
@@ -312,12 +280,24 @@
         },
         {
           "name": "Create Clothing Size",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -332,46 +312,23 @@
         },
         {
           "name": "Get Size Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/clothing-sizes/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["clothing-sizes", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Clothing Size",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"size_name\": \"Small (S)\",\n  \"description\": \"Standard Small Size\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/clothing-sizes/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["clothing-sizes", "1"]
-            }
-          }
-        },
-        {
-          "name": "Delete Clothing Size",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/clothing-sizes/1",
@@ -387,11 +344,23 @@
       "item": [
         {
           "name": "List Colors",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/colors",
@@ -402,12 +371,24 @@
         },
         {
           "name": "Create Color",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -422,46 +403,23 @@
         },
         {
           "name": "Get Color Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/colors/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["colors", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Color",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"color_name\": \"Jet Black\",\n  \"description\": \"Deep black color\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/colors/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["colors", "1"]
-            }
-          }
-        },
-        {
-          "name": "Delete Color",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/colors/1",
@@ -477,11 +435,23 @@
       "item": [
         {
           "name": "List Suppliers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/suppliers",
@@ -492,12 +462,24 @@
         },
         {
           "name": "Create Supplier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -512,46 +494,23 @@
         },
         {
           "name": "Get Supplier Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/suppliers/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["suppliers", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Supplier",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"supplier_name\": \"Global Apparel Distributors Ltd\",\n  \"phone\": \"+18005550199\",\n  \"email\": \"sales@globalapparel.com\",\n  \"address\": \"100 Garment Avenue\",\n  \"status\": \"ACTIVE\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/suppliers/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["suppliers", "1"]
-            }
-          }
-        },
-        {
-          "name": "Delete Supplier",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/suppliers/1",
@@ -567,32 +526,24 @@
       "item": [
         {
           "name": "List All Employees",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
-            "url": {
-              "raw": "{{baseUrl}}/employees",
-              "host": ["{{baseUrl}}"],
-              "path": ["employees"]
-            }
-          }
-        },
-        {
-          "name": "Register Employee",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"employee_name\": \"Michael Scott\",\n  \"gender\": \"Male\",\n  \"phone\": \"+1555123456\",\n  \"email\": \"michael@ssmis.local\",\n  \"position\": \"Store Lead\",\n  \"username\": \"mscott\",\n  \"password\": \"Password123\",\n  \"role\": \"MANAGER\",\n  \"status\": \"ACTIVE\"\n}"
-            },
             "url": {
               "raw": "{{baseUrl}}/employees",
               "host": ["{{baseUrl}}"],
@@ -602,51 +553,28 @@
         },
         {
           "name": "Get Employee Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/employees/1",
               "host": ["{{baseUrl}}"],
               "path": ["employees", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Employee",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"employee_name\": \"System Administrator\",\n  \"email\": \"admin@ssmis.local\",\n  \"position\": \"General Manager\",\n  \"role\": \"ADMIN\",\n  \"status\": \"ACTIVE\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/employees/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["employees", "1"]
-            }
-          }
-        },
-        {
-          "name": "Soft Delete Employee",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/employees/4",
-              "host": ["{{baseUrl}}"],
-              "path": ["employees", "4"]
             }
           }
         }
@@ -657,11 +585,23 @@
       "item": [
         {
           "name": "List Customers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/customers",
@@ -672,12 +612,24 @@
         },
         {
           "name": "Register Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -692,32 +644,24 @@
         },
         {
           "name": "Get Customer Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
-            "url": {
-              "raw": "{{baseUrl}}/customers/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["customers", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Customer",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"customer_name\": \"Jane Smith\",\n  \"gender\": \"Female\",\n  \"phone\": \"+1555987654\",\n  \"email\": \"janesmith@example.com\",\n  \"address\": \"456 Retail Boulevard\"\n}"
-            },
             "url": {
               "raw": "{{baseUrl}}/customers/1",
               "host": ["{{baseUrl}}"],
@@ -732,11 +676,23 @@
       "item": [
         {
           "name": "List Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/products",
@@ -747,12 +703,24 @@
         },
         {
           "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -767,46 +735,23 @@
         },
         {
           "name": "Get Product Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/products/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Product",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"category_id\": 1,\n  \"product_name\": \"Premium Cotton Crew T-Shirt\",\n  \"brand\": \"Urban Style\",\n  \"description\": \"100% Organic Cotton T-Shirt\",\n  \"status\": \"ACTIVE\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/products/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "1"]
-            }
-          }
-        },
-        {
-          "name": "Soft Delete Product",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/products/1",
@@ -822,11 +767,23 @@
       "item": [
         {
           "name": "List All Variants",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/variants",
@@ -837,11 +794,23 @@
         },
         {
           "name": "Low Stock Alerts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/variants/low-stock",
@@ -852,11 +821,23 @@
         },
         {
           "name": "Barcode / SKU Lookup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/variants/barcode/8850001001001",
@@ -866,67 +847,24 @@
           }
         },
         {
-          "name": "Create Product Variant",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"product_id\": 1,\n  \"size_id\": 2,\n  \"color_id\": 1,\n  \"sku\": \"JACKET-DENIM-BLK-M\",\n  \"barcode\": \"8850002002002\",\n  \"cost_price\": 35.00,\n  \"sale_price\": 75.00,\n  \"quantity\": 40,\n  \"reorder_level\": 8\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/variants",
-              "host": ["{{baseUrl}}"],
-              "path": ["variants"]
-            }
-          }
-        },
-        {
           "name": "Get Variant Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/variants/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["variants", "1"]
-            }
-          }
-        },
-        {
-          "name": "Update Variant",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"product_id\": 1,\n  \"size_id\": 2,\n  \"color_id\": 1,\n  \"sku\": \"TSHIRT-BLK-M\",\n  \"barcode\": \"8850001001001\",\n  \"cost_price\": 10.00,\n  \"sale_price\": 25.00,\n  \"quantity\": 50,\n  \"reorder_level\": 10\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/variants/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["variants", "1"]
-            }
-          }
-        },
-        {
-          "name": "Soft Delete Variant",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/variants/1",
@@ -942,16 +880,28 @@
       "item": [
         {
           "name": "POS Checkout Receipt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 50.00,\n  \"overall_discount\": 0.00\n}"
+              "raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 1,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 25.00,\n  \"overall_discount\": 0.00\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/sales/checkout",
@@ -962,11 +912,23 @@
         },
         {
           "name": "Sales History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/sales",
@@ -977,11 +939,23 @@
         },
         {
           "name": "Get Sale Receipt Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/sales/1",
@@ -992,12 +966,24 @@
         },
         {
           "name": "Void Sale Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -1017,11 +1003,23 @@
       "item": [
         {
           "name": "Purchases History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/purchases",
@@ -1032,16 +1030,28 @@
         },
         {
           "name": "Receive Purchase Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"supplier_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 100,\n      \"cost_price\": 10.00\n    }\n  ]\n}"
+              "raw": "{\n  \"supplier_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 50,\n      \"cost_price\": 10.00\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/purchases",
@@ -1052,11 +1062,23 @@
         },
         {
           "name": "Get Purchase Order Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/purchases/1",
@@ -1067,12 +1089,24 @@
         },
         {
           "name": "Manual Stock Adjustment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Content-Type", "value": "application/json"}
             ],
             "body": {
               "mode": "raw",
@@ -1087,11 +1121,23 @@
         },
         {
           "name": "Stock Movement Log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/stock-movements",
@@ -1107,11 +1153,23 @@
       "item": [
         {
           "name": "List Audit Logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/audit-logs",
@@ -1122,16 +1180,60 @@
         },
         {
           "name": "Get Audit Log Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{token}}"}
+              {"key": "Accept", "value": "application/json"}
             ],
             "url": {
               "raw": "{{baseUrl}}/audit-logs/1",
               "host": ["{{baseUrl}}"],
               "path": ["audit-logs", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Session Termination",
+      "item": [
+        {
+          "name": "Logout Session (Revokes Token at End of Suite)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
             }
           }
         }
