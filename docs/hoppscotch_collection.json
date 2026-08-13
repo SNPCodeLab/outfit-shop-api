@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "name": "SS-MIS Clothing Sales Management API (v1)",
+  "name": "SS-MIS Clothing Sales Management System (v1)",
   "folders": [
     {
       "v": 1,
@@ -22,6 +22,20 @@
         },
         {
           "v": 1,
+          "name": "Manager Login",
+          "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"username\": \"manager\",\n  \"password\": \"Manager@123456\"\n}"
+          }
+        },
+        {
+          "v": 1,
           "name": "Cashier Login",
           "endpoint": "http://127.0.0.1:8000/api/v1/auth/login",
           "method": "POST",
@@ -36,9 +50,19 @@
         },
         {
           "v": 1,
-          "name": "Get Authenticated Profile",
+          "name": "Get Current Profile",
           "endpoint": "http://127.0.0.1:8000/api/v1/auth/me",
           "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Logout Session",
+          "endpoint": "http://127.0.0.1:8000/api/v1/auth/logout",
+          "method": "POST",
           "headers": [
             {"key": "Accept", "value": "application/json", "active": true},
             {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
@@ -48,12 +72,22 @@
     },
     {
       "v": 1,
-      "name": "2. POS & Sales",
+      "name": "2. Categories",
       "requests": [
         {
           "v": 1,
-          "name": "POS Checkout Receipt",
-          "endpoint": "http://127.0.0.1:8000/api/v1/sales/checkout",
+          "name": "List Categories",
+          "endpoint": "http://127.0.0.1:8000/api/v1/categories",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Create Category",
+          "endpoint": "http://127.0.0.1:8000/api/v1/categories",
           "method": "POST",
           "headers": [
             {"key": "Accept", "value": "application/json", "active": true},
@@ -62,13 +96,13 @@
           ],
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 50.00,\n  \"overall_discount\": 0.00\n}"
+            "body": "{\n  \"category_name\": \"Footwear & Shoes\",\n  \"description\": \"Sneakers, boots, and casual shoes\"\n}"
           }
         },
         {
           "v": 1,
-          "name": "Get Sales History",
-          "endpoint": "http://127.0.0.1:8000/api/v1/sales",
+          "name": "Get Category Details",
+          "endpoint": "http://127.0.0.1:8000/api/v1/categories/1",
           "method": "GET",
           "headers": [
             {"key": "Accept", "value": "application/json", "active": true},
@@ -79,12 +113,192 @@
     },
     {
       "v": 1,
-      "name": "3. Products & Inventory",
+      "name": "3. Clothing Sizes & Colors",
       "requests": [
         {
           "v": 1,
-          "name": "Get Products Catalog",
+          "name": "List Sizes",
+          "endpoint": "http://127.0.0.1:8000/api/v1/clothing-sizes",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Create Size",
+          "endpoint": "http://127.0.0.1:8000/api/v1/clothing-sizes",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"size_name\": \"XXL\",\n  \"description\": \"Double Extra Large\"\n}"
+          }
+        },
+        {
+          "v": 1,
+          "name": "List Colors",
+          "endpoint": "http://127.0.0.1:8000/api/v1/colors",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Create Color",
+          "endpoint": "http://127.0.0.1:8000/api/v1/colors",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"color_name\": \"Emerald Green\",\n  \"description\": \"Rich dark green shade\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "4. Suppliers",
+      "requests": [
+        {
+          "v": 1,
+          "name": "List Suppliers",
+          "endpoint": "http://127.0.0.1:8000/api/v1/suppliers",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Create Supplier",
+          "endpoint": "http://127.0.0.1:8000/api/v1/suppliers",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"supplier_name\": \"Pacific Textile Traders\",\n  \"phone\": \"+19005550188\",\n  \"email\": \"contact@pacifictextiles.com\",\n  \"address\": \"88 Harbor Drive, Port City\",\n  \"status\": \"ACTIVE\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "5. Employees (Admin)",
+      "requests": [
+        {
+          "v": 1,
+          "name": "List Employees",
+          "endpoint": "http://127.0.0.1:8000/api/v1/employees",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Register Employee",
+          "endpoint": "http://127.0.0.1:8000/api/v1/employees",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"employee_name\": \"Michael Scott\",\n  \"gender\": \"Male\",\n  \"phone\": \"+1555123456\",\n  \"email\": \"michael@ssmis.local\",\n  \"position\": \"Assistant Manager\",\n  \"username\": \"mscott\",\n  \"password\": \"Password123\",\n  \"role\": \"MANAGER\",\n  \"status\": \"ACTIVE\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "6. Customers",
+      "requests": [
+        {
+          "v": 1,
+          "name": "List Customers",
+          "endpoint": "http://127.0.0.1:8000/api/v1/customers",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Register Customer",
+          "endpoint": "http://127.0.0.1:8000/api/v1/customers",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"customer_name\": \"Robert Downey\",\n  \"gender\": \"Male\",\n  \"phone\": \"+1555998877\",\n  \"email\": \"robert@example.com\",\n  \"address\": \"777 Hollywood Blvd\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "7. Products Catalog",
+      "requests": [
+        {
+          "v": 1,
+          "name": "List Products",
           "endpoint": "http://127.0.0.1:8000/api/v1/products",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Create Product",
+          "endpoint": "http://127.0.0.1:8000/api/v1/products",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"category_id\": 1,\n  \"product_name\": \"Classic Denim Jacket\",\n  \"brand\": \"Levi Style\",\n  \"description\": \"Vintage washed blue denim jacket\",\n  \"status\": \"ACTIVE\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "8. Product Variants & Inventory",
+      "requests": [
+        {
+          "v": 1,
+          "name": "List Variants",
+          "endpoint": "http://127.0.0.1:8000/api/v1/variants",
           "method": "GET",
           "headers": [
             {"key": "Accept", "value": "application/json", "active": true},
@@ -110,16 +324,133 @@
             {"key": "Accept", "value": "application/json", "active": true},
             {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
           ]
+        },
+        {
+          "v": 1,
+          "name": "Create Product Variant",
+          "endpoint": "http://127.0.0.1:8000/api/v1/variants",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"product_id\": 1,\n  \"size_id\": 2,\n  \"color_id": 1,\n  \"sku\": \"JACKET-DENIM-BLK-M\",\n  \"barcode\": \"8850002002002\",\n  \"cost_price\": 35.00,\n  \"sale_price\": 75.00,\n  \"quantity\": 40,\n  \"reorder_level\": 8\n}"
+          }
         }
       ]
     },
     {
       "v": 1,
-      "name": "4. Audit Logs (Manager/Admin)",
+      "name": "9. POS Sales & Checkout",
       "requests": [
         {
           "v": 1,
-          "name": "Get System Audit Trail",
+          "name": "POS Checkout Receipt",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales/checkout",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 50.00,\n  \"overall_discount\": 0.00\n}"
+          }
+        },
+        {
+          "v": 1,
+          "name": "Get Sales History",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Get Sale Receipt Details",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales/1",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        },
+        {
+          "v": 1,
+          "name": "Void Sale Invoice",
+          "endpoint": "http://127.0.0.1:8000/api/v1/sales/1/void",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"reason\": \"Customer requested cancellation and refund\"\n}"
+          }
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "10. Purchases & Stock Adjustments",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Receive Purchase Order",
+          "endpoint": "http://127.0.0.1:8000/api/v1/purchases",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"supplier_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 100,\n      \"cost_price\": 10.00\n    }\n  ]\n}"
+          }
+        },
+        {
+          "v": 1,
+          "name": "Manual Stock Adjustment",
+          "endpoint": "http://127.0.0.1:8000/api/v1/stock-movements/adjust",
+          "method": "POST",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Content-Type", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ],
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"variant_id\": 1,\n  \"quantity\": 5,\n  \"movement_type\": \"ADJUSTMENT\",\n  \"note\": \"Physical audit count correction\"\n}"
+          }
+        },
+        {
+          "v": 1,
+          "name": "Get Stock Movement Audit Trail",
+          "endpoint": "http://127.0.0.1:8000/api/v1/stock-movements",
+          "method": "GET",
+          "headers": [
+            {"key": "Accept", "value": "application/json", "active": true},
+            {"key": "Authorization", "value": "Bearer <<SANCTUM_TOKEN>>", "active": true}
+          ]
+        }
+      ]
+    },
+    {
+      "v": 1,
+      "name": "11. Security Audit Logs",
+      "requests": [
+        {
+          "v": 1,
+          "name": "Get Audit Logs",
           "endpoint": "http://127.0.0.1:8000/api/v1/audit-logs",
           "method": "GET",
           "headers": [
