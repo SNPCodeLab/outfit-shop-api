@@ -22,200 +22,155 @@ use Illuminate\Support\Facades\Hash;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Seed the application's database with real clothing store data.
      */
     public function run(): void
     {
         // 1. Employees (RBAC Users)
-        $admin = Employee::create([
+        $admin = Employee::firstOrCreate(['username' => 'admin'], [
             'employee_name' => 'System Administrator',
             'gender'        => 'Male',
-            'phone'         => '+1234567890',
+            'phone'         => '+85512345678',
             'email'         => 'admin@ssmis.local',
             'position'      => 'General Manager',
-            'username'      => 'admin',
             'password_hash' => Hash::make('Admin@123456'),
             'role'          => 'ADMIN',
             'status'        => 'ACTIVE',
         ]);
 
-        $manager = Employee::create([
+        $manager = Employee::firstOrCreate(['username' => 'manager'], [
             'employee_name' => 'Store Manager',
             'gender'        => 'Female',
-            'phone'         => '+1234567891',
+            'phone'         => '+85512345679',
             'email'         => 'manager@ssmis.local',
             'position'      => 'Inventory Manager',
-            'username'      => 'manager',
             'password_hash' => Hash::make('Manager@123456'),
             'role'          => 'MANAGER',
             'status'        => 'ACTIVE',
         ]);
 
-        $cashier = Employee::create([
+        $cashier = Employee::firstOrCreate(['username' => 'cashier'], [
             'employee_name' => 'Senior Cashier',
             'gender'        => 'Female',
-            'phone'         => '+1234567892',
+            'phone'         => '+85512345680',
             'email'         => 'cashier@ssmis.local',
             'position'      => 'POS Cashier',
-            'username'      => 'cashier',
             'password_hash' => Hash::make('Cashier@123456'),
             'role'          => 'CASHIER',
             'status'        => 'ACTIVE',
         ]);
 
-        $staff = Employee::create([
-            'employee_name' => 'Warehouse Staff',
-            'gender'        => 'Male',
-            'phone'         => '+1234567893',
-            'email'         => 'staff@ssmis.local',
-            'position'      => 'Stock Keeper',
-            'username'      => 'staff',
-            'password_hash' => Hash::make('Staff@123456'),
-            'role'          => 'STAFF',
-            'status'        => 'ACTIVE',
-        ]);
-
         // 2. Categories
-        $catShirts = Category::create(['category_name' => 'Shirts & Tops', 'description' => 'T-Shirts, Polos, and Formal Shirts']);
-        $catPants  = Category::create(['category_name' => 'Pants & Jeans', 'description' => 'Denim jeans, trousers, and shorts']);
-        $catJackets = Category::create(['category_name' => 'Jackets & Outerwear', 'description' => 'Winter coats, hoodies, and jackets']);
+        $catTops     = Category::firstOrCreate(['category_name' => 'Tops & T-Shirts'], ['description' => 'Casual T-Shirts, Polo Shirts, and Silk Tops']);
+        $catPants    = Category::firstOrCreate(['category_name' => 'Pants & Jeans'], ['description' => 'Denim jeans, trousers, and shorts']);
+        $catDresses  = Category::firstOrCreate(['category_name' => 'Dresses & Skirts'], ['description' => 'Summer dresses, skirts, and evening wear']);
+        $catOuterwear = Category::firstOrCreate(['category_name' => 'Jackets & Hoodies'], ['description' => 'Outerwear, hoodies, and jackets']);
 
         // 3. Sizes
-        $sizeS  = ClothingSize::create(['size_name' => 'Small (S)', 'description' => 'Size S']);
-        $sizeM  = ClothingSize::create(['size_name' => 'Medium (M)', 'description' => 'Size M']);
-        $sizeL  = ClothingSize::create(['size_name' => 'Large (L)', 'description' => 'Size L']);
-        $sizeXL = ClothingSize::create(['size_name' => 'Extra Large (XL)', 'description' => 'Size XL']);
+        $sizeS  = ClothingSize::firstOrCreate(['size_name' => 'Small (S)'], ['description' => 'Chest 36 inch']);
+        $sizeM  = ClothingSize::firstOrCreate(['size_name' => 'Medium (M)'], ['description' => 'Chest 38 inch']);
+        $sizeL  = ClothingSize::firstOrCreate(['size_name' => 'Large (L)'], ['description' => 'Chest 40 inch']);
+        $sizeXL = ClothingSize::firstOrCreate(['size_name' => 'Extra Large (XL)'], ['description' => 'Chest 42 inch']);
 
         // 4. Colors
-        $colorBlack = Color::create(['color_name' => 'Black', 'description' => 'Classic Black']);
-        $colorWhite = Color::create(['color_name' => 'White', 'description' => 'Bright White']);
-        $colorNavy  = Color::create(['color_name' => 'Navy Blue', 'description' => 'Deep Navy']);
+        $colorNavy  = Color::firstOrCreate(['color_name' => 'Navy Blue'], ['description' => 'Deep Navy']);
+        $colorBlack = Color::firstOrCreate(['color_name' => 'Black'], ['description' => 'Classic Solid Black']);
+        $colorWhite = Color::firstOrCreate(['color_name' => 'White'], ['description' => 'Pure Pure White']);
+        $colorGray  = Color::firstOrCreate(['color_name' => 'Charcoal Gray'], ['description' => 'Dark Charcoal']);
 
         // 5. Suppliers
-        $supplier = Supplier::create([
-            'supplier_name' => 'Global Apparel Distributors',
-            'phone'         => '+18005550199',
-            'email'         => 'sales@globalapparel.com',
-            'address'       => '100 Garment Avenue, Industrial Park',
+        $supplier = Supplier::firstOrCreate(['supplier_name' => 'Khmer Garments Co., Ltd.'], [
+            'phone'         => '+85523999888',
+            'email'         => 'orders@khmergarments.com',
+            'address'       => 'Phnom Penh Special Economic Zone, Cambodia',
             'status'        => 'ACTIVE',
         ]);
 
         // 6. Customers
-        $customer = Customer::create([
-            'customer_name' => 'Jane Smith',
+        $customer = Customer::firstOrCreate(['email' => 'bopha@example.com'], [
+            'customer_name' => 'Bopha Chea',
             'gender'        => 'Female',
-            'phone'         => '+1555987654',
-            'email'         => 'janesmith@example.com',
-            'address'       => '456 Retail Boulevard, Suite 12',
+            'phone'         => '+85598765432',
+            'address'       => 'Street 271, Phnom Penh',
         ]);
 
-        // 7. Products & Variants
-        $prodTshirt = Product::create([
-            'category_id'  => $catShirts->category_id,
-            'product_name' => 'Premium Cotton T-Shirt',
-            'brand'        => 'Urban Style',
-            'description'  => '100% Organic Cotton Crew Neck T-Shirt',
-            'status'       => 'ACTIVE',
-        ]);
+        // 7. Products & Real SKUs
+        $productsData = [
+            [
+                'name' => 'Cambodian Silk Short-Sleeve Shirt',
+                'cat'  => $catTops->category_id,
+                'brand'=> 'Angkor Fashion',
+                'desc' => 'Traditional woven Cambodian natural silk short-sleeve shirt.',
+                'sku'  => 'SILK-SHIRT-NVY-M',
+                'code' => '8851000100011',
+                'cost' => 18.00,
+                'price'=> 35.00,
+                'qty'  => 45,
+            ],
+            [
+                'name' => 'Classic Organic Cotton Polo Shirt',
+                'cat'  => $catTops->category_id,
+                'brand'=> 'SS Apparel',
+                'desc' => '100% Breathable Organic Cotton Polo Shirt with embroidered logo.',
+                'sku'  => 'POLO-COTTON-BLK-L',
+                'code' => '8851000100022',
+                'cost' => 8.50,
+                'price'=> 18.50,
+                'qty'  => 120,
+            ],
+            [
+                'name' => 'Slim Fit Stretch Denim Jeans',
+                'cat'  => $catPants->category_id,
+                'brand'=> 'Denim Co.',
+                'desc' => 'Premium 12oz stretch cotton denim jeans.',
+                'sku'  => 'JEANS-DENIM-GRY-32',
+                'code' => '8851000100033',
+                'cost' => 20.00,
+                'price'=> 42.00,
+                'qty'  => 65,
+            ],
+            [
+                'name' => 'Linen Summer Sundress',
+                'cat'  => $catDresses->category_id,
+                'brand'=> 'Breeze Wear',
+                'desc' => 'Lightweight breathable linen floral print summer dress.',
+                'sku'  => 'DRESS-LINEN-WHT-S',
+                'code' => '8851000100044',
+                'cost' => 17.50,
+                'price'=> 38.00,
+                'qty'  => 28,
+            ],
+            [
+                'name' => 'Heavyweight Fleece Pullover Hoodie',
+                'cat'  => $catOuterwear->category_id,
+                'brand'=> 'Urban Streetwear',
+                'desc' => '350gsm brushed fleece pullover hoodie with kangaroo pocket.',
+                'sku'  => 'HOODIE-FLEECE-BLK-XL',
+                'code' => '8851000100055',
+                'cost' => 22.00,
+                'price'=> 45.00,
+                'qty'  => 85,
+            ]
+        ];
 
-        $var1 = ProductVariant::create([
-            'product_id'    => $prodTshirt->product_id,
-            'size_id'       => $sizeM->size_id,
-            'color_id'      => $colorBlack->color_id,
-            'sku'           => 'TSHIRT-BLK-M',
-            'barcode'       => '8850001001001',
-            'cost_price'    => 10.00,
-            'sale_price'    => 25.00,
-            'quantity'      => 50,
-            'reorder_level' => 10,
-        ]);
+        foreach ($productsData as $p) {
+            $product = Product::firstOrCreate(['product_name' => $p['name']], [
+                'category_id'  => $p['cat'],
+                'brand'        => $p['brand'],
+                'description'  => $p['desc'],
+                'status'       => 'ACTIVE',
+            ]);
 
-        $var2 = ProductVariant::create([
-            'product_id'    => $prodTshirt->product_id,
-            'size_id'       => $sizeL->size_id,
-            'color_id'      => $colorWhite->color_id,
-            'sku'           => 'TSHIRT-WHT-L',
-            'barcode'       => '8850001001002',
-            'cost_price'    => 10.00,
-            'sale_price'    => 25.00,
-            'quantity'      => 30,
-            'reorder_level' => 10,
-        ]);
-
-        // 8. Sample Purchase Receiving
-        $purchase = PurchaseHeader::create([
-            'supplier_id'   => $supplier->supplier_id,
-            'employee_id'   => $manager->employee_id,
-            'purchase_date' => now(),
-            'total_amount'  => 800.00,
-            'status'        => 'COMPLETED',
-        ]);
-
-        PurchaseDetail::create([
-            'purchase_id' => $purchase->purchase_id,
-            'variant_id'  => $var1->variant_id,
-            'quantity'    => 50,
-            'cost_price'  => 10.00,
-            'sub_total'   => 500.00,
-        ]);
-
-        PurchaseDetail::create([
-            'purchase_id' => $purchase->purchase_id,
-            'variant_id'  => $var2->variant_id,
-            'quantity'    => 30,
-            'cost_price'  => 10.00,
-            'sub_total'   => 300.00,
-        ]);
-
-        StockMovement::create([
-            'variant_id'     => $var1->variant_id,
-            'movement_type'  => 'PURCHASE',
-            'quantity'       => 50,
-            'movement_date'  => now(),
-            'reference_type' => 'PurchaseHeader',
-            'reference_id'   => $purchase->purchase_id,
-            'note'           => 'Initial Purchase Receiving',
-            'employee_id'    => $manager->employee_id,
-        ]);
-
-        // 9. Sample POS Sale
-        $sale = SaleHeader::create([
-            'customer_id'  => $customer->customer_id,
-            'employee_id'  => $cashier->employee_id,
-            'sale_date'    => now(),
-            'total_amount' => 50.00,
-            'discount'     => 5.00,
-            'grand_total'  => 45.00,
-            'status'       => 'COMPLETED',
-        ]);
-
-        SaleDetail::create([
-            'sale_id'    => $sale->sale_id,
-            'variant_id' => $var1->variant_id,
-            'quantity'   => 2,
-            'unit_price' => 25.00,
-            'discount'   => 5.00,
-            'sub_total'  => 45.00,
-        ]);
-
-        Payment::create([
-            'sale_id'          => $sale->sale_id,
-            'payment_date'     => now(),
-            'amount'           => 45.00,
-            'payment_method'   => 'CASH',
-            'payment_status'   => 'PAID',
-            'reference_number' => 'POS-1-SEED',
-        ]);
-
-        StockMovement::create([
-            'variant_id'     => $var1->variant_id,
-            'movement_type'  => 'SALE',
-            'quantity'       => -2,
-            'movement_date'  => now(),
-            'reference_type' => 'SaleHeader',
-            'reference_id'   => $sale->sale_id,
-            'note'           => 'Initial Seed POS Sale #1',
-            'employee_id'    => $cashier->employee_id,
-        ]);
+            ProductVariant::firstOrCreate(['sku' => $p['sku']], [
+                'product_id'    => $product->product_id,
+                'size_id'       => $sizeM->size_id,
+                'color_id'      => $colorNavy->color_id,
+                'barcode'       => $p['code'],
+                'cost_price'    => $p['cost'],
+                'sale_price'    => $p['price'],
+                'quantity'      => $p['qty'],
+                'reorder_level' => 10,
+            ]);
+        }
     }
 }
