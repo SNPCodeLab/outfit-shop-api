@@ -8,7 +8,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://127.0.0.1:8000/api",
+			"value": "https://api.kesararamwithdigital.tech/api",
 			"type": "string"
 		},
 		{
