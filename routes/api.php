@@ -23,11 +23,45 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Public Authentication Endpoints (Unprotected)
+// --------------------------------------------------------------------------
+// 1. PUBLIC API ROUTES (Unprotected for easy product testing)
+// --------------------------------------------------------------------------
+
+// Authentication
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected API Routes (Sanctum Auth + Rate Limiting 60 req/min)
+// Public Read-Only Product Catalog & Status
+Route::prefix('v1')->group(function () {
+    Route::get('/status', [StatusController::class, 'index']);
+
+    // Public Categories Read
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+
+    // Public Clothing Sizes Read
+    Route::get('/clothing-sizes', [ClothingSizeController::class, 'index']);
+    Route::get('/clothing-sizes/{id}', [ClothingSizeController::class, 'show']);
+
+    // Public Colors Read
+    Route::get('/colors', [ColorController::class, 'index']);
+    Route::get('/colors/{id}', [ColorController::class, 'show']);
+
+    // Public Products Read
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+
+    // Public Product Variants Read & Stock Lookup
+    Route::get('/variants', [ProductVariantController::class, 'index']);
+    Route::get('/variants/low-stock', [ProductVariantController::class, 'lowStock']);
+    Route::get('/variants/barcode/{barcode}', [ProductVariantController::class, 'lookupBarcode']);
+    Route::get('/variants/{id}', [ProductVariantController::class, 'show']);
+});
+
+
+// --------------------------------------------------------------------------
+// 2. PROTECTED API ROUTES (Sanctum Auth Required + Rate Limiting 60 req/min)
+// --------------------------------------------------------------------------
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     // Auth Session Management
@@ -39,35 +73,11 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     });
 
-    // ----------------------------------------------------------------------
-    // SS-MIS V1 API Resource Routes
-    // ----------------------------------------------------------------------
     Route::prefix('v1')->group(function () {
-
-        // Status
-        Route::get('/status', [StatusController::class, 'index']);
 
         // Auth Aliases
         Route::get('/auth/me', [AuthController::class, 'user']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
-
-        // Catalog Lookups
-        Route::get('/categories', [CategoryController::class, 'index']);
-        Route::get('/categories/{id}', [CategoryController::class, 'show']);
-
-        Route::get('/clothing-sizes', [ClothingSizeController::class, 'index']);
-        Route::get('/clothing-sizes/{id}', [ClothingSizeController::class, 'show']);
-
-        Route::get('/colors', [ColorController::class, 'index']);
-        Route::get('/colors/{id}', [ColorController::class, 'show']);
-
-        Route::get('/products', [ProductController::class, 'index']);
-        Route::get('/products/{id}', [ProductController::class, 'show']);
-
-        Route::get('/variants', [ProductVariantController::class, 'index']);
-        Route::get('/variants/low-stock', [ProductVariantController::class, 'lowStock']);
-        Route::get('/variants/barcode/{barcode}', [ProductVariantController::class, 'lookupBarcode']);
-        Route::get('/variants/{id}', [ProductVariantController::class, 'show']);
 
         // Customer Management
         Route::get('/customers', [CustomerController::class, 'index']);
