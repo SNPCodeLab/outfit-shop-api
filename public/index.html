@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS-MIS REST API — មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ & ឯកសារបច្ចេកទេស (Neobrutal Portal)</title>
+    <title>SS-MIS REST API - មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ & ឯកសារបច្ចេកទេស</title>
     
     <!-- Google Fonts: Google Sans & Kantumruuy Pro (Khmer) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
             margin: 0 auto;
         }
 
-        /* Top Banner Header */
+        /* Top Header Banner */
         .header-banner {
             background-color: var(--bg-card);
             border: 3.5px solid var(--border-color);
@@ -49,7 +49,6 @@
             padding: 2.5rem;
             box-shadow: var(--shadow-card);
             margin-bottom: 2rem;
-            position: relative;
         }
 
         .badge-group {
@@ -67,16 +66,13 @@
             font-size: 0.85rem;
             font-weight: 700;
             box-shadow: 2px 2px 0px #000000;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .neo-tag-lime { background-color: var(--bg-lime); }
         .neo-tag-pink { background-color: var(--bg-pink); }
 
         h1.main-title {
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             font-weight: 800;
             margin-bottom: 0.75rem;
             letter-spacing: -0.01em;
@@ -84,25 +80,23 @@
         }
 
         p.sub-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 500;
             color: #222222;
             margin-bottom: 1.75rem;
             max-width: 850px;
         }
 
-        /* Action Buttons */
+        /* Single Action Button */
         .btn-row {
             display: flex;
             gap: 1rem;
-            flex-wrap: wrap;
         }
 
         .neo-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             padding: 0.85rem 1.75rem;
             border: 3px solid var(--border-color);
             border-radius: 12px;
@@ -113,11 +107,8 @@
             cursor: pointer;
             box-shadow: var(--shadow-btn);
             transition: all 0.15s ease;
+            background-color: var(--bg-pink);
         }
-
-        .neo-btn-pink { background-color: var(--bg-pink); }
-        .neo-btn-cyan { background-color: var(--bg-cyan); }
-        .neo-btn-lime { background-color: var(--bg-lime); }
 
         .neo-btn:hover {
             transform: translate(-2px, -2px);
@@ -164,7 +155,6 @@
         .section-header {
             display: flex;
             align-items: center;
-            gap: 12px;
             margin-bottom: 1.5rem;
             background: #ffffff;
             border: 3px solid #000;
@@ -181,7 +171,7 @@
 
         /* Endpoints Group Box */
         .group-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 800;
             margin: 1.75rem 0 1rem 0;
             padding: 8px 16px;
@@ -322,28 +312,22 @@
         <!-- Header Banner -->
         <header class="header-banner">
             <div class="badge-group">
-                <span class="neo-tag neo-tag-lime">🐘 Neon Serverless PostgreSQL Database</span>
-                <span class="neo-tag neo-tag-pink">🔒 Laravel Sanctum Auth (50+ Endpoints)</span>
-                <span class="neo-tag">⚡ Production Base: /api</span>
+                <span class="neo-tag neo-tag-lime">Neon Serverless PostgreSQL Database</span>
+                <span class="neo-tag neo-tag-pink">Laravel Sanctum Auth</span>
+                <span class="neo-tag">Production Base: /api</span>
             </div>
 
             <h1 class="main-title">
-                🚀 មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ SS-MIS Enterprise REST API Portal
+                មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ SS-MIS REST API Portal
             </h1>
             <p class="sub-title">
-                🇰🇭 **ប្រព័ន្ធគ្រប់គ្រងស្តុកហាង & ចំណុចលក់ (Store Stock & Point-of-Sale Information System)**  
-                បញ្ជី API Endpoints ពេញលេញ និងឯកសារបច្ចេកទេសសម្រាប់ភ្ជាប់ជាមួយ Frontend Web Clients (React/Vue/JavaScript) និង Postman testing។
+                ប្រព័ន្ធគ្រប់គ្រងស្តុកហាង & ចំណុចលក់ (Store Stock & Point-of-Sale Information System)  
+                ឯកសារបច្ចេកទេស និង API Endpoints សម្រាប់ភ្ជាប់ជាមួយ Frontend Web Clients និង Postman Integration។
             </p>
 
             <div class="btn-row">
-                <a href="/SS_MIS.postman_collection.json" download class="neo-btn neo-btn-pink">
-                    ⚡ ទាញយក Postman Collection ពេញលេញ (.json)
-                </a>
-                <a href="https://github.com/shiliaiwei/SS-MIS" target="_blank" class="neo-btn neo-btn-cyan">
-                    📦 GitHub Repository
-                </a>
-                <a href="https://api.kesararamwithdigital.tech/api/v1/status" target="_blank" class="neo-btn neo-btn-lime">
-                    🟢 ពិនិត្យ API Status Live
+                <a href="/SS_MIS.postman_collection.json" download class="neo-btn">
+                    ទាញយក Postman Collection (.json)
                 </a>
             </div>
         </header>
@@ -370,17 +354,17 @@
 
         <!-- Section: Core API Endpoints -->
         <div class="section-header">
-            <h2>📡 បញ្ជី Core REST API Endpoints ទាំងអស់ (Full API Reference)</h2>
+            <h2>បញ្ជី Core REST API Endpoints ទាំងអស់ (Full API Reference)</h2>
         </div>
 
         <!-- Group 1: Auth -->
-        <div class="group-title">🔑 1. Authentication & Session Management</div>
+        <div class="group-title">1. Authentication & Session Management</div>
         <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/register</span>
-                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin Account (Register User)</span>
+                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin (Register User / Admin)</span>
                 </div>
                 <span class="auth-pill">Public</span>
             </div>
@@ -411,20 +395,20 @@
         </div>
 
         <!-- Group 2: Admin Traffic Stats -->
-        <div class="group-title">📊 2. Admin Traffic Monitoring & Analytics</div>
+        <div class="group-title">2. Admin Traffic Monitoring & Analytics</div>
         <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/dashboard/stats</span>
-                    <span class="desc-text">មើលស្ថិតិចរាចរណ៍ API, គណនីលុកចូល, & 20 Recent Logs (Admin Dashboard Stats)</span>
+                    <span class="desc-text">មើលស្ថិតិចរាចរណ៍ API & Recent Logs (Admin Dashboard Stats)</span>
                 </div>
                 <span class="auth-pill">Admin Only</span>
             </div>
         </div>
 
         <!-- Group 3: Catalog & Products -->
-        <div class="group-title">📦 3. Product Catalog, Sizes, Colors & Variants</div>
+        <div class="group-title">3. Product Catalog, Sizes, Colors & Variants</div>
         <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
@@ -469,7 +453,7 @@
         </div>
 
         <!-- Group 4: POS Sales & Receipts -->
-        <div class="group-title">🛒 4. POS Sales Checkout & Invoices</div>
+        <div class="group-title">4. POS Sales Checkout & Invoices</div>
         <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
@@ -498,7 +482,7 @@
         </div>
 
         <!-- Group 5: Customers, Suppliers & Purchasing -->
-        <div class="group-title">👥 5. Customers, Suppliers & Purchase Orders</div>
+        <div class="group-title">5. Customers, Suppliers & Purchase Orders</div>
         <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
@@ -536,14 +520,14 @@
 
         <!-- Code Helper -->
         <div class="section-header">
-            <h2>💻 កូដសម្រាប់ភ្ជាប់ជាមួយ Frontend JavaScript Client (Integration Helper)</h2>
+            <h2>កូដសម្រាប់ភ្ជាប់ជាមួយ Frontend JavaScript Client (Integration Helper)</h2>
         </div>
 
         <div class="code-container">
             <div class="code-header-bar">
-                <span class="code-title">JS Fetch Client Helper — apiRequest()</span>
-                <button class="neo-btn neo-btn-cyan" style="padding: 4px 12px; font-size: 0.82rem;" onclick="copyCode()">
-                    📋 ចម្លងកូដ (Copy Code)
+                <span class="code-title">JS Fetch Client Helper - apiRequest()</span>
+                <button class="neo-btn" style="background-color: var(--bg-cyan); padding: 4px 12px; font-size: 0.82rem;" onclick="copyCode()">
+                    ចម្លងកូដ (Copy Code)
                 </button>
             </div>
             <pre><span class="code-keyword">const</span> API_BASE_URL = <span class="code-string">'https://api.kesararamwithdigital.tech/api'</span>;
@@ -573,7 +557,7 @@
 
         <!-- Footer -->
         <footer>
-            SS-MIS Enterprise REST API &copy; 2026 — ភ្ជាប់ទិន្នន័យជាមួយ Neon Serverless PostgreSQL &amp; Laravel Sanctum
+            SS-MIS REST API &copy; 2026 - Neon Serverless PostgreSQL &amp; Laravel Sanctum
         </footer>
 
     </div>
