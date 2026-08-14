@@ -11,17 +11,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Kantumruuy+Pro:ital,wght@0,100..700;1,100..700&family=Fira+Code:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Strict 3 Primary Colors Palette: 1. Yellow (#FFDE59), 2. Cyan (#00F0FF), 3. White (#FFFFFF) / Black (#000000) */
         :root {
-            --bg-yellow: #ffde59;
-            --bg-cyan: #00f0ff;
-            --bg-pink: #ff66c4;
-            --bg-lime: #7ed957;
-            --bg-card: #ffffff;
-            --bg-dark: #121212;
-            --border-color: #000000;
+            --color-yellow: #ffde59;
+            --color-cyan: #00f0ff;
+            --color-white: #ffffff;
+            --color-black: #000000;
             --font-family: 'Kantumruuy Pro', 'Google Sans', system-ui, sans-serif;
             --font-code: 'Fira Code', monospace;
-            --shadow-hard: 5px 5px 0px #000000;
             --shadow-btn: 4px 4px 0px #000000;
             --shadow-card: 6px 6px 0px #000000;
         }
@@ -29,8 +26,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
 
         body {
-            background-color: var(--bg-yellow);
-            color: #000000;
+            background-color: var(--color-yellow);
+            color: var(--color-black);
             min-height: 100vh;
             padding: 2.5rem 1rem;
             line-height: 1.5;
@@ -43,8 +40,8 @@
 
         /* Top Header Banner */
         .header-banner {
-            background-color: var(--bg-card);
-            border: 3.5px solid var(--border-color);
+            background-color: var(--color-white);
+            border: 3.5px solid var(--color-black);
             border-radius: 16px;
             padding: 2.5rem;
             box-shadow: var(--shadow-card);
@@ -59,8 +56,8 @@
         }
 
         .neo-tag {
-            background-color: var(--bg-cyan);
-            border: 2.5px solid var(--border-color);
+            background-color: var(--color-cyan);
+            border: 2.5px solid var(--color-black);
             padding: 6px 14px;
             border-radius: 8px;
             font-size: 0.85rem;
@@ -68,8 +65,7 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
-        .neo-tag-lime { background-color: var(--bg-lime); }
-        .neo-tag-pink { background-color: var(--bg-pink); }
+        .neo-tag-yellow { background-color: var(--color-yellow); }
 
         h1.main-title {
             font-size: 2.2rem;
@@ -98,16 +94,16 @@
             align-items: center;
             justify-content: center;
             padding: 0.85rem 1.75rem;
-            border: 3px solid var(--border-color);
+            border: 3px solid var(--color-black);
             border-radius: 12px;
             font-weight: 700;
             font-size: 1rem;
             text-decoration: none;
-            color: #000000;
+            color: var(--color-black);
             cursor: pointer;
             box-shadow: var(--shadow-btn);
             transition: all 0.15s ease;
-            background-color: var(--bg-pink);
+            background-color: var(--color-cyan);
         }
 
         .neo-btn:hover {
@@ -129,8 +125,8 @@
         }
 
         .spec-box {
-            background-color: var(--bg-card);
-            border: 3px solid var(--border-color);
+            background-color: var(--color-white);
+            border: 3px solid var(--color-black);
             border-radius: 14px;
             padding: 1.25rem;
             box-shadow: var(--shadow-card);
@@ -156,8 +152,8 @@
             display: flex;
             align-items: center;
             margin-bottom: 1.5rem;
-            background: #ffffff;
-            border: 3px solid #000;
+            background: var(--color-white);
+            border: 3px solid var(--color-black);
             padding: 12px 20px;
             border-radius: 12px;
             box-shadow: var(--shadow-btn);
@@ -175,8 +171,8 @@
             font-weight: 800;
             margin: 1.75rem 0 1rem 0;
             padding: 8px 16px;
-            background-color: var(--bg-cyan);
-            border: 2.5px solid #000;
+            background-color: var(--color-cyan);
+            border: 2.5px solid var(--color-black);
             border-radius: 8px;
             display: inline-block;
             box-shadow: 3px 3px 0px #000;
@@ -190,8 +186,8 @@
         }
 
         .endpoint-card {
-            background-color: var(--bg-card);
-            border: 3px solid var(--border-color);
+            background-color: var(--color-white);
+            border: 3px solid var(--color-black);
             border-radius: 14px;
             padding: 1.15rem 1.5rem;
             box-shadow: var(--shadow-card);
@@ -213,17 +209,18 @@
             font-weight: 800;
             font-size: 0.85rem;
             padding: 6px 12px;
-            border: 2.5px solid var(--border-color);
+            border: 2.5px solid var(--color-black);
             border-radius: 8px;
             box-shadow: 2px 2px 0px #000000;
             min-width: 75px;
             text-align: center;
+            background-color: var(--color-cyan);
         }
 
-        .method-post { background-color: var(--bg-lime); }
-        .method-get { background-color: var(--bg-cyan); }
-        .method-put { background-color: var(--bg-yellow); }
-        .method-delete { background-color: var(--bg-pink); }
+        .method-post { background-color: var(--color-cyan); }
+        .method-get { background-color: var(--color-yellow); }
+        .method-put { background-color: var(--color-cyan); }
+        .method-delete { background-color: var(--color-yellow); }
 
         .endpoint-info {
             display: flex;
@@ -237,7 +234,7 @@
             font-family: var(--font-code);
             font-size: 0.95rem;
             font-weight: 700;
-            color: #000000;
+            color: var(--color-black);
         }
 
         .desc-text {
@@ -249,8 +246,8 @@
         .auth-pill {
             font-size: 0.8rem;
             font-weight: 700;
-            background-color: #f0f0f0;
-            border: 2px solid #000;
+            background-color: var(--color-yellow);
+            border: 2px solid var(--color-black);
             padding: 4px 10px;
             border-radius: 6px;
             box-shadow: 2px 2px 0px #000;
@@ -258,13 +255,13 @@
 
         /* Code Block Container */
         .code-container {
-            background-color: var(--bg-dark);
-            border: 3.5px solid var(--border-color);
+            background-color: var(--color-white);
+            border: 3.5px solid var(--color-black);
             border-radius: 16px;
             padding: 1.75rem;
             box-shadow: var(--shadow-card);
             margin-bottom: 3rem;
-            color: #ffffff;
+            color: var(--color-black);
         }
 
         .code-header-bar {
@@ -273,14 +270,14 @@
             align-items: center;
             margin-bottom: 1.25rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid #333333;
+            border-bottom: 2.5px solid var(--color-black);
         }
 
         .code-title {
             font-family: var(--font-code);
             font-weight: 700;
             font-size: 0.95rem;
-            color: var(--bg-cyan);
+            color: var(--color-black);
         }
 
         pre {
@@ -288,19 +285,23 @@
             font-size: 0.9rem;
             line-height: 1.6;
             overflow-x: auto;
-            color: #e2e8f0;
+            color: var(--color-black);
+            background-color: #f5f5f5;
+            padding: 1.25rem;
+            border: 2px solid var(--color-black);
+            border-radius: 8px;
         }
 
-        .code-keyword { color: var(--bg-pink); font-weight: 700; }
-        .code-string { color: var(--bg-cyan); }
-        .code-comment { color: #64748b; font-style: italic; }
+        .code-keyword { color: #d32f2f; font-weight: 700; }
+        .code-string { color: #0288d1; }
+        .code-comment { color: #616161; font-style: italic; }
 
         footer {
             text-align: center;
             font-size: 0.95rem;
             font-weight: 700;
             padding: 2rem 0;
-            border-top: 3px solid #000000;
+            border-top: 3px solid var(--color-black);
             margin-top: 2rem;
         }
     </style>
@@ -312,8 +313,8 @@
         <!-- Header Banner -->
         <header class="header-banner">
             <div class="badge-group">
-                <span class="neo-tag neo-tag-lime">Neon Serverless PostgreSQL Database</span>
-                <span class="neo-tag neo-tag-pink">Laravel Sanctum Auth</span>
+                <span class="neo-tag">Neon Serverless PostgreSQL Database</span>
+                <span class="neo-tag neo-tag-yellow">Laravel Sanctum Auth</span>
                 <span class="neo-tag">Production Base: /api</span>
             </div>
 
@@ -526,7 +527,7 @@
         <div class="code-container">
             <div class="code-header-bar">
                 <span class="code-title">JS Fetch Client Helper - apiRequest()</span>
-                <button class="neo-btn" style="background-color: var(--bg-cyan); padding: 4px 12px; font-size: 0.82rem;" onclick="copyCode()">
+                <button class="neo-btn" style="padding: 4px 12px; font-size: 0.82rem;" onclick="copyCode()">
                     ចម្លងកូដ (Copy Code)
                 </button>
             </div>
