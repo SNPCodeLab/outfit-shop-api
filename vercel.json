@@ -1,7 +1,8 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "public/build",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/(.*)",
