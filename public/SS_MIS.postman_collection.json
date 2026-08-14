@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "ss-mis-api-collection-v1",
-		"name": "SS-MIS REST API Collection",
-		"description": "Postman Collection for SS-MIS (Store Stock & Point-of-Sale Information System) Backend REST API.",
+		"_postman_id": "ss-mis-full-api-collection-v1",
+		"name": "SS-MIS Enterprise REST API Collection",
+		"description": "Complete Postman Collection for SS-MIS (Store Stock & Point-of-Sale Information System) containing all 50+ RESTful API endpoints.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -19,7 +19,7 @@
 	],
 	"item": [
 		{
-			"name": "1. Authentication",
+			"name": "1. Authentication & Session",
 			"item": [
 				{
 					"name": "Register User / Admin",
@@ -33,11 +33,7 @@
 							"mode": "raw",
 							"raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"is_admin\": true\n}"
 						},
-						"url": {
-							"raw": "{{base_url}}/register",
-							"host": ["{{base_url}}"],
-							"path": ["register"]
-						}
+						"url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] }
 					},
 					"event": [
 						{
@@ -48,7 +44,7 @@
 									"    var jsonData = pm.response.json();",
 									"    if (jsonData.access_token) {",
 									"        pm.collectionVariables.set('token', jsonData.access_token);",
-									"        console.log('Token auto-saved to {{token}}');",
+									"        console.log('Sanctum Token auto-saved');",
 									"    }",
 									"}"
 								],
@@ -69,11 +65,7 @@
 							"mode": "raw",
 							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
 						},
-						"url": {
-							"raw": "{{base_url}}/login",
-							"host": ["{{base_url}}"],
-							"path": ["login"]
-						}
+						"url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
 					},
 					"event": [
 						{
@@ -84,7 +76,7 @@
 									"    var jsonData = pm.response.json();",
 									"    if (jsonData.access_token) {",
 									"        pm.collectionVariables.set('token', jsonData.access_token);",
-									"        console.log('Token auto-saved to {{token}}');",
+									"        console.log('Sanctum Token auto-saved');",
 									"    }",
 									"}"
 								],
@@ -94,18 +86,25 @@
 					]
 				},
 				{
-					"name": "Get Authenticated User Profile",
+					"name": "Get Authenticated Profile (/api/user)",
 					"request": {
 						"method": "GET",
 						"header": [
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/user",
-							"host": ["{{base_url}}"],
-							"path": ["user"]
-						}
+						"url": { "raw": "{{base_url}}/user", "host": ["{{base_url}}"], "path": ["user"] }
+					}
+				},
+				{
+					"name": "Get Auth Me (/api/v1/auth/me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/auth/me", "host": ["{{base_url}}"], "path": ["v1", "auth", "me"] }
 					}
 				},
 				{
@@ -116,17 +115,13 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/logout",
-							"host": ["{{base_url}}"],
-							"path": ["logout"]
-						}
+						"url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
 					}
 				}
 			]
 		},
 		{
-			"name": "2. Traffic Monitoring & Admin Dashboard",
+			"name": "2. Admin Dashboard & Traffic Analytics",
 			"item": [
 				{
 					"name": "Get Admin Traffic Stats",
@@ -136,33 +131,30 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/dashboard/stats",
-							"host": ["{{base_url}}"],
-							"path": ["dashboard", "stats"]
-						}
+						"url": { "raw": "{{base_url}}/dashboard/stats", "host": ["{{base_url}}"], "path": ["dashboard", "stats"] }
 					}
 				}
 			]
 		},
 		{
-			"name": "3. POS & Inventory (V1)",
+			"name": "3. System Status",
 			"item": [
 				{
-					"name": "API Status Check",
+					"name": "API Status Health Check",
 					"request": {
 						"method": "GET",
 						"header": [
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/status",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "status"]
-						}
+						"url": { "raw": "{{base_url}}/v1/status", "host": ["{{base_url}}"], "path": ["v1", "status"] }
 					}
-				},
+				}
+			]
+		},
+		{
+			"name": "4. Categories Management",
+			"item": [
 				{
 					"name": "List Categories",
 					"request": {
@@ -171,13 +163,132 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/categories",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "categories"]
-						}
+						"url": { "raw": "{{base_url}}/v1/categories", "host": ["{{base_url}}"], "path": ["v1", "categories"] }
 					}
 				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"category_name\": \"Casual Polo Shirts\",\n  \"slug\": \"casual-polo-shirts\",\n  \"description\": \"Men and Women Polo T-Shirts\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/categories", "host": ["{{base_url}}"], "path": ["v1", "categories"] }
+					}
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/categories/1", "host": ["{{base_url}}"], "path": ["v1", "categories", "1"] }
+					}
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"category_name\": \"Premium Polo Shirts\",\n  \"description\": \"Updated description\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/categories/1", "host": ["{{base_url}}"], "path": ["v1", "categories", "1"] }
+					}
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/categories/1", "host": ["{{base_url}}"], "path": ["v1", "categories", "1"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Clothing Sizes Management",
+			"item": [
+				{
+					"name": "List Clothing Sizes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/clothing-sizes", "host": ["{{base_url}}"], "path": ["v1", "clothing-sizes"] }
+					}
+				},
+				{
+					"name": "Create Size",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"size_code\": \"L\",\n  \"size_name\": \"Large Size\",\n  \"description\": \"Standard Adult Large\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/clothing-sizes", "host": ["{{base_url}}"], "path": ["v1", "clothing-sizes"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Colors Management",
+			"item": [
+				{
+					"name": "List Colors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/colors", "host": ["{{base_url}}"], "path": ["v1", "colors"] }
+					}
+				},
+				{
+					"name": "Create Color",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"color_code\": \"RED\",\n  \"color_name\": \"Crimson Red\",\n  \"hex_code\": \"#FF0000\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/colors", "host": ["{{base_url}}"], "path": ["v1", "colors"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Products Catalog Management",
+			"item": [
 				{
 					"name": "List Products",
 					"request": {
@@ -186,26 +297,66 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/products",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "products"]
-						}
+						"url": { "raw": "{{base_url}}/v1/products", "host": ["{{base_url}}"], "path": ["v1", "products"] }
 					}
 				},
 				{
-					"name": "List Product Variants & Stock",
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_name\": \"Classic Polo Shirt\",\n  \"category_id\": 1,\n  \"brand\": \"SS Apparel\",\n  \"description\": \"100% Breathable Cotton Polo\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/products", "host": ["{{base_url}}"], "path": ["v1", "products"] }
+					}
+				},
+				{
+					"name": "Get Product Details",
 					"request": {
 						"method": "GET",
 						"header": [
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/variants",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "variants"]
-						}
+						"url": { "raw": "{{base_url}}/v1/products/1", "host": ["{{base_url}}"], "path": ["v1", "products", "1"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Product Variants & Stock SKUs",
+			"item": [
+				{
+					"name": "List Variants & Stock",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/variants", "host": ["{{base_url}}"], "path": ["v1", "variants"] }
+					}
+				},
+				{
+					"name": "Create Product Variant SKU",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_id\": 1,\n  \"size_id\": 1,\n  \"color_id\": 1,\n  \"sku\": \"SKU-POLO-NAVY-M\",\n  \"barcode\": \"8850012345678\",\n  \"cost_price\": 8.50,\n  \"sale_price\": 15.00,\n  \"stock_quantity\": 100\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/variants", "host": ["{{base_url}}"], "path": ["v1", "variants"] }
 					}
 				},
 				{
@@ -216,13 +367,25 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/variants/low-stock",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "variants", "low-stock"]
-						}
+						"url": { "raw": "{{base_url}}/v1/variants/low-stock", "host": ["{{base_url}}"], "path": ["v1", "variants", "low-stock"] }
 					}
 				},
+				{
+					"name": "Barcode Scanner Lookup",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/variants/barcode/8850012345678", "host": ["{{base_url}}"], "path": ["v1", "variants", "barcode", "8850012345678"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Customers Management",
+			"item": [
 				{
 					"name": "List Customers",
 					"request": {
@@ -231,13 +394,30 @@
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": {
-							"raw": "{{base_url}}/v1/customers",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "customers"]
-						}
+						"url": { "raw": "{{base_url}}/v1/customers", "host": ["{{base_url}}"], "path": ["v1", "customers"] }
 					}
 				},
+				{
+					"name": "Register Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_name\": \"Bopha Chea\",\n  \"phone\": \"+855 98 765 432\",\n  \"email\": \"bopha@example.com\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/customers", "host": ["{{base_url}}"], "path": ["v1", "customers"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "10. POS Sales & Receipts",
+			"item": [
 				{
 					"name": "POS Checkout Transaction",
 					"request": {
@@ -249,13 +429,170 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"unit_price\": 15.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"amount_tendered\": 30.00\n}"
+							"raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"unit_price\": 15.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"amount_tendered\": 30.00\n}"
 						},
-						"url": {
-							"raw": "{{base_url}}/v1/sales/checkout",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "sales", "checkout"]
-						}
+						"url": { "raw": "{{base_url}}/v1/sales/checkout", "host": ["{{base_url}}"], "path": ["v1", "sales", "checkout"] }
+					}
+				},
+				{
+					"name": "List Sales History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/sales", "host": ["{{base_url}}"], "path": ["v1", "sales"] }
+					}
+				},
+				{
+					"name": "Void Sale Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/sales/1/void", "host": ["{{base_url}}"], "path": ["v1", "sales", "1", "void"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "11. Suppliers Management",
+			"item": [
+				{
+					"name": "List Suppliers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/suppliers", "host": ["{{base_url}}"], "path": ["v1", "suppliers"] }
+					}
+				},
+				{
+					"name": "Create Supplier",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplier_name\": \"Khmer Garments Co., Ltd.\",\n  \"contact_name\": \"Sokha Heng\",\n  \"phone\": \"+855 12 345 678\",\n  \"email\": \"orders@khmergarments.com\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/suppliers", "host": ["{{base_url}}"], "path": ["v1", "suppliers"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "12. Purchase Orders & Inventory Stock",
+			"item": [
+				{
+					"name": "List Purchase Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/purchases", "host": ["{{base_url}}"], "path": ["v1", "purchases"] }
+					}
+				},
+				{
+					"name": "Create Purchase Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"supplier_id\": 1,\n  \"reference_no\": \"PO-2026-0001\",\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 100,\n      \"unit_cost\": 8.50\n    }\n  ]\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/purchases", "host": ["{{base_url}}"], "path": ["v1", "purchases"] }
+					}
+				},
+				{
+					"name": "List Stock Movement Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/stock-movements", "host": ["{{base_url}}"], "path": ["v1", "stock-movements"] }
+					}
+				},
+				{
+					"name": "Manual Stock Adjustment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"variant_id\": 1,\n  \"quantity\": 10,\n  \"movement_type\": \"STOCK_IN\",\n  \"reason\": \"Inventory Audit Correction\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/stock-movements/adjust", "host": ["{{base_url}}"], "path": ["v1", "stock-movements", "adjust"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "13. Employee Management (Admin Only)",
+			"item": [
+				{
+					"name": "List Employees",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/employees", "host": ["{{base_url}}"], "path": ["v1", "employees"] }
+					}
+				},
+				{
+					"name": "Create Employee Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employee_name\": \"Vannak Chan\",\n  \"username\": \"vannak_mgr\",\n  \"password\": \"Password123!\",\n  \"position\": \"Store Manager\",\n  \"role\": \"MANAGER\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/v1/employees", "host": ["{{base_url}}"], "path": ["v1", "employees"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "14. Audit Logs",
+			"item": [
+				{
+					"name": "List System Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": { "raw": "{{base_url}}/v1/audit-logs", "host": ["{{base_url}}"], "path": ["v1", "audit-logs"] }
 					}
 				}
 			]

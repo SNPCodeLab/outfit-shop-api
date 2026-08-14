@@ -37,7 +37,7 @@
         }
 
         .container {
-            max-width: 1080px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
@@ -50,7 +50,6 @@
             box-shadow: var(--shadow-card);
             margin-bottom: 2rem;
             position: relative;
-            overflow: hidden;
         }
 
         .badge-group {
@@ -89,7 +88,7 @@
             font-weight: 500;
             color: #222222;
             margin-bottom: 1.75rem;
-            max-width: 820px;
+            max-width: 850px;
         }
 
         /* Action Buttons */
@@ -119,7 +118,6 @@
         .neo-btn-pink { background-color: var(--bg-pink); }
         .neo-btn-cyan { background-color: var(--bg-cyan); }
         .neo-btn-lime { background-color: var(--bg-lime); }
-        .neo-btn-white { background-color: #ffffff; }
 
         .neo-btn:hover {
             transform: translate(-2px, -2px);
@@ -131,7 +129,7 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
-        /* Stats & Specs Grid */
+        /* Specs Grid */
         .spec-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -156,7 +154,7 @@
         }
 
         .spec-val {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             font-family: var(--font-code);
             word-break: break-all;
@@ -177,23 +175,35 @@
         }
 
         .section-header h2 {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 800;
         }
 
-        /* Endpoints Cards */
+        /* Endpoints Group Box */
+        .group-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 1.75rem 0 1rem 0;
+            padding: 8px 16px;
+            background-color: var(--bg-cyan);
+            border: 2.5px solid #000;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 3px 3px 0px #000;
+        }
+
         .endpoint-container {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
-            margin-bottom: 3rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .endpoint-card {
             background-color: var(--bg-card);
             border: 3px solid var(--border-color);
             border-radius: 14px;
-            padding: 1.25rem 1.5rem;
+            padding: 1.15rem 1.5rem;
             box-shadow: var(--shadow-card);
             display: flex;
             align-items: center;
@@ -211,8 +221,8 @@
         .method-badge {
             font-family: var(--font-code);
             font-weight: 800;
-            font-size: 0.9rem;
-            padding: 6px 14px;
+            font-size: 0.85rem;
+            padding: 6px 12px;
             border: 2.5px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 2px 2px 0px #000000;
@@ -235,15 +245,15 @@
 
         .url-text {
             font-family: var(--font-code);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: #000000;
         }
 
         .desc-text {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             color: #444444;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .auth-pill {
@@ -285,7 +295,7 @@
 
         pre {
             font-family: var(--font-code);
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             line-height: 1.6;
             overflow-x: auto;
             color: #e2e8f0;
@@ -309,25 +319,25 @@
 
     <div class="container">
         
-        <!-- Neobrutalist Header Banner -->
+        <!-- Header Banner -->
         <header class="header-banner">
             <div class="badge-group">
-                <span class="neo-tag neo-tag-lime">🐘 Neon Serverless PostgreSQL</span>
-                <span class="neo-tag neo-tag-pink">🔒 Laravel Sanctum Auth</span>
-                <span class="neo-tag">⚡ REST API v1 Live</span>
+                <span class="neo-tag neo-tag-lime">🐘 Neon Serverless PostgreSQL Database</span>
+                <span class="neo-tag neo-tag-pink">🔒 Laravel Sanctum Auth (50+ Endpoints)</span>
+                <span class="neo-tag">⚡ Production Base: /api</span>
             </div>
 
             <h1 class="main-title">
-                🚀 មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ SS-MIS REST API Portal
+                🚀 មជ្ឈមណ្ឌលអ្នកអភិវឌ្ឍន៍ SS-MIS Enterprise REST API Portal
             </h1>
             <p class="sub-title">
                 🇰🇭 **ប្រព័ន្ធគ្រប់គ្រងស្តុកហាង & ចំណុចលក់ (Store Stock & Point-of-Sale Information System)**  
-                ឯកសារបច្ចេកទេស & API Endpoints សម្រាប់ភ្ជាប់ជាមួយ Frontend Clients, Mobile Apps, និង Postman testing។
+                បញ្ជី API Endpoints ពេញលេញ និងឯកសារបច្ចេកទេសសម្រាប់ភ្ជាប់ជាមួយ Frontend Web Clients (React/Vue/JavaScript) និង Postman testing។
             </p>
 
             <div class="btn-row">
                 <a href="/SS_MIS.postman_collection.json" download class="neo-btn neo-btn-pink">
-                    ⚡ ទាញយក Postman Collection (.json)
+                    ⚡ ទាញយក Postman Collection ពេញលេញ (.json)
                 </a>
                 <a href="https://github.com/shiliaiwei/SS-MIS" target="_blank" class="neo-btn neo-btn-cyan">
                     📦 GitHub Repository
@@ -341,7 +351,7 @@
         <!-- Specifications Grid -->
         <div class="spec-grid">
             <div class="spec-box">
-                <div class="spec-label">Database Connection (ម៉ាស៊ីនទិន្នន័យ)</div>
+                <div class="spec-label">Database Connection</div>
                 <div class="spec-val">Neon PostgreSQL (neondb)</div>
             </div>
             <div class="spec-box">
@@ -353,39 +363,35 @@
                 <div class="spec-val">Bearer Sanctum Token</div>
             </div>
             <div class="spec-box">
-                <div class="spec-label">Rate Limit (កម្រិតសំណើ)</div>
+                <div class="spec-label">Rate Limit</div>
                 <div class="spec-val">60 requests / min</div>
             </div>
         </div>
 
-        <!-- API Endpoints List Section -->
+        <!-- Section: Core API Endpoints -->
         <div class="section-header">
-            <h2>📡 បញ្ជី API Endpoints ដែលអាចប្រើប្រាស់បាន (Core REST API)</h2>
+            <h2>📡 បញ្ជី Core REST API Endpoints ទាំងអស់ (Full API Reference)</h2>
         </div>
 
+        <!-- Group 1: Auth -->
+        <div class="group-title">🔑 1. Authentication & Session Management</div>
         <div class="endpoint-container">
-
-            <!-- Register -->
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/register</span>
-                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin (Register User / Admin)</span>
+                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin Account (Register User)</span>
                 </div>
-                <span class="auth-pill">Public (សាធារណៈ)</span>
+                <span class="auth-pill">Public</span>
             </div>
-
-            <!-- Login -->
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/login</span>
                     <span class="desc-text">ចូលប្រើប្រាស់ប្រព័ន្ធ & ទទួលយក Sanctum Bearer Token (Login)</span>
                 </div>
-                <span class="auth-pill">Public (សាធារណៈ)</span>
+                <span class="auth-pill">Public</span>
             </div>
-
-            <!-- User Profile -->
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
@@ -394,8 +400,6 @@
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
             </div>
-
-            <!-- Logout -->
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
@@ -404,38 +408,69 @@
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
             </div>
+        </div>
 
-            <!-- Dashboard Stats -->
+        <!-- Group 2: Admin Traffic Stats -->
+        <div class="group-title">📊 2. Admin Traffic Monitoring & Analytics</div>
+        <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/dashboard/stats</span>
-                    <span class="desc-text">មើលស្ថិតិចរាចរណ៍ API & Logs សម្រាប់ Admin (Traffic Monitoring Stats)</span>
+                    <span class="desc-text">មើលស្ថិតិចរាចរណ៍ API, គណនីលុកចូល, & 20 Recent Logs (Admin Dashboard Stats)</span>
                 </div>
                 <span class="auth-pill">Admin Only</span>
             </div>
+        </div>
 
-            <!-- Categories -->
+        <!-- Group 3: Catalog & Products -->
+        <div class="group-title">📦 3. Product Catalog, Sizes, Colors & Variants</div>
+        <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/categories</span>
-                    <span class="desc-text">ទាញយករាយនាមប្រភេទផលិតផលទាំងអស់ (List Categories)</span>
+                    <span class="desc-text">ទាញយករាយនាមប្រភេទផលិតផល (List Categories)</span>
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
             </div>
-
-            <!-- Products -->
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
                     <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/products</span>
-                    <span class="desc-text">ទាញយករាយនាមផលិតផល & ស្តុក (List Products & Stock)</span>
+                    <span class="desc-text">ទាញយករាយនាមផលិតផលទាំងអស់ (List Products)</span>
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
             </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/variants</span>
+                    <span class="desc-text">ទាញយករាយនាមទំនិញតាមទំហំ/ពណ៌ & ស្តុក (Product Variants & SKUs)</span>
+                </div>
+                <span class="auth-pill">Sanctum Bearer</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/variants/low-stock</span>
+                    <span class="desc-text">ទាញយករាយនាមទំនិញដែលជិតអស់ពីស្តុក (Low Stock Alert Variants)</span>
+                </div>
+                <span class="auth-pill">Sanctum Bearer</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/variants/barcode/{barcode}</span>
+                    <span class="desc-text">ស្កែន Barcode ស្វែងរកទំនិញ (Barcode Scanner Lookup)</span>
+                </div>
+                <span class="auth-pill">Sanctum Bearer</span>
+            </div>
+        </div>
 
-            <!-- POS Checkout -->
+        <!-- Group 4: POS Sales & Receipts -->
+        <div class="group-title">🛒 4. POS Sales Checkout & Invoices</div>
+        <div class="endpoint-container">
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
@@ -444,10 +479,62 @@
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
             </div>
-
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/sales</span>
+                    <span class="desc-text">ទាញយករាយនាមវិក្កយបត្រលក់ទំនិញ (Sales History)</span>
+                </div>
+                <span class="auth-pill">Sanctum Bearer</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-post">POST</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/sales/{id}/void</span>
+                    <span class="desc-text">លុប/មោឃភាពវិក្កយបត្រលក់ (Void Sale Invoice)</span>
+                </div>
+                <span class="auth-pill">Admin / Manager</span>
+            </div>
         </div>
 
-        <!-- Code Integration Helper Section -->
+        <!-- Group 5: Customers, Suppliers & Purchasing -->
+        <div class="group-title">👥 5. Customers, Suppliers & Purchase Orders</div>
+        <div class="endpoint-container">
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/customers</span>
+                    <span class="desc-text">ទាញយករាយនាមអតិថិជន & ពិន្ទុសន្សំ (Customers & Loyalty Points)</span>
+                </div>
+                <span class="auth-pill">Sanctum Bearer</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/suppliers</span>
+                    <span class="desc-text">ទាញយករាយនាមក្រុមហ៊ុនផ្គត់ផ្គង់ (Suppliers List)</span>
+                </div>
+                <span class="auth-pill">Admin / Manager</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/purchases</span>
+                    <span class="desc-text">ទាញយករាយនាមបញ្ជាទិញទំនិញចូលស្តុក (Purchase Orders)</span>
+                </div>
+                <span class="auth-pill">Admin / Manager</span>
+            </div>
+            <div class="endpoint-card">
+                <span class="method-badge method-get">GET</span>
+                <div class="endpoint-info">
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/stock-movements</span>
+                    <span class="desc-text">មើលប្រវត្តិនៃការកែប្រែទិន្នន័យស្តុក (Stock Movements Audit)</span>
+                </div>
+                <span class="auth-pill">Admin / Manager</span>
+            </div>
+        </div>
+
+        <!-- Code Helper -->
         <div class="section-header">
             <h2>💻 កូដសម្រាប់ភ្ជាប់ជាមួយ Frontend JavaScript Client (Integration Helper)</h2>
         </div>
@@ -486,7 +573,7 @@
 
         <!-- Footer -->
         <footer>
-            SS-MIS REST API &copy; 2026 — ភ្ជាប់ទិន្នន័យជាមួយ Neon Serverless PostgreSQL &amp; Laravel Sanctum
+            SS-MIS Enterprise REST API &copy; 2026 — ភ្ជាប់ទិន្នន័យជាមួយ Neon Serverless PostgreSQL &amp; Laravel Sanctum
         </footer>
 
     </div>
