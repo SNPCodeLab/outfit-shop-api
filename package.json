@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && cp public/index.html public/build/index.html",
         "dev": "vite",
         "dataconnect:start": "firebase emulators:start --only dataconnect",
         "dataconnect:compile": "firebase dataconnect:sdk:generate",
