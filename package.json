@@ -9,7 +9,8 @@
         "dataconnect:compile": "firebase dataconnect:sdk:generate",
         "dataconnect:generate": "firebase dataconnect:sdk:generate",
         "seed": "node resources/js/seed-all-entities.js",
-        "tables": "node resources/js/check-all-tables.js"
+        "tables": "node resources/js/check-all-tables.js",
+        "test:api": "node resources/js/test-api-endpoints.js"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
