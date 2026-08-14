@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ss-mis",
+  "compatibility_date": "2026-08-14",
+  "pages_build_output_dir": "./dist",
+  "observability": {
+    "enabled": true
+  }
+}
