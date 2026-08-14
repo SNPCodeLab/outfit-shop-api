@@ -1,0 +1,282 @@
+# SS-MIS Data Connect GraphQL Queries for all 16 Entities
+
+query ListStores @auth(level: PUBLIC) {
+  stores {
+    id
+    storeName
+    code
+    taxId
+    phone
+    email
+    address
+    isActive
+  }
+}
+
+query ListCategories @auth(level: PUBLIC) {
+  categories {
+    id
+    categoryName
+    slug
+    description
+    isActive
+  }
+}
+
+query ListProducts @auth(level: PUBLIC) {
+  products {
+    id
+    productName
+    brand
+    description
+    status
+    category {
+      id
+      categoryName
+    }
+  }
+}
+
+query ListClothingSizes @auth(level: PUBLIC) {
+  clothingSizes {
+    id
+    sizeCode
+    sizeName
+    description
+  }
+}
+
+query ListColors @auth(level: PUBLIC) {
+  colors {
+    id
+    colorCode
+    colorName
+    hexCode
+  }
+}
+
+query GetProductVariants @auth(level: PUBLIC) {
+  productVariants {
+    id
+    sku
+    barcode
+    costPrice
+    salePrice
+    wholesalePrice
+    stockQuantity
+    reorderLevel
+    isActive
+    product {
+      id
+      productName
+      brand
+    }
+    size {
+      id
+      sizeCode
+      sizeName
+    }
+    color {
+      id
+      colorName
+      hexCode
+    }
+  }
+}
+
+query ListSuppliers @auth(level: PUBLIC) {
+  suppliers {
+    id
+    supplierName
+    contactName
+    phone
+    email
+    address
+    taxId
+    status
+  }
+}
+
+query ListEmployees @auth(level: PUBLIC) {
+  employees {
+    id
+    employeeName
+    gender
+    phone
+    email
+    position
+    username
+    status
+    store {
+      id
+      storeName
+    }
+  }
+}
+
+query ListCustomers @auth(level: PUBLIC) {
+  customers {
+    id
+    customerName
+    gender
+    phone
+    email
+    address
+    loyaltyPoints
+  }
+}
+
+query SearchCustomerByPhone($phone: String!) @auth(level: PUBLIC) {
+  customers(where: { phone: { eq: $phone } }) {
+    id
+    customerName
+    phone
+    email
+    loyaltyPoints
+  }
+}
+
+query ListPurchaseHeaders @auth(level: PUBLIC) {
+  purchaseHeaders {
+    id
+    referenceNo
+    purchaseDate
+    totalAmount
+    taxAmount
+    grandTotal
+    status
+    notes
+    supplier {
+      id
+      supplierName
+    }
+    employee {
+      id
+      employeeName
+    }
+    store {
+      id
+      storeName
+    }
+  }
+}
+
+query ListPurchaseDetails @auth(level: PUBLIC) {
+  purchaseDetails {
+    id
+    quantity
+    unitCost
+    subTotal
+    purchase {
+      id
+      referenceNo
+    }
+    variant {
+      id
+      sku
+    }
+  }
+}
+
+query GetRecentSales($limit: Int = 10) @auth(level: PUBLIC) {
+  saleHeaders(orderBy: [{ saleDate: DESC }], limit: $limit) {
+    id
+    invoiceNo
+    saleDate
+    subTotal
+    discountAmount
+    taxAmount
+    grandTotal
+    paymentStatus
+    status
+    notes
+    store {
+      id
+      storeName
+    }
+    customer {
+      id
+      customerName
+    }
+    employee {
+      id
+      employeeName
+    }
+  }
+}
+
+query ListSaleDetails @auth(level: PUBLIC) {
+  saleDetails {
+    id
+    quantity
+    unitPrice
+    discountAmount
+    subTotal
+    sale {
+      id
+      invoiceNo
+    }
+    variant {
+      id
+      sku
+    }
+  }
+}
+
+query ListPayments @auth(level: PUBLIC) {
+  payments {
+    id
+    paymentDate
+    amount
+    amountTendered
+    changeDue
+    paymentMethod
+    paymentStatus
+    transactionRef
+    sale {
+      id
+      invoiceNo
+    }
+  }
+}
+
+query ListStockMovements @auth(level: PUBLIC) {
+  stockMovements {
+    id
+    movementType
+    quantity
+    stockBefore
+    stockAfter
+    movementDate
+    referenceType
+    referenceId
+    note
+    store {
+      id
+      storeName
+    }
+    variant {
+      id
+      sku
+    }
+    createdBy {
+      id
+      employeeName
+    }
+  }
+}
+
+query ListAuditLogs @auth(level: PUBLIC) {
+  auditLogs {
+    id
+    userId
+    action
+    entityType
+    entityId
+    oldValues
+    newValues
+    ipAddress
+    userAgent
+    createdAt
+  }
+}

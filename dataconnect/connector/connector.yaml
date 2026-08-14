@@ -1,0 +1,5 @@
+connectorId: "ss-mis-connector"
+generate:
+  javascriptSdk:
+    outputDir: "../../resources/js/dataconnect"
+    package: "@ss-mis/dataconnect"

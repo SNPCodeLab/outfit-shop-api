@@ -4,16 +4,25 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "dataconnect:start": "firebase emulators:start --only dataconnect",
+        "dataconnect:compile": "firebase dataconnect:sdk:generate",
+        "dataconnect:generate": "firebase dataconnect:sdk:generate",
+        "seed": "node resources/js/seed-all-entities.js",
+        "tables": "node resources/js/check-all-tables.js"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "concurrently": "^10.0.3",
+        "firebase-tools": "^15.27.0",
         "laravel-vite-plugin": "^3.1",
         "tailwindcss": "^4.0.0",
         "vite": "^8.0.0"
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "firebase": "^12.17.1"
     }
 }

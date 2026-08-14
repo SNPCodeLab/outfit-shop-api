@@ -1,0 +1,200 @@
+# SS-MIS Enterprise Relational Database GraphQL Schema (Cloud SQL for PostgreSQL)
+
+type Store @table {
+  id: UUID! @default(expr: "uuidV4()")
+  storeName: String!
+  code: String! @unique
+  taxId: String
+  phone: String
+  email: String
+  address: String
+  isActive: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Category @table {
+  id: UUID! @default(expr: "uuidV4()")
+  categoryName: String! @unique
+  slug: String! @unique
+  description: String
+  isActive: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Product @table {
+  id: UUID! @default(expr: "uuidV4()")
+  category: Category!
+  productName: String!
+  brand: String
+  description: String
+  status: String! @default(value: "ACTIVE")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type ClothingSize @table {
+  id: UUID! @default(expr: "uuidV4()")
+  sizeCode: String! @unique
+  sizeName: String!
+  description: String
+}
+
+type Color @table {
+  id: UUID! @default(expr: "uuidV4()")
+  colorCode: String! @unique
+  colorName: String!
+  hexCode: String
+}
+
+type ProductVariant @table {
+  id: UUID! @default(expr: "uuidV4()")
+  product: Product!
+  size: ClothingSize
+  color: Color
+  sku: String! @unique
+  barcode: String @unique
+  costPrice: Float!
+  salePrice: Float!
+  wholesalePrice: Float
+  stockQuantity: Int! @default(value: 0)
+  reorderLevel: Int! @default(value: 10)
+  isActive: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Supplier @table {
+  id: UUID! @default(expr: "uuidV4()")
+  supplierName: String!
+  contactName: String
+  phone: String
+  email: String
+  address: String
+  taxId: String
+  status: String! @default(value: "ACTIVE")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Employee @table {
+  id: UUID! @default(expr: "uuidV4()")
+  store: Store!
+  employeeName: String!
+  gender: String
+  phone: String
+  email: String
+  position: String
+  username: String! @unique
+  status: String! @default(value: "ACTIVE")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Customer @table {
+  id: UUID! @default(expr: "uuidV4()")
+  customerName: String!
+  gender: String
+  phone: String @unique
+  email: String
+  address: String
+  loyaltyPoints: Int! @default(value: 0)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type PurchaseHeader @table {
+  id: UUID! @default(expr: "uuidV4()")
+  referenceNo: String! @unique
+  supplier: Supplier!
+  employee: Employee!
+  store: Store!
+  purchaseDate: Timestamp! @default(expr: "request.time")
+  totalAmount: Float!
+  taxAmount: Float!
+  grandTotal: Float!
+  status: String! @default(value: "COMPLETED")
+  notes: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type PurchaseDetail @table {
+  id: UUID! @default(expr: "uuidV4()")
+  purchase: PurchaseHeader!
+  variant: ProductVariant!
+  quantity: Int!
+  unitCost: Float!
+  subTotal: Float!
+}
+
+type SaleHeader @table {
+  id: UUID! @default(expr: "uuidV4()")
+  invoiceNo: String! @unique
+  store: Store!
+  customer: Customer
+  employee: Employee!
+  saleDate: Timestamp! @default(expr: "request.time")
+  subTotal: Float!
+  discountAmount: Float! @default(value: 0)
+  taxAmount: Float! @default(value: 0)
+  grandTotal: Float!
+  paymentStatus: String! @default(value: "PAID")
+  status: String! @default(value: "COMPLETED")
+  notes: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type SaleDetail @table {
+  id: UUID! @default(expr: "uuidV4()")
+  sale: SaleHeader!
+  variant: ProductVariant!
+  quantity: Int!
+  unitPrice: Float!
+  discountAmount: Float! @default(value: 0)
+  subTotal: Float!
+}
+
+type Payment @table {
+  id: UUID! @default(expr: "uuidV4()")
+  sale: SaleHeader!
+  paymentDate: Timestamp! @default(expr: "request.time")
+  amount: Float!
+  amountTendered: Float!
+  changeDue: Float!
+  paymentMethod: String!
+  paymentStatus: String! @default(value: "SUCCESS")
+  transactionRef: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type StockMovement @table {
+  id: UUID! @default(expr: "uuidV4()")
+  store: Store!
+  variant: ProductVariant!
+  movementType: String!
+  quantity: Int!
+  stockBefore: Int!
+  stockAfter: Int!
+  movementDate: Timestamp! @default(expr: "request.time")
+  referenceType: String
+  referenceId: String
+  note: String
+  createdBy: Employee
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type AuditLog @table {
+  id: UUID! @default(expr: "uuidV4()")
+  userId: String
+  action: String!
+  entityType: String!
+  entityId: String
+  oldValues: String
+  newValues: String
+  ipAddress: String
+  userAgent: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
