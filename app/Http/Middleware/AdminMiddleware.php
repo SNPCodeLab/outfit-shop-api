@@ -24,7 +24,7 @@ class AdminMiddleware
             ], 401);
         }
 
-        $isAdmin = ($user->is_admin ?? false) || 
+        $isAdmin = ((bool) ($user->is_admin ?? false)) || 
                    (isset($user->role) && strtoupper($user->role) === 'ADMIN') ||
                    (isset($user->position) && str_contains(strtoupper($user->position), 'ADMIN'));
 
