@@ -147,6 +147,74 @@
             word-break: break-all;
         }
 
+        /* Live Products Cards Grid */
+        .live-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background-color: var(--color-white);
+            border: 3px solid var(--color-black);
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-brand {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background-color: var(--color-cyan);
+            border: 2px solid var(--color-black);
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 0.75rem;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .product-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 1rem;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid var(--color-black);
+            padding-top: 0.75rem;
+        }
+
+        .product-price {
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: var(--font-code);
+            color: #000;
+        }
+
+        .product-qty {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: var(--color-yellow);
+            border: 2px solid var(--color-black);
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
         /* Section Heading */
         .section-header {
             display: flex;
@@ -219,8 +287,6 @@
 
         .method-post { background-color: var(--color-cyan); }
         .method-get { background-color: var(--color-yellow); }
-        .method-put { background-color: var(--color-cyan); }
-        .method-delete { background-color: var(--color-yellow); }
 
         .endpoint-info {
             display: flex;
@@ -353,6 +419,65 @@
             </div>
         </div>
 
+        <!-- Section: Live Sample Data Showcase -->
+        <div class="section-header">
+            <h2>ទិន្នន័យផលិតផលគំរូផ្សាយផ្ទាល់ពី Neon Database (Live Products Showcase)</h2>
+        </div>
+
+        <div class="live-grid" id="liveProductsGrid">
+            <!-- Sample Product 1 -->
+            <div class="product-card">
+                <div>
+                    <span class="product-brand">Angkor Fashion</span>
+                    <div class="product-title">Cambodian Silk Short-Sleeve Shirt</div>
+                    <div class="product-desc">Traditional woven Cambodian natural silk short-sleeve shirt.</div>
+                </div>
+                <div class="product-meta">
+                    <span class="product-price">$35.00</span>
+                    <span class="product-qty">In Stock: 45</span>
+                </div>
+            </div>
+
+            <!-- Sample Product 2 -->
+            <div class="product-card">
+                <div>
+                    <span class="product-brand">SS Apparel</span>
+                    <div class="product-title">Classic Organic Cotton Polo Shirt</div>
+                    <div class="product-desc">100% Breathable Organic Cotton Polo Shirt with embroidered logo.</div>
+                </div>
+                <div class="product-meta">
+                    <span class="product-price">$18.50</span>
+                    <span class="product-qty">In Stock: 120</span>
+                </div>
+            </div>
+
+            <!-- Sample Product 3 -->
+            <div class="product-card">
+                <div>
+                    <span class="product-brand">Denim Co.</span>
+                    <div class="product-title">Slim Fit Stretch Denim Jeans</div>
+                    <div class="product-desc">Premium 12oz stretch cotton denim jeans.</div>
+                </div>
+                <div class="product-meta">
+                    <span class="product-price">$42.00</span>
+                    <span class="product-qty">In Stock: 65</span>
+                </div>
+            </div>
+
+            <!-- Sample Product 4 -->
+            <div class="product-card">
+                <div>
+                    <span class="product-brand">Breeze Wear</span>
+                    <div class="product-title">Linen Summer Sundress</div>
+                    <div class="product-desc">Lightweight breathable linen floral print summer dress.</div>
+                </div>
+                <div class="product-meta">
+                    <span class="product-price">$38.00</span>
+                    <span class="product-qty">In Stock: 28</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Section: Core API Endpoints -->
         <div class="section-header">
             <h2>បញ្ជី Core REST API Endpoints ទាំងអស់ (Full API Reference)</h2>
@@ -434,88 +559,6 @@
                     <span class="desc-text">ទាញយករាយនាមទំនិញតាមទំហំ/ពណ៌ & ស្តុក (Product Variants & SKUs)</span>
                 </div>
                 <span class="auth-pill">Public</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/variants/low-stock</span>
-                    <span class="desc-text">ទាញយករាយនាមទំនិញដែលជិតអស់ពីស្តុក (Low Stock Alert Variants)</span>
-                </div>
-                <span class="auth-pill">Public</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/variants/barcode/{barcode}</span>
-                    <span class="desc-text">ស្កែន Barcode ស្វែងរកទំនិញ (Barcode Scanner Lookup)</span>
-                </div>
-                <span class="auth-pill">Public</span>
-            </div>
-        </div>
-
-        <!-- Group 4: POS Sales & Receipts -->
-        <div class="group-title">4. POS Sales Checkout & Invoices</div>
-        <div class="endpoint-container">
-            <div class="endpoint-card">
-                <span class="method-badge method-post">POST</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/sales/checkout</span>
-                    <span class="desc-text">កត់ត្រាការលក់ទំនិញ POS & បង់ប្រាក់ (POS Checkout Transaction)</span>
-                </div>
-                <span class="auth-pill">Sanctum Bearer</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/sales</span>
-                    <span class="desc-text">ទាញយករាយនាមវិក្កយបត្រលក់ទំនិញ (Sales History)</span>
-                </div>
-                <span class="auth-pill">Sanctum Bearer</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-post">POST</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/sales/{id}/void</span>
-                    <span class="desc-text">លុប/មោឃភាពវិក្កយបត្រលក់ (Void Sale Invoice)</span>
-                </div>
-                <span class="auth-pill">Admin / Manager</span>
-            </div>
-        </div>
-
-        <!-- Group 5: Customers, Suppliers & Purchasing -->
-        <div class="group-title">5. Customers, Suppliers & Purchase Orders</div>
-        <div class="endpoint-container">
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/customers</span>
-                    <span class="desc-text">ទាញយករាយនាមអតិថិជន & ពិន្ទុសន្សំ (Customers & Loyalty Points)</span>
-                </div>
-                <span class="auth-pill">Sanctum Bearer</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/suppliers</span>
-                    <span class="desc-text">ទាញយករាយនាមក្រុមហ៊ុនផ្គត់ផ្គង់ (Suppliers List)</span>
-                </div>
-                <span class="auth-pill">Admin / Manager</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/purchases</span>
-                    <span class="desc-text">ទាញយករាយនាមបញ្ជាទិញទំនិញចូលស្តុក (Purchase Orders)</span>
-                </div>
-                <span class="auth-pill">Admin / Manager</span>
-            </div>
-            <div class="endpoint-card">
-                <span class="method-badge method-get">GET</span>
-                <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/stock-movements</span>
-                    <span class="desc-text">មើលប្រវត្តិនៃការកែប្រែទិន្នន័យស្តុក (Stock Movements Audit)</span>
-                </div>
-                <span class="auth-pill">Admin / Manager</span>
             </div>
         </div>
 
