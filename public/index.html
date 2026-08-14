@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SS-MIS — Store Stock & Point-of-Sale Information System</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-light); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 680px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: var(--success); padding: 6px 16px; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; box-shadow: 0 0 10px var(--success); }
+        h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; text-align: left; margin-bottom: 2rem; }
+        .grid-item { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); padding: 1.25rem; border-radius: 12px; }
+        .grid-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 0.25rem; }
+        .grid-val { font-size: 1rem; font-weight: 600; color: var(--text-light); word-break: break-all; }
+        .actions { display: flex; gap: 1rem; justify-content: center; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: #0f172a; }
+        .btn-primary:hover { background: #0284c7; transform: translateY(-2px); }
+        .btn-secondary { background: var(--border); color: var(--text-light); }
+        .btn-secondary:hover { background: #475569; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">
+            <span class="dot"></span> Firebase Backend Live & Ready
+        </div>
+        <h1>SS-MIS Web Platform</h1>
+        <p>Store Stock & Point-of-Sale Information System powered by Firebase Auth, Firestore, and SQL Connect (PostgreSQL).</p>
+        
+        <div class="grid">
+            <div class="grid-item">
+                <div class="grid-label">Firebase Project</div>
+                <div class="grid-val">ssmis-ea5df</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label">Web App ID</div>
+                <div class="grid-val">6907a2030cad7690d4501e</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label">Custom Domain</div>
+                <div class="grid-val">api.kesararamwithdigital.tech</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label">Database Entities</div>
+                <div class="grid-val">16 Relational Tables</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="https://console.firebase.google.com/project/ssmis-ea5df/overview" target="_blank" class="btn btn-primary">Firebase Console</a>
+            <a href="https://github.com/shiliaiwei/SS-MIS" target="_blank" class="btn btn-secondary">GitHub Repository</a>
+        </div>
+    </div>
+</body>
+</html>
