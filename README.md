@@ -1,58 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CSMS-API (Store Stock & Point-of-Sale Information System)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel Version](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![Database](https://img.shields.io/badge/Database-Neon%20Cloud%20PostgreSQL-00E599?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech)
+[![Oracle Ready](https://img.shields.io/badge/Oracle%20SQL-Yajra%20Supported-F80000?style=for-the-badge&logo=oracle&logoColor=white)](https://github.com/yajra/laravel-oracle)
+[![Live API Status](https://img.shields.io/badge/API-Live%20Online-00C853?style=for-the-badge&logo=fastapi&logoColor=white)](https://api.kesararamwithdigital.tech/api/v1/status)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**CSMS-API (SS-MIS)** is an enterprise-grade RESTful API Gateway built with **Laravel 11**. It serves as the secure backend for Point-of-Sale (POS) applications, inventory tracking, clothing size and color variant management, supplier purchases, sales checkouts, audit logging, and role-based access control.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **GitHub Repository**: [https://github.com/SNPbuilds/csms-api](https://github.com/SNPbuilds/csms-api)
+* **Live API Base URL**: `https://api.kesararamwithdigital.tech/api/v1`
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🗄️ Database Architecture & Cloud Infrastructure
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **Database Hosting**: **Managed 24/7 on Neon Cloud** with zero server maintenance.
+* **Database Host**: `ep-dawn-union-awnp9sve-pooler.c-12.us-east-1.aws.neon.tech` (Neon Cloud PostgreSQL)
+* **Live Database Tables (22 Total)**:
+  * `users` & `personal_access_tokens` (Sanctum Authentication)
+  * `employees`, `customers`, `suppliers`
+  * `categories`, `clothing_sizes`, `colors`, `products`, `product_variants`
+  * `purchase_headers`, `purchase_details`
+  * `sale_headers`, `sale_details`, `payments`
+  * `stock_movements`, `audit_logs`, `api_logs`
+  * `permissions`, `roles`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` (Spatie RBAC)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🔴 Dual Database Engine Support (PostgreSQL + Oracle SQL)
+* **Active Production Engine**: PostgreSQL on Neon Cloud (`DB_CONNECTION=pgsql`).
+* **Oracle SQL Engine**: Fully configured with `yajra/laravel-oracle` (`DB_CONNECTION=oracle`). Switching to Oracle SQL requires changing only 1 line in `.env`.
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 👑 Role-Based Access Control (RBAC)
 
-```bash
-composer require laravel/boost --dev
+Managed via **Spatie Laravel-Permission** using granular `{resource}.{action}` permission scoping:
 
-php artisan boost:install
+| Role | Access Level | Responsibilities |
+| :--- | :--- | :--- |
+| **`admin`** | Full System Control | Unrestricted CRUD on catalog, sales, suppliers, purchases, employees, & audit logs |
+| **`manager`** | Inventory & Sales Operations | Full catalog, sales checkout, void sales, stock adjustment, & supplier management |
+| **`cashier`** | POS Operator | Process sales checkout, register customers, & read-only catalog access |
+| **`viewer`** | Read-Only | Read-only inspection across products, sales, and inventory stock |
+
+---
+
+## 🔐 Authentication & Security
+
+* **Authentication Strategy**: **Laravel Sanctum Bearer Tokens** (`/api/v1/auth/login`, `/api/v1/auth/register`, `/api/v1/auth/me`, `/api/v1/auth/logout`).
+* **Rate Limiting**: `throttle:10,1` on login/register endpoints, `throttle:60,1` on protected resource routes.
+* **CORS Configuration**: Explicitly permits requests from live web domains and local frontend dev servers (`https://app.kesararamwithdigital.tech`, `http://localhost:3000`, `http://localhost:5173`, `http://localhost:8080`, `http://localhost:4200`).
+* **Standardized JSON Error Payload**:
+  ```json
+  {
+    "success": false,
+    "message": "Human readable error description",
+    "error_code": "ERR_FORBIDDEN",
+    "errors": null
+  }
+  ```
+
+---
+
+## 📡 Core API Routes Summary (`/api/v1/`)
+
+```text
+POST      /api/v1/auth/login .......................... Authenticate & issue Sanctum Bearer Token
+POST      /api/v1/auth/register ....................... Register new user account
+GET       /api/v1/auth/me ............................. Get current authenticated profile
+POST      /api/v1/auth/logout ......................... Revoke active Sanctum token
+GET       /api/v1/status .............................. System health & status check
+GET       /api/v1/products ............................ Read product catalog (Public)
+POST      /api/v1/products ............................ Create product (Admin / Manager)
+POST      /api/v1/sales/checkout ...................... Process POS sale transaction & stock deduction
+POST      /api/v1/sales/{id}/void ..................... Void sale transaction & restore stock
+POST      /api/v1/stock-movements/adjust ............. Adjust variant inventory stock
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 📄 Project Documentation & Deliverables
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* **[API_DOCS.md](file:///Users/Apple16/Desktop/SS_MIS/API_DOCS.md)**: Full REST API Documentation & Request/Response Contracts.
+* **[SS_MIS.postman_collection.json](file:///Users/Apple16/Desktop/SS_MIS/SS_MIS.postman_collection.json)**: Ready-to-import Postman Collection for testing endpoints.
+* **[.agents/skills/](file:///Users/Apple16/Desktop/SS_MIS/.agents/skills/)**: Agent skills for Oracle DB schema, SS-MIS entity definitions, custom domain setup, and DBeaver SQL querying.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠️ Local Development Setup
 
-## Security Vulnerabilities
+```bash
+# 1. Clone Repository
+git clone https://github.com/SNPbuilds/csms-api.git
+cd csms-api
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 2. Install PHP Dependencies
+composer install
 
-## License
+# 3. Environment Setup
+cp .env.example .env
+php artisan key:generate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 4. Run Migrations & Seeders
+php artisan migrate --force
+php artisan db:seed --class=RolesAndPermissionsSeeder
+
+# 5. Start Development Server
+php artisan serve
+```
