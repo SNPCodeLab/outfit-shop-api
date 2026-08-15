@@ -33,14 +33,32 @@ class Employee extends Authenticatable
     ];
 
     /**
-     * Get the password for the user.
-     *
-     * @return string
+     * Return the password attribute so Sanctum's auth driver can verify it.
      */
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return $this->password_hash;
     }
+
+    /**
+     * Canonical uppercase role for this employee.
+     */
+    public function getRoleLabel(): string
+    {
+        return strtoupper($this->role ?? 'STAFF');
+    }
+
+    /**
+     * Whether this employee is a super-admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->getRoleLabel() === 'ADMIN';
+    }
+
+    // -----------------------------------------------------------------------
+    // Relationships
+    // -----------------------------------------------------------------------
 
     public function purchases(): HasMany
     {

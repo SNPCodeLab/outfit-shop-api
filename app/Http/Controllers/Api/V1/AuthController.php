@@ -8,83 +8,112 @@ use App\Models\User;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseApiController
 {
+    // -------------------------------------------------------------------------
+    // Permission map: what each role is allowed to do in the API.
+    // Returned in login/me response so the frontend knows without asking.
+    // -------------------------------------------------------------------------
+    private const ROLE_PERMISSIONS = [
+        'ADMIN' => [
+            'catalog.read', 'catalog.write',
+            'customers.read', 'customers.write',
+            'sales.read', 'sales.checkout', 'sales.void',
+            'suppliers.read', 'suppliers.write',
+            'purchases.read', 'purchases.write',
+            'stock.read', 'stock.adjust',
+            'employees.read', 'employees.write',
+            'dashboard.view', 'audit-logs.view',
+            'users.create',
+        ],
+        'MANAGER' => [
+            'catalog.read', 'catalog.write',
+            'customers.read', 'customers.write',
+            'sales.read', 'sales.checkout', 'sales.void',
+            'suppliers.read', 'suppliers.write',
+            'purchases.read', 'purchases.write',
+            'stock.read', 'stock.adjust',
+            'dashboard.view', 'audit-logs.view',
+        ],
+        'CASHIER' => [
+            'catalog.read',
+            'customers.read', 'customers.write',
+            'sales.read', 'sales.checkout',
+        ],
+        'STAFF' => [
+            'catalog.read',
+            'customers.read',
+            'sales.read',
+        ],
+    ];
+
     /**
-     * Register a new user account.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Resolve the canonical UPPERCASE role string for any authenticatable model.
      */
-    public function register(Request $request): JsonResponse
+    private function resolveRole(mixed $account): string
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role'     => 'nullable|string|in:admin,manager,cashier,viewer',
-        ]);
-
-        $roleName = strtolower($request->input('role', 'viewer'));
-
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'is_admin' => $roleName === 'admin',
-        ]);
-
-        // Assign Spatie Role if model uses HasRoles
-        if (method_exists($user, 'assignRole')) {
-            $user->assignRole($roleName);
+        if ($account instanceof Employee) {
+            return strtoupper($account->role ?? 'STAFF');
         }
 
-        $token = $user->createToken('ssmis-api-token')->plainTextToken;
+        if (property_exists($account, 'is_admin') && $account->is_admin) {
+            return 'ADMIN';
+        }
 
-        return $this->successResponse([
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
-            'user'         => [
-                'id'       => $user->id,
-                'name'     => $user->name,
-                'email'    => $user->email,
-                'role'     => $roleName,
-                'is_admin' => (bool) $user->is_admin,
-            ],
-        ], 'User registered successfully', 201);
+        // Spatie role (User model)
+        if (method_exists($account, 'getRoleNames')) {
+            $spatieRole = $account->getRoleNames()->first();
+            if ($spatieRole) {
+                return strtoupper($spatieRole);
+            }
+        }
+
+        return 'STAFF';
     }
 
     /**
-     * Authenticate user/employee credentials and issue a Sanctum token.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Return the permission list for a given role string.
      */
+    private function permissionsFor(string $role): array
+    {
+        return self::ROLE_PERMISSIONS[$role] ?? self::ROLE_PERMISSIONS['STAFF'];
+    }
+
+    // =========================================================================
+    // POST /api/v1/auth/login
+    // =========================================================================
+
     public function login(Request $request): JsonResponse
     {
         $request->validate([
             'username' => 'required_without:email|string',
-            'email'    => 'required_without:username|string',
+            'email'    => 'required_without:username|string|email',
             'password' => 'required|string',
         ]);
 
-        $loginIdentifier = $request->input('username') ?? $request->input('email');
+        $identifier = $request->input('username') ?? $request->input('email');
 
-        // 1. Try Employee authentication
-        $employee = Employee::where('username', $loginIdentifier)
-            ->orWhere('email', $loginIdentifier)
+        // 1 — Employee authentication (username or email)
+        $employee = Employee::where('username', $identifier)
+            ->orWhere('email', $identifier)
             ->first();
 
         if ($employee && Hash::check($request->password, $employee->password_hash)) {
+
             if ($employee->status !== 'ACTIVE') {
-                return $this->errorResponse('Account is inactive. Please contact system administrator.', 403);
+                return $this->errorResponse(
+                    message:   'Account is inactive. Please contact your administrator.',
+                    code:      403,
+                    errorCode: 'ERR_ACCOUNT_INACTIVE'
+                );
             }
 
-            $token = $employee->createToken('ssmis-api-token')->plainTextToken;
+            $role        = $this->resolveRole($employee);
+            $token       = $employee->createToken('ssmis-api-token')->plainTextToken;
+            $permissions = $this->permissionsFor($role);
 
             if (class_exists(AuditLogService::class)) {
                 AuditLogService::log(
@@ -98,88 +127,86 @@ class AuthController extends BaseApiController
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
-                'user'         => [
+                'account_type' => 'employee',
+                'user' => [
                     'id'          => $employee->employee_id,
                     'name'        => $employee->employee_name,
                     'username'    => $employee->username,
                     'email'       => $employee->email,
                     'position'    => $employee->position,
-                    'role'        => strtolower($employee->role ?? 'cashier'),
+                    'role'        => $role,
+                    'permissions' => $permissions,
                 ],
-                'employee'     => [
-                    'employee_id'   => $employee->employee_id,
-                    'employee_name' => $employee->employee_name,
-                    'username'      => $employee->username,
-                    'email'         => $employee->email,
-                    'position'      => $employee->position,
-                    'role'          => strtolower($employee->role ?? 'cashier'),
-                ],
-            ], 'Employee login successful');
+            ], 'Login successful');
         }
 
-        // 2. Try User authentication
-        $user = User::where('email', $loginIdentifier)->first();
+        // 2 — User authentication (email)
+        $user = User::where('email', $identifier)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            $token = $user->createToken('ssmis-api-token')->plainTextToken;
+
+            $role        = $this->resolveRole($user);
+            $token       = $user->createToken('ssmis-api-token')->plainTextToken;
+            $permissions = $this->permissionsFor($role);
 
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
-                'user'         => [
-                    'id'       => $user->id,
-                    'name'     => $user->name,
-                    'email'    => $user->email,
-                    'role'     => $user->is_admin ? 'admin' : 'viewer',
-                    'is_admin' => (bool) $user->is_admin,
+                'account_type' => 'user',
+                'user' => [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'email'       => $user->email,
+                    'role'        => $role,
+                    'permissions' => $permissions,
                 ],
-            ], 'User login successful');
+            ], 'Login successful');
         }
 
         throw ValidationException::withMessages([
-            'username' => ['Invalid login credentials provided.'],
+            'username' => ['Invalid credentials. Please check your username/email and password.'],
         ]);
     }
 
-    /**
-     * Get the current authenticated user/employee profile.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    // =========================================================================
+    // GET /api/v1/auth/me
+    // =========================================================================
+
     public function me(Request $request): JsonResponse
     {
-        $account = $request->user();
+        $account     = $request->user();
+        $role        = $this->resolveRole($account);
+        $permissions = $this->permissionsFor($role);
 
         if ($account instanceof Employee) {
             return $this->successResponse([
-                'id'       => $account->employee_id,
-                'name'     => $account->employee_name,
-                'username' => $account->username,
-                'email'    => $account->email,
-                'position' => $account->position,
-                'role'     => strtolower($account->role ?? 'cashier'),
-                'status'   => $account->status,
-                'type'     => 'employee',
-            ], 'Authenticated employee profile');
+                'account_type' => 'employee',
+                'id'           => $account->employee_id,
+                'name'         => $account->employee_name,
+                'username'     => $account->username,
+                'email'        => $account->email,
+                'position'     => $account->position,
+                'role'         => $role,
+                'status'       => $account->status,
+                'permissions'  => $permissions,
+            ], 'Authenticated profile');
         }
 
         return $this->successResponse([
-            'id'       => $account->id,
-            'name'     => $account->name,
-            'email'    => $account->email,
-            'role'     => $account->is_admin ? 'admin' : 'viewer',
-            'is_admin' => (bool) $account->is_admin,
-            'type'     => 'user',
-        ], 'Authenticated user profile');
+            'account_type' => 'user',
+            'id'           => $account->id,
+            'name'         => $account->name,
+            'email'        => $account->email,
+            'role'         => $role,
+            'is_admin'     => (bool) ($account->is_admin ?? false),
+            'permissions'  => $permissions,
+        ], 'Authenticated profile');
     }
 
-    /**
-     * Revoke the current access token (logout).
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    // =========================================================================
+    // POST /api/v1/auth/logout
+    // =========================================================================
+
     public function logout(Request $request): JsonResponse
     {
         $account = $request->user();
@@ -200,5 +227,48 @@ class AuthController extends BaseApiController
         }
 
         return $this->successResponse(null, 'Logout successful');
+    }
+
+    // =========================================================================
+    // POST /api/v1/auth/register  (ADMIN only — creates team accounts)
+    // =========================================================================
+
+    public function register(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role'     => 'nullable|string|in:admin,manager,cashier,staff,viewer',
+        ]);
+
+        $roleName = strtolower($request->input('role', 'staff'));
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'is_admin' => $roleName === 'admin',
+        ]);
+
+        if (method_exists($user, 'assignRole')) {
+            $user->assignRole($roleName);
+        }
+
+        $resolvedRole = $this->resolveRole($user);
+        $token        = $user->createToken('ssmis-api-token')->plainTextToken;
+
+        return $this->successResponse([
+            'access_token' => $token,
+            'token_type'   => 'Bearer',
+            'account_type' => 'user',
+            'user' => [
+                'id'          => $user->id,
+                'name'        => $user->name,
+                'email'       => $user->email,
+                'role'        => $resolvedRole,
+                'permissions' => $this->permissionsFor($resolvedRole),
+            ],
+        ], 'User account created successfully', 201);
     }
 }
