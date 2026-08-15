@@ -1,5 +1,13 @@
 <?php
 
+// Force Vercel Serverless environment overrides for Neon PostgreSQL & stderr logging
+putenv('DB_CONNECTION=pgsql');
+putenv('LOG_CHANNEL=stderr');
+$_ENV['DB_CONNECTION'] = 'pgsql';
+$_ENV['LOG_CHANNEL'] = 'stderr';
+$_SERVER['DB_CONNECTION'] = 'pgsql';
+$_SERVER['LOG_CHANNEL'] = 'stderr';
+
 // Prepare writable /tmp storage & bootstrap cache paths for Vercel serverless functions
 $storagePath = '/tmp/storage';
 $cachePath = '/tmp/cache';
