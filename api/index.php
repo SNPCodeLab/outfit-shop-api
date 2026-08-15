@@ -1,60 +1,79 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Vercel Serverless Entry Point
+|--------------------------------------------------------------------------
+|
+| This file bootstraps Laravel for Vercel's read-only serverless environment.
+| All environment overrides and writable /tmp paths are set BEFORE the
+| Composer autoloader and Laravel app are loaded, so that no part of the
+| framework can attempt to write to the read-only /var/task filesystem.
+|
+*/
+
+// ─── 1. Vercel Environment Overrides (MUST run before autoloader) ─────────
+putenv('LOG_CHANNEL=null');           // Completely disable file logging
+putenv('LOG_LEVEL=error');
+putenv('DB_CONNECTION=pgsql');
+putenv('CACHE_DRIVER=array');
+putenv('SESSION_DRIVER=array');
+
+$_ENV['LOG_CHANNEL']    = 'null';
+$_ENV['LOG_LEVEL']      = 'error';
+$_ENV['DB_CONNECTION']  = 'pgsql';
+$_ENV['CACHE_DRIVER']   = 'array';
+$_ENV['SESSION_DRIVER'] = 'array';
+
+$_SERVER['LOG_CHANNEL']    = 'null';
+$_SERVER['DB_CONNECTION']  = 'pgsql';
+$_SERVER['CACHE_DRIVER']   = 'array';
+$_SERVER['SESSION_DRIVER'] = 'array';
+
+// ─── 2. Create writable /tmp directory structure ───────────────────────────
+$storagePath = '/tmp/storage';
+
+@mkdir($storagePath . '/framework/views',    0755, true);
+@mkdir($storagePath . '/framework/sessions', 0755, true);
+@mkdir($storagePath . '/framework/cache/data', 0755, true);
+@mkdir($storagePath . '/logs',               0755, true);
+@mkdir('/tmp/cache',                          0755, true);
+
+putenv("APP_STORAGE={$storagePath}");
+putenv("APP_SERVICES_CACHE=/tmp/cache/services.php");
+putenv("APP_PACKAGES_CACHE=/tmp/cache/packages.php");
+putenv("APP_CONFIG_CACHE=/tmp/cache/config.php");
+putenv("APP_ROUTES_CACHE=/tmp/cache/routes.php");
+putenv("APP_EVENTS_CACHE=/tmp/cache/events.php");
+
+$_ENV['APP_STORAGE']         = $storagePath;
+$_SERVER['APP_STORAGE']      = $storagePath;
+
+// ─── 3. Bootstrap & Dispatch ───────────────────────────────────────────────
 try {
-    // 1. Force Vercel Serverless environment overrides
-    putenv('DB_CONNECTION=pgsql');
-    putenv('LOG_CHANNEL=stderr');
-    $_ENV['DB_CONNECTION'] = 'pgsql';
-    $_ENV['LOG_CHANNEL'] = 'stderr';
-    $_SERVER['DB_CONNECTION'] = 'pgsql';
-    $_SERVER['LOG_CHANNEL'] = 'stderr';
-
-    // 2. Prepare writable /tmp storage paths
-    $storagePath = '/tmp/storage';
-    $cachePath = '/tmp/cache';
-
-    @mkdir($storagePath . '/framework/views', 0755, true);
-    @mkdir($storagePath . '/framework/sessions', 0755, true);
-    @mkdir($storagePath . '/framework/cache', 0755, true);
-    @mkdir($storagePath . '/logs', 0755, true);
-    @mkdir($cachePath, 0755, true);
-
-    putenv("APP_STORAGE={$storagePath}");
-    putenv("APP_SERVICES_CACHE={$cachePath}/services.php");
-    putenv("APP_PACKAGES_CACHE={$cachePath}/packages.php");
-
-    $_ENV['APP_STORAGE'] = $storagePath;
-    $_SERVER['APP_STORAGE'] = $storagePath;
-
-    // 3. Register Composer autoloader
     require __DIR__ . '/../vendor/autoload.php';
 
-    // 4. Bootstrap Laravel application
     /** @var \Illuminate\Foundation\Application $app */
     $app = require __DIR__ . '/../bootstrap/app.php';
 
-    // 5. Force Laravel container to use /tmp/storage for ALL log & framework operations
+    // Override storage path BEFORE any logging or framework file operations
     $app->useStoragePath($storagePath);
 
-    // 6. Handle request directly
-    $request = \Illuminate\Http\Request::capture();
+    $request  = \Illuminate\Http\Request::capture();
     $response = $app->handleRequest($request);
     $response->send();
+
 } catch (\Throwable $e) {
-    http_response_code(200);
-    header('Content-Type: application/json');
+    // Last-resort: always return clean JSON — never expose a PHP fatal page
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+    }
     echo json_encode([
-        'system'            => 'Store Stock & Point-of-Sale MIS API',
-        'version'           => '1.0.0',
-        'status'            => 'online',
-        'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
-        'health_url'        => 'https://api.kesararamwithdigital.tech/api/v1/health',
-        'auth_login_url'    => 'https://api.kesararamwithdigital.tech/api/v1/auth/login',
-        'products_url'      => 'https://api.kesararamwithdigital.tech/api/v1/products',
-        'categories_url'    => 'https://api.kesararamwithdigital.tech/api/v1/categories',
-        'sales_url'         => 'https://api.kesararamwithdigital.tech/api/v1/sales',
-        'employees_url'     => 'https://api.kesararamwithdigital.tech/api/v1/employees',
-        'customers_url'     => 'https://api.kesararamwithdigital.tech/api/v1/customers',
-        'suppliers_url'     => 'https://api.kesararamwithdigital.tech/api/v1/suppliers'
+        'success'    => false,
+        'message'    => $e->getMessage(),
+        'error_code' => 'ERR_BOOTSTRAP_FAILURE',
+        'file'       => $e->getFile(),
+        'line'       => $e->getLine(),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
