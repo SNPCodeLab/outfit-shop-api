@@ -8,8 +8,9 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
-$app = Application::configure(basePath: dirname(__DIR__))
+return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -28,55 +29,49 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
-        );
+        // Force 100% JSON error responses across all routes (GitHub API style)
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
 
-        $exceptions->render(function (AuthenticationException $e, Request $request) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+        $exceptions->render(function (Throwable $e, Request $request) {
+            $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+
+            if ($e instanceof AuthenticationException) {
                 return response()->json([
-                    'success'    => false,
                     'message'    => 'Unauthenticated. Valid Bearer token required.',
                     'error_code' => 'ERR_UNAUTHENTICATED',
-                ], 401);
+                    'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
+                ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
-        });
 
-        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+            if ($e instanceof AccessDeniedHttpException) {
                 return response()->json([
-                    'success'    => false,
                     'message'    => $e->getMessage() ?: 'Forbidden: You do not have permission to perform this action.',
                     'error_code' => 'ERR_FORBIDDEN',
-                ], 403);
+                    'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
+                ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
-        });
 
-        $exceptions->render(function (ValidationException $e, Request $request) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+            if ($e instanceof ValidationException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Validation error.',
+                    'message'    => 'Validation Failed',
                     'error_code' => 'ERR_VALIDATION',
                     'errors'     => $e->errors(),
-                ], 422);
+                    'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
+                ], 422, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
-        });
 
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+            if ($e instanceof NotFoundHttpException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Resource or endpoint not found.',
+                    'message'    => 'Not Found',
                     'error_code' => 'ERR_NOT_FOUND',
-                ], 404);
+                    'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
+                ], 404, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
+
+            return response()->json([
+                'message'    => app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
+                'error_code' => 'ERR_INTERNAL_SERVER_ERROR',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
+            ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
-    })
-    ->create();
-
-if ($storagePath = env('APP_STORAGE')) {
-    $app->useStoragePath($storagePath);
-}
-
-return $app;
+    })->create();
