@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\V1\AuditLogController;
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ClothingSizeController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -19,70 +19,66 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| SS-MIS RESTful Web API Routes
+| SS-MIS RESTful Web API Gateway Routes
 |--------------------------------------------------------------------------
+| Base URL: https://api.kesararamwithdigital.tech/api/v1
+| All endpoints are versioned under /v1/
 */
 
-// --------------------------------------------------------------------------
-// 1. PUBLIC API ROUTES (Unprotected for easy product testing)
-// --------------------------------------------------------------------------
-
-// Authentication
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-// Public Read-Only Product Catalog & Status
 Route::prefix('v1')->group(function () {
+
+    // --------------------------------------------------------------------------
+    // 1. PUBLIC AUTHENTICATION & CATALOG (Unprotected + Rate Limiting)
+    // --------------------------------------------------------------------------
+
+    // Authentication (Rate limited to 10 attempts/min to prevent brute-force)
+    Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register']);
+    });
+
+    // Health Check & Status
     Route::get('/status', [StatusController::class, 'index']);
 
-    // Public Categories Read
+    // Public Product Catalog Read Endpoints
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{id}', [CategoryController::class, 'show']);
 
-    // Public Clothing Sizes Read
     Route::get('/clothing-sizes', [ClothingSizeController::class, 'index']);
     Route::get('/clothing-sizes/{id}', [ClothingSizeController::class, 'show']);
 
-    // Public Colors Read
     Route::get('/colors', [ColorController::class, 'index']);
     Route::get('/colors/{id}', [ColorController::class, 'show']);
 
-    // Public Products Read
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
 
-    // Public Product Variants Read & Stock Lookup
     Route::get('/variants', [ProductVariantController::class, 'index']);
     Route::get('/variants/low-stock', [ProductVariantController::class, 'lowStock']);
     Route::get('/variants/barcode/{barcode}', [ProductVariantController::class, 'lookupBarcode']);
     Route::get('/variants/{id}', [ProductVariantController::class, 'show']);
-});
 
 
-// --------------------------------------------------------------------------
-// 2. PROTECTED API ROUTES (Sanctum Auth Required + Rate Limiting 60 req/min)
-// --------------------------------------------------------------------------
-Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    // --------------------------------------------------------------------------
+    // 2. PROTECTED API ROUTES (Sanctum Auth Required + Rate Limiting 60 req/min)
+    // --------------------------------------------------------------------------
+    Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
-    // Auth Session Management
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
+        // Authenticated Session Management
+        Route::prefix('auth')->group(function () {
+            Route::get('/me', [AuthController::class, 'me']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+        });
 
-    // Admin Dashboard & Traffic Stats (Admin Only)
-    Route::middleware('admin')->group(function () {
-        Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
-    });
+        // Analytics & Dashboard Stats (Admin / Manager)
+        Route::middleware('role:ADMIN,MANAGER')->group(function () {
+            Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+        });
 
-    Route::prefix('v1')->group(function () {
-
-        // Auth Aliases
-        Route::get('/auth/me', [AuthController::class, 'user']);
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
-
-        // Customer Management
+        // Customer Management (Cashier, Manager, Admin)
         Route::get('/customers', [CustomerController::class, 'index']);
-        Route::post('/customers', [CustomerController::class, 'store']);
         Route::get('/customers/{id}', [CustomerController::class, 'show']);
+        Route::post('/customers', [CustomerController::class, 'store']);
         Route::put('/customers/{id}', [CustomerController::class, 'update']);
 
         // POS Sales
@@ -113,14 +109,14 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
             Route::delete('/variants/{id}', [ProductVariantController::class, 'destroy']);
 
             Route::get('/suppliers', [SupplierController::class, 'index']);
-            Route::post('/suppliers', [SupplierController::class, 'store']);
             Route::get('/suppliers/{id}', [SupplierController::class, 'show']);
+            Route::post('/suppliers', [SupplierController::class, 'store']);
             Route::put('/suppliers/{id}', [SupplierController::class, 'update']);
             Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy']);
 
             Route::get('/purchases', [PurchaseController::class, 'index']);
-            Route::post('/purchases', [PurchaseController::class, 'store']);
             Route::get('/purchases/{id}', [PurchaseController::class, 'show']);
+            Route::post('/purchases', [PurchaseController::class, 'store']);
 
             Route::get('/stock-movements', [StockMovementController::class, 'index']);
             Route::post('/stock-movements/adjust', [StockMovementController::class, 'adjust']);
@@ -131,11 +127,11 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
             Route::get('/audit-logs/{id}', [AuditLogController::class, 'show']);
         });
 
-        // Admin Only Routes
+        // Employee Management (Admin Only)
         Route::middleware('role:ADMIN')->group(function () {
             Route::get('/employees', [EmployeeController::class, 'index']);
-            Route::post('/employees', [EmployeeController::class, 'store']);
             Route::get('/employees/{id}', [EmployeeController::class, 'show']);
+            Route::post('/employees', [EmployeeController::class, 'store']);
             Route::put('/employees/{id}', [EmployeeController::class, 'update']);
             Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
         });

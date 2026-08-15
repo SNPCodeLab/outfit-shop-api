@@ -25,15 +25,26 @@ class CheckRole
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Check if employee role is in allowed roles list
-        $userRole = strtoupper($user->role ?? '');
+        // Check if user is admin
+        if ($user->is_admin || strtoupper($user->role ?? '') === 'ADMIN') {
+            return $next($request);
+        }
 
+        // Check if employee role or Spatie role matches allowed roles list
+        $userRole = strtoupper($user->role ?? '');
         $allowedRoles = array_map('strtoupper', $roles);
 
-        if (!in_array($userRole, $allowedRoles)) {
+        $hasRoleMatch = in_array($userRole, $allowedRoles);
+
+        if (!$hasRoleMatch && method_exists($user, 'hasAnyRole')) {
+            $hasRoleMatch = $user->hasAnyRole($roles);
+        }
+
+        if (!$hasRoleMatch) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden: Your role [' . ($user->role ?? 'NONE') . '] does not have permission to access this resource.',
+                'error_code' => 'ERR_FORBIDDEN',
             ], Response::HTTP_FORBIDDEN);
         }
 
