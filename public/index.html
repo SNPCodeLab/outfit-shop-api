@@ -489,23 +489,23 @@
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/register</span>
-                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin (Register User / Admin)</span>
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/auth/register</span>
+                    <span class="desc-text">ចុះឈ្មោះគណនីអ្នកប្រើប្រាស់ថ្មី ឬ Admin (Register User Account)</span>
                 </div>
-                <span class="auth-pill">Public</span>
+                <span class="auth-pill">Public (10/min)</span>
             </div>
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/login</span>
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/auth/login</span>
                     <span class="desc-text">ចូលប្រើប្រាស់ប្រព័ន្ធ & ទទួលយក Sanctum Bearer Token (Login)</span>
                 </div>
-                <span class="auth-pill">Public</span>
+                <span class="auth-pill">Public (10/min)</span>
             </div>
             <div class="endpoint-card">
                 <span class="method-badge method-get">GET</span>
                 <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/user</span>
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/auth/me</span>
                     <span class="desc-text">មើលព័ត៌មានគណនីដែលបានចូលប្រើ (Get Authenticated User Profile)</span>
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
@@ -513,7 +513,7 @@
             <div class="endpoint-card">
                 <span class="method-badge method-post">POST</span>
                 <div class="endpoint-info">
-                    <span class="url-text">https://api.kesararamwithdigital.tech/api/logout</span>
+                    <span class="url-text">https://api.kesararamwithdigital.tech/api/v1/auth/logout</span>
                     <span class="desc-text">ចាកចេញពីប្រព័ន្ធ & លុប Access Token (Logout)</span>
                 </div>
                 <span class="auth-pill">Sanctum Bearer</span>
