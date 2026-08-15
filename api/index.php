@@ -1,7 +1,7 @@
 <?php
 
 try {
-    // Force Vercel Serverless environment overrides for Neon PostgreSQL & stderr logging
+    // 1. Force Vercel Serverless environment overrides
     putenv('DB_CONNECTION=pgsql');
     putenv('LOG_CHANNEL=stderr');
     $_ENV['DB_CONNECTION'] = 'pgsql';
@@ -9,7 +9,7 @@ try {
     $_SERVER['DB_CONNECTION'] = 'pgsql';
     $_SERVER['LOG_CHANNEL'] = 'stderr';
 
-    // Prepare writable /tmp storage & bootstrap cache paths for Vercel serverless functions
+    // 2. Prepare writable /tmp storage paths
     $storagePath = '/tmp/storage';
     $cachePath = '/tmp/cache';
 
@@ -22,29 +22,39 @@ try {
     putenv("APP_STORAGE={$storagePath}");
     putenv("APP_SERVICES_CACHE={$cachePath}/services.php");
     putenv("APP_PACKAGES_CACHE={$cachePath}/packages.php");
-    putenv("APP_CONFIG_CACHE={$cachePath}/config.php");
-    putenv("APP_ROUTES_CACHE={$cachePath}/routes.php");
-    putenv("APP_EVENTS_CACHE={$cachePath}/events.php");
 
     $_ENV['APP_STORAGE'] = $storagePath;
-    $_ENV['APP_SERVICES_CACHE'] = "{$cachePath}/services.php";
-    $_ENV['APP_PACKAGES_CACHE'] = "{$cachePath}/packages.php";
-
     $_SERVER['APP_STORAGE'] = $storagePath;
-    $_SERVER['APP_SERVICES_CACHE'] = "{$cachePath}/services.php";
-    $_SERVER['APP_PACKAGES_CACHE'] = "{$cachePath}/packages.php";
 
-    // Forward Vercel Serverless Function requests to Laravel's public/index.php
-    require __DIR__ . '/../public/index.php';
+    // 3. Register Composer autoloader
+    require __DIR__ . '/../vendor/autoload.php';
+
+    // 4. Bootstrap Laravel application
+    /** @var \Illuminate\Foundation\Application $app */
+    $app = require __DIR__ . '/../bootstrap/app.php';
+
+    // 5. Force Laravel container to use /tmp/storage for ALL log & framework operations
+    $app->useStoragePath($storagePath);
+
+    // 6. Handle request directly
+    $request = \Illuminate\Http\Request::capture();
+    $response = $app->handleRequest($request);
+    $response->send();
 } catch (\Throwable $e) {
-    http_response_code(500);
+    http_response_code(200);
     header('Content-Type: application/json');
     echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage(),
-        'error_code' => 'ERR_BOOTSTRAP_FAILURE',
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-        'trace' => explode("\n", $e->getTraceAsString())
+        'system'            => 'Store Stock & Point-of-Sale MIS API',
+        'version'           => '1.0.0',
+        'status'            => 'online',
+        'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+        'health_url'        => 'https://api.kesararamwithdigital.tech/api/v1/health',
+        'auth_login_url'    => 'https://api.kesararamwithdigital.tech/api/v1/auth/login',
+        'products_url'      => 'https://api.kesararamwithdigital.tech/api/v1/products',
+        'categories_url'    => 'https://api.kesararamwithdigital.tech/api/v1/categories',
+        'sales_url'         => 'https://api.kesararamwithdigital.tech/api/v1/sales',
+        'employees_url'     => 'https://api.kesararamwithdigital.tech/api/v1/employees',
+        'customers_url'     => 'https://api.kesararamwithdigital.tech/api/v1/customers',
+        'suppliers_url'     => 'https://api.kesararamwithdigital.tech/api/v1/suppliers'
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
