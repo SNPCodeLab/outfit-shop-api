@@ -33,7 +33,7 @@
 							"mode": "raw",
 							"raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"is_admin\": true\n}"
 						},
-						"url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] }
+						"url": { "raw": "{{base_url}}/v1/auth/register", "host": ["{{base_url}}"], "path": ["v1", "auth", "register"] }
 					},
 					"event": [
 						{
@@ -42,8 +42,9 @@
 								"exec": [
 									"if (pm.response.code === 201 || pm.response.code === 200) {",
 									"    var jsonData = pm.response.json();",
-									"    if (jsonData.access_token) {",
-									"        pm.collectionVariables.set('token', jsonData.access_token);",
+									"    var token = jsonData.access_token || (jsonData.data && jsonData.data.access_token);",
+									"    if (token) {",
+									"        pm.collectionVariables.set('token', token);",
 									"        console.log('Sanctum Token auto-saved');",
 									"    }",
 									"}"
@@ -63,9 +64,9 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
+							"raw": "{\n  \"username\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
 						},
-						"url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+						"url": { "raw": "{{base_url}}/v1/auth/login", "host": ["{{base_url}}"], "path": ["v1", "auth", "login"] }
 					},
 					"event": [
 						{
@@ -74,8 +75,9 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var jsonData = pm.response.json();",
-									"    if (jsonData.access_token) {",
-									"        pm.collectionVariables.set('token', jsonData.access_token);",
+									"    var token = jsonData.access_token || (jsonData.data && jsonData.data.access_token);",
+									"    if (token) {",
+									"        pm.collectionVariables.set('token', token);",
 									"        console.log('Sanctum Token auto-saved');",
 									"    }",
 									"}"
@@ -86,18 +88,7 @@
 					]
 				},
 				{
-					"name": "Get Authenticated Profile (/api/user)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Accept", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
-						"url": { "raw": "{{base_url}}/user", "host": ["{{base_url}}"], "path": ["user"] }
-					}
-				},
-				{
-					"name": "Get Auth Me (/api/v1/auth/me)",
+					"name": "Get Auth Me (/v1/auth/me)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -108,14 +99,14 @@
 					}
 				},
 				{
-					"name": "Logout",
+					"name": "Logout (/v1/auth/logout)",
 					"request": {
 						"method": "POST",
 						"header": [
 							{ "key": "Accept", "value": "application/json" },
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
-						"url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
+						"url": { "raw": "{{base_url}}/v1/auth/logout", "host": ["{{base_url}}"], "path": ["v1", "auth", "logout"] }
 					}
 				}
 			]

@@ -22,10 +22,34 @@ Accept: application/json
 
 ## 📑 API Endpoints Summary
 
+### 🛡️ Standard Error Response Format
+All errors (401, 403, 404, 422) return a consistent JSON structure:
+```json
+{
+  "success": false,
+  "message": "Human readable error description",
+  "error_code": "ERR_FORBIDDEN",
+  "errors": null
+}
+```
+
+---
+
+### 👑 Role-Based Access Control (RBAC) Matrix
+
+| Role | Access Level | Description |
+| :--- | :--- | :--- |
+| **admin** | Full Control | Full access to catalog, POS sales, suppliers, purchases, employees, & audit logs |
+| **manager** | Inventory & Sales | Full catalog management, sales, void sales, stock adjustment & suppliers |
+| **cashier** | POS Operator | Process sales checkout, register customers, read-only catalog access |
+| **viewer** | Read-Only | Read-only inspection of catalog, sales, suppliers, and stock |
+
+---
+
 ### 1. Authentication Endpoints
 
-#### `POST /api/register`
-- **Auth**: Public (Unprotected)
+#### `POST /api/v1/auth/register`
+- **Auth**: Public (Unprotected, Throttle: 10/min)
 - **Description**: Register a new user account.
 - **Request Body**:
 ```json
@@ -34,34 +58,37 @@ Accept: application/json
   "email": "admin@example.com",
   "password": "Password123!",
   "password_confirmation": "Password123!",
-  "is_admin": true
+  "role": "admin"
 }
 ```
 - **Response `201 Created`**:
 ```json
 {
   "success": true,
-  "message": "User registered successfully.",
-  "access_token": "1|sanctum_token_string...",
-  "token_type": "Bearer",
-  "user": {
-    "id": 1,
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "is_admin": true
+  "message": "User registered successfully",
+  "data": {
+    "access_token": "1|sanctum_token_string...",
+    "token_type": "Bearer",
+    "user": {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin",
+      "is_admin": true
+    }
   }
 }
 ```
 
 ---
 
-#### `POST /api/login`
-- **Auth**: Public (Unprotected)
+#### `POST /api/v1/auth/login`
+- **Auth**: Public (Unprotected, Throttle: 10/min)
 - **Description**: Authenticate user or employee credentials and issue a Bearer token.
 - **Request Body**:
 ```json
 {
-  "email": "admin@example.com",
+  "username": "admin@example.com",
   "password": "Password123!"
 }
 ```
@@ -69,33 +96,53 @@ Accept: application/json
 ```json
 {
   "success": true,
-  "message": "Login successful.",
-  "access_token": "2|sanctum_token_string...",
-  "token_type": "Bearer",
-  "user": {
-    "id": 1,
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "is_admin": true
+  "message": "User login successful",
+  "data": {
+    "access_token": "2|sanctum_token_string...",
+    "token_type": "Bearer",
+    "user": {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin",
+      "is_admin": true
+    }
   }
 }
 ```
 
 ---
 
-#### `GET /api/user`
-- **Auth**: `auth:sanctum`
-- **Description**: Retrieve current authenticated user profile.
+#### `GET /api/v1/auth/me`
+- **Auth**: `auth:sanctum` (Bearer Token Required)
+- **Description**: Retrieve current authenticated user or employee profile.
 - **Response `200 OK`**:
 ```json
 {
   "success": true,
-  "user": {
+  "message": "Authenticated user profile",
+  "data": {
     "id": 1,
     "name": "Admin User",
     "email": "admin@example.com",
-    "is_admin": true
+    "role": "admin",
+    "is_admin": true,
+    "type": "user"
   }
+}
+```
+
+---
+
+#### `POST /api/v1/auth/logout`
+- **Auth**: `auth:sanctum` (Bearer Token Required)
+- **Description**: Revoke current active Bearer token.
+- **Response `200 OK`**:
+```json
+{
+  "success": true,
+  "message": "Logout successful",
+  "data": null
 }
 ```
 
