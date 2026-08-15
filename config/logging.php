@@ -1,21 +1,16 @@
 <?php
 
 use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
-use Monolog\Processor\PsrLogMessageProcessor;
-
-$logPath = env('APP_STORAGE', '/tmp/storage') . '/logs/laravel.log';
 
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Log Channel
+    | Default Log Channel (Errorlog for Vercel Serverless)
     |--------------------------------------------------------------------------
     */
 
-    'default' => 'stderr',
+    'default' => 'errorlog',
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
@@ -32,34 +27,26 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['stderr'],
+            'channels' => ['errorlog'],
             'ignore_exceptions' => false,
         ],
 
         'single' => [
-            'driver' => 'single',
-            'path' => $logPath,
+            'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
 
         'daily' => [
-            'driver' => 'daily',
-            'path' => $logPath,
+            'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
-            'max_files' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
         ],
 
         'stderr' => [
-            'driver' => 'monolog',
+            'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => StreamHandler::class,
-            'with' => [
-                'stream' => 'php://stderr',
-            ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
-            'processors' => [PsrLogMessageProcessor::class],
+            'replace_placeholders' => true,
         ],
 
         'syslog' => [
@@ -81,7 +68,7 @@ return [
         ],
 
         'emergency' => [
-            'path' => $logPath,
+            'driver' => 'errorlog',
         ],
 
     ],
