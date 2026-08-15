@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SS-MIS API Documentation — Store Stock & POS</title>
+  <meta name="description" content="Complete API reference for the Store Stock & Point-of-Sale Management Information System. Covers authentication, role-based access, and all available endpoints." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #0d0f14;
+      --surface:     #141720;
+      --surface-2:   #1b1f2e;
+      --border:      #252a3a;
+      --border-2:    #2e3448;
+      --text:        #e2e8f0;
+      --text-muted:  #7c8599;
+      --text-dim:    #4a5168;
+
+      --green:       #22c55e;
+      --green-bg:    #052e16;
+      --green-dim:   #14532d;
+      --blue:        #60a5fa;
+      --blue-bg:     #0c1a2e;
+      --yellow:      #fbbf24;
+      --yellow-bg:   #1a1200;
+      --red:         #f87171;
+      --red-bg:      #1f0606;
+      --purple:      #a78bfa;
+      --purple-bg:   #150d2e;
+      --orange:      #fb923c;
+
+      --radius:      10px;
+      --radius-sm:   6px;
+      --font-mono:   'JetBrains Mono', monospace;
+      --font-sans:   'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 28px 0 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+    .sidebar-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-logo h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .sidebar-logo p {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .version-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+      border-radius: 20px;
+      padding: 1px 8px;
+      margin-top: 6px;
+    }
+
+    .nav-section {
+      padding: 8px 20px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all .15s;
+      border-left: 2px solid transparent;
+    }
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+    .nav-link.active {
+      color: var(--blue);
+      border-left-color: var(--blue);
+      background: var(--blue-bg);
+    }
+    .nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Main content ─────────────────────────────────────── */
+    .main {
+      max-width: 900px;
+      padding: 56px 48px 100px;
+    }
+
+    /* ── Section headers ─────────────────────────────────── */
+    .section {
+      margin-bottom: 72px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    h1 { font-size: 32px; font-weight: 700; line-height: 1.2; color: var(--text); }
+    h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+    h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 10px; margin-top: 28px; }
+
+    p { color: var(--text-muted); margin-bottom: 14px; line-height: 1.7; }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero {
+      margin-bottom: 56px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .badge-green  { color: var(--green);  background: var(--green-bg);  border-color: var(--green-dim); }
+    .badge-blue   { color: var(--blue);   background: var(--blue-bg);   border-color: #1e3a5f; }
+    .badge-yellow { color: var(--yellow); background: var(--yellow-bg); border-color: #3d2e00; }
+    .badge-purple { color: var(--purple); background: var(--purple-bg); border-color: #2e1f6e; }
+    .badge-orange { color: var(--orange); background: #1f0e00;          border-color: #4a2500; }
+
+    /* ── Tier cards ───────────────────────────────────────── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .tier-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color .2s;
+    }
+    .tier-card:hover { border-color: var(--border-2); }
+    .tier-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .tier-card h3 { margin-top: 0; font-size: 15px; }
+    .tier-card p  { font-size: 13px; margin-bottom: 10px; }
+    .tier-can {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tier-can li {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .tier-can li::before { content: '✓'; color: var(--green); flex-shrink: 0; font-weight: 700; }
+
+    /* ── Code blocks ──────────────────────────────────────── */
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .copy-btn {
+      font-size: 11px;
+      font-family: var(--font-sans);
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid var(--border-2);
+      border-radius: 4px;
+      padding: 2px 8px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--text-dim); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green-dim); }
+
+    pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    pre::-webkit-scrollbar { height: 4px; }
+    pre::-webkit-scrollbar-track { background: transparent; }
+    pre::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+    .token-method { color: #f9a8d4; font-weight: 600; }
+    .token-url    { color: var(--blue); }
+    .token-key    { color: var(--purple); }
+    .token-str    { color: var(--green); }
+    .token-num    { color: var(--orange); }
+    .token-bool   { color: var(--yellow); }
+    .token-comment{ color: var(--text-dim); font-style: italic; }
+    .token-success{ color: var(--green); font-weight: 600; }
+    .token-error  { color: var(--red); font-weight: 600; }
+
+    /* ── Inline code ──────────────────────────────────────── */
+    code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--blue);
+    }
+
+    /* ── Endpoint table ───────────────────────────────────── */
+    .endpoint-group {
+      margin-bottom: 36px;
+    }
+    .endpoint-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .endpoint-list {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow: hidden;
+    }
+    .endpoint-row {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+    .endpoint-row:last-child { border-bottom: none; }
+    .endpoint-row:hover { background: var(--surface-2); }
+
+    .method {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      padding: 3px 0;
+      border-radius: var(--radius-sm);
+      letter-spacing: .04em;
+    }
+    .get    { background: #0a2e1a; color: #4ade80; border: 1px solid #14532d; }
+    .post   { background: #0c1a2e; color: #60a5fa; border: 1px solid #1e3a5f; }
+    .put    { background: #1a1200; color: #fbbf24; border: 1px solid #3d2e00; }
+    .delete { background: #1f0606; color: #f87171; border: 1px solid #5e1616; }
+
+    .endpoint-path {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .endpoint-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .endpoint-auth {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .auth-public  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-dim); }
+    .auth-bearer  { background: var(--blue-bg);   color: var(--blue);   border: 1px solid #1e3a5f; }
+    .auth-manager { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #3d2e00; }
+    .auth-admin   { background: var(--purple-bg); color: var(--purple); border: 1px solid #2e1f6e; }
+
+    /* ── Response example ─────────────────────────────────── */
+    .response-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      background: var(--surface-2);
+    }
+    .tab-btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 14px;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font-sans);
+    }
+    .tab-btn:hover { color: var(--text-muted); }
+    .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Alert boxes ──────────────────────────────────────── */
+    .alert {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      border-left: 3px solid;
+      font-size: 13.5px;
+    }
+    .alert-info    { background: var(--blue-bg);   border-color: var(--blue);   color: #93c5fd; }
+    .alert-tip     { background: var(--green-bg);  border-color: var(--green);  color: #86efac; }
+    .alert-warning { background: var(--yellow-bg); border-color: var(--yellow); color: #fde68a; }
+    .alert strong  { display: block; margin-bottom: 4px; font-weight: 600; }
+
+    /* ── Credentials table ────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13.5px;
+    }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: .04em;
+    }
+    td {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    tr:hover td { background: var(--surface-2); }
+    td code { font-size: 12px; }
+
+    /* ── Divider ──────────────────────────────────────────── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ── Step list ────────────────────────────────────────── */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      border: 1px solid #1e3a5f;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-body h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .step-body p { font-size: 13.5px; margin-bottom: 6px; }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .main { padding: 32px 20px 60px; }
+      .tier-grid { grid-template-columns: 1fr; }
+      .endpoint-row { grid-template-columns: 60px 1fr; }
+      .endpoint-auth { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ─── Sidebar ──────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h2>SS-MIS API</h2>
+      <p>Store Stock & Point-of-Sale</p>
+      <span class="version-badge">v1.0.0 · Live</span>
+    </div>
+
+    <div class="nav-section">Getting Started</div>
+    <a href="#overview"        class="nav-link active"><span class="nav-dot" style="background:#60a5fa"></span>Overview</a>
+    <a href="#who-is-this-for" class="nav-link"><span class="nav-dot" style="background:#a78bfa"></span>Who Is This For?</a>
+    <a href="#base-urls"       class="nav-link"><span class="nav-dot" style="background:#22c55e"></span>Base URLs</a>
+
+    <div class="nav-section">Authentication</div>
+    <a href="#how-to-login"     class="nav-link"><span class="nav-dot" style="background:#fbbf24"></span>How to Login</a>
+    <a href="#using-token"      class="nav-link"><span class="nav-dot" style="background:#fbbf24"></span>Using the Token</a>
+    <a href="#credentials"      class="nav-link"><span class="nav-dot" style="background:#fbbf24"></span>Credentials</a>
+
+    <div class="nav-section">Access Control</div>
+    <a href="#roles"           class="nav-link"><span class="nav-dot" style="background:#f87171"></span>Roles & Tiers</a>
+    <a href="#permissions"     class="nav-link"><span class="nav-dot" style="background:#f87171"></span>Permissions</a>
+
+    <div class="nav-section">Endpoints</div>
+    <a href="#ep-public"       class="nav-link"><span class="nav-dot" style="background:#22c55e"></span>🌐 Public</a>
+    <a href="#ep-auth"         class="nav-link"><span class="nav-dot" style="background:#60a5fa"></span>🔑 Auth</a>
+    <a href="#ep-manager"      class="nav-link"><span class="nav-dot" style="background:#fbbf24"></span>🔒 Manager</a>
+    <a href="#ep-admin"        class="nav-link"><span class="nav-dot" style="background:#a78bfa"></span>👑 Admin</a>
+
+    <div class="nav-section">Testing</div>
+    <a href="#postman"         class="nav-link"><span class="nav-dot" style="background:#fb923c"></span>Postman / Thunder</a>
+    <a href="#curl"            class="nav-link"><span class="nav-dot" style="background:#fb923c"></span>cURL Examples</a>
+    <a href="#local-dev"       class="nav-link"><span class="nav-dot" style="background:#fb923c"></span>Local Development</a>
+
+    <div class="nav-section">Reference</div>
+    <a href="#errors"          class="nav-link"><span class="nav-dot" style="background:#f87171"></span>Error Codes</a>
+    <a href="#response-format" class="nav-link"><span class="nav-dot" style="background:#7c8599"></span>Response Format</a>
+  </nav>
+
+  <!-- ─── Main ─────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero" id="overview">
+      <div class="section-eyebrow">API Reference</div>
+      <h1>SS-MIS REST API</h1>
+      <p style="font-size:16px; margin-top:12px;">
+        The Store Stock & Point-of-Sale Management Information System API. Built on Laravel, hosted on Vercel, backed by Neon PostgreSQL.
+      </p>
+      <div class="hero-badges">
+        <span class="badge badge-green">● Live</span>
+        <span class="badge badge-blue">REST / JSON</span>
+        <span class="badge badge-blue">Laravel 11</span>
+        <span class="badge badge-purple">Sanctum Auth</span>
+        <span class="badge badge-yellow">RBAC</span>
+      </div>
+    </div>
+
+    <!-- WHO IS THIS FOR -->
+    <section class="section" id="who-is-this-for">
+      <h2>Who Is This For?</h2>
+      <div class="tier-grid">
+        <div class="tier-card">
+          <div class="tier-icon">🌐</div>
+          <h3>Public / End Users</h3>
+          <p>Browse product data with <strong>no account needed</strong>.</p>
+          <ul class="tier-can">
+            <li>View all products & variants</li>
+            <li>Browse categories & colors</li>
+            <li>Search by barcode / SKU</li>
+            <li>Check low-stock items</li>
+          </ul>
+        </div>
+        <div class="tier-card">
+          <div class="tier-icon">🔑</div>
+          <h3>Cashier Staff</h3>
+          <p>POS operators who handle sales daily.</p>
+          <ul class="tier-can">
+            <li>Everything public users can do</li>
+            <li>Process POS checkout</li>
+            <li>Register & update customers</li>
+            <li>View sales history</li>
+          </ul>
+        </div>
+        <div class="tier-card">
+          <div class="tier-icon">🔒</div>
+          <h3>Frontend Developers / Manager</h3>
+          <p>Build the management dashboard UI.</p>
+          <ul class="tier-can">
+            <li>Create, update, delete products</li>
+            <li>Manage categories, sizes, colors</li>
+            <li>Handle suppliers & purchases</li>
+            <li>View dashboard stats & audit logs</li>
+          </ul>
+        </div>
+        <div class="tier-card">
+          <div class="tier-icon">👑</div>
+          <h3>System Administrator</h3>
+          <p>Full control of the entire system.</p>
+          <ul class="tier-can">
+            <li>Everything manager can do</li>
+            <li>Create & manage employees</li>
+            <li>Create new user accounts</li>
+            <li>Assign roles & permissions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- BASE URLS -->
+    <section class="section" id="base-urls">
+      <h2>Base URLs</h2>
+      <p>All API endpoints are prefixed with <code>/api/v1</code>.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Production</span>
+          <button class="copy-btn" onclick="copyCode(this, 'url-prod')">Copy</button>
+        </div>
+        <pre id="url-prod"><span class="token-url">https://api.kesararamwithdigital.tech</span></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Local Development</span>
+          <button class="copy-btn" onclick="copyCode(this, 'url-local')">Copy</button>
+        </div>
+        <pre id="url-local"><span class="token-url">http://localhost:8000</span>   <span class="token-comment"># php artisan serve</span></pre>
+      </div>
+
+      <div class="alert alert-tip">
+        <strong>✓ All responses are JSON</strong>
+        Every response — including errors — is always <code>application/json</code>. No HTML error pages.
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- HOW TO LOGIN -->
+    <section class="section" id="how-to-login">
+      <h2>How to Login</h2>
+      <p>Send a <code>POST</code> request to <code>/api/v1/auth/login</code> with your username and password. You get back an <code>access_token</code> and a <code>permissions[]</code> list.</p>
+
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Send Login Request</h4>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-label">Request</span>
+                <button class="copy-btn" onclick="copyCode(this, 'login-req')">Copy</button>
+              </div>
+              <pre id="login-req"><span class="token-method">POST</span>  <span class="token-url">https://api.kesararamwithdigital.tech/api/v1/auth/login</span>
+<span class="token-key">Content-Type</span>: application/json
+
+{
+  <span class="token-key">"username"</span>: <span class="token-str">"manager"</span>,
+  <span class="token-key">"password"</span>: <span class="token-str">"Manager@123456"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Receive Token + Permissions</h4>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-label">Response · 200 OK</span>
+              </div>
+              <pre>{
+  <span class="token-key">"success"</span>:      <span class="token-bool">true</span>,
+  <span class="token-key">"message"</span>:      <span class="token-str">"Login successful"</span>,
+  <span class="token-key">"data"</span>: {
+    <span class="token-key">"access_token"</span>: <span class="token-str">"1|abc123xyz..."</span>,
+    <span class="token-key">"token_type"</span>:   <span class="token-str">"Bearer"</span>,
+    <span class="token-key">"account_type"</span>: <span class="token-str">"employee"</span>,
+    <span class="token-key">"user"</span>: {
+      <span class="token-key">"id"</span>:       <span class="token-num">2</span>,
+      <span class="token-key">"name"</span>:     <span class="token-str">"Store Manager"</span>,
+      <span class="token-key">"username"</span>: <span class="token-str">"manager"</span>,
+      <span class="token-key">"role"</span>:     <span class="token-str">"MANAGER"</span>,
+      <span class="token-key">"permissions"</span>: [
+        <span class="token-str">"catalog.read"</span>, <span class="token-str">"catalog.write"</span>,
+        <span class="token-str">"customers.read"</span>, <span class="token-str">"customers.write"</span>,
+        <span class="token-str">"sales.read"</span>, <span class="token-str">"sales.checkout"</span>,
+        <span class="token-str">"suppliers.read"</span>, <span class="token-str">"purchases.read"</span>,
+        <span class="token-str">"stock.adjust"</span>, <span class="token-str">"dashboard.view"</span>
+      ]
+    }
+  }
+}</pre>
+            </div>
+            <div class="alert alert-info">
+              <strong>💡 Use permissions[], not role strings</strong>
+              Check <code>permissions.includes("catalog.write")</code> on the frontend instead of checking the role name. This means you never need to update your UI code when roles change.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Store the token</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">JavaScript (fetch)</span><button class="copy-btn" onclick="copyCode(this,'js-store')">Copy</button></div>
+              <pre id="js-store"><span class="token-comment">// After a successful login:</span>
+<span class="token-key">const</span> { data } = await response.json();
+
+localStorage.setItem(<span class="token-str">'token'</span>,       data.access_token);
+localStorage.setItem(<span class="token-str">'permissions'</span>, JSON.stringify(data.user.permissions));
+localStorage.setItem(<span class="token-str">'role'</span>,        data.user.role);</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USING THE TOKEN -->
+    <section class="section" id="using-token">
+      <h2>Using the Token</h2>
+      <p>Add the token to the <code>Authorization</code> header on every protected request.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">JavaScript — All Protected Requests</span><button class="copy-btn" onclick="copyCode(this,'js-fetch')">Copy</button></div>
+        <pre id="js-fetch"><span class="token-key">const</span> token = localStorage.getItem(<span class="token-str">'token'</span>);
+
+<span class="token-key">const</span> response = await fetch(<span class="token-str">'https://api.kesararamwithdigital.tech/api/v1/products'</span>, {
+  method: <span class="token-str">'GET'</span>,
+  headers: {
+    <span class="token-str">'Authorization'</span>: <span class="token-str">`Bearer ${token}`</span>,
+    <span class="token-str">'Content-Type'</span>:  <span class="token-str">'application/json'</span>,
+    <span class="token-str">'Accept'</span>:         <span class="token-str">'application/json'</span>,
+  }
+});
+
+<span class="token-key">const</span> json = await response.json();
+<span class="token-comment">// json.data → your data</span></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Frontend — Conditional UI with permissions</span><button class="copy-btn" onclick="copyCode(this,'js-perms')">Copy</button></div>
+        <pre id="js-perms"><span class="token-key">const</span> permissions = JSON.parse(localStorage.getItem(<span class="token-str">'permissions'</span>) || <span class="token-str">'[]'</span>);
+<span class="token-key">const</span> can = (perm) => permissions.includes(perm);
+
+<span class="token-comment">// Show "Edit" button only if user has write access:</span>
+<span class="token-key">if</span> (can(<span class="token-str">'catalog.write'</span>)) {
+  document.getElementById(<span class="token-str">'btn-edit-product'</span>).style.display = <span class="token-str">'block'</span>;
+}
+
+<span class="token-comment">// Show employee menu only for admin:</span>
+<span class="token-key">if</span> (can(<span class="token-str">'employees.write'</span>)) {
+  document.getElementById(<span class="token-str">'nav-employees'</span>).style.display = <span class="token-str">'block'</span>;
+}</pre>
+      </div>
+    </section>
+
+    <!-- CREDENTIALS -->
+    <section class="section" id="credentials">
+      <h2>Default Credentials</h2>
+      <p>These accounts are created when you run <code>php artisan db:seed</code>.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Username / Email</th>
+            <th>Password</th>
+            <th>Can Do</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-purple" style="font-size:11px">ADMIN</span></td>
+            <td><code>admin</code></td>
+            <td><code>Admin@123456</code></td>
+            <td>Everything</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow" style="font-size:11px">MANAGER</span></td>
+            <td><code>manager</code></td>
+            <td><code>Manager@123456</code></td>
+            <td>Catalog CRUD, inventory, analytics</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue" style="font-size:11px">CASHIER</span></td>
+            <td><code>cashier</code></td>
+            <td><code>Cashier@123456</code></td>
+            <td>POS checkout, customers</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow" style="font-size:11px">MANAGER</span></td>
+            <td><code>frontend@ssmis.local</code></td>
+            <td><code>Frontend@123456</code></td>
+            <td>Dev team account (User model)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-warning">
+        <strong>⚠ Change passwords before going live</strong>
+        These are seeded development passwords. Update them through the employee update endpoint or directly in the database before production use.
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- ROLES -->
+    <section class="section" id="roles">
+      <h2>Roles & Access Tiers</h2>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="badge badge-green">🌐 PUBLIC</span>
+          No token required — open to everyone
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/products</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/categories</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/variants</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/clothing-sizes</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/colors</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/auth/login</span>
+            <span class="endpoint-auth auth-public">No token</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="badge badge-blue">🔑 AUTHENTICATED</span>
+          Any valid Bearer token (all roles)
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/auth/me</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/auth/logout</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/customers</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/customers</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/sales/checkout</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/sales</span>
+            <span class="endpoint-auth auth-bearer">Bearer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="badge badge-yellow">🔒 MANAGER</span>
+          Bearer token + role MANAGER or ADMIN
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/products</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method put">PUT</span>
+            <span class="endpoint-path">/api/v1/products/{id}</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method delete">DEL</span>
+            <span class="endpoint-path">/api/v1/products/{id}</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/categories</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/suppliers</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/purchases</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/stock-movements</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/dashboard/stats</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/audit-logs</span>
+            <span class="endpoint-auth auth-manager">Manager+</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="badge badge-purple">👑 ADMIN</span>
+          Bearer token + role ADMIN only
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-row">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/employees</span>
+            <span class="endpoint-auth auth-admin">Admin only</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/employees</span>
+            <span class="endpoint-auth auth-admin">Admin only</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method put">PUT</span>
+            <span class="endpoint-path">/api/v1/employees/{id}</span>
+            <span class="endpoint-auth auth-admin">Admin only</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method delete">DEL</span>
+            <span class="endpoint-path">/api/v1/employees/{id}</span>
+            <span class="endpoint-auth auth-admin">Admin only</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/api/v1/auth/register</span>
+            <span class="endpoint-auth auth-admin">Admin only</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- FULL ENDPOINT REFERENCE -->
+    <section class="section" id="ep-public">
+      <h2>🌐 Public Endpoints</h2>
+
+      <h3>Products</h3>
+      <div class="endpoint-group">
+        <div class="endpoint-list">
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/products</span>
+            <span class="endpoint-desc">List all products with variants</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/products/{id}</span>
+            <span class="endpoint-desc">Get one product by ID</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/variants</span>
+            <span class="endpoint-desc">List all product variants</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/variants/{id}</span>
+            <span class="endpoint-desc">Get one variant</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/variants/barcode/{barcode}</span>
+            <span class="endpoint-desc">Scan barcode or SKU</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/variants/low-stock</span>
+            <span class="endpoint-desc">Items at or below reorder level</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/categories</span>
+            <span class="endpoint-desc">List all categories</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/clothing-sizes</span>
+            <span class="endpoint-desc">List S, M, L, XL sizes</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/colors</span>
+            <span class="endpoint-desc">List all colors</span>
+          </div>
+          <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/api/v1/health</span>
+            <span class="endpoint-desc">API health check / status</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ep-auth">
+      <h2>🔑 Authenticated Endpoints</h2>
+
+      <h3>POS — Checkout Request Body</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/sales/checkout</span></div>
+        <pre>{
+  <span class="token-key">"customer_id"</span>:   <span class="token-num">1</span>,           <span class="token-comment">// optional</span>
+  <span class="token-key">"items"</span>: [
+    {
+      <span class="token-key">"variant_id"</span>: <span class="token-num">1</span>,
+      <span class="token-key">"quantity"</span>:   <span class="token-num">2</span>,
+      <span class="token-key">"discount"</span>:   <span class="token-num">0</span>          <span class="token-comment">// per-item discount in USD</span>
+    }
+  ],
+  <span class="token-key">"payment_method"</span>:   <span class="token-str">"CASH"</span>,    <span class="token-comment">// CASH | CARD | QR | ABA</span>
+  <span class="token-key">"payment_amount"</span>:   <span class="token-num">80.00</span>,
+  <span class="token-key">"overall_discount"</span>: <span class="token-num">0</span>
+}</pre>
+      </div>
+
+      <h3>Customer — Create Body</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/customers</span></div>
+        <pre>{
+  <span class="token-key">"customer_name"</span>: <span class="token-str">"Sokha Heng"</span>,
+  <span class="token-key">"gender"</span>:        <span class="token-str">"Male"</span>,
+  <span class="token-key">"phone"</span>:         <span class="token-str">"+85512000001"</span>,
+  <span class="token-key">"email"</span>:         <span class="token-str">"sokha@example.com"</span>,
+  <span class="token-key">"address"</span>:       <span class="token-str">"Street 63, Phnom Penh"</span>
+}</pre>
+      </div>
+    </section>
+
+    <section class="section" id="ep-manager">
+      <h2>🔒 Manager Endpoints</h2>
+
+      <h3>Create Product</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/products</span></div>
+        <pre>{
+  <span class="token-key">"category_id"</span>:  <span class="token-num">1</span>,
+  <span class="token-key">"product_name"</span>: <span class="token-str">"Batik Silk Shirt"</span>,
+  <span class="token-key">"brand"</span>:        <span class="token-str">"Khmer Style"</span>,
+  <span class="token-key">"description"</span>:  <span class="token-str">"Handmade traditional Cambodian batik"</span>,
+  <span class="token-key">"status"</span>:       <span class="token-str">"ACTIVE"</span>         <span class="token-comment">// ACTIVE | INACTIVE</span>
+}</pre>
+      </div>
+
+      <h3>Create Product Variant</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/variants</span></div>
+        <pre>{
+  <span class="token-key">"product_id"</span>:    <span class="token-num">1</span>,
+  <span class="token-key">"size_id"</span>:       <span class="token-num">2</span>,
+  <span class="token-key">"color_id"</span>:      <span class="token-num">1</span>,
+  <span class="token-key">"sku"</span>:           <span class="token-str">"BATIK-BLK-M-001"</span>,
+  <span class="token-key">"barcode"</span>:       <span class="token-str">"8851000199999"</span>,
+  <span class="token-key">"cost_price"</span>:    <span class="token-num">12.00</span>,
+  <span class="token-key">"sale_price"</span>:    <span class="token-num">28.00</span>,
+  <span class="token-key">"quantity"</span>:      <span class="token-num">50</span>,
+  <span class="token-key">"reorder_level"</span>: <span class="token-num">5</span>
+}</pre>
+      </div>
+
+      <h3>Stock Adjustment</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/stock-movements/adjust</span></div>
+        <pre>{
+  <span class="token-key">"variant_id"</span>: <span class="token-num">1</span>,
+  <span class="token-key">"type"</span>:       <span class="token-str">"ADJUSTMENT"</span>,   <span class="token-comment">// ADJUSTMENT | RETURN | DAMAGE</span>
+  <span class="token-key">"quantity"</span>:   <span class="token-num">10</span>,
+  <span class="token-key">"reason"</span>:     <span class="token-str">"Stocktake correction"</span>
+}</pre>
+      </div>
+    </section>
+
+    <section class="section" id="ep-admin">
+      <h2>👑 Admin Endpoints</h2>
+
+      <h3>Create Employee</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/employees</span></div>
+        <pre>{
+  <span class="token-key">"employee_name"</span>: <span class="token-str">"Dara Sok"</span>,
+  <span class="token-key">"gender"</span>:        <span class="token-str">"Male"</span>,
+  <span class="token-key">"phone"</span>:         <span class="token-str">"+85512999001"</span>,
+  <span class="token-key">"email"</span>:         <span class="token-str">"dara@store.local"</span>,
+  <span class="token-key">"position"</span>:      <span class="token-str">"Sales Associate"</span>,
+  <span class="token-key">"username"</span>:      <span class="token-str">"dara"</span>,
+  <span class="token-key">"password"</span>:      <span class="token-str">"Dara@123456"</span>,
+  <span class="token-key">"role"</span>:          <span class="token-str">"CASHIER"</span>,       <span class="token-comment">// ADMIN | MANAGER | CASHIER | STAFF</span>
+  <span class="token-key">"status"</span>:        <span class="token-str">"ACTIVE"</span>
+}</pre>
+      </div>
+
+      <h3>Register Frontend Team Account</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">POST /api/v1/auth/register</span></div>
+        <pre>{
+  <span class="token-key">"name"</span>:                  <span class="token-str">"New Developer"</span>,
+  <span class="token-key">"email"</span>:                 <span class="token-str">"dev@yourteam.com"</span>,
+  <span class="token-key">"password"</span>:              <span class="token-str">"Dev@123456"</span>,
+  <span class="token-key">"password_confirmation"</span>: <span class="token-str">"Dev@123456"</span>,
+  <span class="token-key">"role"</span>:                  <span class="token-str">"manager"</span>        <span class="token-comment">// admin | manager | cashier | staff</span>
+}</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- POSTMAN -->
+    <section class="section" id="postman">
+      <h2>Postman / Thunder Client / Insomnia</h2>
+      <p>Import the ready-made collection files from the <code>docs/</code> folder.</p>
+
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Download the files from GitHub</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">Files</span></div>
+              <pre>docs/SS-MIS-API.postman_collection.json
+docs/SS-MIS-Production.postman_environment.json
+docs/SS-MIS-Local.postman_environment.json</pre>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Import into Postman</h4>
+            <p><strong>File → Import</strong> → drag all 3 files in at once.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Select environment</h4>
+            <p>Top-right dropdown: choose <strong>SS-MIS — Production</strong> or <strong>SS-MIS — Local</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>Login — token is saved automatically</h4>
+            <p>Run <strong>Login (Admin)</strong> or <strong>Login (Manager)</strong>. The test script auto-saves <code>{{access_token}}</code> to the environment. Every other request uses it automatically.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-tip">
+        <strong>⚡ The collection includes RBAC test requests</strong>
+        Look for the <strong>"⚡ RBAC — Permission Tests"</strong> folder. It has pre-built requests to verify that 401, 403, and 200 responses all work correctly.
+      </div>
+    </section>
+
+    <!-- CURL -->
+    <section class="section" id="curl">
+      <h2>cURL Examples</h2>
+
+      <h3>Public — no token</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'curl-pub')">Copy</button></div>
+        <pre id="curl-pub">curl https://api.kesararamwithdigital.tech/api/v1/products</pre>
+      </div>
+
+      <h3>Login and capture token</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Shell (bash)</span><button class="copy-btn" onclick="copyCode(this,'curl-login')">Copy</button></div>
+        <pre id="curl-login">TOKEN=$(curl -s -X POST https://api.kesararamwithdigital.tech/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"manager","password":"Manager@123456"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['access_token'])")
+
+echo "Token: $TOKEN"</pre>
+      </div>
+
+      <h3>Authenticated request</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'curl-auth')">Copy</button></div>
+        <pre id="curl-auth">curl https://api.kesararamwithdigital.tech/api/v1/auth/me \
+  -H "Authorization: Bearer $TOKEN"</pre>
+      </div>
+
+      <h3>Create a product (Manager)</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'curl-create')">Copy</button></div>
+        <pre id="curl-create">curl -X POST https://api.kesararamwithdigital.tech/api/v1/products \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category_id": 1,
+    "product_name": "Linen Batik Shirt",
+    "brand": "Angkor Style",
+    "status": "ACTIVE"
+  }'</pre>
+      </div>
+    </section>
+
+    <!-- LOCAL DEV -->
+    <section class="section" id="local-dev">
+      <h2>Local Development</h2>
+
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Install dependencies</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'local-1')">Copy</button></div>
+              <pre id="local-1">composer install</pre>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Configure environment</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'local-2')">Copy</button></div>
+              <pre id="local-2">cp .env.example .env
+php artisan key:generate</pre>
+            </div>
+            <p>Set your Neon DB credentials in <code>.env</code>: <code>DB_CONNECTION=pgsql</code>, <code>DB_HOST</code>, <code>DB_DATABASE</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Migrate & seed</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'local-3')">Copy</button></div>
+              <pre id="local-3">php artisan migrate:fresh --seed</pre>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>Start the server</h4>
+            <div class="code-block">
+              <div class="code-header"><span class="code-label">Shell</span><button class="copy-btn" onclick="copyCode(this,'local-4')">Copy</button></div>
+              <pre id="local-4">php artisan serve   # → http://localhost:8000</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- ERRORS -->
+    <section class="section" id="errors">
+      <h2>Error Codes</h2>
+      <table>
+        <thead>
+          <tr><th>HTTP</th><th>error_code</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>401</td><td><code>ERR_UNAUTHENTICATED</code></td><td>No token or expired token</td></tr>
+          <tr><td>403</td><td><code>ERR_FORBIDDEN</code></td><td>Token valid, but role too low. Check <code>your_role</code> and <code>required_role</code> in the response.</td></tr>
+          <tr><td>403</td><td><code>ERR_ACCOUNT_INACTIVE</code></td><td>Employee account has been deactivated</td></tr>
+          <tr><td>404</td><td><code>ERR_NOT_FOUND</code></td><td>Resource with that ID does not exist</td></tr>
+          <tr><td>422</td><td><code>ERR_VALIDATION</code></td><td>Input validation failed. Check <code>errors</code> object for field details.</td></tr>
+          <tr><td>500</td><td><code>ERR_INTERNAL_SERVER_ERROR</code></td><td>Unexpected server error</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Example 403 Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">403 Forbidden</span></div>
+        <pre>{
+  <span class="token-key">"success"</span>:           <span class="token-bool">false</span>,
+  <span class="token-key">"message"</span>:           <span class="token-str">"Forbidden. You do not have permission to perform this action."</span>,
+  <span class="token-key">"error_code"</span>:        <span class="token-str">"ERR_FORBIDDEN"</span>,
+  <span class="token-key">"your_role"</span>:         <span class="token-str">"CASHIER"</span>,
+  <span class="token-key">"required_role"</span>:     <span class="token-str">"MANAGER or ADMIN"</span>,
+  <span class="token-key">"documentation_url"</span>: <span class="token-str">"https://github.com/SNPbuilds/csms-api"</span>
+}</pre>
+      </div>
+    </section>
+
+    <!-- RESPONSE FORMAT -->
+    <section class="section" id="response-format">
+      <h2>Standard Response Format</h2>
+      <p>Every response follows the same envelope structure.</p>
+
+      <h3>Success</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">200 / 201 OK</span></div>
+        <pre>{
+  <span class="token-key">"success"</span>: <span class="token-bool">true</span>,
+  <span class="token-key">"message"</span>: <span class="token-str">"Products catalog retrieved"</span>,
+  <span class="token-key">"data"</span>:    [ <span class="token-comment">/* array or object */</span> ]
+}</pre>
+      </div>
+
+      <h3>Validation Error</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">422 Unprocessable Entity</span></div>
+        <pre>{
+  <span class="token-key">"success"</span>:    <span class="token-bool">false</span>,
+  <span class="token-key">"message"</span>:    <span class="token-str">"Validation Failed"</span>,
+  <span class="token-key">"error_code"</span>: <span class="token-str">"ERR_VALIDATION"</span>,
+  <span class="token-key">"errors"</span>: {
+    <span class="token-key">"product_name"</span>: [<span class="token-str">"The product name field is required."</span>],
+    <span class="token-key">"category_id"</span>:  [<span class="token-str">"The selected category id is invalid."</span>]
+  }
+}</pre>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ── Copy to clipboard ──────────────────────────────────────
+  function copyCode(btn, id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  }
+
+  // ── Active sidebar link on scroll ─────────────────────────
+  const sections = document.querySelectorAll('.section, .hero');
+  const links    = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const id = entry.target.id;
+        const active = document.querySelector(`.nav-link[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
