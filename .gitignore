@@ -1,31 +1,54 @@
-*.log
-.DS_Store
+# Environment & Secrets
 .env
 .env.backup
 .env.production
-*-debug.log
-.dataconnect/
-*.sqlite
-database/*.sqlite
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
+*.env
+!.env.example
 /auth.json
+
+# PHP & Composer Dependencies
+/vendor
+
+# Node & Frontend Build Artifacts
 /node_modules
 /public/build
-/public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+/public/fonts-manifest.dev.json
+
+# Logs, Cache & Temporary Files
+*.log
+*-debug.log
 /storage/*.key
 /storage/pail
-/vendor
+.phpunit.result.cache
+/.phpunit.cache
+.phpactor.json
+
+# Databases & SQLite
+*.sqlite
+*.sqlite-journal
+database/*.sqlite
+database/*.sqlite-journal
+.dataconnect/
+
+# macOS / Windows OS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Vercel & Cloud Deployments
+.vercel
+
+# IDEs & Editor Configuration
+/.idea
+/.vscode
+/.cursor/
+/.codex
+/.nova
+/.zed
 _ide_helper.php
 Homestead.json
 Homestead.yaml
-Thumbs.db
