@@ -7,6 +7,9 @@
       "runtime": "vercel-php@0.7.3"
     }
   },
+  "env": {
+    "VERCEL_PHP_VERSION": "8.3"
+  },
   "routes": [
     {
       "src": "/(.*)",
