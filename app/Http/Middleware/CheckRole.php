@@ -6,48 +6,58 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * CheckRole Middleware
+ *
+ * Checks that the authenticated user has one of the required roles.
+ * Works for both:
+ *   - Employee model (column-based `role` field: ADMIN, MANAGER, CASHIER, STAFF)
+ *   - User model (Spatie Permission HasRoles trait)
+ *
+ * Usage in routes:
+ *   Route::middleware('role:MANAGER,ADMIN')
+ *   Route::middleware('role:ADMIN')
+ */
 class CheckRole
 {
-    /**
-     * Handle an incoming request for Role-Based Access Control (RBAC).
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles
-     */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated access.',
+                'success'            => false,
+                'message'            => 'Unauthenticated. A valid Bearer token is required.',
+                'error_code'         => 'ERR_UNAUTHENTICATED',
+                'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Check if user is admin
-        if ($user->is_admin || strtoupper($user->role ?? '') === 'ADMIN') {
+        $allowedRoles = array_map('strtoupper', $roles);
+        $userRole     = strtoupper($user->role ?? '');
+
+        // 1. Admin is always allowed everywhere
+        if ($userRole === 'ADMIN' || (property_exists($user, 'is_admin') && $user->is_admin)) {
             return $next($request);
         }
 
-        // Check if employee role or Spatie role matches allowed roles list
-        $userRole = strtoupper($user->role ?? '');
-        $allowedRoles = array_map('strtoupper', $roles);
-
-        $hasRoleMatch = in_array($userRole, $allowedRoles);
-
-        if (!$hasRoleMatch && method_exists($user, 'hasAnyRole')) {
-            $hasRoleMatch = $user->hasAnyRole($roles);
+        // 2. Check column-based role (Employee model)
+        if (in_array($userRole, $allowedRoles, true)) {
+            return $next($request);
         }
 
-        if (!$hasRoleMatch) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Forbidden: Your role [' . ($user->role ?? 'NONE') . '] does not have permission to access this resource.',
-                'error_code' => 'ERR_FORBIDDEN',
-            ], Response::HTTP_FORBIDDEN);
+        // 3. Fallback: check Spatie HasRoles (User model)
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole($roles)) {
+            return $next($request);
         }
 
-        return $next($request);
+        return response()->json([
+            'success'            => false,
+            'message'            => 'Forbidden. You do not have permission to perform this action.',
+            'error_code'         => 'ERR_FORBIDDEN',
+            'your_role'          => $userRole ?: 'NONE',
+            'required_role'      => implode(' or ', $allowedRoles),
+            'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
+        ], Response::HTTP_FORBIDDEN);
     }
 }
