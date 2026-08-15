@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Facade;
+
 // Prepare writable /tmp storage & bootstrap cache paths for Vercel serverless functions
 $storagePath = '/tmp/storage';
 $cachePath = '/tmp/cache';
@@ -25,5 +29,10 @@ $_SERVER['APP_STORAGE'] = $storagePath;
 $_SERVER['APP_SERVICES_CACHE'] = "{$cachePath}/services.php";
 $_SERVER['APP_PACKAGES_CACHE'] = "{$cachePath}/packages.php";
 
-// Forward request to Laravel public/index.php
-require __DIR__ . '/../public/index.php';
+/** @var Application $app */
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->useStoragePath($storagePath);
+
+Facade::setFacadeApplication($app);
+
+$app->handleRequest(Request::capture());
