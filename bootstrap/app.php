@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -75,3 +75,9 @@ return Application::configure(basePath: dirname(__DIR__))
             ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
     })->create();
+
+if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || is_dir('/tmp')) {
+    $app->useStoragePath('/tmp/storage');
+}
+
+return $app;
