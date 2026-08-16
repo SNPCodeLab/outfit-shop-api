@@ -39,39 +39,47 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof AuthenticationException) {
                 return response()->json([
-                    'message'           => 'Requires authentication',
+                    'message'           => 'សូមអភ័យទោស! លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន 🔐✨',
                     'documentation_url' => $docUrl,
                     'status'            => '401',
-                ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
             if ($e instanceof AccessDeniedHttpException) {
                 return response()->json([
-                    'message'           => $e->getMessage() ?: 'Forbidden',
+                    'message'           => 'សូមអភ័យទោស! គណនីរបស់លោកអ្នកមិនទាន់មានសិទ្ធិគ្រប់គ្រាន់ដើម្បីបើកមើលផ្នែកនេះទេ 🚫',
                     'documentation_url' => $docUrl,
                     'status'            => '403',
-                ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
             if ($e instanceof ValidationException) {
                 return response()->json([
-                    'message'           => 'Validation Failed',
+                    'message'           => 'ទិន្នន័យដែលបានបញ្ជូនមកមិនត្រឹមត្រូវតាមទម្រង់ទេ! សូមពិនិត្យមើលព័ត៌មានដែលបានបំពេញម្តងទៀត 📝',
                     'errors'            => $e->errors(),
                     'documentation_url' => $docUrl,
                     'status'            => '422',
-                ], 422, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                ], 422, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
             if ($e instanceof NotFoundHttpException) {
                 return response()->json([
-                    'message'           => 'Not Found',
+                    'message'           => 'រកមិនឃើញទិន្នន័យដែលលោកអ្នកកំពុងស្វែងរកទេ! សូមពិនិត្យមើល URL ឡើងវិញម្តងទៀតណា៎ 🔍',
                     'documentation_url' => $docUrl,
                     'status'            => '404',
-                ], 404, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                ], 404, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException || $e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                return response()->json([
+                    'message'           => 'លោកអ្នកបានចុចញឹកញាប់ពេកហើយ! សូមសម្រាកបន្តិចសិន រួចសាកល្បងម្តងទៀតណា៎ ☕⏱️',
+                    'documentation_url' => $docUrl,
+                    'status'            => '429',
+                ], 429, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
             $data = [
-                'message'           => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
+                'message'           => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'ប្រព័ន្ធកំពុងជួបបញ្ហាបច្ចេកទេសបន្តិចបន្តួច! ក្រុមការងារយើងកំពុងពិនិត្យមើល សូមអធ្យាស្រ័យ 🛠️',
                 'documentation_url' => $docUrl,
                 'status'            => (string) ($status >= 400 && $status < 600 ? $status : 500),
             ];
@@ -82,7 +90,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $data['line']    = $e->getLine();
             }
 
-            return response()->json($data, $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            return response()->json($data, $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         });
     })->create();
 
