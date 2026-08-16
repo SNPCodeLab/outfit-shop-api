@@ -68,8 +68,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return response()->json([
-                'message'    => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
+                'message'    => 'Internal Server Error',
                 'error_code' => 'ERR_INTERNAL_SERVER_ERROR',
+                'details'    => $e->getMessage(),
+                'file'       => $e->getFile(),
+                'line'       => $e->getLine(),
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
             ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
