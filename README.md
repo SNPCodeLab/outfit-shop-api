@@ -112,16 +112,3 @@ php artisan migrate --seed
 ```bash
 php artisan serve
 ```
-
----
-
-## Postman Collections
-
-Pre-configured collection JSON files are located in the `postman_collections` directory:
-- Level_0_System_and_Health.postman_collection.json
-- Level_1_Public_Catalog_and_Auth.postman_collection.json
-- Level_2_Cashier_POS_and_Customers.postman_collection.json
-- Level_3_Manager_Inventory_and_Purchasing.postman_collection.json
-- Level_4_Admin_Employees_and_User_Management.postman_collection.json
-- SS_MIS_All_In_One_Complete.postman_collection.json
-- SS_MIS_Production.postman_environment.json
