@@ -15,19 +15,22 @@
 define('LARAVEL_START', microtime(true));
 
 // ─── 1. Vercel Environment Overrides (MUST run before autoloader) ─────────
-putenv('LOG_CHANNEL=null');           // Completely disable file logging
+putenv('LOG_CHANNEL=stderr');
 putenv('LOG_LEVEL=error');
+putenv('CACHE_STORE=array');
 putenv('CACHE_DRIVER=array');
-putenv('SESSION_DRIVER=array');
+putenv('SESSION_DRIVER=cookie');
 
-$_ENV['LOG_CHANNEL']    = 'null';
+$_ENV['LOG_CHANNEL']    = 'stderr';
 $_ENV['LOG_LEVEL']      = 'error';
+$_ENV['CACHE_STORE']    = 'array';
 $_ENV['CACHE_DRIVER']   = 'array';
-$_ENV['SESSION_DRIVER'] = 'array';
+$_ENV['SESSION_DRIVER'] = 'cookie';
 
-$_SERVER['LOG_CHANNEL']    = 'null';
+$_SERVER['LOG_CHANNEL']    = 'stderr';
+$_SERVER['CACHE_STORE']    = 'array';
 $_SERVER['CACHE_DRIVER']   = 'array';
-$_SERVER['SESSION_DRIVER'] = 'array';
+$_SERVER['SESSION_DRIVER'] = 'cookie';
 
 if (!getenv('DB_CONNECTION')) {
     putenv('DB_CONNECTION=pgsql');
