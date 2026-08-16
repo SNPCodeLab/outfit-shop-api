@@ -26,12 +26,15 @@ class StatusController extends BaseApiController
         }
 
         $data = [
-            'project'     => 'Store Stock & Point-of-Sale Information System',
+            'brand'       => 'KhmeRiel',
+            'brand_logo'  => 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png',
+            'project'     => 'KhmeRiel Store Stock & Point-of-Sale MIS',
             'acronym'     => 'SS-MIS',
             'version'     => 'v1.0.0',
             'api_status'  => 'Operational',
             'database'    => $dbStatus,
             'environment' => config('app.env', 'production'),
+            'frontend_url'=> 'https://app.kesararamwithdigital.tech',
             'timestamp'   => now()->toIso8601String(),
         ];
 

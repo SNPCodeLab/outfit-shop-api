@@ -1,0 +1,189 @@
+---
+name: kwd-frontend-design-system
+description: >
+  Frontend design system, architectural specification, and UI/UX styling rules for KhmeRiel (Khmer + Riel) Clothing MIS & POS.
+  Covers the dual-interface architecture:
+  1. Internal Admin & Staff Controller Portal (Dashboard, Inventory, Sales, Reports, Audit, Employees) using SalesBinder-style inventory matrices + shadcn/ui + Neo-Brutalist design tokens.
+  2. Customer-Facing Storefront & Product Showcase using Ralph Lauren-style luxury 3:4 catalog cards with micro color swatches and quick-shop drawers, fused with the nadanada.me Neo-Brutalism aesthetic.
+  Includes RBAC route guards, component specifications, color tokens, and the master copy-ready Next.js build prompt.
+---
+
+# KhmeRiel — Frontend Architecture & Neo-Brutalism Design System
+
+## 1. Brand Identity: KhmeRiel (Clothing MIS & POS)
+
+| Property | Value |
+|---|---|
+| **Brand Name** | **KhmeRiel** (*Khmer Culture + Riel Currency*) |
+| **Official Brand Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png` |
+| **Subtitle / Domain** | **KhmeRiel • Clothing & POS MIS** |
+| **Frontend Portal URL** | `https://app.kesararamwithdigital.tech` |
+| **Backend REST API Gateway**| `https://api.kesararamwithdigital.tech/api/v1` |
+| **Visual Identity** | Fusion of **Ralph Lauren luxury fashion catalog UX** (3:4 portrait tiles, micro color swatches, quick view) + **SalesBinder apparel matrices** + **nadanada.me / shadcn Neo-Brutalist design tokens**. |
+
+---
+
+## 2. Dual-Interface Architecture
+
+```
+                          ┌──────────────────────────────────────────────┐
+                          │         KhmeRiel Next.js Web App             │
+                          │        app.kesararamwithdigital.tech         │
+                          └──────────────────────┬───────────────────────┘
+                                                 │
+                   ┌─────────────────────────────┴─────────────────────────────┐
+                   ▼                                                           ▼
+    ┌──────────────────────────────┐                            ┌──────────────────────────────┐
+    │   PHASE 1: CONTROLLER PORTAL │                            │   PHASE 2: STORE SHOWCASE    │
+    │   (Admin / Manager / Staff)  │                            │      (Customer / Public)     │
+    │                              │                            │                              │
+    │ • SalesBinder-style Size ×   │                            │ • Ralph Lauren-style Luxury  │
+    │   Color Variant Matrices     │                            │   Catalog Grid (3:4 Ratio)   │
+    │ • Continuous Barcode Scanner │                            │ • Interactive Color Swatches │
+    │ • RBAC Role-Gated Controller │                            │ • Quick-Shop Slide-Up Drawer │
+    │ • Dashboard, Inventory, POS, │                            │ • Category & Size Filters    │
+    │   Sales, Reports, Audit Logs │                            │ • Tactile Neo-Brutalist Look │
+    └──────────────┬───────────────┘                            └──────────────┬───────────────┘
+                   │                                                           │
+                   └─────────────────────────────┬─────────────────────────────┘
+                                                 │
+                                                 │ Sanctum Bearer Token / HTTPS JSON
+                                                 ▼
+                          ┌──────────────────────────────────────────────┐
+                          │     CSMS-API Backend (Laravel 11 Engine)     │
+                          │        api.kesararamwithdigital.tech         │
+                          └──────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Ralph Lauren-Inspired Fashion Catalog Design (Storefront)
+
+From analyzing **Ralph Lauren (`ralphlauren.com/men-clothing`)**, we adopt these luxury fashion e-commerce UX standards and infuse them into our Neo-Brutalism system:
+
+### 3.1 Luxury Catalog Principles
+1. **3:4 Portrait Image Tiles**: Every clothing item renders in a high-resolution 3:4 portrait aspect ratio on clean studio backgrounds (`#F0EFED` / `#FAF7F0`).
+2. **Interactive Color Swatches**: Micro circular color swatches (`COLORS` table) positioned directly under the title. Hovering or clicking a swatch switches the preview image and updates active variant SKU.
+3. **Quick Shop / ជ្រើសរើសទំហំ Bar**: A canary yellow action button (`#FEE227`) that opens a bottom drawer or modal to select sizes (S, M, L, XL, 2XL) and add to cart without leaving the catalog page.
+4. **Sticky Filter & Sort Toolbar**: Top sticky bar with clean Neo-Brutalist dropdowns:
+   - `Category` (Shirts, Polos, Trousers, Hoodies)
+   - `Size (S - 2XL)`
+   - `Color Swatches`
+   - `Price Range`
+   - `Sort By` (Newest, Price: Low to High, Bestselling)
+
+---
+
+## 4. Visual Design DNA: Neo-Brutalism (nadanada.me & shadcn-retro)
+
+| Element | Specification | Tailwind CSS Utility |
+|---|---|---|
+| **Borders** | Solid 2.5px stark pitch black on every container and button | `border-2 border-black` or `border-[2.5px] border-black` |
+| **Drop Shadows** | Hard offset rectangular shadow (**0px blur radius**) | `shadow-[4px_4px_0px_0px_#000000]` |
+| **Active Click** | Physical 3D push-down translation | `hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all` |
+| **Canvas Background** | Warm Cream / Off-White with faint subtle grid | `bg-[#FAF7F0]` with `bg-grid-slate-200/50` |
+| **Primary Accent** | Canary Yellow | `#FEE227` / `#FFE600` |
+| **Typography** | Kantumruy Pro / Siemreap (Khmer) + Inter (English) | `font-black uppercase tracking-tight` |
+
+### Color Tokens
+
+```css
+:root {
+  --canvas: #FAF7F0;
+  --surface: #FFFFFF;
+  --ink: #000000;
+  --accent-yellow: #FEE227;
+  
+  /* Status & Role Badges */
+  --badge-green: #86EFAC;   /* Success / Cashier Role / Paid / In Stock */
+  --badge-blue: #93C5FD;    /* Info / Manager Role / Purchase / API */
+  --badge-amber: #FDE047;   /* Warning / Low Stock / Adjustment / Pending */
+  --badge-red: #FCA5A5;     /* Danger / Admin Role / Voided / Out of Stock / Delete */
+  --badge-gray: #E5E7EB;    /* Staff / Public */
+}
+```
+
+---
+
+## 5. Master Single-Prompt to Generate the Next.js Frontend
+
+*(Copy this prompt into any AI/coding environment to build the entire KhmeRiel frontend)*
+
+```markdown
+Act as a Principal Full-Stack Engineer and World-Class UI/UX Designer. Build a complete, production-ready Next.js 14+ (App Router, TypeScript) frontend application for "KhmeRiel" (Clothing & POS MIS) deployed at `https://app.kesararamwithdigital.tech`.
+
+### 1. BRAND IDENTITY & VISUAL DESIGN DNA
+- Brand Name: KhmeRiel (Khmer + Riel)
+- Brand Logo URL: https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png
+- Tagline: KhmeRiel • Clothing & POS MIS
+- Web App URL: https://app.kesararamwithdigital.tech
+- Design Style: Fusion of Ralph Lauren Luxury Catalog UX + SalesBinder Inventory Matrix + nadanada.me / shadcn Neo-Brutalism.
+- Canvas: Warm Cream background (#FAF7F0) with a subtle 20px grid line pattern.
+- Primary Accent: Canary Yellow (#FEE227 / #FFE600) for CTAs, active badges, and highlight cards.
+- Surface: Pure White (#FFFFFF) for tables, dialogs, modals, and product cards.
+- Outlines: Solid 2.5px stark pitch black (border-2 border-black).
+- Shadows: Hard rectangular box shadows with ZERO blur (shadow-[4px_4px_0px_0px_#000]).
+- Micro-Interactions: 3D physical tactile push-down effect on all buttons and cards (hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all).
+- Status Badges: Mint Green (#86EFAC: Paid/Cashier/In Stock), Soft Blue (#93C5FD: Manager/Purchase), Pastel Amber (#FDE047: Low Stock/Pending), Pastel Red (#FCA5A5: Admin/Void/Out of Stock).
+- Typography: Kantumruy Pro / Siemreap (Khmer) + Inter (English) with bold uppercase tracking.
+- Top Ticker Tape: Full-width black marquee bar with bold white uppercase text (⚡ KHMERIEL • REAL-TIME POS ENGINE • ACID-COMPLIANT STOCK • REST API v1).
+
+### 2. BACKEND API INTEGRATION & AUTHENTICATION
+- Production Base URL: https://api.kesararamwithdigital.tech/api/v1
+- Authentication: Laravel Sanctum Bearer Token via Authorization: Bearer <token> header.
+- Token Persistence: Store access_token in localStorage.getItem('auth_token') and authenticated user profile in auth_user.
+- Global Axios Interceptor (lib/api.ts):
+  - Automatically inject Bearer token on every outgoing request.
+  - Intercept 401 Unauthorized responses to clear local storage and redirect user to /login.
+  - Handle standard JSON error schema: { success: false, message: "...", error_code: "..." }.
+
+### 3. ROLE-BASED ACCESS CONTROL (RBAC) MATRIX
+Implement a strict useRoleGuard(minRole) client-side route guard enforcing the 4-tier access ladder:
+- ADMIN (Rank 4): Full access to Employee CRUD (/admin/employees), Security Audit Logs (/admin/audit), and User Account Creation.
+- MANAGER (Rank 3): Access to MIS Analytics Dashboard (/dashboard), Catalog & Variant Matrix CRUD (/inventory), Supplier Purchasing (/reports), Stock Adjustments (/inventory/adjust), and Transaction Voiding (/sales/void).
+- CASHIER (Rank 2): Access to POS Barcode Checkout Counter (/pos), Customer Registration (/customers), and Sales Receipts (/sales).
+- STAFF (Rank 1): Read-only product catalog lookup.
+
+### 4. CORE SCREENS & MODULES TO BUILD
+1. Authentication Portal (app/(auth)/login/page.tsx): Neo-Brutalist card with username/email and password fields, validation error banners, and loading button. Consumes POST /auth/login.
+2. Executive MIS Dashboard (app/(dashboard)/dashboard/page.tsx - Manager+): 4 Neo-Brutalist Stat Cards consuming GET /dashboard/stats, 7-Day API Request Traffic chart, and 20 Recent Requests Data Table with latency and HTTP status pills.
+3. High-Speed POS Checkout Counter (app/(dashboard)/pos/page.tsx - Cashier+): Continuous auto-focus Barcode/SKU scanner input consuming GET /variants/barcode/{barcode}, real-time cart manager, customer selector, payment method selector (CASH, CARD, QR, ABA) with change calculation, and checkout submission consuming POST /sales/checkout with instant printable receipt modal.
+4. SalesBinder-Style Matrix Inventory Controller (app/(dashboard)/inventory/page.tsx - Manager+): Searchable catalog table from GET /products and GET /variants, Apparel Size (S-2XL) × Color Matrix Grid with real-time stock balances, low-stock warnings from GET /variants/low-stock, and stock adjustment dialog consuming POST /stock-movements/adjust.
+5. Ralph Lauren-Style Storefront Catalog (app/(dashboard)/shop/page.tsx - Public / All): 4-column luxury product grid with tall 3:4 portrait aspect ratio clothing photography, interactive micro color swatches, hover "Quick View / ជ្រើសរើសទំហំ" size drawer, and sticky filter bar.
+6. Sales History & Void Manager (app/(dashboard)/sales/page.tsx - Cashier / Manager): Paginated transactions from GET /sales with expandable line items and manager void action consuming POST /sales/{id}/void.
+7. Employee & Audit Administration (app/(dashboard)/admin/page.tsx - Admin Only): Staff management table from GET/POST/PUT/DELETE /employees and security audit log feed from GET /audit-logs.
+
+### 5. PROJECT FILE STRUCTURE TO GENERATE
+```text
+src/
+├── app/
+│   ├── layout.tsx
+│   ├── globals.css
+│   ├── (auth)/
+│   │   └── login/page.tsx
+│   └── (dashboard)/
+│       ├── layout.tsx
+│       ├── dashboard/page.tsx
+│       ├── pos/page.tsx
+│       ├── inventory/page.tsx
+│       ├── shop/page.tsx
+│       ├── sales/page.tsx
+│       └── admin/
+│           ├── employees/page.tsx
+│           └── audit/page.tsx
+├── components/
+│   ├── ui/
+│   ├── Navbar.tsx
+│   ├── TickerTape.tsx
+│   ├── POSCart.tsx
+│   ├── VariantMatrix.tsx
+│   └── ProductTile.tsx
+├── hooks/
+│   └── useRoleGuard.ts
+└── lib/
+    ├── api.ts
+    └── utils.ts
+```
+
+Provide the complete, copy-paste ready code for tailwind.config.js, globals.css, lib/api.ts, hooks/useRoleGuard.ts, components/Navbar.tsx, components/TickerTape.tsx, components/VariantMatrix.tsx, components/ProductTile.tsx, and the primary /dashboard, /pos, and /shop screen implementations.
+```

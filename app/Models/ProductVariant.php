@@ -20,6 +20,8 @@ class ProductVariant extends Model
         'color_id',
         'sku',
         'barcode',
+        'image_url',
+        'image_public_id',
         'cost_price',
         'sale_price',
         'quantity',
