@@ -26,10 +26,10 @@ class CheckRole
 
         if (! $user) {
             return response()->json([
-                'message'           => 'Requires authentication',
+                'message'           => 'សូមអភ័យទោស! លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន 🔐✨',
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
                 'status'            => '401',
-            ], Response::HTTP_UNAUTHORIZED);
+            ], Response::HTTP_UNAUTHORIZED, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
         $allowedRoles = array_map('strtoupper', $roles);
@@ -51,9 +51,9 @@ class CheckRole
         }
 
         return response()->json([
-            'message'           => 'Forbidden',
+            'message'           => 'សូមអភ័យទោស! គណនីរបស់លោកអ្នកមិនទាន់មានសិទ្ធិគ្រប់គ្រាន់ដើម្បីបើកមើលផ្នែកនេះទេ 🚫',
             'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
             'status'            => '403',
-        ], Response::HTTP_FORBIDDEN);
+        ], Response::HTTP_FORBIDDEN, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 }
