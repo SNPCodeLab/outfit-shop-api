@@ -206,3 +206,62 @@ src/
 
 Provide the complete, copy-paste ready code for tailwind.config.js, globals.css, lib/api.ts, hooks/useRoleGuard.ts, components/Navbar.tsx, components/TickerTape.tsx, components/VariantMatrix.tsx, components/ProductTile.tsx, and the primary /dashboard, /pos, and /shop screen implementations.
 ```
+
+---
+
+## 6. Official Cloudinary CDN Asset Registry & URL Schema
+
+### 6.1 CDN Endpoint Architecture
+All media assets are served via high-speed global Edge CDN on Cloudinary:
+* **Cloud Name**: `od8t271n`
+* **Base URL Format**: `https://res.cloudinary.com/od8t271n/image/upload/v{timestamp}/{public_id}.{format}`
+* **Audio URL Format**: `https://res.cloudinary.com/od8t271n/video/upload/v{timestamp}/{public_id}.wav`
+
+### 6.2 Standardized Public ID Naming Convention
+All assets follow the strict uppercase semantic format:
+`KHMERIEL_{DEPARTMENT}_{STYLE_NAME}_{COLORWAY}_{VIEW_TYPE}_{SEQUENCE_CODE}`
+
+* **Department Types**: `TOPS`, `BOTTOMS`, `DRESSES`, `SKIRTS`, `OUTERWEAR`, `KNITWEAR`, `BAGS`, `SHOES`, `ACCESSORIES`, `MENS_CLASSIC_POLO`, `MENS_DESIGNER_COLLECTION`, `MENS_RLX_GOLF`, `MENS_US_OPEN_TENNIS`, `DIGITAL_BOOK_PUBLICATION`, `MARKETING_BANNER`, `AUDIO_FX`
+* **View Types**:
+  * `LOOK`: On-model editorial & lookbook photography
+  * `FLAT`: Clean product lay-down / cutout photography
+  * `DETAIL`: Macro fabric & stitching closeups
+  * `IMG`: Catalog grid photography
+
+### 6.3 Live Cloudinary Verified Assets (566+ Active)
+```text
+Dresses & Gowns:
+• KHMERIEL_DRESSES_BACKLESS_SILK_EVENING_DRESS_BLACK_LOOK_cloth_056..059 (.png)
+• KHMERIEL_DRESSES_BACKLESS_SILK_EVENING_DRESS_WHITE_LOOK_cloth_061..064 (.png)
+• KHMERIEL_DRESSES_CRINOLINE_COLUMN_GOWN_TERRACOTTA_LOOK_cloth_092..096 (.png)
+• KHMERIEL_DRESSES_LONG_SLEEVE_CRINOLINE_DRESS_WHITE_LOOK_cloth_079..085 (.png)
+• KHMERIEL_DRESSES_V_NECK_SILK_MAXI_DRESS_NAVY_LOOK_cloth_103..107 (.png)
+
+Tops, Shirts & Outerwear:
+• KHMERIEL_TOPS_FLUID_DRAPED_SILK_BLOUSE_CREAM_BEIGE_LOOK_cloth_003..012 (.png)
+• KHMERIEL_TOPS_OVERSIZED_POPLIN_SHIRT_LOOK_cloth_015..022 (.png)
+• KHMERIEL_TOPS_CLASSIC_EMBROIDERED_SILK_SHIRT_BLACK_LOOK_cloth_025..033 (.png)
+• KHMERIEL_OUTERWEAR_COLLARED_TAILORED_JACKET_SAGE_GREEN_LOOK_cloth_038..047 (.png)
+
+Bottoms, Culottes & Skirts:
+• KHMERIEL_BOTTOMS_MONOGRAM_SILK_CULOTTES_BLACK_LOOK_cloth_259..268 (.png)
+• KHMERIEL_BOTTOMS_MONOGRAM_SILK_CULOTTES_IVORY_LOOK_cloth_271..277 (.png)
+• KHMERIEL_BOTTOMS_WIDE_TAILORED_SHORTS_CREAM_BEIGE_LOOK_cloth_222..229 (.png)
+• KHMERIEL_SKIRTS_CRINOLINE_FLARE_SKIRT_TERRACOTTA_LOOK_cloth_295..298 (.png)
+• KHMERIEL_SKIRTS_FLUTED_KNIT_MIDI_SKIRT_BLACK_LOOK_cloth_306..313 (.png)
+• KHMERIEL_SKIRTS_BEADED_EVENING_MIDI_SKIRT_BLACK_LOOK_cloth_279..282 (.png)
+
+Luxury Leather Bags & Shoes:
+• KHMERIEL_BAGS_MINI_T_LOCK_CROSSBODY_BAG_BLACK_LOOK_cloth_127..128 (.png)
+• KHMERIEL_BAGS_MINI_T_LOCK_CROSSBODY_BAG_OFF_WHITE_LOOK_cloth_134..135 (.png)
+• KHMERIEL_BAGS_THREE_COMPARTMENT_LEATHER_TOTE_BLACK_LOOK_cloth_142..143 (.png)
+• KHMERIEL_BAGS_T_LOCK_LEATHER_CLUTCH_BAG_OFF_WHITE_LOOK_cloth_150..151 (.png)
+• KHMERIEL_BAGS_ROAM_LEATHER_EVERYDAY_TOTE_WARM_TAUPE_LOOK_cloth_120..121 (.png)
+• KHMERIEL_SHOES_T_STRAP_NAPPA_LEATHER_SANDALS_DARK_BROWN_LOOK_cloth_180..183 (.png)
+• KHMERIEL_SHOES_NAPLACK_LEATHER_BALLERINAS_BUTTERCUP_YELLOW_LOOK_cloth_162..165 (.png)
+
+Digital eBooks & Audio:
+• KHMERIEL_DIGITAL_BOOK_PUBLICATION_EN_*.pdf (26+ Full eBooks)
+• KHMERIEL_POS_SCANNER_AUDIO_FX_*.wav (3 POS Audio Cues)
+```
+
