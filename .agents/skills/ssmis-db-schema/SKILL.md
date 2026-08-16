@@ -411,4 +411,82 @@ erDiagram
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
+
+    POS_SHIFT {
+        BIGINT shift_id PK
+        BIGINT employee_id FK
+        BIGINT branch_id FK
+        TIMESTAMP opened_at
+        TIMESTAMP closed_at
+        DECIMAL opening_float_usd
+        DECIMAL opening_float_khr
+        DECIMAL cash_sales_usd
+        DECIMAL cash_sales_khr
+        DECIMAL card_sales_usd
+        DECIMAL qr_sales_usd
+        DECIMAL petty_cash_drops_usd
+        DECIMAL expected_cash_usd
+        DECIMAL closing_cash_usd
+        DECIMAL discrepancy_usd
+        VARCHAR status
+        TEXT notes
+        JSONB z_report_summary
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CUSTOMER_LOYALTY_LOG {
+        BIGINT log_id PK
+        BIGINT customer_id FK
+        BIGINT sale_id FK
+        VARCHAR transaction_type
+        INT points
+        INT balance_after
+        VARCHAR description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    VARIANT_PRICING_TIER {
+        BIGINT tier_id PK
+        BIGINT variant_id FK
+        INT min_quantity
+        INT max_quantity
+        DECIMAL unit_price
+        DECIMAL discount_percentage
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    GIFT_CARD {
+        BIGINT card_id PK
+        VARCHAR card_code UK
+        VARCHAR pin_hash
+        DECIMAL initial_balance
+        DECIMAL current_balance
+        BIGINT purchaser_customer_id FK
+        TIMESTAMP expiry_date
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    SHIPPING_ORDER {
+        BIGINT shipping_id PK
+        BIGINT sale_id FK
+        BIGINT branch_id FK
+        VARCHAR fulfillment_type
+        VARCHAR courier_name
+        VARCHAR tracking_number
+        VARCHAR recipient_name
+        VARCHAR recipient_phone
+        TEXT shipping_address
+        VARCHAR shipping_city
+        DECIMAL shipping_cost
+        VARCHAR status
+        TIMESTAMP dispatched_at
+        TIMESTAMP delivered_at
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
 ```
