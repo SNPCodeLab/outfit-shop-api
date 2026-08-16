@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "Level 1 - Public Catalog & Authentication",
+    "_postman_id": "ssmis-level-1-public",
+    "description": "Public read-only catalog and authentication login endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1.1 Login (Auto-Saves Bearer Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.data && jsonData.data.access_token) {",
+              "    pm.collectionVariables.set('token', jsonData.data.access_token);",
+              "    pm.environment.set('token', jsonData.data.access_token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123456\"\n}"
+        },
+        "url": "{{base_url}}/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "1.2 List Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/categories"
+      }
+    },
+    {
+      "name": "1.3 Get Category by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/categories/1"
+      }
+    },
+    {
+      "name": "1.4 List Clothing Sizes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/clothing-sizes"
+      }
+    },
+    {
+      "name": "1.5 Get Size by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/clothing-sizes/1"
+      }
+    },
+    {
+      "name": "1.6 List Colors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/colors"
+      }
+    },
+    {
+      "name": "1.7 Get Color by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/colors/1"
+      }
+    },
+    {
+      "name": "1.8 List Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/products"
+      }
+    },
+    {
+      "name": "1.9 Get Product by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/products/1"
+      }
+    },
+    {
+      "name": "1.10 List Variants for Product",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/products/1/variants"
+      }
+    },
+    {
+      "name": "1.11 List All SKU Variants",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/variants"
+      }
+    },
+    {
+      "name": "1.12 Get SKU Variant by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/variants/1"
+      }
+    },
+    {
+      "name": "1.13 Lookup Variant by Barcode",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/variants/barcode/8851000100011"
+      }
+    },
+    {
+      "name": "1.14 List Low Stock SKU Items",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/v1/variants/low-stock"
+      }
+    }
+  ]
+}
