@@ -27,8 +27,9 @@ if (!getenv('APP_KEY')) {
     $_ENV['APP_KEY'] = 'base64:bSQmNjhGdsJcRUWtzZqs50fNJf5uQVe80BuOfTV6uLk=';
 }
 
-if (!getenv('DB_CONNECTION')) {
+if (!getenv('DB_CONNECTION') || trim((string)getenv('DB_CONNECTION')) === '') {
     putenv('DB_CONNECTION=pgsql');
+    $_ENV['DB_CONNECTION'] = 'pgsql';
 }
 
 // Create writable /tmp paths
