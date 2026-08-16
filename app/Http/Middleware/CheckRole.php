@@ -26,11 +26,9 @@ class CheckRole
 
         if (! $user) {
             return response()->json([
-                'success'            => false,
-                'message'            => 'Unauthenticated. Missing or invalid Authorization Bearer token.',
-                'error_code'         => 'ERR_UNAUTHENTICATED',
-                'hint'               => 'Please provide "Authorization: Bearer <TOKEN>" in your request headers. Log in at POST /api/v1/auth/login to get a token.',
-                'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
+                'success'    => false,
+                'message'    => 'Access token is missing or invalid. Please sign in to continue.',
+                'error_code' => 'ERR_UNAUTHENTICATED',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -53,12 +51,10 @@ class CheckRole
         }
 
         return response()->json([
-            'success'            => false,
-            'message'            => 'Forbidden. You do not have permission to perform this action.',
-            'error_code'         => 'ERR_FORBIDDEN',
-            'your_role'          => $userRole ?: 'NONE',
-            'required_role'      => implode(' or ', $allowedRoles),
-            'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
+            'success'       => false,
+            'message'       => 'You do not have permission to perform this action.',
+            'error_code'    => 'ERR_FORBIDDEN',
+            'required_role' => implode(' or ', $allowedRoles),
         ], Response::HTTP_FORBIDDEN);
     }
 }

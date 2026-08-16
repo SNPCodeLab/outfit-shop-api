@@ -46,8 +46,6 @@ abstract class BaseApiController extends Controller
             $response['errors'] = $errors;
         }
 
-        $response['documentation_url'] = 'https://github.com/SNPbuilds/csms-api';
-
         return response()->json($response, $code);
     }
 }
