@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-$app = Application::configure(basePath: dirname(__DIR__))
+return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -68,15 +68,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             }
 
             return response()->json([
-                'message'    => app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
+                'message'    => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
                 'error_code' => 'ERR_INTERNAL_SERVER_ERROR',
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
             ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
     })->create();
 
-if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || is_dir('/tmp')) {
-    $app->useStoragePath('/tmp/storage');
-}
-
-return $app;
