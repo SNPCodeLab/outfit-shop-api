@@ -56,12 +56,10 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath($storagePath);
+\Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
 $_SERVER['SCRIPT_NAME']      = '/index.php';
 $_SERVER['PHP_SELF']         = '/index.php';
 $_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
-
-if (empty(config('database.default'))) {
-    config(['database.default' => 'pgsql']);
-}
 
 $app->handleRequest(\Illuminate\Http\Request::capture());
