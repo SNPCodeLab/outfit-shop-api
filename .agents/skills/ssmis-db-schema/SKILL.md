@@ -295,4 +295,120 @@ erDiagram
         BIGINT created_by FK
         TIMESTAMP created_at
     }
+
+    BRAND {
+        BIGINT brand_id PK
+        VARCHAR brand_name UK
+        VARCHAR slug UK
+        VARCHAR logo_url
+        VARCHAR banner_url
+        VARCHAR country_of_origin
+        TEXT description
+        VARCHAR website_url
+        BOOLEAN is_featured
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    STORE_BRANCH {
+        BIGINT branch_id PK
+        VARCHAR branch_name
+        VARCHAR branch_code UK
+        VARCHAR phone
+        VARCHAR email
+        TEXT address
+        VARCHAR city
+        BOOLEAN is_warehouse
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    STORE_INVENTORY {
+        BIGINT inventory_id PK
+        BIGINT branch_id FK
+        BIGINT variant_id FK
+        INT quantity
+        INT reorder_level
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PROMOTION {
+        BIGINT promotion_id PK
+        VARCHAR title
+        VARCHAR promo_code UK
+        VARCHAR discount_type
+        DECIMAL discount_value
+        DECIMAL min_spend
+        VARCHAR target_department
+        TIMESTAMP start_date
+        TIMESTAMP end_date
+        INT max_usage_count
+        INT used_count
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_BUNDLE {
+        BIGINT bundle_id PK
+        VARCHAR bundle_name
+        VARCHAR sku UK
+        VARCHAR barcode UK
+        DECIMAL bundle_price
+        DECIMAL original_total_price
+        TEXT description
+        VARCHAR image_url
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    BUNDLE_ITEM {
+        BIGINT bundle_item_id PK
+        BIGINT bundle_id FK
+        BIGINT variant_id FK
+        INT quantity
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_REVIEW {
+        BIGINT review_id PK
+        BIGINT product_id FK
+        BIGINT customer_id FK
+        VARCHAR reviewer_name
+        INT rating
+        VARCHAR title
+        TEXT comment
+        BOOLEAN is_verified_purchase
+        BOOLEAN is_approved
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CUSTOMER_WISHLIST {
+        BIGINT wishlist_id PK
+        BIGINT customer_id FK
+        BIGINT product_id FK
+        BIGINT variant_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    MARKETING_BANNER {
+        BIGINT banner_id PK
+        VARCHAR title
+        VARCHAR subtitle
+        VARCHAR image_url
+        VARCHAR image_public_id
+        VARCHAR link_url
+        VARCHAR placement
+        VARCHAR target_department
+        INT sort_order
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
 ```

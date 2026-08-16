@@ -147,11 +147,30 @@ Implement a strict useRoleGuard(minRole) client-side route guard enforcing the 4
 ### 4. CORE SCREENS & MODULES TO BUILD
 1. Authentication Portal (app/(auth)/login/page.tsx): Neo-Brutalist card with username/email and password fields, validation error banners, and loading button. Consumes POST /auth/login.
 2. Executive MIS Dashboard (app/(dashboard)/dashboard/page.tsx - Manager+): 4 Neo-Brutalist Stat Cards consuming GET /dashboard/stats, 7-Day API Request Traffic chart, and 20 Recent Requests Data Table with latency and HTTP status pills.
-3. High-Speed POS Checkout Counter (app/(dashboard)/pos/page.tsx - Cashier+): Continuous auto-focus Barcode/SKU scanner input consuming GET /variants/barcode/{barcode}, real-time cart manager, customer selector, payment method selector (CASH, CARD, QR, ABA) with change calculation, and checkout submission consuming POST /sales/checkout with instant printable receipt modal.
-4. SalesBinder-Style Matrix Inventory Controller (app/(dashboard)/inventory/page.tsx - Manager+): Searchable catalog table from GET /products and GET /variants, Apparel Size (S-2XL) × Color Matrix Grid with real-time stock balances, low-stock warnings from GET /variants/low-stock, and stock adjustment dialog consuming POST /stock-movements/adjust.
-5. Ralph Lauren-Style Storefront Catalog (app/(dashboard)/shop/page.tsx - Public / All): 4-column luxury product grid with tall 3:4 portrait aspect ratio clothing photography, interactive micro color swatches, hover "Quick View / ជ្រើសរើសទំហំ" size drawer, and sticky filter bar.
-6. Sales History & Void Manager (app/(dashboard)/sales/page.tsx - Cashier / Manager): Paginated transactions from GET /sales with expandable line items and manager void action consuming POST /sales/{id}/void.
-7. Employee & Audit Administration (app/(dashboard)/admin/page.tsx - Admin Only): Staff management table from GET/POST/PUT/DELETE /employees and security audit log feed from GET /audit-logs.
+3. High-Speed POS Checkout Counter (app/(dashboard)/pos/page.tsx - Cashier+): Continuous auto-focus Barcode/SKU scanner input consuming GET /variants/barcode/{barcode}, audio feedback cues from GET /settings/audio-cues, coupon voucher verification via POST /promotions/verify-coupon, real-time cart manager, customer selector, payment method selector (CASH, CARD, QR, ABA) with change calculation, and checkout submission consuming POST /sales/checkout with instant printable receipt modal.
+4. SalesBinder-Style Matrix Inventory Controller (app/(dashboard)/inventory/page.tsx - Manager+): Searchable catalog table from GET /products and GET /variants, Apparel Size (S-2XL) × Color Matrix Grid with real-time stock balances consuming GET /products/{id}/matrix, low-stock warnings from GET /variants/low-stock, batch expiry monitor from GET /inventory/expiring-soon, and stock adjustment dialog consuming POST /stock-movements/adjust.
+5. Ralph Lauren-Style Storefront Catalog (app/(dashboard)/shop/page.tsx - Public / All): 4-column luxury product grid with tall 3:4 portrait aspect ratio clothing photography, interactive micro color swatches, hover "Quick View / ជ្រើសរើសទំហំ" size drawer, hero banner carousels from GET /marketing/banners, brand directory from GET /brands, combo bundles from GET /bundles, and sticky filter bar.
+6. Product Detail & Lookbook Showcase (app/(dashboard)/shop/[id]/page.tsx - Public / All): Multi-angle photo gallery from GET /products/{id}/images, colorway swatches from GET /products/{id}/colorways, customer reviews & star ratings from GET /products/{id}/reviews, and one-click wishlist saving via POST /wishlist/toggle.
+7. Sales History & Void Manager (app/(dashboard)/sales/page.tsx - Cashier / Manager): Paginated transactions from GET /sales with expandable line items and manager void action consuming POST /sales/{id}/void.
+8. Multi-Branch & Store Management (app/(dashboard)/branches/page.tsx - Manager+): Branch locator and inventory levels across stores from GET /branches and GET /branches/{id}/stock.
+9. Employee & Audit Administration (app/(dashboard)/admin/page.tsx - Admin Only): Staff management table from GET/POST/PUT/DELETE /employees and security audit log feed from GET /audit-logs.
+
+### 5. COMPLETE API ENDPOINT DIRECTORY
+| Module | Method & Endpoint | Description |
+|---|---|---|
+| **Auth** | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Bearer token session authentication |
+| **Catalog** | `GET /products`, `GET /products/{id}`, `GET /products/{id}/matrix`, `GET /products/{id}/colorways`, `GET /products/{id}/download` | Omnichannel catalog & luxury matrix |
+| **Brands** | `GET /brands`, `GET /brands/{id}`, `POST/PUT/DELETE /brands` | Multi-brand directory and lookbooks |
+| **Bundles** | `GET /bundles`, `GET /bundles/{id}`, `POST/DELETE /bundles` | Combo packs and gift sets |
+| **Promotions** | `GET /promotions/active`, `POST /promotions/verify-coupon` | POS discounts & voucher verification |
+| **Reviews** | `GET /products/{id}/reviews`, `POST /products/{id}/reviews` | Customer ratings & feedback |
+| **Branches** | `GET /branches`, `GET /branches/{id}/stock` | Multi-store location inventory |
+| **Wishlist** | `GET /wishlist`, `POST /wishlist/toggle` | Saved items and lookbook bookmarks |
+| **Batches** | `GET /inventory/expiring-soon`, `GET/POST /variants/{id}/batches` | FMCG FIFO expiry & lot tracking |
+| **CMS** | `GET /marketing/banners`, `POST/DELETE /marketing/banners` | Storefront hero carousel banners |
+| **Settings** | `GET /settings/audio-cues` | POS sound FX & currency exchange rate |
+| **POS Sales** | `POST /sales/checkout`, `GET /sales`, `POST /sales/{id}/void` | ACID transactional checkout & receipts |
+| **Inventory** | `GET /variants`, `GET /variants/low-stock`, `POST /stock-movements/adjust` | Stock movements & adjustments |
 
 ### 5. PROJECT FILE STRUCTURE TO GENERATE
 ```text
