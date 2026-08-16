@@ -84,6 +84,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
     Route::get('/variants/barcode/{barcode}',          [ProductVariantController::class,'lookupBarcode']);
     Route::get('/variants/{id}',                       [ProductVariantController::class,'show']);
+    Route::get('/variants/{id}/tiers',                 [\App\Http\Controllers\Api\V1\VariantPricingTierController::class, 'index']);
+    Route::get('/variants/{id}/barcode-label',         [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'barcodeLabel']);
+
+    // Payments, KHQR & Hardware Print Services
+    Route::get('/payments/khqr',                       [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateCustom']);
+    Route::get('/sales/{id}/khqr',                     [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateForSale']);
+    Route::get('/sales/{id}/receipt-thermal',          [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'receiptThermal']);
+    Route::post('/gift-cards/check',                   [\App\Http\Controllers\Api\V1\GiftCardController::class, 'check']);
 
     // Storefront CMS Banners & System Settings
     Route::get('/marketing/banners',                   [\App\Http\Controllers\Api\V1\MarketingBannerController::class, 'index']);
@@ -101,16 +109,30 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout',  [AuthController::class, 'logout']);
         });
 
-        // -- Customer Management (Cashier, Manager, Admin) --
-        Route::get('/customers',          [CustomerController::class, 'index']);
-        Route::get('/customers/{id}',     [CustomerController::class, 'show']);
-        Route::post('/customers',         [CustomerController::class, 'store']);
-        Route::put('/customers/{id}',     [CustomerController::class, 'update']);
+        // -- Customer Management & Loyalty (Cashier, Manager, Admin) --
+        Route::get('/customers',                       [CustomerController::class, 'index']);
+        Route::get('/customers/{id}',                  [CustomerController::class, 'show']);
+        Route::post('/customers',                      [CustomerController::class, 'store']);
+        Route::put('/customers/{id}',                  [CustomerController::class, 'update']);
+        Route::get('/customers/{id}/loyalty',          [\App\Http\Controllers\Api\V1\CustomerLoyaltyController::class, 'show']);
+        Route::post('/customers/{id}/redeem-points',   [\App\Http\Controllers\Api\V1\CustomerLoyaltyController::class, 'redeem']);
 
-        // -- POS Sales (Cashier, Manager, Admin) --
-        Route::post('/sales/checkout',    [SaleController::class, 'checkout']);
-        Route::get('/sales',              [SaleController::class, 'index']);
-        Route::get('/sales/{id}',         [SaleController::class, 'show']);
+        // -- POS Cash Register Shifts (Z-Report) --
+        Route::get('/shifts/current',                  [\App\Http\Controllers\Api\V1\PosShiftController::class, 'current']);
+        Route::post('/shifts/open',                    [\App\Http\Controllers\Api\V1\PosShiftController::class, 'open']);
+        Route::post('/shifts/drop-cash',               [\App\Http\Controllers\Api\V1\PosShiftController::class, 'dropCash']);
+        Route::post('/shifts/close',                   [\App\Http\Controllers\Api\V1\PosShiftController::class, 'close']);
+
+        // -- POS Sales & Gift Cards (Cashier, Manager, Admin) --
+        Route::post('/sales/checkout',                 [SaleController::class, 'checkout']);
+        Route::get('/sales',                           [SaleController::class, 'index']);
+        Route::get('/sales/{id}',                      [SaleController::class, 'show']);
+        Route::post('/gift-cards/issue',               [\App\Http\Controllers\Api\V1\GiftCardController::class, 'issue']);
+
+        // -- Omnichannel Shipping & Click-and-Collect --
+        Route::get('/shipping/orders',                 [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'index']);
+        Route::post('/shipping/create',                [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'create']);
+        Route::post('/shipping/{id}/status',           [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'updateStatus']);
 
 
         // =====================================================================
@@ -118,8 +140,10 @@ Route::prefix('v1')->group(function () {
         // =====================================================================
         Route::middleware('role:MANAGER,ADMIN')->group(function () {
 
-            // Analytics & Dashboard
-            Route::get('/dashboard/stats',             [DashboardController::class,     'stats']);
+            // Analytics, Dashboard & Restock Forecasting
+            Route::get('/dashboard/stats',                      [DashboardController::class,     'stats']);
+            Route::get('/inventory/restock-recommendations',    [\App\Http\Controllers\Api\V1\InventoryForecastingController::class, 'restockRecommendations']);
+            Route::post('/purchases/auto-generate',             [\App\Http\Controllers\Api\V1\InventoryForecastingController::class, 'autoGeneratePurchaseOrder']);
 
             // Catalog Write Access
             Route::post('/categories',                 [CategoryController::class,      'store']);
@@ -147,6 +171,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/variants',                   [ProductVariantController::class,'store']);
             Route::put('/variants/{id}',               [ProductVariantController::class,'update']);
             Route::delete('/variants/{id}',            [ProductVariantController::class,'destroy']);
+            Route::post('/variants/{id}/tiers',        [\App\Http\Controllers\Api\V1\VariantPricingTierController::class, 'store']);
 
             // Bundles & Promotions
             Route::post('/bundles',                    [\App\Http\Controllers\Api\V1\ProductBundleController::class, 'store']);
