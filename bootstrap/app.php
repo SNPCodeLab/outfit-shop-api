@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin'      => \App\Http\Middleware\AdminMiddleware::class,
         ]);
 
+        $middleware->redirectGuestsTo(fn () => null);
+
         $middleware->api(append: [
             \App\Http\Middleware\LogApiRequests::class,
         ]);

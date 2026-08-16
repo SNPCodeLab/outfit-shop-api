@@ -44,7 +44,7 @@ Route::prefix('v1')->group(function () {
 
     // Authentication — rate-limited to prevent brute-force
     Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
-        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/login', [AuthController::class, 'login'])->name('login');
     });
 
     // Public Product Catalog — read-only, no token needed
