@@ -12,7 +12,7 @@ class ProductVariantController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = ProductVariant::with(['product', 'size', 'color']);
+        $query = ProductVariant::with(['product', 'size', 'color', 'batches', 'images']);
 
         // Fast search by SKU, Barcode, or Product Name
         if ($search = $request->input('q') ?? $request->input('search')) {
@@ -23,6 +23,11 @@ class ProductVariantController extends BaseApiController
                       $p->where('product_name', 'ILIKE', "%{$search}%");
                   });
             });
+        }
+
+        // Filter by Unit of Measure (PIECE, CAN, BOTTLE, CARTON_24, etc.)
+        if ($uom = $request->input('unit_of_measure') ?? $request->input('uom')) {
+            $query->where('unit_of_measure', strtoupper($uom));
         }
 
         // Filter by Product ID

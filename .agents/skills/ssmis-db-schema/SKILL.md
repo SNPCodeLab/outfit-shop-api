@@ -24,8 +24,12 @@ erDiagram
     STORE ||--o{ EMPLOYEE : employs
     STORE ||--o{ STOCK_MOVEMENT : holds
 
+    CATEGORY ||--o{ CATEGORY : parent_child
     CATEGORY ||--o{ PRODUCT : categorizes
     PRODUCT ||--o{ PRODUCT_VARIANT : has
+    PRODUCT ||--o{ PRODUCT_IMAGE : gallery
+    PRODUCT_VARIANT ||--o{ PRODUCT_IMAGE : variant_image
+    PRODUCT_VARIANT ||--o{ PRODUCT_BATCH : tracks_lot
     CLOTHING_SIZE ||--o{ PRODUCT_VARIANT : sizes
     COLOR ||--o{ PRODUCT_VARIANT : colors
 
@@ -59,9 +63,12 @@ erDiagram
 
     CATEGORY {
         BIGINT category_id PK
+        BIGINT parent_id FK
         VARCHAR category_name UK
         VARCHAR slug UK
+        VARCHAR department_type
         TEXT description
+        VARCHAR image_url
         BOOLEAN is_active
         TIMESTAMP created_at
         TIMESTAMP updated_at
@@ -71,9 +78,18 @@ erDiagram
     PRODUCT {
         BIGINT product_id PK
         BIGINT category_id FK
+        VARCHAR product_type
         VARCHAR product_name
         VARCHAR brand
+        VARCHAR gender
+        VARCHAR material_fabric
+        VARCHAR season_collection
+        VARCHAR author_artist
+        VARCHAR isbn_code
+        VARCHAR featured_badge
         TEXT description
+        VARCHAR image_url
+        VARCHAR image_public_id
         VARCHAR status
         TIMESTAMP created_at
         TIMESTAMP updated_at
@@ -99,17 +115,50 @@ erDiagram
         BIGINT product_id FK
         BIGINT size_id FK
         BIGINT color_id FK
+        VARCHAR unit_of_measure
+        VARCHAR volume_or_weight
+        DECIMAL alcohol_by_volume
+        VARCHAR download_file_url
         VARCHAR sku UK
         VARCHAR barcode UK
+        VARCHAR image_url
+        VARCHAR image_public_id
         DECIMAL cost_price
         DECIMAL sale_price
         DECIMAL wholesale_price
-        INT stock_quantity
+        INT quantity
         INT reorder_level
         BOOLEAN is_active
         TIMESTAMP created_at
         TIMESTAMP updated_at
         TIMESTAMP deleted_at
+    }
+
+    PRODUCT_IMAGE {
+        BIGINT image_id PK
+        BIGINT product_id FK
+        BIGINT variant_id FK
+        VARCHAR image_url
+        VARCHAR image_public_id
+        VARCHAR shot_type
+        VARCHAR alt_text
+        INT sort_order
+        BOOLEAN is_primary
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_BATCH {
+        BIGINT batch_id PK
+        BIGINT variant_id FK
+        VARCHAR batch_number
+        DATE manufacturing_date
+        DATE expiry_date
+        INT quantity_received
+        INT quantity_remaining
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     SUPPLIER {

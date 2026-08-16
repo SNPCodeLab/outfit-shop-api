@@ -16,11 +16,18 @@ class Product extends Model
 
     protected $fillable = [
         'category_id',
+        'product_type',
         'product_name',
         'brand',
+        'gender',
+        'material_fabric',
+        'season_collection',
+        'author_artist',
+        'isbn_code',
         'description',
         'image_url',
         'image_public_id',
+        'featured_badge',
         'status',
     ];
 
@@ -32,5 +39,15 @@ class Product extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class, 'product_id', 'product_id')->orderBy('sort_order', 'asc');
+    }
+
+    public function primaryImage(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ProductImage::class, 'product_id', 'product_id')->whereRaw('is_primary is true');
     }
 }
