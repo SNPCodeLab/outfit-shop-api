@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\ClothingSizeController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\EmployeeController;
+use App\Http\Controllers\Api\V1\ImageUploadController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\PurchaseController;
@@ -132,6 +133,14 @@ Route::prefix('v1')->group(function () {
             // Inventory
             Route::get('/stock-movements',             [StockMovementController::class, 'index']);
             Route::post('/stock-movements/adjust',     [StockMovementController::class, 'adjust']);
+
+            // Cloudinary Image Media Management
+            Route::get('/uploads/gallery',                   [ImageUploadController::class,   'gallery']);
+            Route::post('/uploads/image',                    [ImageUploadController::class,   'upload']);
+            Route::post('/uploads/batch',                    [ImageUploadController::class,   'uploadBatch']);
+            Route::delete('/uploads/image',                  [ImageUploadController::class,   'destroy']);
+            Route::post('/products/{id}/image',              [ImageUploadController::class,   'uploadForProduct']);
+            Route::post('/variants/{id}/image',              [ImageUploadController::class,   'uploadForVariant']);
 
             // Sales Management
             Route::post('/sales/{id}/void',            [SaleController::class,          'void']);
