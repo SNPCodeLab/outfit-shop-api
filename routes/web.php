@@ -21,9 +21,13 @@ Route::get('/', function () {
     $base = rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/');
 
     return response()->json([
-        'system'             => 'Store Stock & Point-of-Sale MIS API',
+        'brand_name'         => 'KhmeRiel',
+        'brand_tagline'      => 'KhmeRiel • Clothing & POS MIS',
+        'brand_logo_url'     => 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png',
+        'system'             => 'KhmeRiel Store Stock & Point-of-Sale MIS API',
         'version'            => '1.0.0',
         'status'             => 'online',
+        'frontend_url'       => 'https://app.kesararamwithdigital.tech',
         'documentation_url'  => 'https://github.com/SNPbuilds/csms-backend-api',
 
         // ── Public (no token) ─────────────────────────────────────────────
@@ -49,6 +53,9 @@ Route::get('/', function () {
         'suppliers_url'          => "{$base}/api/v1/suppliers",
         'purchases_url'          => "{$base}/api/v1/purchases",
         'stock_movements_url'    => "{$base}/api/v1/stock-movements",
+        'media_gallery_url'      => "{$base}/api/v1/uploads/gallery",
+        'media_upload_url'       => "{$base}/api/v1/uploads/image",
+        'media_batch_upload_url' => "{$base}/api/v1/uploads/batch",
         'dashboard_stats_url'    => "{$base}/api/v1/dashboard/stats",
         'audit_logs_url'         => "{$base}/api/v1/audit-logs",
 

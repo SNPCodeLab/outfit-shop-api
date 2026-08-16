@@ -220,6 +220,12 @@ All errors (401, 403, 404, 422) return a consistent JSON structure:
 | `/api/v1/suppliers` | `GET` | Sanctum (Admin/Manager) | List suppliers |
 | `/api/v1/purchases` | `GET` | Sanctum (Admin/Manager) | List purchase orders |
 | `/api/v1/stock-movements/adjust` | `POST` | Sanctum (Admin/Manager) | Adjust inventory stock |
+| `/api/v1/uploads/image` | `POST` | Sanctum (Admin/Manager) | Upload single image to Cloudinary |
+| `/api/v1/uploads/batch` | `POST` | Sanctum (Admin/Manager) | Batch upload list of images or URLs |
+| `/api/v1/uploads/gallery` | `GET` | Sanctum (Admin/Manager) | List all attached product & variant images |
+| `/api/v1/uploads/image` | `DELETE` | Sanctum (Admin/Manager) | Delete image from Cloudinary |
+| `/api/v1/products/{id}/image` | `POST` | Sanctum (Admin/Manager) | Upload & attach image to product |
+| `/api/v1/variants/{id}/image` | `POST` | Sanctum (Admin/Manager) | Upload & attach image to variant |
 | `/api/v1/audit-logs` | `GET` | Sanctum (Admin/Manager) | View audit logs |
 | `/api/v1/employees` | `GET` | Sanctum (Admin Only) | List employees |
 

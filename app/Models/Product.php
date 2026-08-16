@@ -19,6 +19,8 @@ class Product extends Model
         'product_name',
         'brand',
         'description',
+        'image_url',
+        'image_public_id',
         'status',
     ];
 

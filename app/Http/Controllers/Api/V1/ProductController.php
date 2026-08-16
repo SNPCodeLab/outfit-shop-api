@@ -21,9 +21,11 @@ class ProductController extends BaseApiController
         $validated = $request->validate([
             'category_id'  => 'required|exists:categories,category_id',
             'product_name' => 'required|string|max:150',
-            'brand'        => 'nullable|string',
-            'description'  => 'nullable|string',
-            'status'       => 'nullable|string|in:ACTIVE,INACTIVE',
+            'brand'           => 'nullable|string',
+            'description'     => 'nullable|string',
+            'image_url'       => 'nullable|string|max:500',
+            'image_public_id' => 'nullable|string|max:255',
+            'status'          => 'nullable|string|in:ACTIVE,INACTIVE',
         ]);
 
         $product = Product::create($validated);
@@ -45,11 +47,13 @@ class ProductController extends BaseApiController
         $old = $product->toArray();
 
         $validated = $request->validate([
-            'category_id'  => 'required|exists:categories,category_id',
-            'product_name' => 'required|string|max:150',
-            'brand'        => 'nullable|string',
-            'description'  => 'nullable|string',
-            'status'       => 'nullable|string|in:ACTIVE,INACTIVE',
+            'category_id'     => 'required|exists:categories,category_id',
+            'product_name'    => 'required|string|max:150',
+            'brand'           => 'nullable|string',
+            'description'     => 'nullable|string',
+            'image_url'       => 'nullable|string|max:500',
+            'image_public_id' => 'nullable|string|max:255',
+            'status'          => 'nullable|string|in:ACTIVE,INACTIVE',
         ]);
 
         $product->update($validated);
