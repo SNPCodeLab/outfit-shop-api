@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "Level 4 - Admin (Employees & User Management)",
+    "_postman_id": "ssmis-level-4-admin",
+    "description": "Super Admin operations for HR employee administration and user registration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "4.1 List All Employees",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/employees"
+      }
+    },
+    {
+      "name": "4.2 Get Employee by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/employees/1"
+      }
+    },
+    {
+      "name": "4.3 Create Employee Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"vanna_cashier\",\n  \"employee_name\": \"Vanna Seng\",\n  \"email\": \"vanna@ssmis.local\",\n  \"password\": \"Cashier@123456\",\n  \"role\": \"CASHIER\",\n  \"position\": \"Morning POS Cashier\",\n  \"phone\": \"+85512445566\",\n  \"gender\": \"Female\",\n  \"salary\": 360.00\n}"
+        },
+        "url": "{{base_url}}/api/v1/employees"
+      }
+    },
+    {
+      "name": "4.4 Update Employee Account",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"position\": \"Senior Branch Manager\",\n  \"salary\": 850.00,\n  \"status\": \"ACTIVE\"\n}"
+        },
+        "url": "{{base_url}}/api/v1/employees/2"
+      }
+    },
+    {
+      "name": "4.5 Delete Employee Account",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/employees/5"
+      }
+    },
+    {
+      "name": "4.6 Register Developer API Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Mobile App Developer\",\n  \"email\": \"mobile_dev@company.com\",\n  \"password\": \"MobileDev@123456\",\n  \"role\": \"manager\"\n}"
+        },
+        "url": "{{base_url}}/api/v1/auth/register"
+      }
+    }
+  ]
+}
