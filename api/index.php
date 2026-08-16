@@ -2,17 +2,20 @@
 
 /*
 |--------------------------------------------------------------------------
-| Vercel Serverless Entry Point
+| Vercel Serverless Entry Point (KhmeRiel MIS & POS API)
 |--------------------------------------------------------------------------
 |
-| This file bootstraps Laravel for Vercel's read-only serverless environment.
-| All environment overrides and writable /tmp paths are set BEFORE the
-| Composer autoloader and Laravel app are loaded, so that no part of the
-| framework can attempt to write to the read-only /var/task filesystem.
+| Bootstraps Laravel 11 for Vercel's read-only serverless AWS Lambda environment.
+| All environment overrides, deprecation filters, and writable /tmp paths are set
+| BEFORE the Composer autoloader and Laravel application are loaded.
 |
 */
 
 define('LARAVEL_START', microtime(true));
+
+// Silence PHP 8.x PDO deprecation notices so they do not corrupt HTTP JSON output
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+ini_set('display_errors', '0');
 
 // ─── 1. Vercel Environment Overrides (MUST run before autoloader) ─────────
 putenv('LOG_CHANNEL=stderr');
@@ -73,7 +76,11 @@ $_SERVER['APP_STORAGE']      = $storagePath;
 
 // ─── 3. Bootstrap & Dispatch ───────────────────────────────────────────────
 try {
-    require __DIR__ . '/../vendor/autoload.php';
+    $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+    if (!file_exists($autoloadPath)) {
+        throw new \RuntimeException('Composer vendor directory not found. Please run composer install.');
+    }
+    require $autoloadPath;
 
     /** @var \Illuminate\Foundation\Application $app */
     $app = require_once __DIR__ . '/../bootstrap/app.php';
