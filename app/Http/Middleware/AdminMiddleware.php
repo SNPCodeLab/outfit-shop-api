@@ -19,9 +19,9 @@ class AdminMiddleware
 
         if (!$user) {
             return response()->json([
-                'success'    => false,
-                'message'    => 'Access token is missing or invalid. Please sign in to continue.',
-                'error_code' => 'ERR_UNAUTHENTICATED',
+                'message'           => 'Requires authentication',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'status'            => '401',
             ], 401);
         }
 
@@ -31,9 +31,9 @@ class AdminMiddleware
 
         if (!$isAdmin) {
             return response()->json([
-                'success'    => false,
-                'message'    => 'You do not have permission to perform this action. Administrator privileges required.',
-                'error_code' => 'ERR_FORBIDDEN',
+                'message'           => 'Must have admin rights.',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'status'            => '403',
             ], 403);
         }
 
