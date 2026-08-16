@@ -302,3 +302,44 @@ Payment methods: `CASH`, `CARD`, `QR`, `ABA`
 | 2026-08-16 | `.env.example` three-block database config | Clarified PostgreSQL=primary, Oracle=alternative, SQLite=test-only |
 | 2026-08-16 | Academic Terminology explanation pattern recorded | For student exam/defense preparation and frontend team onboarding |
 | 2026-08-16 | Frontend team integration guide added to skill | For frontend developers consuming the API |
+| 2026-08-17 | Enterprise Omnichannel Rollout (Phases 1–3) Implemented | Bakong KHQR, thermal labels, shifts, loyalty, wholesale tiers, gift cards, shipping, restock forecasting |
+| 2026-08-17 | Single Master Directory `khmeRiel-Items/` (643 Assets) | Consolidated 8 flat catalog departments with Cloudinary CDN / Neon DB separation |
+| 2026-08-17 | Git Branch Isolation Workflow Protocol Locked | Work exclusively on `dev` branch; never push directly to `main`; merge only on explicit user command |
+
+---
+
+## 11. Omnichannel Rollout Sequence & Catalog Memory (Locked Standards)
+
+### 11.1 Master Catalog Asset Inventory (`khmeRiel-Items/`)
+- Total Verified Items: **643 assets** across 8 flat subdirectories:
+  1. `cloths/` (389 items — luxury apparel, polos, silk shirts, denim, dresses)
+  2. `books/` (79 items — 32 downloadable PDF eBooks + 47 covers)
+  3. `drinks/` (74 items — beverages, Vattanac/Hanuman beers, water, sodas)
+  4. `banners/` (62 items — storefront hero carousels & promotional cards)
+  5. `cosmetics/` (14 items — beauty & skincare products)
+  6. `icons_and_audio/` (12 items — 9 UI icons + 3 POS scanner WAV audio cues)
+  7. `health/` (8 items — wellness & pharmacy items)
+  8. `food/` (5 items — consumer packaged snacks)
+- Storage Rule: Binary files remain on Cloudinary CDN and local storage (ignored in `.gitignore` and `.vercelignore`), while Neon PostgreSQL stores pure relational metadata and URLs.
+
+### 11.2 Rollout Sequence Architecture
+- **Phase 1: Financial & POS Hardware**
+  - Bakong Dynamic KHQR Generation (`KhqrService`, EMVCo Tag-Length-Value with CRC16 CCITT).
+  - Dual-Currency Precision Engine (USD $\leftrightarrow$ KHR at 4,100 rate with change breakdown).
+  - Hardware Print Engine (`BarcodePrintController` for 50x30mm thermal barcode stickers and 80mm ESC/POS thermal receipts).
+- **Phase 2: Cashier Accountability & Customer Growth**
+  - POS Shift Management (`pos_shifts`, open floats, cash drops, close register, cash over/short discrepancy, Z-Reports).
+  - Customer VIP Loyalty Ledger (`customer_loyalty_logs`, Bronze/Silver/Gold/Platinum tiers, points redemption).
+  - B2B Volume Pricing Tiers (`variant_pricing_tiers` for bulk apparel & beverage carton discounts).
+  - Digital Gift Cards (`gift_cards` 16-digit voucher cards and store credit balances).
+- **Phase 3: Omnichannel Logistics & Predictive Automation**
+  - Click-and-Collect (BOPIS) & Courier Tracking (`shipping_orders` for Virak Buntham, J&T, Grab).
+  - Sales Velocity Restock Forecasting ($V = \frac{\text{units}}{14}$, run rate, days remaining).
+  - One-Click Automated Purchase Order drafting (`InventoryForecastingController`).
+
+### 11.3 Git Development Protocol (Strictly Enforced)
+- **Active Branch**: `dev`
+- **Rule**: NEVER push directly to `main`.
+- **Workflow**: Stage, commit, and push all new features and fixes exclusively to `dev`.
+- **Merge**: Only merge `dev` $\rightarrow$ `main` upon receiving the explicit user instruction `"merge"`.
+
