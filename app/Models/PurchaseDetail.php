@@ -25,6 +25,11 @@ class PurchaseDetail extends Model
         return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
     }
 
+    public function purchase(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
+    }
+
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id', 'variant_id');
