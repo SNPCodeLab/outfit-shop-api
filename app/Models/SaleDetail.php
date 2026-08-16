@@ -26,6 +26,11 @@ class SaleDetail extends Model
         return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');
     }
 
+    public function sale(): BelongsTo
+    {
+        return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');
+    }
+
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id', 'variant_id');
