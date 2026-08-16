@@ -52,3 +52,4 @@ Desktop.ini
 _ide_helper.php
 Homestead.json
 Homestead.yaml
+.env*
