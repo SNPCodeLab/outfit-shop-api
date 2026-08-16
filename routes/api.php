@@ -61,11 +61,18 @@ Route::prefix('v1')->group(function () {
     Route::get('/products',                            [ProductController::class,       'index']);
     Route::get('/products/{id}',                       [ProductController::class,       'show']);
     Route::get('/products/{id}/images',                [\App\Http\Controllers\Api\V1\ProductImageController::class, 'index']);
+    Route::get('/products/{id}/matrix',                [\App\Http\Controllers\Api\V1\ProductMatrixController::class, 'matrix']);
+    Route::get('/products/{id}/colorways',             [\App\Http\Controllers\Api\V1\ProductMatrixController::class, 'colorways']);
+    Route::get('/products/{id}/download',              [\App\Http\Controllers\Api\V1\DigitalAssetController::class, 'download']);
 
     Route::get('/variants',                            [ProductVariantController::class,'index']);
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
     Route::get('/variants/barcode/{barcode}',          [ProductVariantController::class,'lookupBarcode']);
     Route::get('/variants/{id}',                       [ProductVariantController::class,'show']);
+
+    // Storefront CMS Banners & System Settings
+    Route::get('/marketing/banners',                   [\App\Http\Controllers\Api\V1\MarketingBannerController::class, 'index']);
+    Route::get('/settings/audio-cues',                 [\App\Http\Controllers\Api\V1\SystemSettingController::class, 'audioCues']);
 
 
     // =========================================================================
@@ -121,6 +128,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/variants',                   [ProductVariantController::class,'store']);
             Route::put('/variants/{id}',               [ProductVariantController::class,'update']);
             Route::delete('/variants/{id}',            [ProductVariantController::class,'destroy']);
+
+            // FMCG FIFO & Batch Tracking
+            Route::get('/inventory/expiring-soon',     [\App\Http\Controllers\Api\V1\InventoryBatchController::class, 'expiringSoon']);
+            Route::get('/variants/{id}/batches',       [\App\Http\Controllers\Api\V1\InventoryBatchController::class, 'listBatches']);
+            Route::post('/variants/{id}/batches',      [\App\Http\Controllers\Api\V1\InventoryBatchController::class, 'storeBatch']);
+
+            // Storefront CMS Marketing Banners
+            Route::post('/marketing/banners',          [\App\Http\Controllers\Api\V1\MarketingBannerController::class, 'store']);
+            Route::delete('/marketing/banners/{id}',   [\App\Http\Controllers\Api\V1\MarketingBannerController::class, 'destroy']);
 
             // Suppliers & Purchasing
             Route::get('/suppliers',                   [SupplierController::class,      'index']);

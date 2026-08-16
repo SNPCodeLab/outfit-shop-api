@@ -61,7 +61,9 @@ class POSService
                     throw new Exception("Product variant ID {$variantId} not found.");
                 }
 
-                if ($variant->quantity < $qty) {
+                $isDigital = ($variant->product->product_type ?? 'PHYSICAL_APPAREL') === 'DIGITAL_DOWNLOAD';
+
+                if (!$isDigital && $variant->quantity < $qty) {
                     throw new Exception("Insufficient stock for SKU [{$variant->sku}]. Requested: {$qty}, Available: {$variant->quantity}.");
                 }
 
@@ -76,6 +78,7 @@ class POSService
                     'unit_price'  => $unitPrice,
                     'discount'    => $itemDiscount,
                     'sub_total'   => $subTotal,
+                    'is_digital'  => $isDigital,
                 ];
             }
 
@@ -97,6 +100,7 @@ class POSService
                 /** @var ProductVariant $variant */
                 $variant = $detail['variant'];
                 $qty = $detail['quantity'];
+                $isDigital = $detail['is_digital'];
 
                 SaleDetail::create([
                     'sale_id'    => $saleHeader->sale_id,
@@ -107,20 +111,22 @@ class POSService
                     'sub_total'  => $detail['sub_total'],
                 ]);
 
-                // Atomically update stock
-                $variant->decrement('quantity', $qty);
+                // Atomically update stock only for physical products
+                if (!$isDigital) {
+                    $variant->decrement('quantity', $qty);
 
-                // Stock Movement Audit
-                StockMovement::create([
-                    'variant_id'     => $variant->variant_id,
-                    'movement_type'  => 'SALE',
-                    'quantity'       => -$qty,
-                    'movement_date'  => now(),
-                    'reference_type' => 'SaleHeader',
-                    'reference_id'   => $saleHeader->sale_id,
-                    'note'           => "POS Sale #{$saleHeader->sale_id}",
-                    'employee_id'    => $employeeId,
-                ]);
+                    // Stock Movement Audit
+                    StockMovement::create([
+                        'variant_id'     => $variant->variant_id,
+                        'movement_type'  => 'SALE',
+                        'quantity'       => -$qty,
+                        'movement_date'  => now(),
+                        'reference_type' => 'SaleHeader',
+                        'reference_id'   => $saleHeader->sale_id,
+                        'note'           => "POS Sale #{$saleHeader->sale_id}",
+                        'employee_id'    => $employeeId,
+                    ]);
+                }
             }
 
             // 4. Create Payment Record
