@@ -2,7 +2,7 @@
 
 **Project**: Store Stock & Point-of-Sale Information System (SS-MIS)  
 **API Gateway**: `https://api.kesararamwithdigital.tech`  
-**Repository**: `https://github.com/SNPbuilds/csms-api`  
+**Repository**: `https://github.com/SNPbuilds/csms-backend-api`  
 **Audit Date**: August 16, 2026  
 **Auditor**: Automated Security & Engineering Pipeline  
 **Overall Security Status**: PASSED / PRODUCTION READY  

@@ -20,7 +20,7 @@ class AdminMiddleware
         if (!$user) {
             return response()->json([
                 'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
                 'status'            => '401',
             ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
@@ -32,7 +32,7 @@ class AdminMiddleware
         if (!$isAdmin) {
             return response()->json([
                 'message'           => 'ទាមទារសិទ្ធិជាអ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Admin) ទើបអាចប្រើប្រាស់មុខងារនេះបាន',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
                 'status'            => '403',
             ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
