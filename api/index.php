@@ -52,14 +52,25 @@ $_ENV['APP_STORAGE'] = $storagePath;
 // Register Autoloader & Bootstrap App
 require __DIR__ . '/../vendor/autoload.php';
 
-/** @var \Illuminate\Foundation\Application $app */
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+try {
+    /** @var \Illuminate\Foundation\Application $app */
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
+    $app->useStoragePath($storagePath);
+    \Illuminate\Support\Facades\Facade::setFacadeApplication($app);
 
-$app->useStoragePath($storagePath);
-\Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+    $_SERVER['SCRIPT_NAME']      = '/index.php';
+    $_SERVER['PHP_SELF']         = '/index.php';
+    $_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
 
-$_SERVER['SCRIPT_NAME']      = '/index.php';
-$_SERVER['PHP_SELF']         = '/index.php';
-$_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
-
-$app->handleRequest(\Illuminate\Http\Request::capture());
+    $app->handleRequest(\Illuminate\Http\Request::capture());
+} catch (\Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success'   => false,
+        'error'     => $e->getMessage(),
+        'file'      => $e->getFile(),
+        'line'      => $e->getLine(),
+        'trace'     => explode("\n", $e->getTraceAsString()),
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+}
