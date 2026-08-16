@@ -73,6 +73,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'details'    => $e->getMessage(),
                 'file'       => $e->getFile(),
                 'line'       => $e->getLine(),
+                'trace'      => array_map(fn($t) => ($t['class'] ?? '') . ($t['type'] ?? '') . ($t['function'] ?? '') . ' (' . ($t['file'] ?? '') . ':' . ($t['line'] ?? '') . ')', array_slice($e->getTrace(), 0, 8)),
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
             ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
