@@ -39,7 +39,7 @@ class SaleController extends BaseApiController
         ]);
 
         try {
-            $employeeId = $request->user()->employee_id;
+            $employeeId = $request->user()->employee_id ?? $request->user()->id;
 
             $sale = $this->posService->checkout(
                 employeeId: $employeeId,
@@ -78,7 +78,7 @@ class SaleController extends BaseApiController
         ]);
 
         try {
-            $employeeId = $request->user()->employee_id;
+            $employeeId = $request->user()->employee_id ?? $request->user()->id;
             $sale = $this->posService->voidSale($id, $employeeId, $request->reason);
 
             return $this->successResponse($sale, 'Sale #'.$id.' voided successfully and inventory restored');

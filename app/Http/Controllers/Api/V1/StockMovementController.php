@@ -29,7 +29,7 @@ class StockMovementController extends BaseApiController
         ]);
 
         try {
-            $employeeId = $request->user()->employee_id;
+            $employeeId = $request->user()->employee_id ?? $request->user()->id;
             $movement = $this->inventoryService->adjustStock(
                 variantId: $validated['variant_id'],
                 quantity: $validated['quantity'],

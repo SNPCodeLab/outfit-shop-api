@@ -24,9 +24,9 @@ class CloudinaryService
             $this->apiSecret = $parsed['pass'] ?? '';
             $this->cloudName = $parsed['host'] ?? '';
         } else {
-            $this->cloudName = config('cloudinary.cloud_name') ?? env('CLOUDINARY_CLOUD_NAME', 'od8t271n');
-            $this->apiKey = config('cloudinary.api_key') ?? env('CLOUDINARY_API_KEY', '292517627621863');
-            $this->apiSecret = config('cloudinary.api_secret') ?? env('CLOUDINARY_API_SECRET', 'CZhMlOoVVxAQBS_Vc_OrnPtqr4g');
+            $this->cloudName = config('cloudinary.cloud_name') ?? env('CLOUDINARY_CLOUD_NAME', '');
+            $this->apiKey = config('cloudinary.api_key') ?? env('CLOUDINARY_API_KEY', '');
+            $this->apiSecret = config('cloudinary.api_secret') ?? env('CLOUDINARY_API_SECRET', '');
         }
 
         $this->defaultFolder = config('cloudinary.folder', 'khmeriel/products');
