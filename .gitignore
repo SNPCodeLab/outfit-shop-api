@@ -24,6 +24,7 @@
 .phpunit.result.cache
 /.phpunit.cache
 .phpactor.json
+*.py
 
 # Databases & SQLite
 *.sqlite
