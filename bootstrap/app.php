@@ -38,16 +38,20 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof AuthenticationException) {
                 return response()->json([
-                    'message'    => 'Unauthenticated. Valid Bearer token required.',
-                    'error_code' => 'ERR_UNAUTHENTICATED',
+                    'success'           => false,
+                    'message'           => 'Unauthenticated. Missing or invalid Authorization Bearer token.',
+                    'error_code'        => 'ERR_UNAUTHENTICATED',
+                    'hint'              => 'Please provide "Authorization: Bearer <TOKEN>" in your request headers. Log in at POST /api/v1/auth/login to get a token.',
                     'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
                 ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             if ($e instanceof AccessDeniedHttpException) {
                 return response()->json([
-                    'message'    => $e->getMessage() ?: 'Forbidden: You do not have permission to perform this action.',
-                    'error_code' => 'ERR_FORBIDDEN',
+                    'success'           => false,
+                    'message'           => $e->getMessage() ?: 'Forbidden: You do not have permission to perform this action.',
+                    'error_code'        => 'ERR_FORBIDDEN',
+                    'hint'              => 'Your account role does not have sufficient permission for this endpoint.',
                     'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
                 ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
