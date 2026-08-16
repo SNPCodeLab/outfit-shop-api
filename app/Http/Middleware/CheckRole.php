@@ -26,9 +26,9 @@ class CheckRole
 
         if (! $user) {
             return response()->json([
-                'success'    => false,
-                'message'    => 'Access token is missing or invalid. Please sign in to continue.',
-                'error_code' => 'ERR_UNAUTHENTICATED',
+                'message'           => 'Requires authentication',
+                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'status'            => '401',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -51,10 +51,9 @@ class CheckRole
         }
 
         return response()->json([
-            'success'       => false,
-            'message'       => 'You do not have permission to perform this action.',
-            'error_code'    => 'ERR_FORBIDDEN',
-            'required_role' => implode(' or ', $allowedRoles),
+            'message'           => 'Forbidden',
+            'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+            'status'            => '403',
         ], Response::HTTP_FORBIDDEN);
     }
 }

@@ -34,45 +34,46 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
 
         $exceptions->render(function (Throwable $e, Request $request) {
+            $docUrl = 'https://github.com/SNPbuilds/csms-api';
             $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
 
             if ($e instanceof AuthenticationException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Access token is missing or invalid. Please sign in to continue.',
-                    'error_code' => 'ERR_UNAUTHENTICATED',
+                    'message'           => 'Requires authentication',
+                    'documentation_url' => $docUrl,
+                    'status'            => '401',
                 ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             if ($e instanceof AccessDeniedHttpException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'You do not have permission to access this resource.',
-                    'error_code' => 'ERR_FORBIDDEN',
+                    'message'           => $e->getMessage() ?: 'Forbidden',
+                    'documentation_url' => $docUrl,
+                    'status'            => '403',
                 ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             if ($e instanceof ValidationException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Validation failed. Please check the submitted data.',
-                    'error_code' => 'ERR_VALIDATION',
-                    'errors'     => $e->errors(),
+                    'message'           => 'Validation Failed',
+                    'errors'            => $e->errors(),
+                    'documentation_url' => $docUrl,
+                    'status'            => '422',
                 ], 422, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             if ($e instanceof NotFoundHttpException) {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'The requested resource was not found.',
-                    'error_code' => 'ERR_NOT_FOUND',
+                    'message'           => 'Not Found',
+                    'documentation_url' => $docUrl,
+                    'status'            => '404',
                 ], 404, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             $data = [
-                'success'    => false,
-                'message'    => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'An unexpected error occurred. Please try again later.',
-                'error_code' => 'ERR_INTERNAL_SERVER_ERROR',
+                'message'           => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
+                'documentation_url' => $docUrl,
+                'status'            => (string) ($status >= 400 && $status < 600 ? $status : 500),
             ];
 
             if (config('app.debug') || app()->isLocal()) {
