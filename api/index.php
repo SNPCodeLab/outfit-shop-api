@@ -38,9 +38,19 @@ $_SERVER['SESSION_DRIVER']         = 'cookie';
 $_SERVER['APP_MAINTENANCE_DRIVER'] = 'file';
 $_SERVER['APP_MAINTENANCE_STORE']  = 'array';
 
+if (!getenv('APP_KEY')) {
+    putenv('APP_KEY=base64:bSQmNjhGdsJcRUWtzZqs50fNJf5uQVe80BuOfTV6uLk=');
+    $_ENV['APP_KEY']    = 'base64:bSQmNjhGdsJcRUWtzZqs50fNJf5uQVe80BuOfTV6uLk=';
+    $_SERVER['APP_KEY'] = 'base64:bSQmNjhGdsJcRUWtzZqs50fNJf5uQVe80BuOfTV6uLk=';
+}
+
 if (!getenv('DB_CONNECTION')) {
     putenv('DB_CONNECTION=pgsql');
 }
+
+// Normalize SCRIPT_NAME so Laravel doesn't strip /api from request URIs in serverless
+$_SERVER['SCRIPT_NAME']     = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/index.php';
 
 // ─── 2. Create writable /tmp directory structure ───────────────────────────
 $storagePath = '/tmp/storage';

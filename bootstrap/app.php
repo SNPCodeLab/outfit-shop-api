@@ -67,15 +67,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
-            return response()->json([
-                'message'    => 'Internal Server Error',
+            $data = [
+                'message'    => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'Internal Server Error',
                 'error_code' => 'ERR_INTERNAL_SERVER_ERROR',
-                'details'    => $e->getMessage(),
-                'file'       => $e->getFile(),
-                'line'       => $e->getLine(),
-                'trace'      => array_map(fn($t) => ($t['class'] ?? '') . ($t['type'] ?? '') . ($t['function'] ?? '') . ' (' . ($t['file'] ?? '') . ':' . ($t['line'] ?? '') . ')', array_slice($e->getTrace(), 0, 8)),
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-api'
-            ], $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            ];
+
+            if (config('app.debug') || app()->isLocal()) {
+                $data['details'] = $e->getMessage();
+                $data['file']    = $e->getFile();
+                $data['line']    = $e->getLine();
+            }
+
+            return response()->json($data, $status >= 400 && $status < 600 ? $status : 500, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         });
     })->create();
 
