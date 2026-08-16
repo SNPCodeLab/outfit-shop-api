@@ -128,6 +128,11 @@ class AuthController extends BaseApiController
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
                 'account_type' => 'employee',
+                'employee'     => [
+                    'employee_id' => $employee->employee_id,
+                    'username'    => $employee->username,
+                    'role'        => $role,
+                ],
                 'user' => [
                     'id'          => $employee->employee_id,
                     'name'        => $employee->employee_name,

@@ -302,3 +302,123 @@ Payment methods: `CASH`, `CARD`, `QR`, `ABA`
 | 2026-08-16 | `.env.example` three-block database config | Clarified PostgreSQL=primary, Oracle=alternative, SQLite=test-only |
 | 2026-08-16 | Academic Terminology explanation pattern recorded | For student exam/defense preparation and frontend team onboarding |
 | 2026-08-16 | Frontend team integration guide added to skill | For frontend developers consuming the API |
+| 2026-08-17 | Enterprise Omnichannel Rollout (Phases 1–3) Implemented | Bakong KHQR, thermal labels, shifts, loyalty, wholesale tiers, gift cards, shipping, restock forecasting |
+| 2026-08-17 | Single Master Directory `khmeRiel-Items/` (643 Assets) | Consolidated 8 flat catalog departments with Cloudinary CDN / Neon DB separation |
+| 2026-08-17 | Git Branch Isolation Workflow Protocol Locked | Work exclusively on `dev` branch; never push directly to `main`; merge only on explicit user command |
+
+---
+
+## 11. Omnichannel Rollout Sequence & Catalog Memory (Locked Standards)
+
+### 11.1 Master Catalog Asset Inventory (`khmeRiel-Items/`)
+- Total Verified Items: **643 assets** across 8 flat subdirectories:
+  1. `cloths/` (389 items — luxury apparel, polos, silk shirts, denim, dresses)
+  2. `books/` (79 items — 32 downloadable PDF eBooks + 47 covers)
+  3. `drinks/` (74 items — beverages, Vattanac/Hanuman beers, water, sodas)
+  4. `banners/` (62 items — storefront hero carousels & promotional cards)
+  5. `cosmetics/` (14 items — beauty & skincare products)
+  6. `icons_and_audio/` (12 items — 9 UI icons + 3 POS scanner WAV audio cues)
+  7. `health/` (8 items — wellness & pharmacy items)
+  8. `food/` (5 items — consumer packaged snacks)
+- Storage Rule: Binary files remain on Cloudinary CDN and local storage (ignored in `.gitignore` and `.vercelignore`), while Neon PostgreSQL stores pure relational metadata and URLs.
+
+### 11.2 Rollout Sequence Architecture
+- **Phase 1: Financial & POS Hardware**
+  - Bakong Dynamic KHQR Generation (`KhqrService`, EMVCo Tag-Length-Value with CRC16 CCITT).
+  - Dual-Currency Precision Engine (USD $\leftrightarrow$ KHR at 4,100 rate with change breakdown).
+  - Hardware Print Engine (`BarcodePrintController` for 50x30mm thermal barcode stickers and 80mm ESC/POS thermal receipts).
+- **Phase 2: Cashier Accountability & Customer Growth**
+  - POS Shift Management (`pos_shifts`, open floats, cash drops, close register, cash over/short discrepancy, Z-Reports).
+  - Customer VIP Loyalty Ledger (`customer_loyalty_logs`, Bronze/Silver/Gold/Platinum tiers, points redemption).
+  - B2B Volume Pricing Tiers (`variant_pricing_tiers` for bulk apparel & beverage carton discounts).
+  - Digital Gift Cards (`gift_cards` 16-digit voucher cards and store credit balances).
+- **Phase 3: Omnichannel Logistics & Predictive Automation**
+  - Click-and-Collect (BOPIS) & Courier Tracking (`shipping_orders` for Virak Buntham, J&T, Grab).
+  - Sales Velocity Restock Forecasting ($V = \frac{\text{units}}{14}$, run rate, days remaining).
+  - One-Click Automated Purchase Order drafting (`InventoryForecastingController`).
+
+### 11.3 Git Development Protocol (Strictly Enforced)
+- **Active Branch**: `dev`
+- **Rule**: NEVER push directly to `main`.
+- **Workflow**: Stage, commit, and push all new features and fixes exclusively to `dev`.
+- **Merge**: Only merge `dev` $\rightarrow$ `main` upon receiving the explicit user instruction `"merge"`.
+
+---
+
+## 12. Standard RBAC REST API Taxonomy & Postman Collection Reference
+
+### 12.1 Master Collection Hierarchy
+The authoritative Postman Collection is located at:
+`docs/KHMERIEL_MASTER_API_RBAC_COLLECTION.postman_collection.json` (Schema: Postman v2.1.0).
+
+All 118 REST API endpoints are grouped into 4 distinct RBAC Access Levels:
+
+```
+├── 1. Public & Customer Storefront (No Auth) [24 Endpoints]
+│   ├── Health, Diagnostics & Engine Version (/health, /status)
+│   ├── Employee Login & Token Grant (/auth/login)
+│   ├── Omnichannel Product Catalog & Search (/products, /products/{id})
+│   ├── SalesBinder Colorways & Matrix Grids (/products/{id}/matrix, /colorways)
+│   ├── Customer Reviews & Ratings (/products/{id}/reviews)
+│   ├── Digital Publication & eBook Downloads (/products/{id}/download)
+│   ├── Master Taxonomy Lists (/categories, /clothing-sizes, /colors, /variants)
+│   ├── Barcode Scanner Instant Lookups (/variants/barcode/{code})
+│   ├── B2B Volume Pricing Tiers (/variants/{id}/tiers)
+│   ├── Marketing Hero Banners & Active Promos (/marketing/banners, /promotions/active)
+│   ├── Coupon Verification & Stored-Value Gift Cards (/verify-coupon, /gift-cards/check)
+│   ├── Curated Product Bundles & Package Deals (/bundles)
+│   ├── Dynamic KHQR Bakong String Generator (/payments/khqr)
+│   └── UI Scanner Audio Cues & WAV Feedback (/settings/audio-cues)
+│
+├── 2. Level 1: Cashier & POS Operator (Role: CASHIER / STAFF) [18 Endpoints]
+│   ├── Active Cash Drawer Shift Inspection (/shifts/current)
+│   ├── Shift Opening with Cash Float (/shifts/open)
+│   ├── Midday Cash Drop / Skim to Vault (/shifts/drop-cash)
+│   ├── Shift Closing, Cash Discrepancy & Z-Report Locking (/shifts/close)
+│   ├── Multi-Item Point-of-Sale Checkout & Stock Deduction (/sales/checkout)
+│   ├── Invoices, Transactions & Order History (/sales, /sales/{id})
+│   ├── Pending Invoice KHQR Bakong Payment Generation (/sales/{id}/khqr)
+│   ├── ESC/POS 80mm Thermal Receipt Printing Payload (/sales/{id}/receipt-thermal)
+│   ├── Immediate Transaction Void & Auto-Restock (/sales/{id}/void)
+│   ├── Customer CRM Registry & Walk-In Creation (/customers, /customers/{id})
+│   ├── Customer VIP Loyalty Tier & Points Ledger (/customers/{id}/loyalty)
+│   ├── Points Redemption for Dollar Discount Vouchers (/customers/{id}/redeem-points)
+│   ├── Courier Delivery & Click-and-Collect Booking (/shipping/create, /shipping/orders)
+│   └── Shipping Dispatch Status Updates (/shipping/{id}/status)
+│
+├── 3. Level 2: Inventory & Warehouse Manager (Role: MANAGER) [24 Endpoints]
+│   ├── Master Catalog Item CRUD Operations (POST/PUT/DELETE /products)
+│   ├── Product Variant & SKU Creation with Reorder Trigger (POST/PUT/DELETE /variants)
+│   ├── Low-Stock Alert System (Below Safety Stock Threshold) (/variants/low-stock)
+│   ├── Retail 50x30mm Barcode Sticker Label Generator (/variants/{id}/barcode-label)
+│   ├── B2B Wholesale Tier Pricing Rules (POST /variants/{id}/tiers)
+│   ├── Cloudinary Image Upload & Photoshoot Gallery (POST /uploads/image, /uploads/gallery)
+│   ├── AI Sales Velocity Restock Forecasting (/inventory/restock-recommendations)
+│   ├── 1-Click Automated Supplier Purchase Order Generation (/purchases/auto-generate)
+│   ├── Manual Purchase Order Stock-In & Cost Average Tracking (/purchases)
+│   ├── FMCG Expirable Batch Lot Management (POST /variants/{id}/batches)
+│   ├── FEFO Expiration Date Risk & Flash Clearance Alerts (/inventory/expiring-soon)
+│   ├── Immutable Stock Movement Audit Ledger (/stock-movements)
+│   ├── Manual Inventory Write-Off & Damage Adjustments (/stock-movements/adjust)
+│   └── Wholesale Textile & Beverage Supplier CRM (/suppliers)
+│
+└── 4. Level 3: Executive Administrator & Auditor (Role: ADMIN / SUPERADMIN) [14 Endpoints]
+    ├── Executive KPI & Analytics Real-Time Dashboard (/dashboard/stats)
+    ├── Employee & Staff Account Provisioning (POST/PUT/DELETE /employees)
+    ├── RBAC Security Role & Location Reassignment (PUT /employees/{id})
+    ├── Campaign Promo Codes & Seasonal Discounts (POST/DELETE /promotions)
+    ├── 16-Digit Voucher Stored-Value Gift Card Issuance (/gift-cards/issue)
+    ├── Homepage Marketing Banners & Hero Slide Management (POST/DELETE /marketing/banners)
+    └── Master Taxonomy Department Category Creation (POST/PUT/DELETE /categories)
+```
+
+### 12.2 Global Postman Environment Variables
+```json
+{
+  "base_url": "https://api.kesararamwithdigital.tech",
+  "local_url": "http://127.0.0.1:8000",
+  "token": "YOUR_BEARER_SANCTUM_TOKEN_HERE"
+}
+```
+
+

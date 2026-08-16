@@ -30,7 +30,7 @@ class PurchaseController extends BaseApiController
         ]);
 
         try {
-            $employeeId = $request->user()->employee_id;
+            $employeeId = $request->user()->employee_id ?? $request->user()->id;
             $purchase = $this->inventoryService->receivePurchase(
                 supplierId: $validated['supplier_id'],
                 employeeId: $employeeId,
