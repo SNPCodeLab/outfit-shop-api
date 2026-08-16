@@ -24,7 +24,7 @@ Route::get('/', function () {
         'system'             => 'Store Stock & Point-of-Sale MIS API',
         'version'            => '1.0.0',
         'status'             => 'online',
-        'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
+        'documentation_url'  => 'https://github.com/SNPbuilds/csms-backend-api',
 
         // ── Public (no token) ─────────────────────────────────────────────
         'health_url'             => "{$base}/api/v1/health",

@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
 
         $exceptions->render(function (Throwable $e, Request $request) {
-            $docUrl = 'https://github.com/SNPbuilds/csms-api';
+            $docUrl = 'https://github.com/SNPbuilds/csms-backend-api';
             $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
 
             if ($e instanceof AuthenticationException) {
