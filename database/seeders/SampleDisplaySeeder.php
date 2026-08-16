@@ -100,14 +100,14 @@ class SampleDisplaySeeder extends Seeder
         );
 
         // ─────────────────────────────────────────────────────────────────────
-        // 5. EXACTLY 9 DISPLAY PRODUCTS (3 VARIANTS EACH, KHMER LOCAL NAMES)
+        // 5. EXACTLY 9 DISPLAY PRODUCTS (3 VARIANTS EACH, 100% ENGLISH NAMES)
         // ─────────────────────────────────────────────────────────────────────
         $displayProducts = [
             // Product 1: Evening Gown
             [
                 'cat_slug'     => 'dresses-gowns',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'រ៉ូបរាត្រីសមោសរសូត្រប្រណិត (Silk Evening Column Gown)',
+                'name_en'      => 'KhmeRiel Silk Evening Column Gown',
                 'desc_en'      => 'Floor-length pure silk evening column gown tailored for formal galas.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905171/KHMERIEL_DRESSES_CRINOLINE_COLUMN_GOWN_TERRACOTTA_LOOK_cloth_096.png',
                 'public_id'    => 'KHMERIEL_DRESSES_CRINOLINE_COLUMN_GOWN_TERRACOTTA_LOOK_cloth_096',
@@ -122,7 +122,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'tops-silk-blouses',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'អាវសូត្រទន់រលោងដៃវែង (Fluid Draped Silk Blouse)',
+                'name_en'      => 'KhmeRiel Fluid Draped Silk Blouse',
                 'desc_en'      => 'Relaxed silhouette fluid draped luxury blouse with flowing shoulder lines.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905145/KHMERIEL_TOPS_FLUID_DRAPED_SILK_BLOUSE_CREAM_BEIGE_LOOK_cloth_012.png',
                 'public_id'    => 'KHMERIEL_TOPS_FLUID_DRAPED_SILK_BLOUSE_CREAM_BEIGE_LOOK_cloth_012',
@@ -137,7 +137,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'bottoms-culottes',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'ខោសូត្រជើងរីក Monogram (Monogram Silk PJ Culottes)',
+                'name_en'      => 'KhmeRiel Monogram Silk PJ Culottes',
                 'desc_en'      => 'Wide-leg silk lounge culottes featuring all-over monogram jacquard.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905186/KHMERIEL_BOTTOMS_MONOGRAM_SILK_CULOTTES_IVORY_LOOK_cloth_277.png',
                 'public_id'    => 'KHMERIEL_BOTTOMS_MONOGRAM_SILK_CULOTTES_IVORY_LOOK_cloth_277',
@@ -152,7 +152,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'skirts-flares',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'សំពត់ Crinoline បត់ផ្នត់រលក (Crinoline Flare Skirt)',
+                'name_en'      => 'KhmeRiel Crinoline Flare Midi Skirt',
                 'desc_en'      => 'Architectural flare skirt crafted with structured crinoline weave.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905197/KHMERIEL_SKIRTS_CRINOLINE_FLARE_SKIRT_TERRACOTTA_LOOK_cloth_298.png',
                 'public_id'    => 'KHMERIEL_SKIRTS_CRINOLINE_FLARE_SKIRT_TERRACOTTA_LOOK_cloth_298',
@@ -167,7 +167,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'outerwear-jackets',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'អាវក្រៅកាត់ដេររាងសង្ហា (Collared Tailored Jacket)',
+                'name_en'      => 'KhmeRiel Collared Tailored Jacket',
                 'desc_en'      => 'Single-breasted tailored outerwear jacket with structured shoulder pads.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905170/KHMERIEL_OUTERWEAR_COLLARED_TAILORED_JACKET_SAGE_GREEN_LOOK_cloth_047.png',
                 'public_id'    => 'KHMERIEL_OUTERWEAR_COLLARED_TAILORED_JACKET_SAGE_GREEN_LOOK_cloth_047',
@@ -182,7 +182,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'knitwear-sweaters',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'អាវចាក់រោមចៀមស្រាល (Fine Gauge Knit Sweater)',
+                'name_en'      => 'KhmeRiel Fine Gauge Knit Sweater',
                 'desc_en'      => 'Ultra-soft fine gauge knit crewneck sweater for trans-seasonal layering.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905149/KHMERIEL_KNITWEAR_FINE_GAUGE_KNIT_SWEATER_TERRACOTTA_LOOK_cloth_349.png',
                 'public_id'    => 'KHMERIEL_KNITWEAR_FINE_GAUGE_KNIT_SWEATER_TERRACOTTA_LOOK_cloth_349',
@@ -197,7 +197,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'luxury-bags',
                 'brand_id'     => $brandKhmeriel->brand_id,
-                'name_kh'      => 'កាបូបស្បែកពិតម៉ូដ Mini T-Lock (Mini T-Lock Leather Crossbody Bag)',
+                'name_en'      => 'KhmeRiel Mini T-Lock Leather Crossbody Bag',
                 'desc_en'      => 'Italian-tanned smooth calfskin crossbody bag with polished metal T-lock closure.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905158/KHMERIEL_BAGS_MINI_T_LOCK_CROSSBODY_BAG_BLACK_LOOK_cloth_128.png',
                 'public_id'    => 'KHMERIEL_BAGS_MINI_T_LOCK_CROSSBODY_BAG_BLACK_LOOK_cloth_128',
@@ -212,7 +212,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'beverages-drinks',
                 'brand_id'     => $brandVattanac->brand_id,
-                'name_kh'      => 'ស្រាបៀរវឌ្ឍនៈប្រណិតកំប៉ុង (Vattanac Premium Craft Beer 330ml)',
+                'name_en'      => 'Vattanac Premium Craft Beer 330ml',
                 'desc_en'      => 'Crisp Cambodian luxury lager brewed from 100% pure malt and noble European hops.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png',
                 'public_id'    => 'KhmerRiel_Beer_Vattanac_330ml',
@@ -227,7 +227,7 @@ class SampleDisplaySeeder extends Seeder
             [
                 'cat_slug'     => 'digital-ebooks',
                 'brand_id'     => $brandKwd->brand_id,
-                'name_kh'      => 'សៀវភៅបច្ចេកវិទ្យាបណ្តាញឌីជីថល (Networking Concepts Master Manual)',
+                'name_en'      => 'Cloud Networking Concepts Master Handbook',
                 'desc_en'      => 'Complete digital handbook covering full-stack cloud infrastructure and networking protocols.',
                 'image_url'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905169/KHMERIEL_DIGITAL_BOOK_PUBLICATION_EN_A_TYPOLOGY_OF_VERBAL_BORROWINGS_JAN_WOHLGEMUTH_cloth_389.pdf',
                 'public_id'    => 'KHMERIEL_DIGITAL_BOOK_PUBLICATION_EN_A_TYPOLOGY_OF_VERBAL_BORROWINGS_JAN_WOHLGEMUTH_cloth_389',
@@ -244,8 +244,8 @@ class SampleDisplaySeeder extends Seeder
             $cat = $categories[$pData['cat_slug']];
 
             $product = Product::create([
-                'product_name'     => $pData['name_kh'],
-                'slug'             => Str::slug($pData['name_kh']) . '-' . ($index + 1),
+                'product_name'     => $pData['name_en'],
+                'slug'             => Str::slug($pData['name_en']) . '-' . ($index + 1),
                 'category_id'      => $cat->category_id,
                 'brand_id'         => $pData['brand_id'],
                 'product_type'     => $pData['product_type'],
