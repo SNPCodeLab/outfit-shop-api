@@ -55,6 +55,8 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath($storagePath);
-$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['SCRIPT_NAME']      = '/index.php';
+$_SERVER['PHP_SELF']         = '/index.php';
+$_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
 
 $app->handleRequest(\Illuminate\Http\Request::capture());
