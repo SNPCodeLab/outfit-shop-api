@@ -2,9 +2,15 @@
 /node_modules
 /khmeRiel-Items
 /storage/*.key
+/storage/collection_template.json
+/docs
+/scripts
+/tests
+/postman_collections
 .git
 .github
 .agents
 .phpunit.cache
+.phpunit.result.cache
 *.md
 *.log
