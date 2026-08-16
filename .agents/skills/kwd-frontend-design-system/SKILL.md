@@ -126,6 +126,7 @@ Act as a Principal Full-Stack Engineer and World-Class UI/UX Designer. Build a c
 - Micro-Interactions: 3D physical tactile push-down effect on all buttons and cards (hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all).
 - Status Badges: Mint Green (#86EFAC: Paid/Cashier/In Stock), Soft Blue (#93C5FD: Manager/Purchase), Pastel Amber (#FDE047: Low Stock/Pending), Pastel Red (#FCA5A5: Admin/Void/Out of Stock).
 - Typography: Kantumruy Pro / Siemreap (Khmer) + Inter (English) with bold uppercase tracking.
+- Product Image Rendering Standard (CRITICAL): ALL product photos MUST render in their full ORIGINAL natural aspect ratio without artificial stretching, squishing, distortion, or clipping (use `object-contain` / natural bounds with pure white backgrounds so full-length gowns, coats, bags, and shoes retain their pristine original editorial framing).
 - Top Ticker Tape: Full-width black marquee bar with bold white uppercase text (⚡ KHMERIEL • REAL-TIME POS ENGINE • ACID-COMPLIANT STOCK • REST API v1).
 
 ### 2. BACKEND API INTEGRATION & AUTHENTICATION
