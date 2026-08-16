@@ -19,11 +19,9 @@ class AdminMiddleware
 
         if (!$user) {
             return response()->json([
-                'success'           => false,
-                'message'           => 'Unauthenticated. Missing or invalid Authorization Bearer token.',
-                'error_code'        => 'ERR_UNAUTHENTICATED',
-                'hint'              => 'Please provide "Authorization: Bearer <TOKEN>" in your request headers. Log in at POST /api/v1/auth/login to get a token.',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'success'    => false,
+                'message'    => 'Access token is missing or invalid. Please sign in to continue.',
+                'error_code' => 'ERR_UNAUTHENTICATED',
             ], 401);
         }
 
@@ -33,11 +31,9 @@ class AdminMiddleware
 
         if (!$isAdmin) {
             return response()->json([
-                'success'           => false,
-                'message'           => 'Forbidden. Admin privileges required.',
-                'error_code'        => 'ERR_FORBIDDEN',
-                'hint'              => 'Your account requires the ADMIN role to perform this action.',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-api',
+                'success'    => false,
+                'message'    => 'You do not have permission to perform this action. Administrator privileges required.',
+                'error_code' => 'ERR_FORBIDDEN',
             ], 403);
         }
 
