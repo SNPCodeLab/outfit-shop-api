@@ -91,7 +91,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123456\"\n}"
+              "raw": "{\n  \"username\": \"your_username_here\",\n  \"password\": \"your_password_here\"\n}"
             },
             "url": "{{base_url}}/api/v1/auth/login"
           }
@@ -830,7 +830,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"vanna_cashier\",\n  \"employee_name\": \"Vanna Seng\",\n  \"email\": \"vanna@ssmis.local\",\n  \"password\": \"Cashier@123456\",\n  \"role\": \"CASHIER\",\n  \"position\": \"Morning POS Cashier\",\n  \"phone\": \"+85512445566\",\n  \"gender\": \"Female\",\n  \"salary\": 360.00\n}"
+              "raw": "{\n  \"username\": \"new_cashier\",\n  \"employee_name\": \"Vanna Seng\",\n  \"email\": \"vanna@example.com\",\n  \"password\": \"your_secure_password_here\",\n  \"role\": \"CASHIER\",\n  \"position\": \"Morning POS Cashier\",\n  \"phone\": \"+85512445566\",\n  \"gender\": \"Female\",\n  \"salary\": 360.00\n}"
             },
             "url": "{{base_url}}/api/v1/employees"
           }
@@ -897,7 +897,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Mobile App Developer\",\n  \"email\": \"mobile_dev@company.com\",\n  \"password\": \"MobileDev@123456\",\n  \"role\": \"manager\"\n}"
+              "raw": "{\n  \"name\": \"Mobile App Developer\",\n  \"email\": \"mobile_dev@example.com\",\n  \"password\": \"your_secure_password_here\",\n  \"role\": \"manager\"\n}"
             },
             "url": "{{base_url}}/api/v1/auth/register"
           }
