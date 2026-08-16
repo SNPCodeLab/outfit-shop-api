@@ -6,6 +6,12 @@
 !.env.example
 /auth.json
 
+# Postman, API Collections & Client Environments
+/postman_collections/
+postman_collections/
+*postman*
+*hoppscotch*
+
 # PHP & Composer Dependencies
 /vendor
 
