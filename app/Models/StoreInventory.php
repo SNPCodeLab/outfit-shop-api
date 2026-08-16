@@ -6,28 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PurchaseDetail extends Model
+class StoreInventory extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'purchase_detail_id';
+    protected $table = 'store_inventories';
+    protected $primaryKey = 'inventory_id';
 
     protected $fillable = [
-        'purchase_id',
+        'branch_id',
         'variant_id',
         'quantity',
-        'cost_price',
-        'sub_total',
+        'reorder_level',
     ];
 
-    public function header(): BelongsTo
+    public function branch(): BelongsTo
     {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
-    }
-
-    public function purchase(): BelongsTo
-    {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
+        return $this->belongsTo(StoreBranch::class, 'branch_id', 'branch_id');
     }
 
     public function variant(): BelongsTo

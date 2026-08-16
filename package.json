@@ -1,4 +1,7 @@
 {
   "name": "csms-api",
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "18.x"
+  }
 }

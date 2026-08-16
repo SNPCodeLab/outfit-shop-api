@@ -6,30 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SaleDetail extends Model
+class VariantPricingTier extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'sale_detail_id';
+    protected $table = 'variant_pricing_tiers';
+    protected $primaryKey = 'tier_id';
 
     protected $fillable = [
-        'sale_id',
         'variant_id',
-        'quantity',
+        'min_quantity',
+        'max_quantity',
         'unit_price',
-        'discount',
-        'sub_total',
+        'discount_percentage',
     ];
 
-    public function header(): BelongsTo
-    {
-        return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');
-    }
-
-    public function sale(): BelongsTo
-    {
-        return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');
-    }
+    protected $casts = [
+        'min_quantity'        => 'integer',
+        'max_quantity'        => 'integer',
+        'unit_price'          => 'float',
+        'discount_percentage' => 'float',
+    ];
 
     public function variant(): BelongsTo
     {

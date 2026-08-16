@@ -6,28 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PurchaseDetail extends Model
+class BundleItem extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'purchase_detail_id';
+    protected $table = 'bundle_items';
+    protected $primaryKey = 'bundle_item_id';
 
     protected $fillable = [
-        'purchase_id',
+        'bundle_id',
         'variant_id',
         'quantity',
-        'cost_price',
-        'sub_total',
     ];
 
-    public function header(): BelongsTo
-    {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
-    }
+    protected $casts = [
+        'quantity' => 'integer',
+    ];
 
-    public function purchase(): BelongsTo
+    public function bundle(): BelongsTo
     {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
+        return $this->belongsTo(ProductBundle::class, 'bundle_id', 'bundle_id');
     }
 
     public function variant(): BelongsTo
