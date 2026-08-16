@@ -21,17 +21,25 @@ Designed according to **worldwide enterprise SQL standards**, incorporating:
 ```mermaid
 erDiagram
 
-    STORE ||--o{ EMPLOYEE : employs
-    STORE ||--o{ STOCK_MOVEMENT : holds
-
+    STORE_BRANCH ||--o{ STORE_INVENTORY : holds
+    STORE_BRANCH ||--o{ EMPLOYEE : employs
+    
+    BRAND ||--o{ PRODUCT : manufactures
     CATEGORY ||--o{ CATEGORY : parent_child
     CATEGORY ||--o{ PRODUCT : categorizes
     PRODUCT ||--o{ PRODUCT_VARIANT : has
     PRODUCT ||--o{ PRODUCT_IMAGE : gallery
+    PRODUCT ||--o{ PRODUCT_REVIEW : receives
+    PRODUCT ||--o{ CUSTOMER_WISHLIST : saved_in
     PRODUCT_VARIANT ||--o{ PRODUCT_IMAGE : variant_image
     PRODUCT_VARIANT ||--o{ PRODUCT_BATCH : tracks_lot
+    PRODUCT_VARIANT ||--o{ STORE_INVENTORY : stocked_at
+    PRODUCT_VARIANT ||--o{ BUNDLE_ITEM : component_of
+    PRODUCT_BUNDLE ||--|{ BUNDLE_ITEM : includes
     CLOTHING_SIZE ||--o{ PRODUCT_VARIANT : sizes
     COLOR ||--o{ PRODUCT_VARIANT : colors
+
+    PROMOTION ||--o{ SALE_HEADER : discounts
 
     SUPPLIER ||--o{ PURCHASE_HEADER : supplies
     EMPLOYEE ||--o{ PURCHASE_HEADER : creates
@@ -39,6 +47,8 @@ erDiagram
     PRODUCT_VARIANT ||--o{ PURCHASE_DETAIL : purchased
 
     CUSTOMER ||--o{ SALE_HEADER : places
+    CUSTOMER ||--o{ PRODUCT_REVIEW : writes
+    CUSTOMER ||--o{ CUSTOMER_WISHLIST : maintains
     EMPLOYEE ||--o{ SALE_HEADER : processes
     SALE_HEADER ||--|{ SALE_DETAIL : contains
     PRODUCT_VARIANT ||--o{ SALE_DETAIL : sold
