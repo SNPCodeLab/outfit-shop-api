@@ -23,6 +23,10 @@ class GiftCard extends Model
         'is_active',
     ];
 
+    protected $hidden = [
+        'pin_hash',
+    ];
+
     protected $casts = [
         'initial_balance' => 'float',
         'current_balance' => 'float',
