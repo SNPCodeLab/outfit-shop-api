@@ -27,8 +27,9 @@ class CheckRole
         if (! $user) {
             return response()->json([
                 'success'            => false,
-                'message'            => 'Unauthenticated. A valid Bearer token is required.',
+                'message'            => 'Unauthenticated. Missing or invalid Authorization Bearer token.',
                 'error_code'         => 'ERR_UNAUTHENTICATED',
+                'hint'               => 'Please provide "Authorization: Bearer <TOKEN>" in your request headers. Log in at POST /api/v1/auth/login to get a token.',
                 'documentation_url'  => 'https://github.com/SNPbuilds/csms-api',
             ], Response::HTTP_UNAUTHORIZED);
         }
