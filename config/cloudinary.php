@@ -18,7 +18,7 @@ return [
             $parsed = parse_url($url);
             return $parsed['host'] ?? null;
         }
-        return 'od8t271n';
+        return null;
     }),
 
     'api_key' => env('CLOUDINARY_API_KEY', function () {
@@ -26,7 +26,7 @@ return [
             $parsed = parse_url($url);
             return $parsed['user'] ?? null;
         }
-        return '292517627621863';
+        return null;
     }),
 
     'api_secret' => env('CLOUDINARY_API_SECRET', function () {
@@ -34,7 +34,7 @@ return [
             $parsed = parse_url($url);
             return $parsed['pass'] ?? null;
         }
-        return 'CZhMlOoVVxAQBS_Vc_OrnPtqr4g';
+        return null;
     }),
 
     'folder' => env('CLOUDINARY_FOLDER', 'khmeriel/products'),
