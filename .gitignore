@@ -57,8 +57,9 @@ Desktop.ini
 /.nova
 /.zed
 _ide_helper.php
-# Local Image Catalogs (Uploaded to Cloudinary)
+# Local Image & Asset Catalogs (Served via Cloudinary CDN)
 /khmeriel_catalog/
+/khmerieliterm/
 /TOTEME*
 
 .env*
