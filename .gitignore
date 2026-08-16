@@ -57,6 +57,8 @@ Desktop.ini
 /.nova
 /.zed
 _ide_helper.php
-Homestead.json
-Homestead.yaml
+# Local Image Catalogs (Uploaded to Cloudinary)
+/khmeriel_catalog/
+/TOTEME*
+
 .env*

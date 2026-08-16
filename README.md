@@ -6,10 +6,20 @@ RESTful API backend for retail clothing store inventory, supplier purchasing, an
 
 ## Tech Stack
 
-- Backend: Laravel 11 / PHP 8.3
-- Database: PostgreSQL (Neon DB / Local PostgreSQL)
-- Authentication: Laravel Sanctum Bearer Tokens
-- Deployment: Serverless Gateway (Vercel)
+- **Backend**: Laravel 11 / PHP 8.3
+- **Primary Database**: PostgreSQL — Neon Cloud Managed Serverless (active production)
+- **Alternative Database**: Oracle SQL — via `yajra/laravel-oracle` (on-premise enterprise deployment)
+- **Authentication**: Laravel Sanctum Bearer Tokens
+- **Authorization**: Spatie Laravel-Permission (RBAC)
+- **Deployment**: Serverless Gateway (Vercel)
+
+## System Classification
+
+> **IS Type**: Transaction Processing System (TPS / OLTP) with embedded MIS Reporting  
+> **Architecture**: Monolithic, Headless REST API Backend  
+> **Access Model**: 4-Tier Role-Based Access Control (ADMIN → MANAGER → CASHIER → STAFF)
+
+SS-MIS processes routine retail transactions in real-time (POS checkout, stock deduction, purchase receiving) — qualifying it as a **TPS/OLTP system**. It also exposes structured management reports (low-stock, audit logs, dashboard stats), making it an **MIS reporting layer**. DSS and EIS capabilities are on the roadmap.
 
 ---
 
