@@ -64,6 +64,21 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/{id}/matrix',                [\App\Http\Controllers\Api\V1\ProductMatrixController::class, 'matrix']);
     Route::get('/products/{id}/colorways',             [\App\Http\Controllers\Api\V1\ProductMatrixController::class, 'colorways']);
     Route::get('/products/{id}/download',              [\App\Http\Controllers\Api\V1\DigitalAssetController::class, 'download']);
+    Route::get('/products/{id}/reviews',               [\App\Http\Controllers\Api\V1\ProductReviewController::class, 'index']);
+    Route::post('/products/{id}/reviews',              [\App\Http\Controllers\Api\V1\ProductReviewController::class, 'store']);
+
+    Route::get('/brands',                              [\App\Http\Controllers\Api\V1\BrandController::class, 'index']);
+    Route::get('/brands/{id}',                         [\App\Http\Controllers\Api\V1\BrandController::class, 'show']);
+
+    Route::get('/bundles',                             [\App\Http\Controllers\Api\V1\ProductBundleController::class, 'index']);
+    Route::get('/bundles/{id}',                        [\App\Http\Controllers\Api\V1\ProductBundleController::class, 'show']);
+
+    Route::get('/promotions/active',                   [\App\Http\Controllers\Api\V1\PromotionController::class, 'active']);
+    Route::post('/promotions/verify-coupon',           [\App\Http\Controllers\Api\V1\PromotionController::class, 'verifyCoupon']);
+
+    Route::get('/branches',                            [\App\Http\Controllers\Api\V1\StoreBranchController::class, 'index']);
+    Route::get('/wishlist',                            [\App\Http\Controllers\Api\V1\CustomerWishlistController::class, 'index']);
+    Route::post('/wishlist/toggle',                    [\App\Http\Controllers\Api\V1\CustomerWishlistController::class, 'toggle']);
 
     Route::get('/variants',                            [ProductVariantController::class,'index']);
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
@@ -111,6 +126,10 @@ Route::prefix('v1')->group(function () {
             Route::put('/categories/{id}',             [CategoryController::class,      'update']);
             Route::delete('/categories/{id}',          [CategoryController::class,      'destroy']);
 
+            Route::post('/brands',                     [\App\Http\Controllers\Api\V1\BrandController::class, 'store']);
+            Route::put('/brands/{id}',                 [\App\Http\Controllers\Api\V1\BrandController::class, 'update']);
+            Route::delete('/brands/{id}',              [\App\Http\Controllers\Api\V1\BrandController::class, 'destroy']);
+
             Route::post('/clothing-sizes',             [ClothingSizeController::class,  'store']);
             Route::put('/clothing-sizes/{id}',         [ClothingSizeController::class,  'update']);
             Route::delete('/clothing-sizes/{id}',      [ClothingSizeController::class,  'destroy']);
@@ -128,6 +147,18 @@ Route::prefix('v1')->group(function () {
             Route::post('/variants',                   [ProductVariantController::class,'store']);
             Route::put('/variants/{id}',               [ProductVariantController::class,'update']);
             Route::delete('/variants/{id}',            [ProductVariantController::class,'destroy']);
+
+            // Bundles & Promotions
+            Route::post('/bundles',                    [\App\Http\Controllers\Api\V1\ProductBundleController::class, 'store']);
+            Route::delete('/bundles/{id}',             [\App\Http\Controllers\Api\V1\ProductBundleController::class, 'destroy']);
+
+            Route::get('/promotions',                  [\App\Http\Controllers\Api\V1\PromotionController::class, 'index']);
+            Route::post('/promotions',                 [\App\Http\Controllers\Api\V1\PromotionController::class, 'store']);
+            Route::delete('/promotions/{id}',          [\App\Http\Controllers\Api\V1\PromotionController::class, 'destroy']);
+
+            // Multi-Branch Management
+            Route::get('/branches/{id}/stock',         [\App\Http\Controllers\Api\V1\StoreBranchController::class, 'branchStock']);
+            Route::post('/branches',                   [\App\Http\Controllers\Api\V1\StoreBranchController::class, 'store']);
 
             // FMCG FIFO & Batch Tracking
             Route::get('/inventory/expiring-soon',     [\App\Http\Controllers\Api\V1\InventoryBatchController::class, 'expiringSoon']);
