@@ -21,13 +21,25 @@ Designed according to **worldwide enterprise SQL standards**, incorporating:
 ```mermaid
 erDiagram
 
-    STORE ||--o{ EMPLOYEE : employs
-    STORE ||--o{ STOCK_MOVEMENT : holds
-
+    STORE_BRANCH ||--o{ STORE_INVENTORY : holds
+    STORE_BRANCH ||--o{ EMPLOYEE : employs
+    
+    BRAND ||--o{ PRODUCT : manufactures
+    CATEGORY ||--o{ CATEGORY : parent_child
     CATEGORY ||--o{ PRODUCT : categorizes
     PRODUCT ||--o{ PRODUCT_VARIANT : has
+    PRODUCT ||--o{ PRODUCT_IMAGE : gallery
+    PRODUCT ||--o{ PRODUCT_REVIEW : receives
+    PRODUCT ||--o{ CUSTOMER_WISHLIST : saved_in
+    PRODUCT_VARIANT ||--o{ PRODUCT_IMAGE : variant_image
+    PRODUCT_VARIANT ||--o{ PRODUCT_BATCH : tracks_lot
+    PRODUCT_VARIANT ||--o{ STORE_INVENTORY : stocked_at
+    PRODUCT_VARIANT ||--o{ BUNDLE_ITEM : component_of
+    PRODUCT_BUNDLE ||--|{ BUNDLE_ITEM : includes
     CLOTHING_SIZE ||--o{ PRODUCT_VARIANT : sizes
     COLOR ||--o{ PRODUCT_VARIANT : colors
+
+    PROMOTION ||--o{ SALE_HEADER : discounts
 
     SUPPLIER ||--o{ PURCHASE_HEADER : supplies
     EMPLOYEE ||--o{ PURCHASE_HEADER : creates
@@ -35,6 +47,8 @@ erDiagram
     PRODUCT_VARIANT ||--o{ PURCHASE_DETAIL : purchased
 
     CUSTOMER ||--o{ SALE_HEADER : places
+    CUSTOMER ||--o{ PRODUCT_REVIEW : writes
+    CUSTOMER ||--o{ CUSTOMER_WISHLIST : maintains
     EMPLOYEE ||--o{ SALE_HEADER : processes
     SALE_HEADER ||--|{ SALE_DETAIL : contains
     PRODUCT_VARIANT ||--o{ SALE_DETAIL : sold
@@ -59,9 +73,12 @@ erDiagram
 
     CATEGORY {
         BIGINT category_id PK
+        BIGINT parent_id FK
         VARCHAR category_name UK
         VARCHAR slug UK
+        VARCHAR department_type
         TEXT description
+        VARCHAR image_url
         BOOLEAN is_active
         TIMESTAMP created_at
         TIMESTAMP updated_at
@@ -71,9 +88,18 @@ erDiagram
     PRODUCT {
         BIGINT product_id PK
         BIGINT category_id FK
+        VARCHAR product_type
         VARCHAR product_name
         VARCHAR brand
+        VARCHAR gender
+        VARCHAR material_fabric
+        VARCHAR season_collection
+        VARCHAR author_artist
+        VARCHAR isbn_code
+        VARCHAR featured_badge
         TEXT description
+        VARCHAR image_url
+        VARCHAR image_public_id
         VARCHAR status
         TIMESTAMP created_at
         TIMESTAMP updated_at
@@ -99,17 +125,50 @@ erDiagram
         BIGINT product_id FK
         BIGINT size_id FK
         BIGINT color_id FK
+        VARCHAR unit_of_measure
+        VARCHAR volume_or_weight
+        DECIMAL alcohol_by_volume
+        VARCHAR download_file_url
         VARCHAR sku UK
         VARCHAR barcode UK
+        VARCHAR image_url
+        VARCHAR image_public_id
         DECIMAL cost_price
         DECIMAL sale_price
         DECIMAL wholesale_price
-        INT stock_quantity
+        INT quantity
         INT reorder_level
         BOOLEAN is_active
         TIMESTAMP created_at
         TIMESTAMP updated_at
         TIMESTAMP deleted_at
+    }
+
+    PRODUCT_IMAGE {
+        BIGINT image_id PK
+        BIGINT product_id FK
+        BIGINT variant_id FK
+        VARCHAR image_url
+        VARCHAR image_public_id
+        VARCHAR shot_type
+        VARCHAR alt_text
+        INT sort_order
+        BOOLEAN is_primary
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_BATCH {
+        BIGINT batch_id PK
+        BIGINT variant_id FK
+        VARCHAR batch_number
+        DATE manufacturing_date
+        DATE expiry_date
+        INT quantity_received
+        INT quantity_remaining
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     SUPPLIER {
@@ -235,5 +294,199 @@ erDiagram
         TEXT note
         BIGINT created_by FK
         TIMESTAMP created_at
+    }
+
+    BRAND {
+        BIGINT brand_id PK
+        VARCHAR brand_name UK
+        VARCHAR slug UK
+        VARCHAR logo_url
+        VARCHAR banner_url
+        VARCHAR country_of_origin
+        TEXT description
+        VARCHAR website_url
+        BOOLEAN is_featured
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    STORE_BRANCH {
+        BIGINT branch_id PK
+        VARCHAR branch_name
+        VARCHAR branch_code UK
+        VARCHAR phone
+        VARCHAR email
+        TEXT address
+        VARCHAR city
+        BOOLEAN is_warehouse
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    STORE_INVENTORY {
+        BIGINT inventory_id PK
+        BIGINT branch_id FK
+        BIGINT variant_id FK
+        INT quantity
+        INT reorder_level
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PROMOTION {
+        BIGINT promotion_id PK
+        VARCHAR title
+        VARCHAR promo_code UK
+        VARCHAR discount_type
+        DECIMAL discount_value
+        DECIMAL min_spend
+        VARCHAR target_department
+        TIMESTAMP start_date
+        TIMESTAMP end_date
+        INT max_usage_count
+        INT used_count
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_BUNDLE {
+        BIGINT bundle_id PK
+        VARCHAR bundle_name
+        VARCHAR sku UK
+        VARCHAR barcode UK
+        DECIMAL bundle_price
+        DECIMAL original_total_price
+        TEXT description
+        VARCHAR image_url
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    BUNDLE_ITEM {
+        BIGINT bundle_item_id PK
+        BIGINT bundle_id FK
+        BIGINT variant_id FK
+        INT quantity
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_REVIEW {
+        BIGINT review_id PK
+        BIGINT product_id FK
+        BIGINT customer_id FK
+        VARCHAR reviewer_name
+        INT rating
+        VARCHAR title
+        TEXT comment
+        BOOLEAN is_verified_purchase
+        BOOLEAN is_approved
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CUSTOMER_WISHLIST {
+        BIGINT wishlist_id PK
+        BIGINT customer_id FK
+        BIGINT product_id FK
+        BIGINT variant_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    MARKETING_BANNER {
+        BIGINT banner_id PK
+        VARCHAR title
+        VARCHAR subtitle
+        VARCHAR image_url
+        VARCHAR image_public_id
+        VARCHAR link_url
+        VARCHAR placement
+        VARCHAR target_department
+        INT sort_order
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    POS_SHIFT {
+        BIGINT shift_id PK
+        BIGINT employee_id FK
+        BIGINT branch_id FK
+        TIMESTAMP opened_at
+        TIMESTAMP closed_at
+        DECIMAL opening_float_usd
+        DECIMAL opening_float_khr
+        DECIMAL cash_sales_usd
+        DECIMAL cash_sales_khr
+        DECIMAL card_sales_usd
+        DECIMAL qr_sales_usd
+        DECIMAL petty_cash_drops_usd
+        DECIMAL expected_cash_usd
+        DECIMAL closing_cash_usd
+        DECIMAL discrepancy_usd
+        VARCHAR status
+        TEXT notes
+        JSONB z_report_summary
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CUSTOMER_LOYALTY_LOG {
+        BIGINT log_id PK
+        BIGINT customer_id FK
+        BIGINT sale_id FK
+        VARCHAR transaction_type
+        INT points
+        INT balance_after
+        VARCHAR description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    VARIANT_PRICING_TIER {
+        BIGINT tier_id PK
+        BIGINT variant_id FK
+        INT min_quantity
+        INT max_quantity
+        DECIMAL unit_price
+        DECIMAL discount_percentage
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    GIFT_CARD {
+        BIGINT card_id PK
+        VARCHAR card_code UK
+        VARCHAR pin_hash
+        DECIMAL initial_balance
+        DECIMAL current_balance
+        BIGINT purchaser_customer_id FK
+        TIMESTAMP expiry_date
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    SHIPPING_ORDER {
+        BIGINT shipping_id PK
+        BIGINT sale_id FK
+        BIGINT branch_id FK
+        VARCHAR fulfillment_type
+        VARCHAR courier_name
+        VARCHAR tracking_number
+        VARCHAR recipient_name
+        VARCHAR recipient_phone
+        TEXT shipping_address
+        VARCHAR shipping_city
+        DECIMAL shipping_cost
+        VARCHAR status
+        TIMESTAMP dispatched_at
+        TIMESTAMP delivered_at
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 ```

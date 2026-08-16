@@ -6,28 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PurchaseDetail extends Model
+class CustomerWishlist extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'purchase_detail_id';
+    protected $table = 'customer_wishlists';
+    protected $primaryKey = 'wishlist_id';
 
     protected $fillable = [
-        'purchase_id',
+        'customer_id',
+        'product_id',
         'variant_id',
-        'quantity',
-        'cost_price',
-        'sub_total',
     ];
 
-    public function header(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
+        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
     }
 
-    public function purchase(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
+        return $this->belongsTo(Product::class, 'product_id', 'product_id');
     }
 
     public function variant(): BelongsTo

@@ -1,0 +1,10 @@
+/vendor
+/node_modules
+/khmeRiel-Items
+/storage/*.key
+.git
+.github
+.agents
+.phpunit.cache
+*.md
+*.log

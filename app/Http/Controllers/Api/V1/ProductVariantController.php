@@ -10,9 +10,42 @@ use Illuminate\Http\Request;
 
 class ProductVariantController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $variants = ProductVariant::with(['product', 'size', 'color'])->get();
+        $query = ProductVariant::with(['product', 'size', 'color', 'batches', 'images']);
+
+        // Fast search by SKU, Barcode, or Product Name
+        if ($search = $request->input('q') ?? $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('sku', 'ILIKE', "%{$search}%")
+                  ->orWhere('barcode', 'ILIKE', "%{$search}%")
+                  ->orWhereHas('product', function ($p) use ($search) {
+                      $p->where('product_name', 'ILIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by Unit of Measure (PIECE, CAN, BOTTLE, CARTON_24, etc.)
+        if ($uom = $request->input('unit_of_measure') ?? $request->input('uom')) {
+            $query->where('unit_of_measure', strtoupper($uom));
+        }
+
+        // Filter by Product ID
+        if ($productId = $request->input('product_id')) {
+            $query->where('product_id', $productId);
+        }
+
+        // Filter by Size ID
+        if ($sizeId = $request->input('size_id')) {
+            $query->where('size_id', $sizeId);
+        }
+
+        // Filter by Color ID
+        if ($colorId = $request->input('color_id')) {
+            $query->where('color_id', $colorId);
+        }
+
+        $variants = $query->orderBy('variant_id', 'desc')->get();
         return $this->successResponse($variants, 'Product variants retrieved');
     }
 
