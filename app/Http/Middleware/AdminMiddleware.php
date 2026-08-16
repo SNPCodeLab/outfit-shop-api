@@ -19,6 +19,7 @@ class AdminMiddleware
 
         if (!$user) {
             return response()->json([
+                'success'           => false,
                 'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
                 'status'            => '401',
@@ -31,6 +32,7 @@ class AdminMiddleware
 
         if (!$isAdmin) {
             return response()->json([
+                'success'           => false,
                 'message'           => 'ទាមទារសិទ្ធិជាអ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Admin) ទើបអាចប្រើប្រាស់មុខងារនេះបាន',
                 'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
                 'status'            => '403',

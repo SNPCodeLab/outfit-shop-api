@@ -44,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof AuthenticationException) {
                 return response()->json([
+                    'success'           => false,
                     'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
                     'documentation_url' => $docUrl,
                     'status'            => '401',
@@ -52,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof AccessDeniedHttpException) {
                 return response()->json([
+                    'success'           => false,
                     'message'           => 'សូមអភ័យទោស គណនីរបស់លោកអ្នកមិនមានសិទ្ធិគ្រប់គ្រាន់ដើម្បីដំណើរការផ្នែកនេះទេ',
                     'documentation_url' => $docUrl,
                     'status'            => '403',
@@ -60,6 +62,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof ValidationException) {
                 return response()->json([
+                    'success'           => false,
                     'message'           => 'ទិន្នន័យដែលបានបញ្ជូនមកមិនត្រឹមត្រូវតាមទម្រង់កំណត់ទេ សូមពិនិត្យមើលព័ត៌មានដែលបានបំពេញឡើងវិញ',
                     'errors'            => $e->errors(),
                     'documentation_url' => $docUrl,
@@ -69,6 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof NotFoundHttpException) {
                 return response()->json([
+                    'success'           => false,
                     'message'           => 'រកមិនឃើញទិន្នន័យដែលលោកអ្នកកំពុងស្វែងរកទេ សូមពិនិត្យមើល URL ឡើងវិញម្តងទៀត',
                     'documentation_url' => $docUrl,
                     'status'            => '404',
@@ -77,6 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException || $e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
                 return response()->json([
+                    'success'           => false,
                     'message'           => 'លោកអ្នកបានផ្ញើសំណើញឹកញាប់ពេកហើយ សូមរង់ចាំបន្តិចសិន រួចសាកល្បងម្តងទៀត',
                     'documentation_url' => $docUrl,
                     'status'            => '429',
@@ -84,6 +89,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $data = [
+                'success'           => false,
                 'message'           => config('app.debug') || app()->isLocal() ? $e->getMessage() : 'ប្រព័ន្ធកំពុងជួបបញ្ហាបច្ចេកទេសបន្តិចបន្តួច ក្រុមការងារកំពុងដោះស្រាយ សូមអធ្យាស្រ័យ',
                 'documentation_url' => $docUrl,
                 'status'            => (string) ($status >= 400 && $status < 600 ? $status : 500),

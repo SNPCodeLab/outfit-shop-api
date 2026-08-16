@@ -1,0 +1,57 @@
+{
+    "info": {
+        "name": "KhmeRiel Omnichannel MIS & POS Engine \u2014 Master RBAC API Collection",
+        "_postman_id": "khmeriel-rbac-api-v1-master",
+        "description": "Complete, exhaustive REST API collection for KhmeRiel (Store Stock MIS & Point-of-Sale Engine) with 100% RBAC role-level classification (Public Storefront, Cashier\/POS Operator, Inventory\/Warehouse Manager, Executive Administrator).",
+        "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Public \/ Customer Storefront (No Auth Required)",
+            "description": "Endpoints accessible by guest visitors, customer mobile apps, and e-commerce showcase storefronts.",
+            "item": []
+        },
+        {
+            "name": "2. Level 1: Cashier & POS Operator (Role: CASHIER \/ STAFF)",
+            "description": "Endpoints accessible by front-desk cashiers, retail clerks, shift operators, and POS terminal touchscreens.",
+            "item": []
+        },
+        {
+            "name": "3. Level 2: Inventory & Warehouse Manager (Role: MANAGER)",
+            "description": "Endpoints for catalog management, stock replenishment, PO generation, supplier logistics, and warehouse stock-ins.",
+            "item": []
+        },
+        {
+            "name": "4. Level 3: Executive Administrator & Auditor (Role: ADMIN \/ SUPERADMIN)",
+            "description": "Super-admin endpoints for user\/employee creation, role assignment, audit logs, and master system settings.",
+            "item": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https:\/\/api.kesararamwithdigital.tech",
+            "type": "string"
+        },
+        {
+            "key": "local_url",
+            "value": "http:\/\/127.0.0.1:8000",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "YOUR_ADMIN_SANCTUM_TOKEN",
+            "type": "string"
+        },
+        {
+            "key": "manager_token",
+            "value": "YOUR_MANAGER_SANCTUM_TOKEN",
+            "type": "string"
+        },
+        {
+            "key": "cashier_token",
+            "value": "YOUR_CASHIER_SANCTUM_TOKEN",
+            "type": "string"
+        }
+    ]
+}
