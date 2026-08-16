@@ -60,6 +60,7 @@ _ide_helper.php
 # Local Image & Asset Catalogs (Served via Cloudinary CDN)
 /khmeriel_catalog/
 /khmerieliterm/
+/khmeRiel-Items/
 /TOTEME*
 
 .env*
