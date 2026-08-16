@@ -60,6 +60,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/products',                            [ProductController::class,       'index']);
     Route::get('/products/{id}',                       [ProductController::class,       'show']);
+    Route::get('/products/{id}/images',                [\App\Http\Controllers\Api\V1\ProductImageController::class, 'index']);
 
     Route::get('/variants',                            [ProductVariantController::class,'index']);
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
@@ -114,6 +115,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/products',                   [ProductController::class,       'store']);
             Route::put('/products/{id}',               [ProductController::class,       'update']);
             Route::delete('/products/{id}',            [ProductController::class,       'destroy']);
+            Route::post('/products/{id}/images',       [\App\Http\Controllers\Api\V1\ProductImageController::class, 'store']);
+            Route::delete('/products/{id}/images/{imageId}', [\App\Http\Controllers\Api\V1\ProductImageController::class, 'destroy']);
 
             Route::post('/variants',                   [ProductVariantController::class,'store']);
             Route::put('/variants/{id}',               [ProductVariantController::class,'update']);

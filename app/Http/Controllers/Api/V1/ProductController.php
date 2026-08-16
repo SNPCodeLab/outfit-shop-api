@@ -12,20 +12,42 @@ class ProductController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with(['category', 'variants.size', 'variants.color']);
+        $query = Product::with(['category', 'variants.size', 'variants.color', 'images', 'primaryImage']);
 
-        // Fast search query by name, brand, or description
+        // Fast search query by name, brand, description, author, or ISBN
         if ($search = $request->input('q') ?? $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('product_name', 'ILIKE', "%{$search}%")
                   ->orWhere('brand', 'ILIKE', "%{$search}%")
-                  ->orWhere('description', 'ILIKE', "%{$search}%");
+                  ->orWhere('description', 'ILIKE', "%{$search}%")
+                  ->orWhere('author_artist', 'ILIKE', "%{$search}%")
+                  ->orWhere('isbn_code', 'ILIKE', "%{$search}%");
             });
         }
 
-        // Filter by category ID
+        // Filter by Product Type (PHYSICAL_APPAREL, PHYSICAL_FMCG, DIGITAL_DOWNLOAD)
+        if ($productType = $request->input('product_type')) {
+            $query->where('product_type', strtoupper($productType));
+        }
+
+        // Filter by Gender (MEN, WOMEN, UNISEX, KIDS)
+        if ($gender = $request->input('gender')) {
+            $query->where('gender', strtoupper($gender));
+        }
+
+        // Filter by Season / Collection
+        if ($season = $request->input('season') ?? $request->input('collection')) {
+            $query->where('season_collection', 'ILIKE', "%{$season}%");
+        }
+
+        // Filter by Category ID or Department Type
         if ($categoryId = $request->input('category_id')) {
             $query->where('category_id', $categoryId);
+        }
+        if ($dept = $request->input('department_type')) {
+            $query->whereHas('category', function ($c) use ($dept) {
+                $c->where('department_type', strtoupper($dept));
+            });
         }
 
         // Filter by status
@@ -34,7 +56,7 @@ class ProductController extends BaseApiController
         }
 
         // Fast sorting
-        $sortField = in_array($request->input('sort_by'), ['product_name', 'created_at', 'brand']) 
+        $sortField = in_array($request->input('sort_by'), ['product_name', 'created_at', 'brand', 'season_collection']) 
             ? $request->input('sort_by') 
             : 'product_id';
         $sortOrder = strtolower($request->input('order', 'desc')) === 'asc' ? 'asc' : 'desc';

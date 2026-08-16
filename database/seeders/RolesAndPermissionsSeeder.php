@@ -26,6 +26,11 @@ class RolesAndPermissionsSeeder extends Seeder
         // Clear Spatie permission cache
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // Clear existing role-permission assignments to avoid duplicate key errors on PostgreSQL
+        \Illuminate\Support\Facades\DB::table('role_has_permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('model_has_permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('model_has_roles')->delete();
+
         // ─── 1. Permissions ──────────────────────────────────────────────────
         $permissions = [
             // Status & Analytics
