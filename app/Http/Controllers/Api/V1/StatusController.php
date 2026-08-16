@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class StatusController extends BaseApiController
 {
@@ -14,13 +15,30 @@ class StatusController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        return $this->successResponse([
+        $dbStatus = 'Connected';
+        $dbError = null;
+
+        try {
+            DB::connection()->getPdo();
+        } catch (\Throwable $e) {
+            $dbStatus = 'Disconnected';
+            $dbError = $e->getMessage();
+        }
+
+        $data = [
             'project'     => 'Store Stock & Point-of-Sale Information System',
             'acronym'     => 'SS-MIS',
             'version'     => 'v1.0.0',
             'api_status'  => 'Operational',
-            'environment' => config('app.env'),
+            'database'    => $dbStatus,
+            'environment' => config('app.env', 'production'),
             'timestamp'   => now()->toIso8601String(),
-        ], 'SS-MIS Backend Web API v1 is operational');
+        ];
+
+        if ($dbStatus === 'Disconnected') {
+            $data['db_error'] = $dbError;
+        }
+
+        return $this->successResponse($data, 'SS-MIS Backend Web API v1 is operational');
     }
 }

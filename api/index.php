@@ -12,32 +12,35 @@
 |
 */
 
+define('LARAVEL_START', microtime(true));
+
 // ─── 1. Vercel Environment Overrides (MUST run before autoloader) ─────────
 putenv('LOG_CHANNEL=null');           // Completely disable file logging
 putenv('LOG_LEVEL=error');
-putenv('DB_CONNECTION=pgsql');
 putenv('CACHE_DRIVER=array');
 putenv('SESSION_DRIVER=array');
 
 $_ENV['LOG_CHANNEL']    = 'null';
 $_ENV['LOG_LEVEL']      = 'error';
-$_ENV['DB_CONNECTION']  = 'pgsql';
 $_ENV['CACHE_DRIVER']   = 'array';
 $_ENV['SESSION_DRIVER'] = 'array';
 
 $_SERVER['LOG_CHANNEL']    = 'null';
-$_SERVER['DB_CONNECTION']  = 'pgsql';
 $_SERVER['CACHE_DRIVER']   = 'array';
 $_SERVER['SESSION_DRIVER'] = 'array';
+
+if (!getenv('DB_CONNECTION')) {
+    putenv('DB_CONNECTION=pgsql');
+}
 
 // ─── 2. Create writable /tmp directory structure ───────────────────────────
 $storagePath = '/tmp/storage';
 
-@mkdir($storagePath . '/framework/views',    0755, true);
-@mkdir($storagePath . '/framework/sessions', 0755, true);
+@mkdir($storagePath . '/framework/views',      0755, true);
+@mkdir($storagePath . '/framework/sessions',   0755, true);
 @mkdir($storagePath . '/framework/cache/data', 0755, true);
-@mkdir($storagePath . '/logs',               0755, true);
-@mkdir('/tmp/cache',                          0755, true);
+@mkdir($storagePath . '/logs',                 0755, true);
+@mkdir('/tmp/cache',                            0755, true);
 
 putenv("APP_STORAGE={$storagePath}");
 putenv("APP_SERVICES_CACHE=/tmp/cache/services.php");
@@ -54,14 +57,15 @@ try {
     require __DIR__ . '/../vendor/autoload.php';
 
     /** @var \Illuminate\Foundation\Application $app */
-    $app = require __DIR__ . '/../bootstrap/app.php';
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
 
     // Override storage path BEFORE any logging or framework file operations
     $app->useStoragePath($storagePath);
 
-    $request  = \Illuminate\Http\Request::capture();
-    $response = $app->handleRequest($request);
-    $response->send();
+    \Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
+    // Laravel 11 handleRequest executes and sends the response internally
+    $app->handleRequest(\Illuminate\Http\Request::capture());
 
 } catch (\Throwable $e) {
     // Last-resort: always return clean JSON — never expose a PHP fatal page
