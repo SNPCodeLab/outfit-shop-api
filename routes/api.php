@@ -256,6 +256,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/audit-logs',                  [AuditLogController::class,      'index']);
             Route::get('/audit-logs/{id}',             [AuditLogController::class,      'show']);
 
+            // Bulk / Batch Operations (1 Request vs 100)
+            Route::post('/inventory/bulk-adjust',      [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkAdjust']);
+            Route::post('/variants/bulk-price-update', [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkPriceUpdate']);
+            Route::post('/products/bulk-import',       [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkImport']);
+            Route::post('/purchases/bulk-receive',     [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkReceive']);
+
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
