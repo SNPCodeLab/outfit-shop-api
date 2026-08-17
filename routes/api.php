@@ -158,6 +158,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/shipping/create',                [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'create']);
         Route::post('/shipping/{id}/status',           [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'updateStatus']);
 
+        // -- Offline POS Mode Synchronization & Conflict Resolution --
+        Route::get('/offline/manifest',                [\App\Http\Controllers\Api\V1\OfflineSyncController::class, 'manifest']);
+        Route::post('/offline/push-transactions',       [\App\Http\Controllers\Api\V1\OfflineSyncController::class, 'pushTransactions']);
+
         // -- Live Role-Pulse Analytics (Pie & Agile Graph tracking per role) --
         Route::get('/dashboard/role-pulse',            [\App\Http\Controllers\Api\DashboardController::class, 'rolePulse']);
 
@@ -290,6 +294,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/reports/supplier-performance',      [\App\Http\Controllers\Api\V1\ReportController::class, 'supplierPerformance']);
             Route::get('/reports/profit-margin',             [\App\Http\Controllers\Api\V1\ReportController::class, 'profitMargin']);
             Route::get('/reports/cash-flow',                 [\App\Http\Controllers\Api\V1\ReportController::class, 'cashFlow']);
+
+            // AI Predictive Retail Intelligence & Fraud Anomaly Detection
+            Route::get('/ai/sales-forecast',                 [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'salesForecast']);
+            Route::get('/ai/anomaly-detection',              [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'anomalyDetection']);
+            Route::get('/ai/smart-restock',                  [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'smartRestock']);
+            Route::get('/ai/customer-segmentation',          [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'customerSegmentation']);
+            Route::get('/ai/dynamic-pricing',                [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'dynamicPricing']);
 
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
