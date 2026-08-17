@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 class HelpCentreGuideController extends BaseApiController
 {
     /**
-     * Display the official Documentation and Operations Guide.
+     * Display the cognitive, concise, and psychology-optimized Documentation & Guide.
      *
      * @param Request $request
      * @return Response|JsonResponse
@@ -21,272 +21,236 @@ class HelpCentreGuideController extends BaseApiController
             [
                 'id'          => 'getting-started',
                 'title'       => 'Getting Started',
-                'tagline'     => 'System Onboarding & Architecture',
+                'tagline'     => 'Fast 3-Minute System Quickstart',
                 'icon'        => 'fa-rocket',
-                'description' => 'Comprehensive onboarding guide, architecture topology, access tiers, and standard response envelopes.',
+                'description' => 'Everything you need to know to log in, understand user permissions, and operate your daily store workflow.',
                 'sections'    => [
                     [
-                        'title'   => 'System Overview & Design Philosophy',
-                        'content' => 'This platform operates as a high-throughput Transaction Processing System (TPS) paired with an analytical Management Information System (MIS) layer. It governs real-time retail checkouts, multi-location warehouse inventories, automated purchase replenishment, customer loyalty, and financial balance sheet valuations.',
+                        'title'   => '1. The 4 User Access Levels',
+                        'content' => '• Guest: Browse catalog and size charts (view-only).\n• Cashier: Scan barcodes, handle POS sales, open/close cash shifts.\n• Manager: Restock inventory, create purchase orders, approve discounts.\n• Admin: Manage staff accounts, edit system settings, view financial logs.',
                     ],
                     [
-                        'title'   => 'Role-Based Access Control (4 Tiers)',
-                        'content' => 'The access model is organized into four hierarchical access levels:\n\n• Level 1: Public / Guest — Read-only catalog browsing, size guides, and storefront showcase.\n• Level 2: Cashier & Staff — POS counter sales, shift session management, barcode scanning, and loyalty lookups.\n• Level 3: Manager — Stock adjustments, vendor purchase orders, pricing tiers, and promotional campaigns.\n• Level 4: Administrator — Workforce management, system settings, database migrations, and immutable audit logs.',
+                        'title'   => '2. Daily Operational Routine',
+                        'content' => '1. Morning: Open register shift and enter starting cash float.\n2. Day: Scan items at POS, accept payments (Cash, Card, QR), print receipts.\n3. Evening: Close shift, count drawer cash, print Z-Report.',
                     ],
                     [
-                        'title'   => 'Standard Response Envelopes',
-                        'content' => 'All operations adhere to uniform JSON envelopes containing success booleans, human-readable status messages, payload objects, and HTTP status codes (200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 422 Unprocessable Entity).',
+                        'title'   => '3. Safe Security Habits',
+                        'content' => '• Lock your screen when leaving the cash counter.\n• Never share login passwords between staff members.',
                     ],
                 ],
                 'tips' => [
-                    'Always verify credentials prior to executing privileged manager operations.',
-                    'Keep employee logins secure and never share active cashier shift sessions.',
+                    'Press ⌘K (or Ctrl+K) anywhere in this guide to instantly find what you need.',
                 ]
             ],
             [
                 'id'          => 'accounts-crm',
-                'title'       => 'Accounts & CRM',
-                'tagline'     => 'Customer Profiles & Loyalty Rewards',
+                'title'       => 'Customers & Loyalty',
+                'tagline'     => 'Customer Profiles & Reward Points',
                 'icon'        => 'fa-users',
-                'description' => 'Customer account records, VIP classification tiers, telephone checkout lookups, and loyalty point rewards.',
+                'description' => 'Search customers by phone number, give loyalty points on every purchase, and redeem instant discounts.',
                 'sections'    => [
                     [
-                        'title'   => 'Customer Directory & Profiles',
-                        'content' => 'Maintain complete customer profiles including full name, telephone, email address, physical delivery address, and private credit notes. Cashiers can instantly search customer profiles by phone number during POS checkout.',
+                        'title'   => '1. Fast Customer Lookup',
+                        'content' => '• Type customer phone number at POS checkout.\n• Existing profile loads with name, VIP level, and points balance in 1 second.',
                     ],
                     [
-                        'title'   => 'VIP Loyalty Points Accrual',
-                        'content' => 'Customers automatically earn 1 loyalty point for every $1.00 spent on qualifying purchases. Total accrued points advance customer status through Bronze, Silver, Gold, and Platinum VIP tiers.',
+                        'title'   => '2. How Loyalty Points Work',
+                        'content' => '• Earn: Customer gets 1 Point for every $1.00 spent.\n• Redeem: 100 Points = $5.00 instant cash discount at checkout.\n• Tiers: Bronze (0-499 pts) → Silver (500 pts) → Gold (1,500 pts) → VIP Platinum (3,000+ pts).',
                     ],
                     [
-                        'title'   => 'Points Redemption at Checkout',
-                        'content' => 'Loyalty points can be redeemed directly at the POS counter for immediate transaction discounts. Standard conversion: 100 Points = $5.00 cash deduction.',
+                        'title'   => '3. Why This Works (Customer Psychology)',
+                        'content' => 'Customers return 3x more often when they see their points growing on their printed receipt.',
                     ],
                 ],
                 'tips' => [
-                    'Request mobile numbers from walk-in clients to ensure their reward points are credited.',
-                    'VIP customers receive automated priority notices for seasonal apparel drops.',
+                    'Always ask: "Do you have a loyalty phone number?" before hitting payment.',
                 ]
             ],
             [
                 'id'          => 'inventory-matrix',
-                'title'       => 'Inventory & Matrices',
-                'tagline'     => '4-Tier Stock & 2D Variations Grid',
+                'title'       => 'Inventory & Matrix',
+                'tagline'     => '4-Tier Stock & Size/Color Grid',
                 'icon'        => 'fa-boxes-stacked',
-                'description' => 'Real-time stock ledger, 4-tier quantity lifecycle, 2D size/color variation matrices, and barcode scanning.',
+                'description' => 'Know your real stock counts at a glance and prevent overselling using the 4-tier quantity rule.',
                 'sections'    => [
                     [
-                        'title'   => 'The 4-Tier Quantity Model',
-                        'content' => 'Inventory is classified into four dynamic states:\n\n1. On Hand: Physical units verified in the warehouse or store branch.\n2. Reserved: Units committed to open quotation estimates, draft orders, and pending pickups.\n3. Available: Net sellable quantity = max(0, On Hand - Reserved).\n4. Incoming: Replenishment units ordered on open vendor Purchase Orders.',
+                        'title'   => '1. The 4 Stock Numbers Explained',
+                        'content' => '• On Hand: Physical items in your store right now.\n• Reserved: Items held for customer quotes or pending pickup.\n• Available: What you can sell today = (On Hand − Reserved).\n• Incoming: Stock already ordered from supplier on the way.',
                     ],
                     [
-                        'title'   => '2D Size × Color Matrix Grid',
-                        'content' => 'Apparel items with multiple dimensions are structured inside a 2D matrix (Sizes: S, M, L, XL, OS vs Colors: Black, White, Navy, Gold) allowing rapid mass inventory entry and wholesale bulk ordering.',
+                        'title'   => '2. Size × Color Matrix',
+                        'content' => 'Clothing items are organized in a clean 2D grid (Sizes S to XL across Colors Black, White, Navy). Enter quantities in 1 screen without creating separate items.',
                     ],
                     [
-                        'title'   => 'Continuous Barcode Scanning',
-                        'content' => 'Every variant carries a unique barcode. Scanning immediately retrieves stock balances and unit pricing. Items reaching the minimum reorder point automatically trigger restocking alerts.',
+                        'title'   => '3. Barcode Scanning',
+                        'content' => 'Point scanner at clothing tag. Price and stock appear immediately. Stock decrements automatically when payment succeeds.',
                     ],
                 ],
                 'tips' => [
-                    'Conduct weekly cycle counts on high-velocity inventory to prevent shrinkage.',
-                    'Review low stock alerts daily to maintain optimal inventory turnover.',
+                    'Never sell below Available quantity to avoid customer disappointment.',
                 ]
             ],
             [
                 'id'          => 'invoices-estimates',
-                'title'       => 'Invoices & Billing',
-                'tagline'     => 'Estimates, Invoices & 10% VAT',
+                'title'       => 'Invoices & Quotes',
+                'tagline'     => 'Estimates to Invoice & 10% VAT',
                 'icon'        => 'fa-file-invoice-dollar',
-                'description' => 'Quotation estimates, 1-click invoice conversion, 10% VAT tax calculations, and printable PDF billing.',
+                'description' => 'Send price quotes to clients, convert them to official invoices in 1 click, and print clean A4 or receipt slips.',
                 'sections'    => [
                     [
-                        'title'   => 'Quotation Estimates Workflow',
-                        'content' => 'Create formal client quotations with custom line items, unit prices, discounts, and validity periods. Estimates hold inventory as Reserved without decrementing physical counts.',
+                        'title'   => '1. Quotes vs Invoices',
+                        'content' => '• Estimate (Quote): Reserves stock temporarily without deducting inventory.\n• Invoice: Confirms sale, deducts physical stock, and creates payment record.',
                     ],
                     [
-                        'title'   => '1-Click Convert to Invoice',
-                        'content' => 'When a client approves an estimate, clicking Convert validates stock, decrements physical quantity, writes immutable stock movements, and generates an official invoice.',
+                        'title'   => '2. 1-Click Invoice Conversion',
+                        'content' => 'When customer says "Yes", open the Estimate and click Convert. Stock decrements instantly and official receipt is ready to print.',
                     ],
                     [
-                        'title'   => '10% Tax-Exclusive VAT Calculation',
-                        'content' => 'Formula:\n• Net Subtotal = Sum(Line Items) - Discounts\n• Tax Amount (10% VAT) = Net Subtotal × 0.10\n• Grand Total = Net Subtotal + Tax Amount',
-                    ],
-                    [
-                        'title'   => 'Printable Vector Invoices & Thermal Receipts',
-                        'content' => 'Export high-resolution A4 tax invoices with full customer bill-to metadata, line item tables, and tax breakdowns, or print 80mm ESC/POS thermal receipts with tactile animations.',
+                        'title'   => '3. 10% VAT Formula',
+                        'content' => '• Subtotal = Items Total − Discount\n• Tax (10% VAT) = Subtotal × 0.10\n• Grand Total = Subtotal + Tax',
                     ],
                 ],
                 'tips' => [
-                    'Set quotation validity to 14 days to mitigate wholesale price fluctuations.',
-                    'Use the laser print preview simulation to verify invoice lines before physical printing.',
+                    'Quotes stay valid for 14 days by default.',
                 ]
             ],
             [
                 'id'          => 'purchasing-procurement',
-                'title'       => 'Purchasing & Vendors',
-                'tagline'     => 'Supplier POs & Auto-Replenishment',
+                'title'       => 'Purchasing & POs',
+                'tagline'     => 'Supplier Orders & Restocking',
                 'icon'        => 'fa-truck-ramp-box',
-                'description' => 'Supplier master directory, purchase orders, velocity-based restocking, and goods receiving ledgers.',
+                'description' => 'Order merchandise from suppliers, track delivery transit, and receive stock into inventory with 1 tap.',
                 'sections'    => [
                     [
-                        'title'   => 'Supplier Directory',
-                        'content' => 'Maintain vendor records including contact persons, delivery terms, payment terms, and historical unit cost agreements.',
+                        'title'   => '1. Purchase Order 3-Step Lifecycle',
+                        'content' => '1. Draft: Pick items and enter agreed supplier unit costs.\n2. Ordered: Send PO to vendor (items show as Incoming stock).\n3. Received: Count boxes on arrival and tap Receive Stock to add to On Hand.',
                     ],
                     [
-                        'title'   => 'Purchase Order Lifecycle',
-                        'content' => 'Create POs in Draft state, submit to vendor as Ordered, track in transit as Shipped, and reconcile incoming shipments upon receipt to increment On Hand stock.',
-                    ],
-                    [
-                        'title'   => 'Smart Automated Replenishment',
-                        'content' => 'The system computes weekly sales velocity against minimum reorder levels and suggests purchase orders automatically in 1 click.',
+                        'title'   => '2. Smart Reorder Alerts',
+                        'content' => 'The system flags items with a red badge whenever On Hand falls below the minimum safety threshold (e.g. fewer than 5 units).',
                     ],
                 ],
                 'tips' => [
-                    'Inspect incoming shipments against PO lines before marking goods as Received.',
-                    'Review supplier lead times quarterly to fine-tune automated reorder points.',
+                    'Always count physical items before tapping "Receive Stock" to catch supplier delivery errors.',
                 ]
             ],
             [
                 'id'          => 'locations-branches',
-                'title'       => 'Locations & Branches',
-                'tagline'     => 'Multi-Warehouse & Store Logistics',
+                'title'       => 'Store Locations',
+                'tagline'     => 'Multi-Store & Stock Transfers',
                 'icon'        => 'fa-store',
-                'description' => 'Multi-location inventory tracking, warehouse zones, inter-branch stock transfers, and click-and-collect.',
+                'description' => 'Manage inventory across multiple store branches and central warehouses without confusion.',
                 'sections'    => [
                     [
-                        'title'   => 'Store Branch Hierarchy',
-                        'content' => 'Configure multiple retail stores and central warehouses with specific addresses, operating hours, and localized inventory ledgers.',
+                        'title'   => '1. Multi-Store Isolation',
+                        'content' => 'Each store branch has its own live inventory balance. Cashiers only see and sell stock available at their active branch.',
                     ],
                     [
-                        'title'   => 'Inter-Branch Stock Transfers',
-                        'content' => 'Move inventory between warehouses and retail showrooms with transit status tracking and dual-sign-off verification.',
-                    ],
-                    [
-                        'title'   => 'Omnichannel Click-and-Collect',
-                        'content' => 'Customers can order online and select in-store pickup at their preferred branch or request home dispatch via local couriers.',
+                        'title'   => '2. Transferring Stock Between Stores',
+                        'content' => '1. Origin store creates Stock Transfer manifest.\n2. Driver transports items (status: In Transit).\n3. Destination manager checks items and taps Accept to update local counts.',
                     ],
                 ],
                 'tips' => [
-                    'Assign dedicated staff members to specific store branches to ensure operational accountability.',
-                    'Ensure stock transfer manifests are verified upon physical arrival at the destination branch.',
+                    'Stock transfers require destination manager sign-off to ensure zero lost items.',
                 ]
             ],
             [
                 'id'          => 'kitting-bundling',
-                'title'       => 'Kitting & Bundles',
-                'tagline'     => 'Combo Packages & Auto-Deduction',
+                'title'       => 'Bundles & Kits',
+                'tagline'     => 'Combo Sets & Auto-Deductions',
                 'icon'        => 'fa-cubes',
-                'description' => 'Assembled multi-item combo packs, gift boxes, and dynamic sub-component stock deduction.',
+                'description' => 'Sell multi-item gift sets or outfit combos with automatic sub-item stock deduction.',
                 'sections'    => [
                     [
-                        'title'   => 'Bundle Package Definition',
-                        'content' => 'Create combo packages with unique SKUs, bundled pricing, and assigned individual sub-component quantities.',
+                        'title'   => '1. How Combo Bundles Work',
+                        'content' => '• Example: "Weekend Outfit Set" = 1x Shirt + 1x Pants + 1x Cap.\n• Set a special package price to encourage bulk buys.',
                     ],
                     [
-                        'title'   => 'Dynamic Bundle Stock Availability',
-                        'content' => 'Kit availability is calculated dynamically based on the lowest common denominator of individual sub-components in stock.',
-                    ],
-                    [
-                        'title'   => 'Automatic Component Decrement',
-                        'content' => 'Selling 1 bundle automatically decrements all included sub-variants in the inventory ledger inside an atomic database transaction.',
+                        'title'   => '2. Dynamic Kit Availability',
+                        'content' => 'The bundle is only available if all individual sub-items are in stock. Selling 1 bundle deducts all sub-items simultaneously.',
                     ],
                 ],
                 'tips' => [
-                    'Use bundles for seasonal promotions to increase average order values.',
-                    'Verify individual component stock before launching high-volume bundle promotions.',
+                    'Combos increase Average Order Value (AOV) by up to 35%.',
                 ]
             ],
             [
                 'id'          => 'financial-valuation',
-                'title'       => 'Reports & Valuation',
-                'tagline'     => 'Balance Sheet Valuation & Margins',
+                'title'       => 'Valuation & Margins',
+                'tagline'     => 'Asset Worth & Profit Formulas',
                 'icon'        => 'fa-chart-pie',
-                'description' => 'Real-time financial asset valuation (Purchased Cost vs Resale Retail Value), gross margin %, and performance metrics.',
+                'description' => 'Know exactly how much money is sitting on your shelves and calculate gross profit margins in seconds.',
                 'sections'    => [
                     [
-                        'title'   => 'Balance Sheet Asset Valuation',
-                        'content' => '• Purchased Value (Cost Basis) = Total Stock × Unit Cost Price.\n• Resale Value (Retail Asset) = Total Stock × Unit Retail Price.\n• Potential Gross Profit = Resale Value - Purchased Value.',
+                        'title'   => '1. Balance Sheet Stock Worth',
+                        'content' => '• Purchased Value (Cost Basis): Total Units × What You Paid.\n• Resale Value (Retail Worth): Total Units × Selling Price.\n• Potential Profit = Resale Value − Purchased Value.',
                     ],
                     [
-                        'title'   => 'Gross Profit Margin Percentage',
-                        'content' => 'Formula: Margin % = (Gross Profit ÷ Resale Value) × 100.\nMonitored across product categories and individual apparel collections.',
-                    ],
-                    [
-                        'title'   => 'Operational Velocity Analytics',
-                        'content' => 'Real-time dashboard tracking cashier scanning speed, payment method distribution (Cash, Card, KHQR), and hourly peak traffic.',
+                        'title'   => '2. Gross Margin % Formula',
+                        'content' => '• Gross Margin % = (Profit ÷ Resale Value) × 100\n• Healthy apparel target: 45% to 65% gross margin.',
                     ],
                 ],
                 'tips' => [
-                    'Export financial valuation reports at month-end for accounting reconciliations.',
-                    'Monitor gross margin by category to identify top performing merchandise.',
+                    'Check your Gross Margin report weekly to identify your most profitable clothing items.',
                 ]
             ],
             [
                 'id'          => 'security-rbac',
-                'title'       => 'Security & Governance',
-                'tagline'     => 'Workforce Roles & Audit Trail',
+                'title'       => 'Security & Roles',
+                'tagline'     => 'Permissions & Audit Trails',
                 'icon'        => 'fa-shield-halved',
-                'description' => 'Role-based access guards, employee HR profiles, session security, and immutable audit logs.',
+                'description' => 'Role-based access controls and automatic immutable logs for every price change and stock adjustment.',
                 'sections'    => [
                     [
-                        'title'   => '4-Tier Access Control',
-                        'content' => 'Every action is guarded by role middleware ensuring Cashiers, Staff, Managers, and Admins can only perform authorized tasks.',
+                        'title'   => '1. Separation of Responsibilities',
+                        'content' => '• Cashiers cannot edit prices or delete sales.\n• Only Managers can adjust stock or void receipts.\n• Prevents internal shrinkage and unauthorized discounts.',
                     ],
                     [
-                        'title'   => 'Employee Workforce Management',
-                        'content' => 'Maintain employee records, job positions, base salaries, hire dates, and active system login associations.',
-                    ],
-                    [
-                        'title'   => 'Immutable System Audit Logs',
-                        'content' => 'The system records every stock adjustment, price change, invoice void, and user permission modification with before/after JSON diffs, employee ID, and IP address.',
+                        'title'   => '2. Automatic Audit Trail',
+                        'content' => 'Every action records who did it, exact timestamp, and what changed (Before & After values).',
                     ],
                 ],
                 'tips' => [
-                    'Review audit logs weekly for unusual inventory corrections or voided invoices.',
-                    'Deactivate employee accounts immediately upon staff departure.',
+                    'Review voided sales logs every Monday morning.',
                 ]
             ],
             [
                 'id'          => 'pos-shifts',
-                'title'       => 'POS & Cash Shifts',
-                'tagline'     => 'Cash Drawer Sessions & Z-Reports',
+                'title'       => 'Cash Shifts & Z-Report',
+                'tagline'     => 'Daily Drawer Balance & End of Day',
                 'icon'        => 'fa-cash-register',
-                'description' => 'Cash drawer session opening floats, midday safe cash drops, and closing Z-Report reconciliation.',
+                'description' => 'Simple 3-step cash drawer reconciliation to ensure 100% accurate daily cash counts.',
                 'sections'    => [
                     [
-                        'title'   => 'Opening Cash Shift',
-                        'content' => 'At the start of a shift, the cashier enters the counted opening float (e.g. $100.00 in small bills) to unlock the register.',
+                        'title'   => '1. Morning Opening Float',
+                        'content' => 'Count starting cash (e.g. $100 in change). Enter amount to unlock the POS register.',
                     ],
                     [
-                        'title'   => 'Midday Cash Safe Drops',
-                        'content' => 'Transfer excess cash to the store safe during high-volume hours to minimize cash drawer exposure.',
+                        'title'   => '2. Midday Cash Safe Drop',
+                        'content' => 'When drawer holds more than $1,000, move excess cash to the store safe. System tracks the drop automatically.',
                     ],
                     [
-                        'title'   => 'Closing Shift & Z-Report',
-                        'content' => 'Count physical cash at end of day. The system calculates expected cash (Opening Float + Cash Sales - Cash Drops) and reports exact overage or shortage.',
+                        'title'   => '3. Closing Z-Report Formula',
+                        'content' => '• Expected Cash = (Opening Float + Cash Sales) − Cash Drops\n• Count physical cash. If difference is $0.00, your drawer is perfectly balanced.',
                     ],
                 ],
                 'tips' => [
-                    'Perform cash drops whenever drawer cash exceeds $1,000.00.',
-                    'Require manager sign-off on any closing cash variance exceeding $5.00.',
+                    'Always count cash in private away from customer view before shift sign-off.',
                 ]
             ],
         ];
 
         $popularTopics = [
-            '4-Tier Quantity Model', 'On Hand vs Available', 'Quotation Estimates', '1-Click Invoice Convert',
-            '10% VAT Tax Formula', 'Purchased Value Valuation', 'Resale Value Asset', 'Gross Profit Margin',
-            '2D Size Color Matrix', 'Barcode Scanning', 'Low Stock Thresholds', 'Z-Report Reconciliation',
-            'Cash Drawer Drops', 'VIP Loyalty Points', 'Customer CRM Lookup', 'Supplier Purchase Orders',
-            'Smart Restock Forecast', 'Multi-Store Branches', 'Stock Transfers', 'Combo Kit Bundling',
-            'Immutable Audit Logs', '4-Tier RBAC Access', 'A4 PDF Tax Invoice', 'Thermal ESC/POS Receipts'
+            '4-Tier Quantity Model', 'On Hand vs Available', 'Loyalty Points Rule', '10% VAT Formula',
+            'Gross Profit Margin', 'Barcode Scanning', 'Opening Cash Float', 'Closing Z-Report',
+            'Estimate to Invoice', 'Stock Transfers', 'Combo Bundles', 'Safe Cash Drops',
+            'Role Permissions', 'Customer Phone Search', 'Audit Trail', 'Print Tax Invoice'
         ];
 
         if ($request->wantsJson() && !$request->has('html')) {
             return $this->successResponse([
                 'title'          => 'Documentation & Operations Guide',
-                'tagline'        => 'Official Knowledge Base & Operations Manual',
+                'tagline'        => 'Clear, Actionable Knowledge Base',
                 'total_topics'   => count($categories),
                 'categories'     => $categories,
                 'popular_topics' => $popularTopics,
@@ -409,7 +373,7 @@ class HelpCentreGuideController extends BaseApiController
             height: 56px;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 20px;
             max-width: 100%;
             width: 100%;
         }
@@ -601,48 +565,56 @@ class HelpCentreGuideController extends BaseApiController
             padding: 28px 24px;
         }
         .section-block {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
+            padding: 16px 18px;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
         }
         .section-block:last-child { margin-bottom: 0; }
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--foreground);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             letter-spacing: -0.01em;
         }
         .section-text {
-            font-size: 14px;
-            color: var(--muted-foreground);
+            font-size: 13.5px;
+            color: var(--foreground);
             line-height: 1.7;
             white-space: pre-line;
         }
 
         .tips-callout {
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--primary);
+            border: 1px solid #fef08a;
+            background: #fefce8;
+            color: #713f12;
+            border-left: 3px solid #eab308;
             border-radius: var(--radius);
-            padding: 16px 20px;
-            background: var(--muted);
-            margin-top: 28px;
+            padding: 14px 18px;
+            margin-top: 24px;
+        }
+        .dark .tips-callout {
+            background: #1e1b4b;
+            border-color: #3730a3;
+            color: #e0e7ff;
+            border-left-color: #818cf8;
         }
         .tips-title {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--foreground);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .tips-list {
-            list-style: disc;
-            margin-left: 20px;
+            list-style: none;
             font-size: 13px;
-            color: var(--muted-foreground);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* ── Popular Topics Cloud ── */
@@ -831,15 +803,15 @@ class HelpCentreGuideController extends BaseApiController
                 </div>
 
                 <h1 class='doc-title' id='doc-title'>Getting Started</h1>
-                <p class='doc-description' id='doc-description'>Comprehensive onboarding guide, architecture topology, access tiers, and standard response envelopes.</p>
+                <p class='doc-description' id='doc-description'>Fast 3-Minute System Quickstart</p>
 
                 <div class='component-card'>
                     <div class='component-card-header'>
                         <div class='component-card-title'>
                             <i class='fa-solid fa-book-open'></i>
-                            <span id='component-title'>System Specification &amp; Workflow</span>
+                            <span id='component-title'>Action Steps &amp; Workflows</span>
                         </div>
-                        <span class='brand-tag'>Operational Manual</span>
+                        <span class='brand-tag'>Quick Guide</span>
                     </div>
                     <div class='component-card-body' id='component-body'>
                         <!-- Injected dynamically -->
@@ -847,7 +819,7 @@ class HelpCentreGuideController extends BaseApiController
                 </div>
 
                 <div class='topics-section'>
-                    <div class='sidebar-heading' style='padding: 0;'>Popular Topics &amp; Terminology</div>
+                    <div class='sidebar-heading' style='padding: 0;'>Quick Search Topics</div>
                     <div class='topics-pills-wrap'>
                         {$topicsPillsHtml}
                     </div>
@@ -869,7 +841,7 @@ class HelpCentreGuideController extends BaseApiController
         <div class='search-dialog' onclick='event.stopPropagation()'>
             <div class='search-input-box'>
                 <i class='fa-solid fa-magnifying-glass' style='color: var(--muted-foreground);'></i>
-                <input type='text' id='search-input' class='search-dialog-input' placeholder='Type a topic, matrix rule, or tax calculation...'>
+                <input type='text' id='search-input' class='search-dialog-input' placeholder='Type a topic or shortcut...'>
                 <span class='kbd-badge' style='cursor: pointer;' onclick='closeSearchModal()'>ESC</span>
             </div>
             <div class='search-results-list' id='search-results'>
@@ -893,7 +865,7 @@ class HelpCentreGuideController extends BaseApiController
             document.getElementById('component-title').innerText = data.tagline;
 
             // Render Sections
-            let bodyHtml = `<p style='font-size: 14px; color: var(--foreground); font-weight: 500; margin-bottom: 24px; line-height: 1.6;'>\${data.description}</p>`;
+            let bodyHtml = `<p style='font-size: 14px; color: var(--foreground); font-weight: 500; margin-bottom: 20px; line-height: 1.6;'>\${data.description}</p>`;
             let tocHtml = '';
 
             data.sections.forEach((sec, sIndex) => {
@@ -909,7 +881,7 @@ class HelpCentreGuideController extends BaseApiController
             if (data.tips && data.tips.length > 0) {
                 bodyHtml += `
                 <div class='tips-callout'>
-                    <div class='tips-title'><i class='fa-solid fa-lightbulb' style='color: #eab308;'></i> Practical Tips &amp; Rules</div>
+                    <div class='tips-title'><i class='fa-solid fa-lightbulb'></i> Pro Tip</div>
                     <ul class='tips-list'>
                         \${data.tips.map(t => `<li>\${t}</li>`).join('')}
                     </ul>
