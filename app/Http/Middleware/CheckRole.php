@@ -28,7 +28,7 @@ class CheckRole
             return response()->json([
                 'success'           => false,
                 'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
+                'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
                 'status'            => '401',
             ], Response::HTTP_UNAUTHORIZED, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
@@ -54,7 +54,7 @@ class CheckRole
         return response()->json([
             'success'           => false,
             'message'           => 'សូមអភ័យទោស គណនីរបស់លោកអ្នកមិនមានសិទ្ធិគ្រប់គ្រាន់ដើម្បីដំណើរការផ្នែកនេះទេ',
-            'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
+            'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
             'status'            => '403',
         ], Response::HTTP_FORBIDDEN, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }

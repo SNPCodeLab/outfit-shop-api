@@ -28,7 +28,8 @@ Route::get('/', function () {
         'version'            => '1.0.0',
         'status'             => 'online',
         'frontend_url'       => 'https://app.kesararamwithdigital.tech',
-        'documentation_url'  => 'https://github.com/SNPbuilds/csms-backend-api',
+        'documentation_url'  => "{$base}/guide",
+        'guide_api_url'      => "{$base}/api/v1/guide",
 
         // ── Public (no token) ─────────────────────────────────────────────
         'health_url'             => "{$base}/api/v1/health",
