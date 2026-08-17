@@ -27,20 +27,20 @@ class POSCheckoutApiTest extends TestCase
             'role'          => 'CASHIER',
         ]);
 
-        $category = Category::create(['category_name' => 'Tops']);
-        $size     = ClothingSize::create(['size_name' => 'M']);
-        $color    = Color::create(['color_name' => 'Black']);
+        $category = Category::firstOrCreate(['category_name' => 'Tops']);
+        $size     = ClothingSize::firstOrCreate(['size_name' => 'M']);
+        $color    = Color::firstOrCreate(['color_name' => 'Black']);
 
         $product = Product::create([
             'category_id'  => $category->category_id,
-            'product_name' => 'Classic Polo Shirt',
+            'product_name' => 'Classic Polo Shirt ' . uniqid(),
         ]);
 
         $variant = ProductVariant::create([
             'product_id' => $product->product_id,
             'size_id'    => $size->size_id,
             'color_id'   => $color->color_id,
-            'sku'        => 'POLO-BLK-M',
+            'sku'        => 'POLO-BLK-M-' . uniqid(),
             'cost_price' => 15.00,
             'sale_price' => 30.00,
             'quantity'   => 20,
@@ -57,6 +57,7 @@ class POSCheckoutApiTest extends TestCase
                         'discount'   => 0.00,
                     ]
                 ],
+                'tax_rate'       => 0.00,
                 'payment_method' => 'CASH',
                 'payment_amount' => 90.00,
             ]);
@@ -88,20 +89,20 @@ class POSCheckoutApiTest extends TestCase
             'role'          => 'CASHIER',
         ]);
 
-        $category = Category::create(['category_name' => 'Tops']);
-        $size     = ClothingSize::create(['size_name' => 'M']);
-        $color    = Color::create(['color_name' => 'Black']);
+        $category = Category::firstOrCreate(['category_name' => 'Tops']);
+        $size     = ClothingSize::firstOrCreate(['size_name' => 'M']);
+        $color    = Color::firstOrCreate(['color_name' => 'Black']);
 
         $product = Product::create([
             'category_id'  => $category->category_id,
-            'product_name' => 'Classic Polo Shirt',
+            'product_name' => 'Classic Polo Shirt ' . uniqid(),
         ]);
 
         $variant = ProductVariant::create([
             'product_id' => $product->product_id,
             'size_id'    => $size->size_id,
             'color_id'   => $color->color_id,
-            'sku'        => 'POLO-BLK-M',
+            'sku'        => 'POLO-BLK-M-' . uniqid(),
             'cost_price' => 15.00,
             'sale_price' => 30.00,
             'quantity'   => 2, // Only 2 in stock

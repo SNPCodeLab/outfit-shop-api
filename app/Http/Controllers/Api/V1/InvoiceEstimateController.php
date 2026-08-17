@@ -106,11 +106,11 @@ class InvoiceEstimateController extends BaseApiController
                 $totalAmount += $lineTotal;
 
                 $detailsData[] = [
-                    'variant_id'      => $variant->variant_id,
-                    'quantity'        => $qty,
-                    'unit_price'      => $unitPrice,
-                    'discount_amount' => $itemDiscount,
-                    'line_total'      => $lineTotal,
+                    'variant_id' => $variant->variant_id,
+                    'quantity'   => $qty,
+                    'unit_price' => $unitPrice,
+                    'discount'   => $itemDiscount,
+                    'sub_total'  => $lineTotal,
                 ];
             }
 
