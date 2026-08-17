@@ -134,6 +134,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/shipping/create',                [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'create']);
         Route::post('/shipping/{id}/status',           [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'updateStatus']);
 
+        // -- Live Role-Pulse Analytics (Pie & Agile Graph tracking per role) --
+        Route::get('/dashboard/role-pulse',            [\App\Http\Controllers\Api\DashboardController::class, 'rolePulse']);
+
 
         // =====================================================================
         // TIER 3 — MANAGER (role: MANAGER or ADMIN)
@@ -242,6 +245,19 @@ Route::prefix('v1')->group(function () {
             Route::prefix('auth')->group(function () {
                 Route::post('/register', [AuthController::class, 'register']);
             });
+
+            // Admin Master Tracking Pulse & Broadcast Alert System
+            Route::get('/admin/master-pulse',          [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'masterPulse']);
+            Route::post('/admin/broadcast-alert',      [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'broadcastAlert']);
+        });
+
+        // Active Broadcast Alerts feed for all logged-in staff
+        Route::get('/alerts/active', function () {
+            $alerts = \Illuminate\Support\Facades\DB::table('system_broadcast_alerts')
+                ->where('is_active', true)
+                ->orderBy('alert_id', 'DESC')
+                ->get();
+            return response()->json(['success' => true, 'data' => $alerts]);
         });
     });
 });

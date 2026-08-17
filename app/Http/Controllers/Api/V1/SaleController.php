@@ -36,6 +36,7 @@ class SaleController extends BaseApiController
             'payment_method'     => 'nullable|string|in:CASH,CARD,QR,ABA',
             'payment_amount'     => 'nullable|numeric|min:0',
             'overall_discount'   => 'nullable|numeric|min:0',
+            'tax_rate'           => 'nullable|numeric|min:0|max:100',
         ]);
 
         try {
@@ -47,7 +48,8 @@ class SaleController extends BaseApiController
                 items: $validated['items'],
                 paymentMethod: $validated['payment_method'] ?? 'CASH',
                 paymentAmount: (float) ($validated['payment_amount'] ?? 0.0),
-                overallDiscount: (float) ($validated['overall_discount'] ?? 0.0)
+                overallDiscount: (float) ($validated['overall_discount'] ?? 0.0),
+                taxRate: (float) ($validated['tax_rate'] ?? 10.00)
             );
 
             return $this->successResponse($sale, 'POS Checkout completed successfully', 201);
