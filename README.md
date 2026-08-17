@@ -17,187 +17,72 @@ SS-MIS processes routine retail transactions in real-time (POS checkout, stock d
 ## 2. Complete Database Entity Mindmap Diagram
 
 ```mermaid
-mindmap
-  root((SS-MIS Database Architecture))
-    Catalog and Product Domain
-      CATEGORIES
-        category_id PK
-        category_name
-        department_type
-        description
-      BRANDS
-        brand_id PK
-        brand_name
-        country_of_origin
-        description
-      PRODUCTS
-        product_id PK
-        category_id FK
-        brand_id FK
-        product_name
-        product_type
-        gender
-        material_fabric
-        season_collection
-        featured_badge
-        author_artist
-        isbn_code
-        description
-        status
-      PRODUCT_IMAGES
-        image_id PK
-        product_id FK
-        image_url
-        is_primary
-        sort_order
-      CLOTHING_SIZES
-        size_id PK
-        size_name
-        description
-      COLORS
-        color_id PK
-        color_name
-        description
-      PRODUCT_VARIANTS
-        variant_id PK
-        product_id FK
-        size_id FK
-        color_id FK
-        sku
-        barcode
-        cost_price
-        sale_price
-        wholesale_price
-        quantity
-        reorder_level
-        unit_of_measure
-        volume_or_weight
-        alcohol_by_volume
-        download_file_url
-    Sales and POS Domain
-      STORE_BRANCHES
-        branch_id PK
-        branch_name
-        branch_code
-        address
-        phone
-      CUSTOMERS
-        customer_id PK
-        customer_name
-        phone
-        email
-        customer_type
-        loyalty_points
-        credit_balance
-      POS_SHIFTS
-        shift_id PK
-        employee_id FK
-        branch_id FK
-        opened_at
-        closed_at
-        opening_float_usd
-        opening_float_khr
-        closing_cash_usd
-        status
-      SALE_HEADERS
-        sale_id PK
-        branch_id FK
-        employee_id FK
-        customer_id FK
-        sale_date
-        total_amount
-        discount
-        tax_rate
-        tax_amount
-        grand_total
-        status
-      SALE_DETAILS
-        detail_id PK
-        sale_id FK
-        variant_id FK
-        quantity
-        unit_price
-        discount
-        line_total
-      PAYMENTS
-        payment_id PK
-        sale_id FK
-        payment_method
-        amount
-        currency
-        status
-    Purchasing and Inventory Domain
-      SUPPLIERS
-        supplier_id PK
-        supplier_name
-        contact_person
-        phone
-        email
-        address
-      PURCHASE_HEADERS
-        purchase_id PK
-        supplier_id FK
-        employee_id FK
-        purchase_date
-        total_amount
-        status
-      PURCHASE_DETAILS
-        detail_id PK
-        purchase_id FK
-        variant_id FK
-        quantity
-        cost_price
-        line_total
-      STOCK_MOVEMENTS
-        movement_id PK
-        variant_id FK
-        movement_type
-        quantity
-        previous_quantity
-        new_quantity
-        reference_type
-        reference_id
-    Administration and Security Domain
-      USERS
-        id PK
-        name
-        email
-        password
-      ROLES
-        id PK
-        name
-        guard_name
-      PERMISSIONS
-        id PK
-        name
-        guard_name
-      EMPLOYEES
-        employee_id PK
-        branch_id FK
-        employee_name
-        gender
-        phone
-        email
-        position
-        status
-      SYSTEM_BROADCAST_ALERTS
-        alert_id PK
-        created_by_user_id FK
-        title
-        message
-        priority
-        target_role
-        is_active
-        expires_at
-      AUDIT_LOGS
-        log_id PK
-        user_id FK
-        action
-        table_name
-        record_id
-        old_values
-        new_values
-        ip_address
+flowchart TB
+    root["SS-MIS Database Architecture"]
+
+    subgraph D1["Catalog and Product Domain"]
+        CATEGORIES["CATEGORIES<br/>- category_id PK<br/>- category_name<br/>- department_type<br/>- description"]
+        BRANDS["BRANDS<br/>- brand_id PK<br/>- brand_name<br/>- country_of_origin<br/>- description"]
+        PRODUCTS["PRODUCTS<br/>- product_id PK<br/>- category_id FK<br/>- brand_id FK<br/>- product_name<br/>- product_type<br/>- gender<br/>- material_fabric<br/>- season_collection<br/>- featured_badge<br/>- status"]
+        PRODUCT_IMAGES["PRODUCT_IMAGES<br/>- image_id PK<br/>- product_id FK<br/>- image_url<br/>- is_primary<br/>- sort_order"]
+        CLOTHING_SIZES["CLOTHING_SIZES<br/>- size_id PK<br/>- size_name<br/>- description"]
+        COLORS["COLORS<br/>- color_id PK<br/>- color_name<br/>- description"]
+        PRODUCT_VARIANTS["PRODUCT_VARIANTS<br/>- variant_id PK<br/>- product_id FK<br/>- size_id FK<br/>- color_id FK<br/>- sku<br/>- barcode<br/>- cost_price<br/>- sale_price<br/>- quantity<br/>- volume_or_weight"]
+    end
+
+    subgraph D2["Sales and POS Domain"]
+        STORE_BRANCHES["STORE_BRANCHES<br/>- branch_id PK<br/>- branch_name<br/>- branch_code<br/>- address"]
+        CUSTOMERS["CUSTOMERS<br/>- customer_id PK<br/>- customer_name<br/>- phone<br/>- customer_type<br/>- loyalty_points"]
+        POS_SHIFTS["POS_SHIFTS<br/>- shift_id PK<br/>- employee_id FK<br/>- branch_id FK<br/>- opening_float_usd<br/>- status"]
+        SALE_HEADERS["SALE_HEADERS<br/>- sale_id PK<br/>- branch_id FK<br/>- employee_id FK<br/>- customer_id FK<br/>- total_amount<br/>- tax_rate (10%)<br/>- tax_amount<br/>- grand_total"]
+        SALE_DETAILS["SALE_DETAILS<br/>- detail_id PK<br/>- sale_id FK<br/>- variant_id FK<br/>- quantity<br/>- unit_price<br/>- line_total"]
+        PAYMENTS["PAYMENTS<br/>- payment_id PK<br/>- sale_id FK<br/>- payment_method<br/>- amount<br/>- status"]
+    end
+
+    subgraph D3["Purchasing and Inventory Domain"]
+        SUPPLIERS["SUPPLIERS<br/>- supplier_id PK<br/>- supplier_name<br/>- phone<br/>- address"]
+        PURCHASE_HEADERS["PURCHASE_HEADERS<br/>- purchase_id PK<br/>- supplier_id FK<br/>- employee_id FK<br/>- total_amount<br/>- status"]
+        PURCHASE_DETAILS["PURCHASE_DETAILS<br/>- detail_id PK<br/>- purchase_id FK<br/>- variant_id FK<br/>- quantity<br/>- cost_price"]
+        STOCK_MOVEMENTS["STOCK_MOVEMENTS<br/>- movement_id PK<br/>- variant_id FK<br/>- movement_type<br/>- quantity<br/>- new_quantity"]
+    end
+
+    subgraph D4["Administration and Security Domain"]
+        USERS["USERS<br/>- id PK<br/>- name<br/>- email"]
+        ROLES["ROLES<br/>- id PK<br/>- name<br/>- guard_name"]
+        PERMISSIONS["PERMISSIONS<br/>- id PK<br/>- name<br/>- guard_name"]
+        EMPLOYEES["EMPLOYEES<br/>- employee_id PK<br/>- branch_id FK<br/>- employee_name<br/>- position<br/>- status"]
+        SYSTEM_BROADCAST_ALERTS["SYSTEM_BROADCAST_ALERTS<br/>- alert_id PK<br/>- title<br/>- message<br/>- priority<br/>- target_role"]
+        AUDIT_LOGS["AUDIT_LOGS<br/>- log_id PK<br/>- user_id FK<br/>- action<br/>- table_name<br/>- ip_address"]
+    end
+
+    root --> D1
+    root --> D2
+    root --> D3
+    root --> D4
+
+    CATEGORIES --> PRODUCTS
+    BRANDS --> PRODUCTS
+    PRODUCTS --> PRODUCT_VARIANTS
+    PRODUCTS --> PRODUCT_IMAGES
+    CLOTHING_SIZES --> PRODUCT_VARIANTS
+    COLORS --> PRODUCT_VARIANTS
+
+    STORE_BRANCHES --> SALE_HEADERS
+    CUSTOMERS --> SALE_HEADERS
+    EMPLOYEES --> SALE_HEADERS
+    SALE_HEADERS --> SALE_DETAILS
+    SALE_HEADERS --> PAYMENTS
+    PRODUCT_VARIANTS --> SALE_DETAILS
+
+    SUPPLIERS --> PURCHASE_HEADERS
+    EMPLOYEES --> PURCHASE_HEADERS
+    PURCHASE_HEADERS --> PURCHASE_DETAILS
+    PRODUCT_VARIANTS --> PURCHASE_DETAILS
+    PRODUCT_VARIANTS --> STOCK_MOVEMENTS
+
+    USERS --> ROLES
+    ROLES --> PERMISSIONS
+    EMPLOYEES --> POS_SHIFTS
 ```
 
 ---
