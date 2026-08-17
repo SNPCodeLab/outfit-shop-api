@@ -7,85 +7,50 @@ This document provides the complete data structure, entity mindmap, product dire
 ## 1. Product Catalog Entity Mindmap Diagram
 
 ```mermaid
-mindmap
-  root((Product Catalog Entities))
-    Master Merchandise Headers
-      PRODUCTS
-        product_id
-        product_name
-        brand
-        category_id
-        brand_id
-        product_type
-        gender
-        material_fabric
-        season_collection
-        featured_badge
-        author_artist
-        isbn_code
-        status
-      PRODUCT_IMAGES
-        image_id
-        product_id
-        image_url
-        is_primary
-        sort_order
-    Taxonomy and Classification
-      CATEGORIES
-        category_id
-        category_name
-        department_type
-        description
-      BRANDS
-        brand_id
-        brand_name
-        country_of_origin
-        description
-    Attribute Matrix Definitions
-      CLOTHING_SIZES
-        size_id
-        size_name
-        description
-      COLORS
-        color_id
-        color_name
-        description
-    Stockable Inventory Units
-      PRODUCT_VARIANTS
-        variant_id
-        product_id
-        size_id
-        color_id
-        sku
-        barcode
-        cost_price
-        sale_price
-        wholesale_price
-        quantity
-        reorder_level
-        unit_of_measure
-        volume_or_weight
-        alcohol_by_volume
-        download_file_url
-    Operational Tracking
-      STOCK_MOVEMENTS
-        movement_id
-        variant_id
-        movement_type
-        quantity
-        previous_quantity
-        new_quantity
-      SALE_DETAILS
-        detail_id
-        variant_id
-        quantity
-        unit_price
-        discount
-      PURCHASE_DETAILS
-        detail_id
-        variant_id
-        quantity
-        cost_price
+flowchart TB
+    root["Product Catalog Architecture"]
+
+    subgraph H1["Master Merchandise Headers"]
+        PRODUCTS["PRODUCTS<br/>- product_id PK<br/>- product_name<br/>- brand<br/>- category_id FK<br/>- brand_id FK<br/>- product_type<br/>- gender<br/>- material_fabric<br/>- season_collection<br/>- featured_badge<br/>- status"]
+        PRODUCT_IMAGES["PRODUCT_IMAGES<br/>- image_id PK<br/>- product_id FK<br/>- image_url<br/>- is_primary<br/>- sort_order"]
+    end
+
+    subgraph H2["Taxonomy and Classification"]
+        CATEGORIES["CATEGORIES<br/>- category_id PK<br/>- category_name<br/>- department_type<br/>- description"]
+        BRANDS["BRANDS<br/>- brand_id PK<br/>- brand_name<br/>- country_of_origin<br/>- description"]
+    end
+
+    subgraph H3["Attribute Matrix Definitions"]
+        CLOTHING_SIZES["CLOTHING_SIZES<br/>- size_id PK<br/>- size_name<br/>- description"]
+        COLORS["COLORS<br/>- color_id PK<br/>- color_name<br/>- description"]
+    end
+
+    subgraph H4["Stockable Inventory Units"]
+        PRODUCT_VARIANTS["PRODUCT_VARIANTS<br/>- variant_id PK<br/>- product_id FK<br/>- size_id FK<br/>- color_id FK<br/>- sku<br/>- barcode<br/>- cost_price<br/>- sale_price<br/>- wholesale_price<br/>- quantity<br/>- volume_or_weight<br/>- alcohol_by_volume<br/>- download_file_url"]
+    end
+
+    subgraph H5["Operational Tracking"]
+        STOCK_MOVEMENTS["STOCK_MOVEMENTS<br/>- movement_id PK<br/>- variant_id FK<br/>- movement_type<br/>- quantity"]
+        SALE_DETAILS["SALE_DETAILS<br/>- detail_id PK<br/>- variant_id FK<br/>- quantity<br/>- unit_price"]
+        PURCHASE_DETAILS["PURCHASE_DETAILS<br/>- detail_id PK<br/>- variant_id FK<br/>- quantity<br/>- cost_price"]
+    end
+
+    root --> H1
+    root --> H2
+    root --> H3
+    root --> H4
+    root --> H5
+
+    CATEGORIES --> PRODUCTS
+    BRANDS --> PRODUCTS
+    PRODUCTS --> PRODUCT_VARIANTS
+    PRODUCTS --> PRODUCT_IMAGES
+    CLOTHING_SIZES --> PRODUCT_VARIANTS
+    COLORS --> PRODUCT_VARIANTS
+
+    PRODUCT_VARIANTS --> STOCK_MOVEMENTS
+    PRODUCT_VARIANTS --> SALE_DETAILS
+    PRODUCT_VARIANTS --> PURCHASE_DETAILS
 ```
 
 ---
