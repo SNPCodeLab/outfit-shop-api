@@ -236,417 +236,42 @@ class InvoiceEstimateController extends BaseApiController
         $statusColor = $balanceDue <= 0 ? '#166534' : '#92400e';
         $statusText = $balanceDue <= 0 ? 'PAID IN FULL' : ($totalPaid > 0 ? 'PARTIALLY PAID' : 'UNPAID');
 
-        $html = "
-<!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Tax Invoice #INV-{$sale->sale_id} | Store Stock & POS MIS</title>
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'>
-    <style>
-        @page { size: A4; margin: 15mm; }
-        :root {
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-300: #cbd5e1;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-700: #334155;
-            --slate-900: #0f172a;
-            --radius: 3px;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: var(--slate-900);
-            background-color: var(--slate-100);
-            line-height: 1.5;
-            font-size: 13px;
-            padding: 24px 16px;
-            -webkit-font-smoothing: antialiased;
-        }
-        .page-wrapper {
-            max-width: 840px;
-            margin: 0 auto;
-        }
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--slate-500);
-            text-decoration: none;
-            padding: 6px 12px;
-            background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            transition: all 0.15s ease;
-        }
-        .back-link:hover { color: var(--slate-900); border-color: var(--slate-300); }
-        .print-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--slate-900);
-            color: #ffffff;
-            border: 1px solid var(--slate-900);
-            padding: 8px 18px;
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s ease, transform 0.1s ease;
-        }
-        .print-btn:hover { background: var(--slate-700); }
-        .print-btn:active { transform: scale(0.98); }
+        $customerName = htmlspecialchars($customer->customer_name ?? 'Walk-in Retail Guest');
+        $customerPhone = htmlspecialchars($customer->phone ?? 'N/A');
 
-        .invoice-card {
-            background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            padding: 36px;
-            position: relative;
-            overflow: hidden;
-        }
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid var(--slate-200);
-            padding-bottom: 24px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .brand-text-block {
-            display: flex;
-            flex-direction: column;
-        }
-        .brand-company {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--slate-900);
-            text-transform: uppercase;
-        }
-        .brand-sub {
-            font-size: 12px;
-            color: var(--slate-500);
-            margin-top: 2px;
-        }
-        .invoice-title-block {
-            text-align: right;
-        }
-        .doc-type {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--slate-900);
-            text-transform: uppercase;
-        }
-        .doc-number {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--slate-500);
-            margin-top: 2px;
-        }
-        .status-badge {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 4px 10px;
-            border-radius: var(--radius);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            background: {$statusBg};
-            border: 1px solid {$statusBorder};
-            color: {$statusColor};
-            text-transform: uppercase;
+        $itemsListHtml = '';
+        foreach ($details as $detail) {
+            $variant = $detail->variant;
+            $productName = htmlspecialchars($variant->product->product_name ?? 'Apparel Item');
+            $size = htmlspecialchars($variant->size->size_name ?? 'STD');
+            $color = htmlspecialchars($variant->color->color_name ?? 'Standard');
+            $qty = $detail->quantity;
+            $unitPrice = number_format($detail->unit_price, 2);
+            $lineTotal = number_format($detail->sub_total, 2);
+
+            $itemsListHtml .= "
+            <tr style='border-bottom: 1px solid var(--slate-200);'>
+                <td style='padding: 10px 12px;'>
+                    <div style='font-weight: 600; color: var(--slate-900);'>{$productName}</div>
+                    <div style='font-size: 11px; color: var(--slate-500);'>Size: {$size} | Color: {$color} | SKU: {$variant->sku}</div>
+                </td>
+                <td style='padding: 10px 12px; text-align: center;'>{$qty}</td>
+                <td style='padding: 10px 12px; text-align: right; font-family: monospace;'>\${$unitPrice}</td>
+                <td style='padding: 10px 12px; text-align: right; font-family: monospace; font-weight: 600;'>\${$lineTotal}</td>
+            </tr>";
         }
 
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 28px;
-        }
-        .meta-card {
-            background: var(--slate-50);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            padding: 16px;
-        }
-        .meta-card h4 {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--slate-500);
-            margin-bottom: 8px;
-        }
-        .meta-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--slate-900);
-            margin-bottom: 4px;
-        }
-        .meta-text {
-            font-size: 12px;
-            color: var(--slate-500);
-            line-height: 1.4;
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            margin-bottom: 24px;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        .table th {
-            background: var(--slate-50);
-            border-bottom: 1px solid var(--slate-200);
-            padding: 10px 14px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--slate-500);
-        }
-        .table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--slate-100);
-            font-size: 13px;
-        }
-        .table tr:last-child td {
-            border-bottom: none;
-        }
-        .text-right { text-align: right; }
-        .item-sku {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 11px;
-            color: var(--slate-500);
-        }
-
-        .calc-grid {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 24px;
-            margin-top: 16px;
-        }
-        .notes-card {
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            padding: 14px 16px;
-            background: var(--slate-50);
-            font-size: 12px;
-            color: var(--slate-500);
-        }
-        .summary-card {
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            padding: 16px;
-            background: var(--slate-50);
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            font-size: 12px;
-            color: var(--slate-700);
-        }
-        .grand-row {
-            border-top: 1px solid var(--slate-300);
-            padding-top: 8px;
-            margin-top: 8px;
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--slate-900);
-        }
-
-        .footer-note {
-            margin-top: 36px;
-            padding-top: 16px;
-            border-top: 1px solid var(--slate-200);
-            text-align: center;
-            font-size: 11px;
-            color: var(--slate-400);
-        }
-
-        /* ── Printing Animation Overlay ── */
-        .print-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.2s ease-out;
-        }
-        .print-modal {
-            background: #ffffff;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius);
-            padding: 30px;
-            width: 360px;
-            text-align: center;
-            position: relative;
-        }
-        .printer-icon-wrap {
-            width: 60px;
-            height: 60px;
-            background: var(--slate-100);
-            border-radius: var(--radius);
-            margin: 0 auto 16px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--slate-900);
-            position: relative;
-            overflow: hidden;
-        }
-        .printer-laser {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #3b82f6;
-            box-shadow: 0 0 8px #3b82f6;
-            animation: scanLaser 1.2s infinite ease-in-out;
-        }
-        .print-progress-bar {
-            width: 100%;
-            height: 4px;
-            background: var(--slate-200);
-            border-radius: 2px;
-            margin: 16px 0 8px 0;
-            overflow: hidden;
-        }
-        .print-progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--slate-900);
-            transition: width 0.8s ease-in-out;
-        }
-
-        @keyframes scanLaser {
-            0% { top: 10%; opacity: 0.2; }
-            50% { top: 90%; opacity: 1; }
-            100% { top: 10%; opacity: 0.2; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 12px 8px; }
-            .invoice-card { padding: 20px 16px; }
-            .meta-grid { grid-template-columns: 1fr; gap: 12px; }
-            .calc-grid { grid-template-columns: 1fr; }
-            .invoice-title-block { text-align: left; margin-top: 8px; }
-        }
-
-        @media print {
-            body { padding: 0; background: #ffffff; }
-            .page-wrapper { max-width: 100%; }
-            .invoice-card { border: none; padding: 0; }
-            .action-bar, .print-overlay { display: none !important; }
-        }
-    </style>
-</head>
-<body>
-    <div class='page-wrapper'>
-        <div class='action-bar'>
-            <a href='/guide' class='back-link'><i class='fa-solid fa-arrow-left'></i> Help Centre Guide</a>
-            <button class='print-btn' onclick='startPrintAnimation()'>
-                <i class='fa-solid fa-print'></i> Print / Save as PDF
-            </button>
-        </div>
-
-        <div class='invoice-card' id='invoice-document'>
-            <div class='invoice-header'>
-                <div class='brand-text-block'>
-                    <div class='brand-company'>STORE STOCK &amp; POS MIS</div>
-                    <div class='brand-sub'>Enterprise Retail Inventory &amp; Point-of-Sale Billing</div>
-                </div>
-                <div class='invoice-title-block'>
-                    <div class='doc-type'>" . ($sale->status === 'ESTIMATE' ? 'ESTIMATE / QUOTE' : 'TAX INVOICE') . "</div>
-                    <div class='doc-number'>#INV-" . str_pad($sale->sale_id, 6, '0', STR_PAD_LEFT) . "</div>
-                    <div><span class='status-badge'>{$statusText}</span></div>
-                </div>
-            </div>
-
-            <div class='meta-grid'>
-                <div class='meta-card'>
-                    <h4>Billed To (Customer)</h4>
-                    <div class='meta-name'>" . htmlspecialchars($customer->customer_name ?? 'Walk-in Client') . "</div>
-                    <div class='meta-text'>Telephone: " . htmlspecialchars($customer->phone ?? 'N/A') . "</div>
-                    <div class='meta-text'>Address: " . htmlspecialchars($customer->address ?? 'Phnom Penh, Cambodia') . "</div>
-                </div>
-                <div class='meta-card'>
-                    <h4>Document Details</h4>
-                    <div class='meta-text'><strong>Issue Date:</strong> " . $sale->created_at->format('M d, Y • H:i') . "</div>
-                    <div class='meta-text'><strong>Staff Operator:</strong> " . htmlspecialchars(($employee->first_name ?? 'Admin') . ' ' . ($employee->last_name ?? '')) . "</div>
-                    <div class='meta-text'><strong>Payment Terms:</strong> Due Upon Receipt</div>
-                </div>
-            </div>
-
-            <div class='table-responsive'>
-                <table class='table'>
-                    <thead>
-                        <tr>
-                            <th>Item Description</th>
-                            <th>SKU</th>
-                            <th class='text-right'>Qty</th>
-                            <th class='text-right'>Unit Price</th>
-                            <th class='text-right'>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>";
-
-        foreach ($details as $d) {
-            $productName = htmlspecialchars($d->variant->product->product_name ?? 'Apparel Item');
-            $sku = htmlspecialchars($d->variant->sku ?? '-');
-            $size = htmlspecialchars($d->variant->size->size_name ?? '');
-            $color = htmlspecialchars($d->variant->color->color_name ?? '');
-            $qty = $d->quantity;
-            $price = number_format($d->unit_price, 2);
-            $sub = number_format($d->line_total ?? ($d->quantity * $d->unit_price), 2);
-
-            $html .= "
-                        <tr>
-                            <td>
-                                <div style='font-weight: 600; color: var(--slate-900);'>{$productName}</div>
-                                <div style='font-size: 11px; color: var(--slate-500);'>Size: {$size} • Color: {$color}</div>
-                            </td>
-                            <td class='item-sku'>{$sku}</td>
-                            <td class='text-right' style='font-weight: 600;'>{$qty}</td>
-                            <td class='text-right'>\${$price}</td>
-                            <td class='text-right' style='font-weight: 600;'>\${$sub}</td>
-                        </tr>";
+        $receiptItemsHtml = '';
+        foreach ($details as $detail) {
+            $variant = $detail->variant;
+            $productName = htmlspecialchars(strtoupper(substr($variant->product->product_name ?? 'ITEM', 0, 18)));
+            $qty = $detail->quantity;
+            $lineTotal = number_format($detail->sub_total, 2);
+            $receiptItemsHtml .= "
+            <div style='display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;'>
+                <span>{$qty}x {$productName}</span>
+                <span style='font-weight: 600;'>\${$lineTotal}</span>
+            </div>";
         }
 
         $subtotal = number_format($sale->total_amount, 2);
@@ -655,81 +280,476 @@ class InvoiceEstimateController extends BaseApiController
         $grand = number_format($sale->grand_total, 2);
         $paid = number_format($totalPaid, 2);
         $due = number_format($balanceDue, 2);
+        $saleDate = date('d M Y - H:i', strtotime($sale->sale_date ?? now()));
 
-        $html .= "
-                    </tbody>
-                </table>
+        $html = "
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Tax Invoice #INV-{$sale->sale_id} | Store Stock &amp; POS MIS</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'>
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --radius: 3px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--slate-900);
+            background-color: #f4f4f5;
+            line-height: 1.5;
+            font-size: 13px;
+            padding: 32px 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* ── Top Bar Controls ── */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .view-tabs {
+            display: inline-flex;
+            background: #e4e4e7;
+            padding: 3px;
+            border-radius: var(--radius);
+        }
+        .view-tab-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #71717a;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .view-tab-btn.active {
+            background: #ffffff;
+            color: #18181b;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: #18181b;
+            color: #ffffff;
+            border: 1px solid #18181b;
+        }
+        .btn-primary:hover { background: #27272a; }
+        .btn-secondary {
+            background: #ffffff;
+            color: #18181b;
+            border: 1px solid #e4e4e7;
+        }
+        .btn-secondary:hover { background: #f4f4f5; }
+
+        /* ═══════════════════════════════════════════════
+           TACTILE RECEIPT PRINTER MACHINE (dqnamo style)
+           ═══════════════════════════════════════════════ */
+        .receipt-printer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0 40px;
+        }
+        .printer-machine {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 1.5rem;
+            border: 1px solid #18181b;
+            background: #18181b;
+            padding: 0.75rem;
+            padding-bottom: 2rem;
+            box-shadow: 0 20px 36px -20px rgba(0, 0, 0, 0.45), 0 6px 14px -8px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            z-index: 10;
+        }
+        .printer-screen {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            border: 1px solid #27272a;
+            background: #09090b;
+            padding: 1rem;
+            color: #fafafa;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .printer-status-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #a1a1aa;
+        }
+        .status-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #52525b;
+            border-top-color: #fafafa;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .status-complete-icon {
+            color: #22c55e;
+            font-size: 16px;
+            display: none;
+        }
+        .printer-slot {
+            position: absolute;
+            left: 1.5rem;
+            right: 1.5rem;
+            bottom: 0.75rem;
+            height: 8px;
+            border-radius: 4px;
+            background: #09090b;
+            border: 1px solid #27272a;
+            box-shadow: inset 0 2px 4px #000000;
+            z-index: 40;
+        }
+
+        /* ── Receipt Paper & Stepped Motion ── */
+        .receipt-output-container {
+            position: relative;
+            z-index: 5;
+            margin-top: -1rem;
+            width: 320px;
+            overflow: hidden;
+            padding-bottom: 2rem;
+        }
+        .receipt-paper-wrapper {
+            position: relative;
+            transform: translateY(calc(-100% + 2px));
+            transition: opacity 0.16s ease;
+        }
+        .receipt-paper-wrapper.stepped-feed {
+            animation: steppedPrintingAnimation 1.75s linear forwards;
+        }
+        .receipt-paper-wrapper.complete {
+            transform: translateY(0%);
+        }
+
+        @keyframes steppedPrintingAnimation {
+            0% { transform: translateY(calc(-100% + 2px)); }
+            7.5% { transform: translateY(-91%); }
+            10.5% { transform: translateY(-91%); }
+            18% { transform: translateY(-81%); }
+            21% { transform: translateY(-81%); }
+            28.5% { transform: translateY(-70%); }
+            31.5% { transform: translateY(-70%); }
+            39% { transform: translateY(-58%); }
+            42% { transform: translateY(-58%); }
+            49.5% { transform: translateY(-45%); }
+            52.5% { transform: translateY(-45%); }
+            60% { transform: translateY(-32%); }
+            63% { transform: translateY(-32%); }
+            70.5% { transform: translateY(-20%); }
+            73.5% { transform: translateY(-20%); }
+            81% { transform: translateY(-10%); }
+            84% { transform: translateY(-10%); }
+            91.5% { transform: translateY(-3%); }
+            94.5% { transform: translateY(-3%); }
+            100% { transform: translateY(0%); }
+        }
+
+        .receipt-paper {
+            background: #ffffff;
+            color: #18181b;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            padding: 24px 20px 32px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            /* Jagged Sawtooth Tear Edge at Bottom (40 teeth) */
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 4px),
+                100% calc(100% - 4px), 98.75% 100%, 97.5% calc(100% - 4px), 96.25% 100%, 95% calc(100% - 4px),
+                93.75% 100%, 92.5% calc(100% - 4px), 91.25% 100%, 90% calc(100% - 4px), 88.75% 100%, 87.5% calc(100% - 4px),
+                86.25% 100%, 85% calc(100% - 4px), 83.75% 100%, 82.5% calc(100% - 4px), 81.25% 100%, 80% calc(100% - 4px),
+                78.75% 100%, 77.5% calc(100% - 4px), 76.25% 100%, 75% calc(100% - 4px), 73.75% 100%, 72.5% calc(100% - 4px),
+                71.25% 100%, 70% calc(100% - 4px), 68.75% 100%, 67.5% calc(100% - 4px), 66.25% 100%, 65% calc(100% - 4px),
+                63.75% 100%, 62.5% calc(100% - 4px), 61.25% 100%, 60% calc(100% - 4px), 58.75% 100%, 57.5% calc(100% - 4px),
+                56.25% 100%, 55% calc(100% - 4px), 53.75% 100%, 52.5% calc(100% - 4px), 51.25% 100%, 50% calc(100% - 4px),
+                48.75% 100%, 47.5% calc(100% - 4px), 46.25% 100%, 45% calc(100% - 4px), 43.75% 100%, 42.5% calc(100% - 4px),
+                41.25% 100%, 40% calc(100% - 4px), 38.75% 100%, 37.5% calc(100% - 4px), 36.25% 100%, 35% calc(100% - 4px),
+                33.75% 100%, 32.5% calc(100% - 4px), 31.25% 100%, 30% calc(100% - 4px), 28.75% 100%, 27.5% calc(100% - 4px),
+                26.25% 100%, 25% calc(100% - 4px), 23.75% 100%, 22.5% calc(100% - 4px), 21.25% 100%, 20% calc(100% - 4px),
+                18.75% 100%, 17.5% calc(100% - 4px), 16.25% 100%, 15% calc(100% - 4px), 13.75% 100%, 12.5% calc(100% - 4px),
+                11.25% 100%, 10% calc(100% - 4px), 8.75% 100%, 7.5% calc(100% - 4px), 6.25% 100%, 5% calc(100% - 4px),
+                3.75% 100%, 2.5% calc(100% - 4px), 1.25% 100%, 0% calc(100% - 4px)
+            );
+        }
+
+        .dashed-line {
+            border-top: 1px dashed #d4d4d8;
+            margin: 12px 0;
+        }
+
+        /* ── Standard A4 Sheet Invoice View ── */
+        .invoice-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: var(--radius);
+            padding: 32px 36px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media print {
+            body { background: #ffffff; padding: 0; }
+            .controls-bar, .receipt-printer-section { display: none !important; }
+            .invoice-card { display: block !important; border: none; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class='container-wrap'>
+        <!-- Controls Bar -->
+        <div class='controls-bar'>
+            <div class='view-tabs'>
+                <button class='view-tab-btn active' id='tab-printer' onclick='switchView(\"printer\")'>
+                    <i class='fa-solid fa-receipt' style='margin-right: 4px;'></i> Tactile Printer
+                </button>
+                <button class='view-tab-btn' id='tab-sheet' onclick='switchView(\"sheet\")'>
+                    <i class='fa-solid fa-file-lines' style='margin-right: 4px;'></i> A4 Document Sheet
+                </button>
             </div>
-
-            <div class='calc-grid'>
-                <div class='notes-card'>
-                    <div style='font-weight: 700; color: var(--slate-700); margin-bottom: 4px; text-transform: uppercase; font-size: 11px;'>Terms &amp; Instructions</div>
-                    <div>• Payment is due upon receipt via Cash, Debit/Credit Card, or Bakong KHQR.</div>
-                    <div>• All goods purchased are recorded under the Store Stock ledger.</div>
-                </div>
-
-                <div class='summary-card'>
-                    <div class='summary-row'><span>Subtotal:</span><span style='font-family: monospace;'>\${$subtotal}</span></div>
-                    <div class='summary-row'><span>Discount:</span><span style='font-family: monospace;'>-\${$discount}</span></div>
-                    <div class='summary-row'><span>Tax (10% VAT Exclusive):</span><span style='font-family: monospace;'>+\${$tax}</span></div>
-                    <div class='summary-row grand-row'><span>Grand Total:</span><span style='font-family: monospace;'>\${$grand}</span></div>
-                    <div class='summary-row' style='color: #166534; font-weight: 600; margin-top: 4px;'><span>Paid Amount:</span><span style='font-family: monospace;'>\${$paid}</span></div>
-                    <div class='summary-row' style='color: #92400e; font-weight: 700; border-top: 1px dashed var(--slate-300); padding-top: 6px; margin-top: 4px;'><span>Balance Due:</span><span style='font-family: monospace;'>\${$due}</span></div>
-                </div>
-            </div>
-
-            <div class='footer-note'>
-                Generated by Store Stock & Point-of-Sale Information System • A4 Document Standard
+            <div style='display: flex; gap: 8px;'>
+                <button class='action-btn btn-secondary' onclick='replayPrinterAnimation()'>
+                    <i class='fa-solid fa-rotate-right'></i> Replay Print
+                </button>
+                <button class='action-btn btn-primary' onclick='window.print()'>
+                    <i class='fa-solid fa-print'></i> Print / Save PDF
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Print Simulation Animation Modal -->
-    <div class='print-overlay' id='print-modal'>
-        <div class='print-modal'>
-            <div class='printer-icon-wrap'>
-                <i class='fa-solid fa-print'></i>
-                <div class='printer-laser'></div>
+        <!-- ═══════════════════════════════════════════════
+             1. TACTILE RECEIPT PRINTER MACHINE (dqnamo style)
+             ═══════════════════════════════════════════════ -->
+        <section class='receipt-printer-section' id='view-printer-mode'>
+            <div class='printer-machine'>
+                <div class='printer-screen'>
+                    <div class='screen-header'>
+                        <div style='font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a1a1aa;'>
+                            STORE STOCK &amp; POS
+                        </div>
+                        <span style='font-size: 10px; background: #27272a; padding: 2px 6px; border-radius: 4px; color: #d4d4d8;'>#INV-{$sale->sale_id}</span>
+                    </div>
+                    <div style='display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;'>
+                        <div>
+                            <div style='font-size: 13px; font-weight: 700;'>Sale Transaction</div>
+                            <div style='font-size: 11px; color: #a1a1aa;'>{$details->count()} item(s) included</div>
+                        </div>
+                        <div style='text-align: right;'>
+                            <div style='font-size: 10px; color: #a1a1aa; text-transform: uppercase;'>Total</div>
+                            <div style='font-size: 18px; font-weight: 800; color: #ffffff; font-family: monospace;'>\${$grand}</div>
+                        </div>
+                    </div>
+                    <div class='printer-status-row'>
+                        <span class='status-spinner' id='status-spinner'></span>
+                        <i class='fa-solid fa-circle-check status-complete-icon' id='status-check'></i>
+                        <span id='status-text'>Order complete</span>
+                    </div>
+                </div>
+                <div class='printer-slot'></div>
             </div>
-            <h3 style='font-size: 15px; font-weight: 700; color: var(--slate-900);'>Preparing Document</h3>
-            <p style='font-size: 12px; color: var(--slate-500); margin-top: 4px;'>Formatting A4 vector layout &amp; tax tables...</p>
-            <div class='print-progress-bar'>
-                <div class='print-progress-fill' id='print-fill'></div>
+
+            <!-- Receipt Output with Stepped Feeding Motion -->
+            <div class='receipt-output-container'>
+                <div class='receipt-paper-wrapper complete' id='receipt-paper-wrap'>
+                    <article class='receipt-paper'>
+                        <div style='text-align: center; margin-bottom: 12px;'>
+                            <div style='font-size: 13px; font-weight: 800; letter-spacing: -0.02em;'>STORE STOCK &amp; POS MIS</div>
+                            <div style='font-size: 9px; color: #71717a; text-transform: uppercase;'>Official Store Receipt</div>
+                        </div>
+
+                        <div style='font-size: 10px; color: #52525b; line-height: 1.4;'>
+                            <div>Order #: INV-000{$sale->sale_id}</div>
+                            <div>Date: {$saleDate}</div>
+                            <div>Status: {$statusText}</div>
+                        </div>
+
+                        <div class='dashed-line'></div>
+
+                        <div>
+                            {$receiptItemsHtml}
+                        </div>
+
+                        <div class='dashed-line'></div>
+
+                        <div style='font-size: 11px; line-height: 1.6;'>
+                            <div style='display: flex; justify-content: space-between;'><span>Subtotal:</span><span>\${$subtotal}</span></div>
+                            <div style='display: flex; justify-content: space-between;'><span>Tax (10% VAT):</span><span>+\${$tax}</span></div>
+                            <div style='display: flex; justify-content: space-between; font-weight: 800; font-size: 13px; margin-top: 4px; border-top: 1px solid #18181b; padding-top: 4px;'>
+                                <span>TOTAL PAID</span>
+                                <span>\${$grand}</span>
+                            </div>
+                        </div>
+
+                        <div class='dashed-line'></div>
+
+                        <div style='text-align: center; margin-top: 12px;'>
+                            <div style='display: inline-block; letter-spacing: 2px; font-size: 18px; font-family: monospace; line-height: 1;'>
+                                ||| | | |||| || |||| | |||
+                            </div>
+                            <div style='font-size: 9px; color: #71717a; margin-top: 4px;'>* INV-{$sale->sale_id} *</div>
+                        </div>
+                    </article>
+                </div>
             </div>
-            <span style='font-size: 11px; color: var(--slate-400); font-family: monospace;' id='print-status-text'>Rendering page 1 of 1...</span>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════
+             2. STANDARD A4 SHEET DOCUMENT (Formal Invoice)
+             ═══════════════════════════════════════════════ -->
+        <div class='invoice-card' id='view-sheet-mode'>
+            <div style='display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--slate-200); padding-bottom: 16px;'>
+                <div>
+                    <h1 style='font-size: 18px; font-weight: 800; text-transform: uppercase;'>STORE STOCK &amp; POS MIS</h1>
+                    <div style='font-size: 12px; color: var(--slate-500);'>Enterprise Clothing Retail &amp; Logistics System</div>
+                </div>
+                <div style='text-align: right;'>
+                    <div style='font-size: 16px; font-weight: 800; color: #18181b;'>TAX INVOICE</div>
+                    <div style='font-size: 12px; font-family: monospace; color: var(--slate-500);'>#INV-000{$sale->sale_id}</div>
+                </div>
+            </div>
+
+            <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;'>
+                <div style='background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 12px 14px;'>
+                    <div style='font-size: 11px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; margin-bottom: 6px;'>Customer Info</div>
+                    <div style='font-weight: 700;'>{$customerName}</div>
+                    <div style='font-size: 12px; color: var(--slate-500);'>Phone: {$customerPhone}</div>
+                </div>
+                <div style='background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 12px 14px;'>
+                    <div style='font-size: 11px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; margin-bottom: 6px;'>Invoice Details</div>
+                    <div style='font-size: 12px;'>Date: <strong>{$saleDate}</strong></div>
+                    <div style='font-size: 12px;'>Status: <strong style='color: {$statusColor};'>{$statusText}</strong></div>
+                </div>
+            </div>
+
+            <table style='width: 100%; border-collapse: collapse; margin-bottom: 24px;'>
+                <thead>
+                    <tr style='background: var(--slate-50); border-bottom: 2px solid var(--slate-200); text-align: left; font-size: 11px; text-transform: uppercase; color: var(--slate-500);'>
+                        <th style='padding: 8px 12px;'>Description</th>
+                        <th style='padding: 8px 12px; text-align: center;'>Qty</th>
+                        <th style='padding: 8px 12px; text-align: right;'>Unit Price</th>
+                        <th style='padding: 8px 12px; text-align: right;'>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$itemsListHtml}
+                </tbody>
+            </table>
+
+            <div style='display: flex; justify-content: flex-end;'>
+                <div style='width: 260px;'>
+                    <div style='display: flex; justify-content: space-between; padding: 4px 0;'><span>Subtotal:</span><span style='font-family: monospace;'>\${$subtotal}</span></div>
+                    <div style='display: flex; justify-content: space-between; padding: 4px 0;'><span>Tax (10% VAT):</span><span style='font-family: monospace;'>+\${$tax}</span></div>
+                    <div style='display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; border-top: 1px solid var(--slate-300); padding-top: 6px; margin-top: 4px;'>
+                        <span>Grand Total:</span><span style='font-family: monospace;'>\${$grand}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function startPrintAnimation() {
-            const overlay = document.getElementById('print-modal');
-            const fill = document.getElementById('print-fill');
-            const statusText = document.getElementById('print-status-text');
+        // Init view
+        document.getElementById('status-spinner').style.display = 'none';
+        document.getElementById('status-check').style.display = 'inline-block';
 
-            overlay.style.display = 'flex';
-            fill.style.width = '0%';
-            statusText.innerText = 'Formatting A4 vector layout...';
+        function switchView(mode) {
+            const printerSection = document.getElementById('view-printer-mode');
+            const sheetSection = document.getElementById('view-sheet-mode');
+            const tabPrinter = document.getElementById('tab-printer');
+            const tabSheet = document.getElementById('tab-sheet');
+
+            if (mode === 'printer') {
+                printerSection.style.display = 'flex';
+                sheetSection.style.display = 'none';
+                tabPrinter.classList.add('active');
+                tabSheet.classList.remove('active');
+            } else {
+                printerSection.style.display = 'none';
+                sheetSection.style.display = 'block';
+                tabPrinter.classList.remove('active');
+                tabSheet.classList.add('active');
+            }
+        }
+
+        function replayPrinterAnimation() {
+            switchView('printer');
+            const wrap = document.getElementById('receipt-paper-wrap');
+            const spinner = document.getElementById('status-spinner');
+            const check = document.getElementById('status-check');
+            const text = document.getElementById('status-text');
+
+            // Reset
+            wrap.className = 'receipt-paper-wrapper';
+            spinner.style.display = 'inline-block';
+            check.style.display = 'none';
+            text.innerText = 'Processing your order';
 
             setTimeout(() => {
-                fill.style.width = '70%';
-                statusText.innerText = 'Spooling document to printer...';
-            }, 300);
+                text.innerText = 'Printing your receipt';
+                wrap.classList.add('stepped-feed');
+            }, 400);
 
             setTimeout(() => {
-                fill.style.width = '100%';
-                statusText.innerText = 'Ready! Launching print dialog...';
-            }, 750);
-
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                window.print();
-            }, 1050);
+                wrap.className = 'receipt-paper-wrapper complete';
+                spinner.style.display = 'none';
+                check.style.display = 'inline-block';
+                text.innerText = 'Order complete';
+            }, 2300);
         }
     </script>
 </body>
 </html>";
 
-        return response($html, 200)->header('Content-Type', 'text/html');
+        return response($html, 200)->header('Content-Type', 'text/html; charset=utf-8');
     }
 }
 
