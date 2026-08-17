@@ -45,7 +45,37 @@ class ProductVariantController extends BaseApiController
             $query->where('color_id', $colorId);
         }
 
-        $variants = $query->orderBy('variant_id', 'desc')->get();
+        $variants = $query->orderBy('variant_id', 'desc')->get()->map(function ($variant) {
+            $onHand = (int) $variant->quantity;
+            $reserved = (int) \Illuminate\Support\Facades\DB::table('sale_details')
+                ->join('sale_headers', 'sale_details.sale_id', '=', 'sale_headers.sale_id')
+                ->where('sale_details.variant_id', $variant->variant_id)
+                ->whereIn('sale_headers.status', ['PENDING', 'ESTIMATE', 'DRAFT'])
+                ->sum('sale_details.quantity');
+            $available = max(0, $onHand - $reserved);
+            $incoming = (int) \Illuminate\Support\Facades\DB::table('purchase_details')
+                ->join('purchase_headers', 'purchase_details.purchase_id', '=', 'purchase_headers.purchase_id')
+                ->where('purchase_details.variant_id', $variant->variant_id)
+                ->whereIn('purchase_headers.status', ['PENDING', 'ORDERED', 'SHIPPED'])
+                ->sum('purchase_details.quantity');
+
+            $variantArray = $variant->toArray();
+            $variantArray['quantity_overview'] = [
+                'on_hand'   => $onHand,
+                'reserved'  => $reserved,
+                'available' => $available,
+                'incoming'  => $incoming,
+            ];
+            $variantArray['valuation'] = [
+                'cost_price'      => (float) $variant->cost_price,
+                'selling_price'   => (float) $variant->sale_price,
+                'purchased_value' => round($onHand * (float) $variant->cost_price, 2),
+                'resale_value'    => round($onHand * (float) $variant->sale_price, 2),
+                'margin_percent'  => $variant->sale_price > 0 ? round((((float)$variant->sale_price - (float)$variant->cost_price) / (float)$variant->sale_price) * 100, 2) : 0,
+            ];
+            return $variantArray;
+        });
+
         return $this->successResponse($variants, 'Product variants retrieved');
     }
 
@@ -53,19 +83,44 @@ class ProductVariantController extends BaseApiController
     {
         $lowStockVariants = ProductVariant::with(['product', 'size', 'color'])
             ->whereColumn('quantity', '<=', 'reorder_level')
-            ->get();
+            ->get()
+            ->map(function ($variant) {
+                $onHand = (int) $variant->quantity;
+                $variantArray = $variant->toArray();
+                $variantArray['quantity_overview'] = [
+                    'on_hand'   => $onHand,
+                    'available' => $onHand,
+                    'status'    => $onHand <= 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
+                ];
+                return $variantArray;
+            });
 
         return $this->successResponse($lowStockVariants, 'Low stock items retrieved');
     }
 
     public function lookupBarcode(string $barcode): JsonResponse
     {
-        $variant = ProductVariant::with(['product', 'size', 'color'])
+        $variant = ProductVariant::with(['product', 'size', 'color', 'batches'])
             ->where('barcode', $barcode)
             ->orWhere('sku', $barcode)
             ->firstOrFail();
 
-        return $this->successResponse($variant, 'Variant lookup successful');
+        $onHand = (int) $variant->quantity;
+        $reserved = (int) \Illuminate\Support\Facades\DB::table('sale_details')
+            ->join('sale_headers', 'sale_details.sale_id', '=', 'sale_headers.sale_id')
+            ->where('sale_details.variant_id', $variant->variant_id)
+            ->whereIn('sale_headers.status', ['PENDING', 'ESTIMATE', 'DRAFT'])
+            ->sum('sale_details.quantity');
+        $available = max(0, $onHand - $reserved);
+
+        $variantArray = $variant->toArray();
+        $variantArray['quantity_overview'] = [
+            'on_hand'   => $onHand,
+            'reserved'  => $reserved,
+            'available' => $available,
+        ];
+
+        return $this->successResponse($variantArray, 'Variant lookup successful');
     }
 
     public function store(Request $request): JsonResponse

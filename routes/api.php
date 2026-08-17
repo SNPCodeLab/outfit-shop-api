@@ -87,10 +87,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/variants/{id}/tiers',                 [\App\Http\Controllers\Api\V1\VariantPricingTierController::class, 'index']);
     Route::get('/variants/{id}/barcode-label',         [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'barcodeLabel']);
 
+    // SalesBinder Inventory Statistics & Financial Valuation (On-Hand, Reserved, Available, Incoming, Purchased vs Resale Value)
+    Route::get('/inventory/statistics',                [\App\Http\Controllers\Api\V1\InventoryValuationController::class, 'statistics']);
+
     // Payments, KHQR & Hardware Print Services
     Route::get('/payments/khqr',                       [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateCustom']);
     Route::get('/sales/{id}/khqr',                     [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateForSale']);
     Route::get('/sales/{id}/receipt-thermal',          [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'receiptThermal']);
+    Route::get('/sales/{id}/invoice-pdf',              [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'renderInvoiceHtml']);
     Route::post('/gift-cards/check',                   [\App\Http\Controllers\Api\V1\GiftCardController::class, 'check']);
 
     // Storefront CMS Banners & System Settings
@@ -123,10 +127,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/shifts/drop-cash',               [\App\Http\Controllers\Api\V1\PosShiftController::class, 'dropCash']);
         Route::post('/shifts/close',                   [\App\Http\Controllers\Api\V1\PosShiftController::class, 'close']);
 
-        // -- POS Sales & Gift Cards (Cashier, Manager, Admin) --
+        // -- POS Sales, Invoices & Estimates (SalesBinder Billing Engine) --
         Route::post('/sales/checkout',                 [SaleController::class, 'checkout']);
         Route::get('/sales',                           [SaleController::class, 'index']);
         Route::get('/sales/{id}',                      [SaleController::class, 'show']);
+        Route::get('/invoices',                        [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'index']);
+        Route::post('/estimates',                      [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'createEstimate']);
+        Route::post('/estimates/{id}/convert',         [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'convertEstimateToInvoice']);
         Route::post('/gift-cards/issue',               [\App\Http\Controllers\Api\V1\GiftCardController::class, 'issue']);
 
         // -- Omnichannel Shipping & Click-and-Collect --

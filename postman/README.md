@@ -1,6 +1,6 @@
 # KhmeRiel MIS & POS — Complete 100% Master Postman Collection
 
-This directory contains the **complete, zero-endpoint-skipped** Postman workspace for the **KhmeRiel MIS & POS REST API (124 Endpoints)** with full support for both **Local Development** and **Real Product (Production)** testing.
+This directory contains the **complete, zero-endpoint-skipped** Postman workspace for the **KhmeRiel MIS & POS REST API (129 Endpoints)** with full support for both **Local Development** and **Real Product (Production)** testing.
 
 ---
 
@@ -9,7 +9,7 @@ This directory contains the **complete, zero-endpoint-skipped** Postman workspac
 1. **[`production.json`](file:///Users/Apple16/Desktop/SS_MIS/postman/production.json)** *(⭐ Real Product / Production Collection)*
    - Target URL: `https://api.kesararamwithdigital.tech/api/v1`
    - Pre-configured directly for live production testing. 1-click import and test without having to set up environment variables!
-   - Contains all **124 endpoints** across 13 categories.
+   - Contains all **129 endpoints** across 13 categories (including SalesBinder Invoices, Estimates & Inventory Valuation).
 
 2. **[`local.json`](file:///Users/Apple16/Desktop/SS_MIS/postman/local.json)** *(💻 Local Development Collection)*
    - Target URL: `http://127.0.0.1:8000/api/v1`
