@@ -124,5 +124,5 @@
 ## 3. Support & Contact
 
 * **Email Support**: `support@kesararamwithdigital.tech`
-* **GitHub Repository**: [`SNPbuilds/csms-backend-api`](https://github.com/SNPbuilds/csms-backend-api)
+* **API Documentation**: [`https://api.kesararamwithdigital.tech/guide`](https://api.kesararamwithdigital.tech/guide)
 * **Production Host**: `api.kesararamwithdigital.tech`

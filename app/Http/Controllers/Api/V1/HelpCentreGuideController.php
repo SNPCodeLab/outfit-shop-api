@@ -521,7 +521,7 @@ class HelpCentreGuideController extends BaseApiController
             </div>
             <div class='support-actions'>
                 <a href='mailto:support@kesararamwithdigital.tech' class='support-btn'><i class='fa-solid fa-envelope' style='margin-right: 6px;'></i>Contact Support</a>
-                <a href='https://github.com/SNPbuilds/csms-backend-api' target='_blank' class='support-btn-outline'><i class='fa-brands fa-github' style='margin-right: 6px;'></i>GitHub Repo</a>
+                <a href='/api/v1/guide' class='support-btn-outline'><i class='fa-solid fa-code' style='margin-right: 6px;'></i>API JSON Directory</a>
             </div>
         </div>
     </main>
