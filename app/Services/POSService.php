@@ -9,6 +9,7 @@ use App\Models\SaleHeader;
 use App\Models\StockMovement;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class POSService
@@ -26,12 +27,12 @@ class POSService
      *
      * @param int         $employeeId
      * @param int|null    $customerId
-     * @param array       $items           ['variant_id', 'quantity', 'discount']
-     * @param string      $paymentMethod   CASH | CARD | QR | ABA | BAKONG | GIFT_CARD
-     * @param float       $paymentAmount   Amount tendered (0 = auto-match grand total)
-     * @param float       $overallDiscount Overall order-level discount
-     * @param float       $taxRate         Default 10.00 (tax-exclusive VAT)
-     * @param string|null $idempotencyKey  Optional client-generated idempotency key
+     * @param array       $items          [['variant_id' => 1, 'quantity' => 2, 'discount' => 0.00], ...]
+     * @param string      $paymentMethod  CASH, CARD, QR, ABA, BAKONG, GIFT_CARD
+     * @param float       $paymentAmount
+     * @param float       $overallDiscount
+     * @param float       $taxRate        Default 10.00%
+     * @param string|null $idempotencyKey
      * @return SaleHeader
      * @throws Exception
      */
@@ -45,6 +46,7 @@ class POSService
         float $taxRate = 10.00,
         ?string $idempotencyKey = null
     ): SaleHeader {
+        $startTime = microtime(true);
         // ── Idempotency Guard ─────────────────────────────────────────────────
         // If the same idempotency key was already processed, return the original
         // sale without executing the transaction again (safe retry for frontend).
@@ -63,7 +65,8 @@ class POSService
             $paymentAmount,
             $overallDiscount,
             $taxRate,
-            $idempotencyKey
+            $idempotencyKey,
+            $startTime
         ) {
             $totalAmount    = 0.0;
             $saleDetailsData = [];
@@ -197,7 +200,7 @@ class POSService
                 'reference_number' => $refNum,
             ]);
 
-            // ── 6. System Audit Log ────────────────────────────────────────────
+            // ── 6. System Audit Log & Dedicated POS Channel Logging ──────────
             AuditLogService::log(
                 action:    'SALE',
                 entity:    'SaleHeader',
@@ -210,6 +213,18 @@ class POSService
                 ],
                 userId: $employeeId
             );
+
+            Log::channel('pos')->info('POS Checkout completed', [
+                'sale_id'     => $saleHeader->sale_id,
+                'invoice_no'  => $invoiceNo,
+                'grand_total' => (float) $grandTotal,
+                'cashier_id'  => $employeeId,
+                'items_count' => count($items),
+                'method'      => $paymentMethod,
+                'tendered'    => (float) $amountTendered,
+                'change'      => (float) $changeDue,
+                'duration_ms' => round((microtime(true) - $startTime) * 1000, 2),
+            ]);
 
             return $saleHeader->load(['details.variant.product', 'customer', 'employee', 'payments']);
         });
