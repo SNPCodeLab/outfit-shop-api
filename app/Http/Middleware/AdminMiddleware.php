@@ -21,7 +21,7 @@ class AdminMiddleware
             return response()->json([
                 'success'           => false,
                 'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
+                'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
                 'status'            => '401',
             ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
@@ -34,7 +34,7 @@ class AdminMiddleware
             return response()->json([
                 'success'           => false,
                 'message'           => 'ទាមទារសិទ្ធិជាអ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Admin) ទើបអាចប្រើប្រាស់មុខងារនេះបាន',
-                'documentation_url' => 'https://github.com/SNPbuilds/csms-backend-api',
+                'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
                 'status'            => '403',
             ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
