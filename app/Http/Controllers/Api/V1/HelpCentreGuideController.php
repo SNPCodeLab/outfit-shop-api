@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 class HelpCentreGuideController extends BaseApiController
 {
     /**
-     * Display the official shadcn-templ style Documentation and Help Centre Guide.
+     * Display the official Documentation and Operations Guide.
      *
      * @param Request $request
      * @return Response|JsonResponse
@@ -26,46 +26,46 @@ class HelpCentreGuideController extends BaseApiController
                 'description' => 'Comprehensive onboarding guide, architecture topology, access tiers, and standard response envelopes.',
                 'sections'    => [
                     [
-                        'title'   => 'System Classification & Architecture',
-                        'content' => 'The Store Stock & Point-of-Sale Information System is an enterprise Transaction Processing System (TPS) with embedded Management Information System (MIS) reporting capabilities. It manages real-time retail checkouts, multi-location warehouse stock, automated vendor replenishment, and customer loyalty.',
+                        'title'   => 'System Overview & Design Philosophy',
+                        'content' => 'This platform operates as a high-throughput Transaction Processing System (TPS) paired with an analytical Management Information System (MIS) layer. It governs real-time retail checkouts, multi-location warehouse inventories, automated purchase replenishment, customer loyalty, and financial balance sheet valuations.',
                     ],
                     [
-                        'title'   => '4-Tier Access Model (RBAC)',
-                        'content' => 'The system enforces a hierarchical 4-tier Role-Based Access Control ladder:\n\n• Tier 1: Public / Guest — Read-only catalog browsing, size charts, store showcase.\n• Tier 2: Cashier & Staff — POS register sales, shift management, loyalty redemption, barcode lookups.\n• Tier 3: Manager — Stock adjustments, vendor purchase orders, pricing tiers, promotional campaigns.\n• Tier 4: Superadmin — Workforce HR management, system settings, database migrations, immutable audit trail.',
+                        'title'   => 'Role-Based Access Control (4 Tiers)',
+                        'content' => 'The access model is organized into four hierarchical access levels:\n\n• Level 1: Public / Guest — Read-only catalog browsing, size guides, and storefront showcase.\n• Level 2: Cashier & Staff — POS counter sales, shift session management, barcode scanning, and loyalty lookups.\n• Level 3: Manager — Stock adjustments, vendor purchase orders, pricing tiers, and promotional campaigns.\n• Level 4: Administrator — Workforce management, system settings, database migrations, and immutable audit logs.',
                     ],
                     [
-                        'title'   => 'Uniform Response Structure',
-                        'content' => 'All operations return predictable JSON envelopes with success flags, localized human messages, structured data payloads, and explicit HTTP status codes (200 OK, 201 Created, 401 Unauthorized, 403 Forbidden, 422 Unprocessable Entity).',
+                        'title'   => 'Standard Response Envelopes',
+                        'content' => 'All operations adhere to uniform JSON envelopes containing success booleans, human-readable status messages, payload objects, and HTTP status codes (200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 422 Unprocessable Entity).',
                     ],
                 ],
                 'tips' => [
-                    'Always verify user credentials prior to executing privileged manager operations.',
+                    'Always verify credentials prior to executing privileged manager operations.',
                     'Keep employee logins secure and never share active cashier shift sessions.',
                 ]
             ],
             [
                 'id'          => 'accounts-crm',
                 'title'       => 'Accounts & CRM',
-                'tagline'     => 'Customer Profiles & VIP Loyalty',
+                'tagline'     => 'Customer Profiles & Loyalty Rewards',
                 'icon'        => 'fa-users',
                 'description' => 'Customer account records, VIP classification tiers, telephone checkout lookups, and loyalty point rewards.',
                 'sections'    => [
                     [
                         'title'   => 'Customer Directory & Profiles',
-                        'content' => 'Maintain complete customer records including full name, telephone, email address, physical delivery address, and private credit notes. Cashiers can instantly search customer profiles by phone number during POS checkout.',
+                        'content' => 'Maintain complete customer profiles including full name, telephone, email address, physical delivery address, and private credit notes. Cashiers can instantly search customer profiles by phone number during POS checkout.',
                     ],
                     [
                         'title'   => 'VIP Loyalty Points Accrual',
                         'content' => 'Customers automatically earn 1 loyalty point for every $1.00 spent on qualifying purchases. Total accrued points advance customer status through Bronze, Silver, Gold, and Platinum VIP tiers.',
                     ],
                     [
-                        'title'   => 'Points Redemption at POS',
+                        'title'   => 'Points Redemption at Checkout',
                         'content' => 'Loyalty points can be redeemed directly at the POS counter for immediate transaction discounts. Standard conversion: 100 Points = $5.00 cash deduction.',
                     ],
                 ],
                 'tips' => [
                     'Request mobile numbers from walk-in clients to ensure their reward points are credited.',
-                    'VIP customers receive automated priority notices for seasonal apparel collection drops.',
+                    'VIP customers receive automated priority notices for seasonal apparel drops.',
                 ]
             ],
             [
@@ -73,7 +73,7 @@ class HelpCentreGuideController extends BaseApiController
                 'title'       => 'Inventory & Matrices',
                 'tagline'     => '4-Tier Stock & 2D Variations Grid',
                 'icon'        => 'fa-boxes-stacked',
-                'description' => 'Real-time stock ledger, SalesBinder 4-tier quantity lifecycle, 2D size/color matrices, and barcode scanning.',
+                'description' => 'Real-time stock ledger, 4-tier quantity lifecycle, 2D size/color variation matrices, and barcode scanning.',
                 'sections'    => [
                     [
                         'title'   => 'The 4-Tier Quantity Model',
@@ -98,7 +98,7 @@ class HelpCentreGuideController extends BaseApiController
                 'title'       => 'Invoices & Billing',
                 'tagline'     => 'Estimates, Invoices & 10% VAT',
                 'icon'        => 'fa-file-invoice-dollar',
-                'description' => 'Quotation estimates, 1-click invoice conversion, 10% VAT tax calculations, and A4 printable PDF billing.',
+                'description' => 'Quotation estimates, 1-click invoice conversion, 10% VAT tax calculations, and printable PDF billing.',
                 'sections'    => [
                     [
                         'title'   => 'Quotation Estimates Workflow',
@@ -113,8 +113,8 @@ class HelpCentreGuideController extends BaseApiController
                         'content' => 'Formula:\n• Net Subtotal = Sum(Line Items) - Discounts\n• Tax Amount (10% VAT) = Net Subtotal × 0.10\n• Grand Total = Net Subtotal + Tax Amount',
                     ],
                     [
-                        'title'   => 'Printable A4 Vector Invoices',
-                        'content' => 'Export high-resolution A4 tax invoices with full customer bill-to metadata, line item tables, and tax breakdowns, or print 80mm ESC/POS thermal receipts.',
+                        'title'   => 'Printable Vector Invoices & Thermal Receipts',
+                        'content' => 'Export high-resolution A4 tax invoices with full customer bill-to metadata, line item tables, and tax breakdowns, or print 80mm ESC/POS thermal receipts with tactile animations.',
                     ],
                 ],
                 'tips' => [
@@ -202,7 +202,7 @@ class HelpCentreGuideController extends BaseApiController
                 'title'       => 'Reports & Valuation',
                 'tagline'     => 'Balance Sheet Valuation & Margins',
                 'icon'        => 'fa-chart-pie',
-                'description' => 'Real-time financial asset valuation (Purchased Cost vs Resale Retail Value), gross margin %, and Role-Pulse.',
+                'description' => 'Real-time financial asset valuation (Purchased Cost vs Resale Retail Value), gross margin %, and performance metrics.',
                 'sections'    => [
                     [
                         'title'   => 'Balance Sheet Asset Valuation',
@@ -210,10 +210,10 @@ class HelpCentreGuideController extends BaseApiController
                     ],
                     [
                         'title'   => 'Gross Profit Margin Percentage',
-                        'content' => 'Formula: Margin % = (Gross Profit ÷ Resale Value) × 100.\nMonitored across product categories and individual brands.',
+                        'content' => 'Formula: Margin % = (Gross Profit ÷ Resale Value) × 100.\nMonitored across product categories and individual apparel collections.',
                     ],
                     [
-                        'title'   => 'Role-Pulse Operational Analytics',
+                        'title'   => 'Operational Velocity Analytics',
                         'content' => 'Real-time dashboard tracking cashier scanning speed, payment method distribution (Cash, Card, KHQR), and hourly peak traffic.',
                     ],
                 ],
@@ -224,7 +224,7 @@ class HelpCentreGuideController extends BaseApiController
             ],
             [
                 'id'          => 'security-rbac',
-                'title'       => 'Security & RBAC',
+                'title'       => 'Security & Governance',
                 'tagline'     => 'Workforce Roles & Audit Trail',
                 'icon'        => 'fa-shield-halved',
                 'description' => 'Role-based access guards, employee HR profiles, session security, and immutable audit logs.',
@@ -285,12 +285,12 @@ class HelpCentreGuideController extends BaseApiController
 
         if ($request->wantsJson() && !$request->has('html')) {
             return $this->successResponse([
-                'title'          => 'Store Stock & Point-of-Sale MIS — Help Centre & Operations Guide',
-                'tagline'        => 'Official shadcn-templ style Knowledge Base & Operations Manual',
+                'title'          => 'Documentation & Operations Guide',
+                'tagline'        => 'Official Knowledge Base & Operations Manual',
                 'total_topics'   => count($categories),
                 'categories'     => $categories,
                 'popular_topics' => $popularTopics,
-            ], 'Help Centre Knowledge Base data retrieved');
+            ], 'Documentation data retrieved');
         }
 
         return response($this->buildShadcnTemplHtml($categories, $popularTopics), 200)
@@ -298,7 +298,7 @@ class HelpCentreGuideController extends BaseApiController
     }
 
     /**
-     * Render the official shadcn-templ style documentation layout.
+     * Render the official shadcn-templ documentation layout with responsive sizing.
      *
      * @param array $categories
      * @param array $popularTopics
@@ -328,7 +328,7 @@ class HelpCentreGuideController extends BaseApiController
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Components &amp; Guides | Store Stock &amp; POS MIS</title>
+    <title>Documentation | Operations Guide</title>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'>
     <style>
         :root {
@@ -375,16 +375,26 @@ class HelpCentreGuideController extends BaseApiController
             --ring: #d4d4d8;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        html, body {
+            width: 100%;
+            min-height: 100vh;
             background-color: var(--background);
             color: var(--foreground);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.5;
             font-size: 14px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Header ── */
+        /* ── Fullscreen Responsive Layout ── */
+        .site-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* ── Sticky Header ── */
         .site-header {
             position: sticky;
             top: 0;
@@ -392,16 +402,16 @@ class HelpCentreGuideController extends BaseApiController
             width: 100%;
             border-bottom: 1px solid var(--border);
             background-color: var(--background);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
         .header-container {
             display: flex;
             height: 56px;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            max-width: 1440px;
-            margin: 0 auto;
+            padding: 0 16px;
+            max-width: 100%;
+            width: 100%;
         }
         .brand-text-block {
             display: flex;
@@ -417,19 +427,20 @@ class HelpCentreGuideController extends BaseApiController
             text-transform: uppercase;
         }
         .brand-tag {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             padding: 2px 6px;
             border-radius: var(--radius);
             background: var(--muted);
             color: var(--muted-foreground);
             border: 1px solid var(--border);
+            text-transform: uppercase;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         .search-trigger-btn {
             display: inline-flex;
@@ -442,11 +453,11 @@ class HelpCentreGuideController extends BaseApiController
             font-size: 12px;
             color: var(--muted-foreground);
             cursor: pointer;
-            width: 220px;
+            width: 240px;
             justify-content: space-between;
-            transition: border-color 0.15s ease;
+            transition: all 0.15s ease;
         }
-        .search-trigger-btn:hover { border-color: var(--ring); }
+        .search-trigger-btn:hover { border-color: var(--ring); color: var(--foreground); }
         .kbd-badge {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 10px;
@@ -454,7 +465,7 @@ class HelpCentreGuideController extends BaseApiController
             background: var(--background);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 1px 4px;
+            padding: 1px 5px;
         }
         .theme-toggle-btn {
             background: transparent;
@@ -467,16 +478,16 @@ class HelpCentreGuideController extends BaseApiController
             justify-content: center;
             color: var(--foreground);
             cursor: pointer;
+            transition: background 0.15s ease;
         }
         .theme-toggle-btn:hover { background: var(--accent); }
 
-        /* ── Layout Container ── */
-        .layout-container {
-            max-width: 1440px;
-            margin: 0 auto;
+        /* ── Fullscreen Main Grid ── */
+        .layout-grid {
             display: grid;
-            grid-template-columns: 240px 1fr 220px;
+            grid-template-columns: 260px minmax(0, 1fr) 240px;
             min-height: calc(100vh - 56px);
+            width: 100%;
         }
 
         /* ── Left Sidebar Navigation ── */
@@ -494,7 +505,7 @@ class HelpCentreGuideController extends BaseApiController
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--muted-foreground);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             padding: 0 8px;
         }
         .nav-group {
@@ -507,7 +518,7 @@ class HelpCentreGuideController extends BaseApiController
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 500;
@@ -535,8 +546,9 @@ class HelpCentreGuideController extends BaseApiController
 
         /* ── Main Content Area ── */
         .main-content {
-            padding: 32px 40px;
-            max-width: 860px;
+            padding: 36px 48px;
+            max-width: 100%;
+            min-width: 0;
         }
         .breadcrumb-row {
             display: flex;
@@ -547,7 +559,7 @@ class HelpCentreGuideController extends BaseApiController
             margin-bottom: 12px;
         }
         .doc-title {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 800;
             letter-spacing: -0.03em;
             color: var(--foreground);
@@ -557,16 +569,17 @@ class HelpCentreGuideController extends BaseApiController
             font-size: 15px;
             color: var(--muted-foreground);
             line-height: 1.6;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
-        /* ── Card Component Previews ── */
+        /* ── Premium Component Cards ── */
         .component-card {
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: var(--card);
-            margin-bottom: 32px;
+            margin-bottom: 36px;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
         .component-card-header {
             padding: 16px 20px;
@@ -585,22 +598,23 @@ class HelpCentreGuideController extends BaseApiController
             gap: 8px;
         }
         .component-card-body {
-            padding: 24px 20px;
+            padding: 28px 24px;
         }
         .section-block {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
         .section-block:last-child { margin-bottom: 0; }
         .section-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--foreground);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
         }
         .section-text {
-            font-size: 13.5px;
+            font-size: 14px;
             color: var(--muted-foreground);
-            line-height: 1.65;
+            line-height: 1.7;
             white-space: pre-line;
         }
 
@@ -608,9 +622,9 @@ class HelpCentreGuideController extends BaseApiController
             border: 1px solid var(--border);
             border-left: 3px solid var(--primary);
             border-radius: var(--radius);
-            padding: 14px 18px;
+            padding: 16px 20px;
             background: var(--muted);
-            margin-top: 24px;
+            margin-top: 28px;
         }
         .tips-title {
             font-size: 11px;
@@ -618,36 +632,36 @@ class HelpCentreGuideController extends BaseApiController
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--foreground);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .tips-list {
             list-style: disc;
-            margin-left: 18px;
-            font-size: 12.5px;
+            margin-left: 20px;
+            font-size: 13px;
             color: var(--muted-foreground);
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
         /* ── Popular Topics Cloud ── */
         .topics-section {
-            margin-top: 40px;
+            margin-top: 48px;
             border-top: 1px solid var(--border);
-            padding-top: 28px;
+            padding-top: 32px;
         }
         .topics-pills-wrap {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 14px;
         }
         .topic-badge {
             background: var(--muted);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 5px 10px;
+            padding: 6px 12px;
             font-size: 12px;
             font-weight: 500;
             color: var(--muted-foreground);
@@ -666,19 +680,22 @@ class HelpCentreGuideController extends BaseApiController
             top: 56px;
             height: calc(100vh - 56px);
             overflow-y: auto;
-            padding: 24px 16px;
+            border-left: 1px solid var(--border);
+            padding: 24px 20px;
         }
         .toc-title {
             font-size: 12px;
             font-weight: 700;
             color: var(--foreground);
             margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
         .toc-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            font-size: 12px;
+            gap: 10px;
+            font-size: 13px;
         }
         .toc-link {
             color: var(--muted-foreground);
@@ -691,7 +708,7 @@ class HelpCentreGuideController extends BaseApiController
             font-weight: 600;
         }
 
-        /* ── Search Dialog Modal (⌘K) ── */
+        /* ── Search Modal Dialog (⌘K) ── */
         .search-modal-backdrop {
             position: fixed;
             inset: 0;
@@ -708,15 +725,15 @@ class HelpCentreGuideController extends BaseApiController
             background: var(--background);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            width: 560px;
+            width: 600px;
             max-width: 90vw;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
         .search-input-box {
             display: flex;
             align-items: center;
-            padding: 14px 16px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border);
             gap: 12px;
         }
@@ -729,12 +746,12 @@ class HelpCentreGuideController extends BaseApiController
             color: var(--foreground);
         }
         .search-results-list {
-            max-height: 320px;
+            max-height: 360px;
             overflow-y: auto;
             padding: 8px;
         }
         .search-result-item {
-            padding: 10px 12px;
+            padding: 10px 14px;
             border-radius: var(--radius);
             font-size: 13px;
             color: var(--foreground);
@@ -742,6 +759,7 @@ class HelpCentreGuideController extends BaseApiController
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.1s ease;
         }
         .search-result-item:hover { background: var(--accent); }
 
@@ -750,98 +768,100 @@ class HelpCentreGuideController extends BaseApiController
             to { opacity: 1; }
         }
 
-        @media (max-width: 1024px) {
-            .layout-container { grid-template-columns: 220px 1fr; }
+        /* ── Fluid Breakpoints ── */
+        @media (max-width: 1200px) {
+            .layout-grid { grid-template-columns: 240px minmax(0, 1fr); }
             .sidebar-right { display: none; }
+            .main-content { padding: 32px 36px; }
         }
-        @media (max-width: 768px) {
-            .layout-container { grid-template-columns: 1fr; }
+        @media (max-width: 840px) {
+            .layout-grid { grid-template-columns: 1fr; }
             .sidebar-left { display: none; }
-            .main-content { padding: 20px 16px; }
-            .search-trigger-btn { width: 140px; }
+            .main-content { padding: 24px 16px; }
+            .search-trigger-btn { width: 160px; }
         }
     </style>
 </head>
 <body>
-    <header class='site-header'>
-        <div class='header-container'>
-            <a href='/guide' class='brand-text-block'>
-                <span class='brand-text'>STORE STOCK &amp; POS</span>
-                <span class='brand-tag'>MIS GUIDE</span>
-            </a>
-            <div class='header-actions'>
-                <button class='search-trigger-btn' onclick='openSearchModal()'>
-                    <span><i class='fa-solid fa-magnifying-glass' style='margin-right: 6px;'></i>Search guides...</span>
-                    <span class='kbd-badge'>⌘K</span>
-                </button>
-                <button class='theme-toggle-btn' onclick='toggleTheme()' title='Toggle Theme'>
-                    <i class='fa-solid fa-moon' id='theme-icon'></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <div class='layout-container'>
-        <!-- Left Sidebar Navigation -->
-        <aside class='sidebar-left'>
-            <div class='sidebar-heading'>Operational Guides</div>
-            <nav class='nav-group' id='sidebar-nav'>
-                {$sidebarNavHtml}
-            </nav>
-            <div class='sidebar-heading'>Developer Tools</div>
-            <nav class='nav-group'>
-                <a href='/api/v1/guide' class='nav-item'>
-                    <i class='fa-solid fa-code nav-item-icon'></i>
-                    <span>JSON Directory</span>
+    <div class='site-wrapper'>
+        <header class='site-header'>
+            <div class='header-container'>
+                <a href='/guide' class='brand-text-block'>
+                    <span class='brand-text'>GUIDE</span>
+                    <span class='brand-tag'>DOCUMENTATION</span>
                 </a>
-                <a href='/api/v1/health' class='nav-item'>
-                    <i class='fa-solid fa-signal nav-item-icon'></i>
-                    <span>System Status</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Documentation Content -->
-        <main class='main-content'>
-            <div class='breadcrumb-row'>
-                <span>Docs</span>
-                <span>/</span>
-                <span>Components</span>
-                <span>/</span>
-                <span id='breadcrumb-active' style='color: var(--foreground); font-weight: 600;'>Getting Started</span>
-            </div>
-
-            <h1 class='doc-title' id='doc-title'>Getting Started</h1>
-            <p class='doc-description' id='doc-description'>Comprehensive onboarding guide, architecture topology, access tiers, and standard response envelopes.</p>
-
-            <div class='component-card'>
-                <div class='component-card-header'>
-                    <div class='component-card-title'>
-                        <i class='fa-solid fa-book-open'></i>
-                        <span id='component-title'>System Specification &amp; Workflow</span>
-                    </div>
-                    <span class='brand-tag'>Operational Manual</span>
+                <div class='header-actions'>
+                    <button class='search-trigger-btn' onclick='openSearchModal()'>
+                        <span><i class='fa-solid fa-magnifying-glass' style='margin-right: 6px;'></i>Search guides...</span>
+                        <span class='kbd-badge'>⌘K</span>
+                    </button>
+                    <button class='theme-toggle-btn' onclick='toggleTheme()' title='Toggle Theme'>
+                        <i class='fa-solid fa-moon' id='theme-icon'></i>
+                    </button>
                 </div>
-                <div class='component-card-body' id='component-body'>
+            </div>
+        </header>
+
+        <div class='layout-grid'>
+            <!-- Left Sidebar Navigation -->
+            <aside class='sidebar-left'>
+                <div class='sidebar-heading'>Operational Guides</div>
+                <nav class='nav-group' id='sidebar-nav'>
+                    {$sidebarNavHtml}
+                </nav>
+                <div class='sidebar-heading'>Developer Tools</div>
+                <nav class='nav-group'>
+                    <a href='/api/v1/guide' class='nav-item'>
+                        <i class='fa-solid fa-code nav-item-icon'></i>
+                        <span>JSON Directory</span>
+                    </a>
+                    <a href='/api/v1/health' class='nav-item'>
+                        <i class='fa-solid fa-signal nav-item-icon'></i>
+                        <span>System Status</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Documentation Content -->
+            <main class='main-content'>
+                <div class='breadcrumb-row'>
+                    <span>Docs</span>
+                    <span>/</span>
+                    <span id='breadcrumb-active' style='color: var(--foreground); font-weight: 600;'>Getting Started</span>
+                </div>
+
+                <h1 class='doc-title' id='doc-title'>Getting Started</h1>
+                <p class='doc-description' id='doc-description'>Comprehensive onboarding guide, architecture topology, access tiers, and standard response envelopes.</p>
+
+                <div class='component-card'>
+                    <div class='component-card-header'>
+                        <div class='component-card-title'>
+                            <i class='fa-solid fa-book-open'></i>
+                            <span id='component-title'>System Specification &amp; Workflow</span>
+                        </div>
+                        <span class='brand-tag'>Operational Manual</span>
+                    </div>
+                    <div class='component-card-body' id='component-body'>
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+
+                <div class='topics-section'>
+                    <div class='sidebar-heading' style='padding: 0;'>Popular Topics &amp; Terminology</div>
+                    <div class='topics-pills-wrap'>
+                        {$topicsPillsHtml}
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right TOC Sidebar -->
+            <aside class='sidebar-right'>
+                <div class='toc-title'>On This Page</div>
+                <div class='toc-list' id='toc-list'>
                     <!-- Injected dynamically -->
                 </div>
-            </div>
-
-            <div class='topics-section'>
-                <div class='sidebar-heading' style='padding: 0;'>Popular Topics &amp; Terminology</div>
-                <div class='topics-pills-wrap'>
-                    {$topicsPillsHtml}
-                </div>
-            </div>
-        </main>
-
-        <!-- Right TOC Sidebar -->
-        <aside class='sidebar-right'>
-            <div class='toc-title'>On This Page</div>
-            <div class='toc-list' id='toc-list'>
-                <!-- Injected dynamically -->
-            </div>
-        </aside>
+            </aside>
+        </div>
     </div>
 
     <!-- Search Modal Dialog (⌘K) -->
