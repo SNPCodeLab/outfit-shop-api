@@ -37,6 +37,9 @@ postman_collections/
 database/*.sqlite
 database/*.sqlite-journal
 .dataconnect/
+firebase.json
+.firebaserc
+*firebase*
 
 # macOS / Windows# OS Generated Files
 .DS_Store
