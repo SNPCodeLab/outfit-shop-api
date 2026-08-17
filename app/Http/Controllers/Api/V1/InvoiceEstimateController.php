@@ -238,6 +238,7 @@ class InvoiceEstimateController extends BaseApiController
 
         $customerName = htmlspecialchars($customer->customer_name ?? 'Walk-in Retail Guest');
         $customerPhone = htmlspecialchars($customer->phone ?? 'N/A');
+        $customerAddress = htmlspecialchars($customer->address ?? 'Phnom Penh, Cambodia');
 
         $itemsListHtml = '';
         foreach ($details as $detail) {
@@ -250,14 +251,14 @@ class InvoiceEstimateController extends BaseApiController
             $lineTotal = number_format($detail->sub_total, 2);
 
             $itemsListHtml .= "
-            <tr style='border-bottom: 1px solid var(--slate-200);'>
-                <td style='padding: 10px 12px;'>
-                    <div style='font-weight: 600; color: var(--slate-900);'>{$productName}</div>
-                    <div style='font-size: 11px; color: var(--slate-500);'>Size: {$size} | Color: {$color} | SKU: {$variant->sku}</div>
+            <tr>
+                <td style='padding: 10px 14px; border-bottom: 1px solid #e4e4e7;'>
+                    <div style='font-weight: 700; color: #09090b; font-size: 13px;'>{$productName}</div>
+                    <div style='font-size: 11px; color: #71717a;'>Size: {$size} • Color: {$color} • SKU: {$variant->sku}</div>
                 </td>
-                <td style='padding: 10px 12px; text-align: center;'>{$qty}</td>
-                <td style='padding: 10px 12px; text-align: right; font-family: monospace;'>\${$unitPrice}</td>
-                <td style='padding: 10px 12px; text-align: right; font-family: monospace; font-weight: 600;'>\${$lineTotal}</td>
+                <td style='padding: 10px 14px; text-align: center; border-bottom: 1px solid #e4e4e7; font-weight: 600;'>{$qty}</td>
+                <td style='padding: 10px 14px; text-align: right; border-bottom: 1px solid #e4e4e7; font-family: ui-monospace, monospace;'>\${$unitPrice}</td>
+                <td style='padding: 10px 14px; text-align: right; border-bottom: 1px solid #e4e4e7; font-family: ui-monospace, monospace; font-weight: 700;'>\${$lineTotal}</td>
             </tr>";
         }
 
@@ -268,9 +269,9 @@ class InvoiceEstimateController extends BaseApiController
             $qty = $detail->quantity;
             $lineTotal = number_format($detail->sub_total, 2);
             $receiptItemsHtml .= "
-            <div style='display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;'>
+            <div style='display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;'>
                 <span>{$qty}x {$productName}</span>
-                <span style='font-weight: 600;'>\${$lineTotal}</span>
+                <span style='font-weight: 700;'>\${$lineTotal}</span>
             </div>";
         }
 
@@ -288,39 +289,39 @@ class InvoiceEstimateController extends BaseApiController
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Tax Invoice #INV-{$sale->sale_id} | Store Stock &amp; POS MIS</title>
+    <title>Tax Invoice #INV-{$sale->sale_id} | Documentation</title>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'>
     <style>
         :root {
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-300: #cbd5e1;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
-            --slate-900: #0f172a;
+            --background: #f4f4f5;
+            --foreground: #09090b;
+            --card: #ffffff;
+            --card-foreground: #09090b;
+            --border: #e4e4e7;
+            --muted: #f4f4f5;
+            --muted-foreground: #71717a;
+            --primary: #18181b;
+            --primary-foreground: #fafafa;
             --radius: 3px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: var(--slate-900);
-            background-color: #f4f4f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--foreground);
+            background-color: var(--background);
             line-height: 1.5;
             font-size: 13px;
             padding: 32px 16px;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container-wrap {
-            max-width: 860px;
+        .screen-container {
+            max-width: 820px;
             margin: 0 auto;
         }
 
-        /* ── Top Bar Controls ── */
-        .controls-bar {
+        /* ── Top Navigation & Mode Switcher ── */
+        .controls-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -328,16 +329,16 @@ class InvoiceEstimateController extends BaseApiController
             flex-wrap: wrap;
             gap: 12px;
         }
-        .view-tabs {
+        .mode-tabs-group {
             display: inline-flex;
             background: #e4e4e7;
             padding: 3px;
             border-radius: var(--radius);
         }
-        .view-tab-btn {
+        .mode-tab-btn {
             background: transparent;
             border: none;
-            padding: 6px 14px;
+            padding: 7px 16px;
             font-size: 12px;
             font-weight: 600;
             color: #71717a;
@@ -345,12 +346,12 @@ class InvoiceEstimateController extends BaseApiController
             cursor: pointer;
             transition: all 0.15s ease;
         }
-        .view-tab-btn.active {
+        .mode-tab-btn.active {
             background: #ffffff;
             color: #18181b;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        .action-btn {
+        .toolbar-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -362,18 +363,18 @@ class InvoiceEstimateController extends BaseApiController
             transition: all 0.15s ease;
             text-decoration: none;
         }
-        .btn-primary {
+        .btn-black {
             background: #18181b;
             color: #ffffff;
             border: 1px solid #18181b;
         }
-        .btn-primary:hover { background: #27272a; }
-        .btn-secondary {
+        .btn-black:hover { background: #27272a; }
+        .btn-white {
             background: #ffffff;
             color: #18181b;
             border: 1px solid #e4e4e7;
         }
-        .btn-secondary:hover { background: #f4f4f5; }
+        .btn-white:hover { background: #f4f4f5; }
 
         /* ═══════════════════════════════════════════════
            TACTILE RECEIPT PRINTER MACHINE (dqnamo style)
@@ -383,18 +384,18 @@ class InvoiceEstimateController extends BaseApiController
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 0 40px;
+            padding: 10px 0 40px;
         }
         .printer-machine {
             position: relative;
             width: 100%;
             max-width: 380px;
             border-radius: 1.5rem;
-            border: 1px solid #18181b;
-            background: #18181b;
-            padding: 0.75rem;
-            padding-bottom: 2rem;
-            box-shadow: 0 20px 36px -20px rgba(0, 0, 0, 0.45), 0 6px 14px -8px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            border: 1px solid #27272a;
+            background: linear-gradient(180deg, #1c1c1f 0%, #121214 100%);
+            padding: 0.85rem;
+            padding-bottom: 2.2rem;
+            box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.5), 0 8px 16px -6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
             z-index: 10;
         }
         .printer-screen {
@@ -403,11 +404,11 @@ class InvoiceEstimateController extends BaseApiController
             border-radius: 1rem;
             border: 1px solid #27272a;
             background: #09090b;
-            padding: 1rem;
+            padding: 1.15rem;
             color: #fafafa;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
         }
-        .screen-header {
+        .screen-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -423,8 +424,8 @@ class InvoiceEstimateController extends BaseApiController
         }
         .status-spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
             border: 2px solid #52525b;
             border-top-color: #fafafa;
             border-radius: 50%;
@@ -432,41 +433,38 @@ class InvoiceEstimateController extends BaseApiController
         }
         .status-complete-icon {
             color: #22c55e;
-            font-size: 16px;
-            display: none;
+            font-size: 15px;
+            display: inline-block;
         }
         .printer-slot {
             position: absolute;
             left: 1.5rem;
             right: 1.5rem;
-            bottom: 0.75rem;
-            height: 8px;
+            bottom: 0.8rem;
+            height: 9px;
             border-radius: 4px;
-            background: #09090b;
+            background: #000000;
             border: 1px solid #27272a;
-            box-shadow: inset 0 2px 4px #000000;
+            box-shadow: inset 0 3px 6px #000000;
             z-index: 40;
         }
 
-        /* ── Receipt Paper & Stepped Motion ── */
+        /* ── Receipt Output with Realistic Paper Styling ── */
         .receipt-output-container {
             position: relative;
             z-index: 5;
-            margin-top: -1rem;
+            margin-top: -1.2rem;
             width: 320px;
             overflow: hidden;
             padding-bottom: 2rem;
         }
         .receipt-paper-wrapper {
             position: relative;
-            transform: translateY(calc(-100% + 2px));
+            transform: translateY(0%);
             transition: opacity 0.16s ease;
         }
         .receipt-paper-wrapper.stepped-feed {
             animation: steppedPrintingAnimation 1.75s linear forwards;
-        }
-        .receipt-paper-wrapper.complete {
-            transform: translateY(0%);
         }
 
         @keyframes steppedPrintingAnimation {
@@ -496,8 +494,8 @@ class InvoiceEstimateController extends BaseApiController
             background: #ffffff;
             color: #18181b;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            padding: 24px 20px 32px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            padding: 28px 22px 36px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.05);
             /* Jagged Sawtooth Tear Edge at Bottom (40 teeth) */
             clip-path: polygon(
                 0 0, 100% 0, 100% calc(100% - 4px),
@@ -518,65 +516,186 @@ class InvoiceEstimateController extends BaseApiController
             );
         }
 
-        .dashed-line {
+        .dashed-divider {
             border-top: 1px dashed #d4d4d8;
-            margin: 12px 0;
+            margin: 14px 0;
         }
 
-        /* ── Standard A4 Sheet Invoice View ── */
-        .invoice-card {
+        /* ═══════════════════════════════════════════════
+           FORMAL FULL-WIDTH A4 DOCUMENT SHEET (Clean Vector)
+           ═══════════════════════════════════════════════ */
+        .invoice-document-sheet {
+            width: 100%;
             background: #ffffff;
-            border: 1px solid #e4e4e7;
+            border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 32px 36px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 40px 48px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
             display: none;
+        }
+
+        .doc-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #09090b;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+        .doc-company-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+        .doc-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        .doc-meta-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+        }
+        .doc-meta-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            margin-bottom: 6px;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .doc-table th {
+            background: #fafafa;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            text-align: left;
+        }
+
+        .doc-calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 24px;
+            margin-top: 16px;
+        }
+        .doc-summary-box {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #fafafa;
+            padding: 16px 20px;
+        }
+        .doc-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+        .doc-grand-row {
+            border-top: 2px solid #09090b;
+            padding-top: 8px;
+            margin-top: 6px;
+            font-size: 15px;
+            font-weight: 800;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        /* ═══════════════════════════════════════════════
+           STRICT @MEDIA PRINT RULES FOR FLAWLESS 1-PAGE A4
+           ═══════════════════════════════════════════════ */
+        @page {
+            size: A4 portrait;
+            margin: 10mm 15mm 10mm 15mm;
+        }
         @media print {
-            body { background: #ffffff; padding: 0; }
-            .controls-bar, .receipt-printer-section { display: none !important; }
-            .invoice-card { display: block !important; border: none; box-shadow: none; padding: 0; }
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                font-size: 11pt !important;
+            }
+            .controls-toolbar, .receipt-printer-section, .no-print {
+                display: none !important;
+            }
+            .screen-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .invoice-document-sheet {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+            }
+            .doc-meta-card, .doc-summary-box {
+                background: #ffffff !important;
+                border: 1px solid #cccccc !important;
+            }
+            .doc-table th {
+                background: #f4f4f4 !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class='container-wrap'>
-        <!-- Controls Bar -->
-        <div class='controls-bar'>
-            <div class='view-tabs'>
-                <button class='view-tab-btn active' id='tab-printer' onclick='switchView(\"printer\")'>
+    <div class='screen-container'>
+        <!-- Controls Toolbar -->
+        <div class='controls-toolbar'>
+            <div class='mode-tabs-group'>
+                <button class='mode-tab-btn active' id='tab-printer' onclick='switchView(\"printer\")'>
                     <i class='fa-solid fa-receipt' style='margin-right: 4px;'></i> Tactile Printer
                 </button>
-                <button class='view-tab-btn' id='tab-sheet' onclick='switchView(\"sheet\")'>
+                <button class='mode-tab-btn' id='tab-sheet' onclick='switchView(\"sheet\")'>
                     <i class='fa-solid fa-file-lines' style='margin-right: 4px;'></i> A4 Document Sheet
                 </button>
             </div>
             <div style='display: flex; gap: 8px;'>
-                <button class='action-btn btn-secondary' onclick='replayPrinterAnimation()'>
+                <button class='toolbar-btn btn-white' onclick='replayPrinterAnimation()'>
                     <i class='fa-solid fa-rotate-right'></i> Replay Print
                 </button>
-                <button class='action-btn btn-primary' onclick='window.print()'>
+                <button class='toolbar-btn btn-black' onclick='window.print()'>
                     <i class='fa-solid fa-print'></i> Print / Save PDF
                 </button>
             </div>
         </div>
 
         <!-- ═══════════════════════════════════════════════
-             1. TACTILE RECEIPT PRINTER MACHINE (dqnamo style)
+             1. TACTILE RECEIPT PRINTER MACHINE
              ═══════════════════════════════════════════════ -->
         <section class='receipt-printer-section' id='view-printer-mode'>
             <div class='printer-machine'>
                 <div class='printer-screen'>
-                    <div class='screen-header'>
+                    <div class='screen-top'>
                         <div style='font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a1a1aa;'>
-                            STORE STOCK &amp; POS
+                            POINT OF SALE
                         </div>
-                        <span style='font-size: 10px; background: #27272a; padding: 2px 6px; border-radius: 4px; color: #d4d4d8;'>#INV-{$sale->sale_id}</span>
+                        <span style='font-size: 10px; background: #27272a; padding: 2px 7px; border-radius: 4px; color: #d4d4d8; font-family: monospace;'>#INV-{$sale->sale_id}</span>
                     </div>
                     <div style='display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;'>
                         <div>
@@ -589,7 +708,7 @@ class InvoiceEstimateController extends BaseApiController
                         </div>
                     </div>
                     <div class='printer-status-row'>
-                        <span class='status-spinner' id='status-spinner'></span>
+                        <span class='status-spinner' id='status-spinner' style='display: none;'></span>
                         <i class='fa-solid fa-circle-check status-complete-icon' id='status-check'></i>
                         <span id='status-text'>Order complete</span>
                     </div>
@@ -597,28 +716,28 @@ class InvoiceEstimateController extends BaseApiController
                 <div class='printer-slot'></div>
             </div>
 
-            <!-- Receipt Output with Stepped Feeding Motion -->
+            <!-- Realistic Receipt Output -->
             <div class='receipt-output-container'>
-                <div class='receipt-paper-wrapper complete' id='receipt-paper-wrap'>
+                <div class='receipt-paper-wrapper' id='receipt-paper-wrap'>
                     <article class='receipt-paper'>
-                        <div style='text-align: center; margin-bottom: 12px;'>
-                            <div style='font-size: 13px; font-weight: 800; letter-spacing: -0.02em;'>STORE STOCK &amp; POS MIS</div>
-                            <div style='font-size: 9px; color: #71717a; text-transform: uppercase;'>Official Store Receipt</div>
+                        <div style='text-align: center; margin-bottom: 14px;'>
+                            <div style='font-size: 13px; font-weight: 800; letter-spacing: -0.02em;'>STORE RECEIPT</div>
+                            <div style='font-size: 9px; color: #71717a; text-transform: uppercase; margin-top: 2px;'>Official Sales Transaction</div>
                         </div>
 
-                        <div style='font-size: 10px; color: #52525b; line-height: 1.4;'>
+                        <div style='font-size: 10px; color: #52525b; line-height: 1.5;'>
                             <div>Order #: INV-000{$sale->sale_id}</div>
                             <div>Date: {$saleDate}</div>
                             <div>Status: {$statusText}</div>
                         </div>
 
-                        <div class='dashed-line'></div>
+                        <div class='dashed-divider'></div>
 
                         <div>
                             {$receiptItemsHtml}
                         </div>
 
-                        <div class='dashed-line'></div>
+                        <div class='dashed-divider'></div>
 
                         <div style='font-size: 11px; line-height: 1.6;'>
                             <div style='display: flex; justify-content: space-between;'><span>Subtotal:</span><span>\${$subtotal}</span></div>
@@ -629,9 +748,9 @@ class InvoiceEstimateController extends BaseApiController
                             </div>
                         </div>
 
-                        <div class='dashed-line'></div>
+                        <div class='dashed-divider'></div>
 
-                        <div style='text-align: center; margin-top: 12px;'>
+                        <div style='text-align: center; margin-top: 14px;'>
                             <div style='display: inline-block; letter-spacing: 2px; font-size: 18px; font-family: monospace; line-height: 1;'>
                                 ||| | | |||| || |||| | |||
                             </div>
@@ -643,40 +762,42 @@ class InvoiceEstimateController extends BaseApiController
         </section>
 
         <!-- ═══════════════════════════════════════════════
-             2. STANDARD A4 SHEET DOCUMENT (Formal Invoice)
+             2. FORMAL FULL-WIDTH A4 DOCUMENT SHEET
              ═══════════════════════════════════════════════ -->
-        <div class='invoice-card' id='view-sheet-mode'>
-            <div style='display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--slate-200); padding-bottom: 16px;'>
+        <div class='invoice-document-sheet' id='view-sheet-mode'>
+            <div class='doc-header-row'>
                 <div>
-                    <h1 style='font-size: 18px; font-weight: 800; text-transform: uppercase;'>STORE STOCK &amp; POS MIS</h1>
-                    <div style='font-size: 12px; color: var(--slate-500);'>Enterprise Clothing Retail &amp; Logistics System</div>
+                    <h1 class='doc-company-title'>TAX INVOICE</h1>
+                    <div style='font-size: 12px; color: #71717a; margin-top: 2px;'>Official Sales &amp; Billing Document</div>
                 </div>
                 <div style='text-align: right;'>
-                    <div style='font-size: 16px; font-weight: 800; color: #18181b;'>TAX INVOICE</div>
-                    <div style='font-size: 12px; font-family: monospace; color: var(--slate-500);'>#INV-000{$sale->sale_id}</div>
+                    <div style='font-size: 14px; font-weight: 700;'>#INV-000{$sale->sale_id}</div>
+                    <div style='font-size: 12px; color: #71717a;'>Date: {$saleDate}</div>
                 </div>
             </div>
 
-            <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;'>
-                <div style='background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 12px 14px;'>
-                    <div style='font-size: 11px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; margin-bottom: 6px;'>Customer Info</div>
-                    <div style='font-weight: 700;'>{$customerName}</div>
-                    <div style='font-size: 12px; color: var(--slate-500);'>Phone: {$customerPhone}</div>
+            <div class='doc-meta-grid'>
+                <div class='doc-meta-card'>
+                    <div class='doc-meta-label'>Billed To (Customer)</div>
+                    <div style='font-weight: 700; font-size: 14px;'>{$customerName}</div>
+                    <div style='font-size: 12px; color: #71717a; margin-top: 2px;'>Phone: {$customerPhone}</div>
+                    <div style='font-size: 12px; color: #71717a;'>Address: {$customerAddress}</div>
                 </div>
-                <div style='background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 12px 14px;'>
-                    <div style='font-size: 11px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; margin-bottom: 6px;'>Invoice Details</div>
-                    <div style='font-size: 12px;'>Date: <strong>{$saleDate}</strong></div>
-                    <div style='font-size: 12px;'>Status: <strong style='color: {$statusColor};'>{$statusText}</strong></div>
+                <div class='doc-meta-card'>
+                    <div class='doc-meta-label'>Payment &amp; Status</div>
+                    <div style='font-size: 13px;'>Status: <strong style='color: {$statusColor};'>{$statusText}</strong></div>
+                    <div style='font-size: 12px; color: #71717a; margin-top: 2px;'>Payment Method: Cash / Card / KHQR</div>
+                    <div style='font-size: 12px; color: #71717a;'>Terms: Due Upon Receipt</div>
                 </div>
             </div>
 
-            <table style='width: 100%; border-collapse: collapse; margin-bottom: 24px;'>
+            <table class='doc-table'>
                 <thead>
-                    <tr style='background: var(--slate-50); border-bottom: 2px solid var(--slate-200); text-align: left; font-size: 11px; text-transform: uppercase; color: var(--slate-500);'>
-                        <th style='padding: 8px 12px;'>Description</th>
-                        <th style='padding: 8px 12px; text-align: center;'>Qty</th>
-                        <th style='padding: 8px 12px; text-align: right;'>Unit Price</th>
-                        <th style='padding: 8px 12px; text-align: right;'>Total</th>
+                    <tr>
+                        <th>Item Description</th>
+                        <th style='text-align: center;'>Qty</th>
+                        <th style='text-align: right;'>Unit Price</th>
+                        <th style='text-align: right;'>Line Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -684,23 +805,30 @@ class InvoiceEstimateController extends BaseApiController
                 </tbody>
             </table>
 
-            <div style='display: flex; justify-content: flex-end;'>
-                <div style='width: 260px;'>
-                    <div style='display: flex; justify-content: space-between; padding: 4px 0;'><span>Subtotal:</span><span style='font-family: monospace;'>\${$subtotal}</span></div>
-                    <div style='display: flex; justify-content: space-between; padding: 4px 0;'><span>Tax (10% VAT):</span><span style='font-family: monospace;'>+\${$tax}</span></div>
-                    <div style='display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; border-top: 1px solid var(--slate-300); padding-top: 6px; margin-top: 4px;'>
-                        <span>Grand Total:</span><span style='font-family: monospace;'>\${$grand}</span>
-                    </div>
+            <div class='doc-calc-grid'>
+                <div class='doc-meta-card' style='background: #fafafa; font-size: 12px; color: #71717a;'>
+                    <div style='font-weight: 700; color: #09090b; margin-bottom: 4px; text-transform: uppercase; font-size: 11px;'>Notes &amp; Instructions</div>
+                    <div>• All goods purchased are recorded in the inventory stock ledger.</div>
+                    <div>• Returns or exchanges accepted within 7 days with this invoice.</div>
                 </div>
+
+                <div class='doc-summary-box'>
+                    <div class='doc-summary-row'><span>Subtotal:</span><span style='font-family: monospace;'>\${$subtotal}</span></div>
+                    <div class='doc-summary-row'><span>Discount:</span><span style='font-family: monospace;'>-\${$discount}</span></div>
+                    <div class='doc-summary-row'><span>Tax (10% VAT):</span><span style='font-family: monospace;'>+\${$tax}</span></div>
+                    <div class='doc-summary-row doc-grand-row'><span>Grand Total:</span><span style='font-family: monospace;'>\${$grand}</span></div>
+                    <div class='doc-summary-row' style='color: #166534; font-weight: 600; margin-top: 4px;'><span>Paid:</span><span style='font-family: monospace;'>\${$paid}</span></div>
+                    <div class='doc-summary-row' style='color: #92400e; font-weight: 700; border-top: 1px dashed #d4d4d8; padding-top: 4px; margin-top: 4px;'><span>Balance Due:</span><span style='font-family: monospace;'>\${$due}</span></div>
+                </div>
+            </div>
+
+            <div style='text-align: center; margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: #a1a1aa;'>
+                Thank you for your business.
             </div>
         </div>
     </div>
 
     <script>
-        // Init view
-        document.getElementById('status-spinner').style.display = 'none';
-        document.getElementById('status-check').style.display = 'inline-block';
-
         function switchView(mode) {
             const printerSection = document.getElementById('view-printer-mode');
             const sheetSection = document.getElementById('view-sheet-mode');
@@ -729,6 +857,7 @@ class InvoiceEstimateController extends BaseApiController
 
             // Reset
             wrap.className = 'receipt-paper-wrapper';
+            wrap.style.transform = 'translateY(calc(-100% + 2px))';
             spinner.style.display = 'inline-block';
             check.style.display = 'none';
             text.innerText = 'Processing your order';
@@ -736,14 +865,15 @@ class InvoiceEstimateController extends BaseApiController
             setTimeout(() => {
                 text.innerText = 'Printing your receipt';
                 wrap.classList.add('stepped-feed');
-            }, 400);
+            }, 350);
 
             setTimeout(() => {
-                wrap.className = 'receipt-paper-wrapper complete';
+                wrap.className = 'receipt-paper-wrapper';
+                wrap.style.transform = 'translateY(0%)';
                 spinner.style.display = 'none';
                 check.style.display = 'inline-block';
                 text.innerText = 'Order complete';
-            }, 2300);
+            }, 2100);
         }
     </script>
 </body>

@@ -164,6 +164,6 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $pdfRes->assertStatus(200)
             ->assertHeader('Content-Type', 'text/html; charset=utf-8')
             ->assertSee('TAX INVOICE')
-            ->assertSee('STORE STOCK &amp; POS MIS', false);
+            ->assertSee('STORE RECEIPT');
     }
 }
