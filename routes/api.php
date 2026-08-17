@@ -42,6 +42,8 @@ Route::prefix('v1')->group(function () {
     // Health & Status — always open
     Route::get('/health', [StatusController::class, 'index']);
     Route::get('/status', [StatusController::class, 'index']);
+    Route::get('/guide',  [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+    Route::get('/docs',   [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
 
     // Authentication — rate-limited to prevent brute-force
     Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
