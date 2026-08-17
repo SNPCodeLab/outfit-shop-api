@@ -20,8 +20,45 @@ class DashboardController extends Controller
         $today = Carbon::today();
         $sevenDaysAgo = Carbon::now()->subDays(7);
 
-        // Requests Today
+        $totalRequests = ApiLog::count();
         $requestsToday = ApiLog::where('created_at', '>=', $today)->count();
+
+        // 1. Latency Metrics (Target: < 200ms)
+        $avgDurationMs = round((float) ApiLog::avg('duration_ms'), 2);
+        $maxDurationMs = round((float) ApiLog::max('duration_ms'), 2);
+
+        // 2. Error Rate & Status Distribution (Target: < 1.00%)
+        $errorCount = ApiLog::where('status', '>=', 400)->count();
+        $errorRatePct = $totalRequests > 0 ? round(($errorCount / $totalRequests) * 100, 2) : 0.00;
+
+        // 3. Security Telemetry: Auth Failures (401) & Rate Limit Hits (429)
+        $authFailures401 = ApiLog::where('status', 401)->count();
+        $rateLimitHits429 = ApiLog::where('status', 429)->count();
+
+        // 4. Most Called Endpoints (Top Volume)
+        $mostCalledEndpoints = ApiLog::select(
+            'path',
+            'method',
+            DB::raw('COUNT(*) as call_count'),
+            DB::raw('ROUND(AVG(duration_ms), 2) as avg_duration_ms')
+        )
+            ->groupBy('path', 'method')
+            ->orderBy('call_count', 'DESC')
+            ->limit(10)
+            ->get();
+
+        // 5. Slowest Endpoints (Top Latency)
+        $slowestEndpoints = ApiLog::select(
+            'path',
+            'method',
+            DB::raw('COUNT(*) as call_count'),
+            DB::raw('ROUND(AVG(duration_ms), 2) as avg_duration_ms'),
+            DB::raw('MAX(duration_ms) as max_duration_ms')
+        )
+            ->groupBy('path', 'method')
+            ->orderBy('avg_duration_ms', 'DESC')
+            ->limit(10)
+            ->get();
 
         // Requests last 7 days by date
         $requestsLast7Days = ApiLog::where('created_at', '>=', $sevenDaysAgo)
@@ -29,24 +66,6 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->orderBy('date', 'ASC')
             ->get();
-
-        // Top 10 Endpoints
-        $topEndpoints = ApiLog::select('path', 'method', DB::raw('COUNT(*) as count'))
-            ->groupBy('path', 'method')
-            ->orderBy('count', 'DESC')
-            ->limit(10)
-            ->get();
-
-        // Requests by User
-        $requestsByUser = ApiLog::select('user_id', DB::raw('COUNT(*) as count'))
-            ->whereNotNull('user_id')
-            ->groupBy('user_id')
-            ->orderBy('count', 'DESC')
-            ->limit(10)
-            ->get();
-
-        // Error Count (HTTP status >= 400)
-        $errorCount = ApiLog::where('status', '>=', 400)->count();
 
         // 20 Recent Requests
         $recentRequests = ApiLog::orderBy('id', 'DESC')
@@ -56,13 +75,27 @@ class DashboardController extends Controller
         return response()->json([
             'success' => true,
             'data'    => [
-                'requests_today'       => $requestsToday,
-                'requests_last_7_days' => $requestsLast7Days,
-                'top_endpoints'        => $topEndpoints,
-                'requests_by_user'     => $requestsByUser,
-                'error_count'          => $errorCount,
-                'recent_requests'      => $recentRequests,
+                'sla_targets' => [
+                    'response_time_target'  => '< 200ms',
+                    'avg_response_time_ms'  => $avgDurationMs,
+                    'is_latency_compliant'  => $avgDurationMs <= 200.0,
+                    'error_rate_target'     => '< 1.00%',
+                    'current_error_rate'    => "{$errorRatePct}%",
+                    'is_error_compliant'    => $errorRatePct <= 1.00,
+                ],
+                'telemetry_counters' => [
+                    'total_requests'     => $totalRequests,
+                    'requests_today'     => $requestsToday,
+                    'error_count'        => $errorCount,
+                    'auth_failures_401'  => $authFailures401,
+                    'rate_limit_hits_429'=> $rateLimitHits429,
+                ],
+                'most_called_endpoints' => $mostCalledEndpoints,
+                'slowest_endpoints'     => $slowestEndpoints,
+                'requests_last_7_days'  => $requestsLast7Days,
+                'recent_requests'       => $recentRequests,
             ],
+            'message' => 'API Telemetry & APM Metrics retrieved',
         ]);
     }
 

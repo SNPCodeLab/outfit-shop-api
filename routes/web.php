@@ -21,10 +21,7 @@ Route::get('/', function () {
     $base = rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/');
 
     return response()->json([
-        'brand_name'         => 'KhmeRiel',
-        'brand_tagline'      => 'KhmeRiel • Clothing & POS MIS',
-        'brand_logo_url'     => 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png',
-        'system'             => 'KhmeRiel Store Stock & Point-of-Sale MIS API',
+        'system'             => 'Store Stock & Point-of-Sale MIS API',
         'version'            => '1.0.0',
         'status'             => 'online',
         'frontend_url'       => 'https://app.kesararamwithdigital.tech',
