@@ -32,16 +32,19 @@ class StatusController extends BaseApiController
             'acronym'     => 'SS-MIS',
             'version'     => 'v1.0.0',
             'api_status'  => 'Operational',
-            'database'    => $dbStatus,
-            'environment' => config('app.env', 'production'),
-            'frontend_url'=> 'https://app.kesararamwithdigital.tech',
-            'timestamp'   => now()->toIso8601String(),
+            'database'          => $dbStatus,
+            'environment'       => config('app.env', 'production'),
+            'frontend_url'      => 'https://app.kesararamwithdigital.tech',
+            'guide_url'         => url('/guide'),
+            'guide_api_url'     => url('/api/v1/guide'),
+            'documentation_url' => url('/guide'),
+            'timestamp'         => now()->toIso8601String(),
         ];
 
         if ($dbStatus === 'Disconnected') {
             $data['db_error'] = $dbError;
         }
 
-        return $this->successResponse($data, 'SS-MIS Backend Web API v1 is operational');
+        return $this->successResponse($data, 'API is operational');
     }
 }
