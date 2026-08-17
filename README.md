@@ -1,333 +1,138 @@
-# Store Stock and Point-of-Sale MIS API
+# Store Stock and Point-of-Sale Information System (SS-MIS) API
 
-RESTful API backend for retail clothing store inventory, supplier purchasing, and point-of-sale operations.
-
----
-
-## Tech Stack
-
-- **Backend**: Laravel 11 / PHP 8.3
-- **Primary Database**: PostgreSQL — Neon Cloud Managed Serverless (active production)
-- **Alternative Database**: Oracle SQL — via `yajra/laravel-oracle` (on-premise enterprise deployment)
-- **Authentication**: Laravel Sanctum Bearer Tokens
-- **Authorization**: Spatie Laravel-Permission (RBAC)
-- **Deployment**: Serverless Gateway (Vercel)
-
-## System Classification
-
-> **IS Type**: Transaction Processing System (TPS / OLTP) with embedded MIS Reporting  
-> **Architecture**: Monolithic, Headless REST API Backend  
-> **Access Model**: 4-Tier Role-Based Access Control (ADMIN → MANAGER → CASHIER → STAFF)
-
-SS-MIS processes routine retail transactions in real-time (POS checkout, stock deduction, purchase receiving) — qualifying it as a **TPS/OLTP system**. It also exposes structured management reports (low-stock, audit logs, dashboard stats), making it an **MIS reporting layer**. DSS and EIS capabilities are on the roadmap.
+RESTful API backend for retail clothing store inventory, supplier purchasing, POS checkout, and role-based administrative control.
 
 ---
 
-## Database Architecture
+## 1. System Classification
 
-### 1. Catalog and Inventory Domain
+IS Type: Transaction Processing System (TPS / OLTP) with embedded Management Information System (MIS) Reporting  
+Architecture: Monolithic, Headless REST API Backend  
+Access Model: 4-Tier Role-Based Access Control (Admin, Manager, Cashier, Staff)
+
+SS-MIS processes routine retail transactions in real-time (POS checkout, stock deduction, purchase receiving) qualifying it as a TPS/OLTP system. It also exposes structured management analytics (staff timesheets, financial waterfall, low-stock forecasts, audit logs), functioning as an MIS control layer.
+
+---
+
+## 2. Complete Database Entity Mindmap Diagram
+
 ```mermaid
-erDiagram
-    CATEGORIES ||--o{ PRODUCTS : "contains"
-    PRODUCTS ||--|{ PRODUCT_VARIANTS : "has variants"
-    CLOTHING_SIZES ||--o{ PRODUCT_VARIANTS : "defines size"
-    COLORS ||--o{ PRODUCT_VARIANTS : "defines color"
-    PRODUCT_VARIANTS ||--o{ STOCK_MOVEMENTS : "tracks changes"
+flowchart TB
+    root["SS-MIS Database Architecture"]
 
-    CATEGORIES {
-        bigint id PK
-        string category_name
-        text description
-    }
+    subgraph D1["Catalog and Product Domain"]
+        CATEGORIES["CATEGORIES<br/>- category_id PK<br/>- category_name<br/>- department_type<br/>- description"]
+        BRANDS["BRANDS<br/>- brand_id PK<br/>- brand_name<br/>- country_of_origin<br/>- description"]
+        PRODUCTS["PRODUCTS<br/>- product_id PK<br/>- category_id FK<br/>- brand_id FK<br/>- product_name<br/>- product_type<br/>- gender<br/>- material_fabric<br/>- season_collection<br/>- featured_badge<br/>- status"]
+        PRODUCT_IMAGES["PRODUCT_IMAGES<br/>- image_id PK<br/>- product_id FK<br/>- image_url<br/>- is_primary<br/>- sort_order"]
+        CLOTHING_SIZES["CLOTHING_SIZES<br/>- size_id PK<br/>- size_name<br/>- description"]
+        COLORS["COLORS<br/>- color_id PK<br/>- color_name<br/>- description"]
+        PRODUCT_VARIANTS["PRODUCT_VARIANTS<br/>- variant_id PK<br/>- product_id FK<br/>- size_id FK<br/>- color_id FK<br/>- sku<br/>- barcode<br/>- cost_price<br/>- sale_price<br/>- quantity<br/>- volume_or_weight"]
+    end
 
-    CLOTHING_SIZES {
-        bigint id PK
-        string size_code
-        string size_name
-        integer sort_order
-    }
+    subgraph D2["Sales and POS Domain"]
+        STORE_BRANCHES["STORE_BRANCHES<br/>- branch_id PK<br/>- branch_name<br/>- branch_code<br/>- address"]
+        CUSTOMERS["CUSTOMERS<br/>- customer_id PK<br/>- customer_name<br/>- phone<br/>- customer_type<br/>- loyalty_points"]
+        POS_SHIFTS["POS_SHIFTS<br/>- shift_id PK<br/>- employee_id FK<br/>- branch_id FK<br/>- opening_float_usd<br/>- status"]
+        SALE_HEADERS["SALE_HEADERS<br/>- sale_id PK<br/>- branch_id FK<br/>- employee_id FK<br/>- customer_id FK<br/>- total_amount<br/>- tax_rate (10%)<br/>- tax_amount<br/>- grand_total"]
+        SALE_DETAILS["SALE_DETAILS<br/>- detail_id PK<br/>- sale_id FK<br/>- variant_id FK<br/>- quantity<br/>- unit_price<br/>- line_total"]
+        PAYMENTS["PAYMENTS<br/>- payment_id PK<br/>- sale_id FK<br/>- payment_method<br/>- amount<br/>- status"]
+    end
 
-    COLORS {
-        bigint id PK
-        string color_name
-        string hex_code
-    }
+    subgraph D3["Purchasing and Inventory Domain"]
+        SUPPLIERS["SUPPLIERS<br/>- supplier_id PK<br/>- supplier_name<br/>- phone<br/>- address"]
+        PURCHASE_HEADERS["PURCHASE_HEADERS<br/>- purchase_id PK<br/>- supplier_id FK<br/>- employee_id FK<br/>- total_amount<br/>- status"]
+        PURCHASE_DETAILS["PURCHASE_DETAILS<br/>- detail_id PK<br/>- purchase_id FK<br/>- variant_id FK<br/>- quantity<br/>- cost_price"]
+        STOCK_MOVEMENTS["STOCK_MOVEMENTS<br/>- movement_id PK<br/>- variant_id FK<br/>- movement_type<br/>- quantity<br/>- new_quantity"]
+    end
 
-    PRODUCTS {
-        bigint id PK
-        bigint category_id FK
-        string product_name
-        string brand
-        text description
-        boolean is_active
-    }
+    subgraph D4["Administration and Security Domain"]
+        USERS["USERS<br/>- id PK<br/>- name<br/>- email"]
+        ROLES["ROLES<br/>- id PK<br/>- name<br/>- guard_name"]
+        PERMISSIONS["PERMISSIONS<br/>- id PK<br/>- name<br/>- guard_name"]
+        EMPLOYEES["EMPLOYEES<br/>- employee_id PK<br/>- branch_id FK<br/>- employee_name<br/>- position<br/>- status"]
+        SYSTEM_BROADCAST_ALERTS["SYSTEM_BROADCAST_ALERTS<br/>- alert_id PK<br/>- title<br/>- message<br/>- priority<br/>- target_role"]
+        AUDIT_LOGS["AUDIT_LOGS<br/>- log_id PK<br/>- user_id FK<br/>- action<br/>- table_name<br/>- ip_address"]
+    end
 
-    PRODUCT_VARIANTS {
-        bigint id PK
-        bigint product_id FK
-        bigint size_id FK
-        bigint color_id FK
-        string sku
-        string barcode
-        decimal cost_price
-        decimal sale_price
-        integer quantity
-        integer reorder_level
-        boolean is_active
-    }
+    root --> D1
+    root --> D2
+    root --> D3
+    root --> D4
 
-    STOCK_MOVEMENTS {
-        bigint id PK
-        bigint variant_id FK
-        bigint employee_id FK
-        string movement_type
-        integer quantity
-        integer previous_qty
-        integer new_qty
-        string reference_type
-        bigint reference_id
-        text reason
-    }
-```
+    CATEGORIES --> PRODUCTS
+    BRANDS --> PRODUCTS
+    PRODUCTS --> PRODUCT_VARIANTS
+    PRODUCTS --> PRODUCT_IMAGES
+    CLOTHING_SIZES --> PRODUCT_VARIANTS
+    COLORS --> PRODUCT_VARIANTS
 
-### 2. Point-of-Sale and Purchasing Domain
-```mermaid
-erDiagram
-    SUPPLIERS ||--o{ PURCHASE_HEADERS : "supplies"
-    EMPLOYEES ||--o{ PURCHASE_HEADERS : "creates PO"
-    PURCHASE_HEADERS ||--|{ PURCHASE_DETAILS : "contains lines"
-    PRODUCT_VARIANTS ||--o{ PURCHASE_DETAILS : "restocked in"
+    STORE_BRANCHES --> SALE_HEADERS
+    CUSTOMERS --> SALE_HEADERS
+    EMPLOYEES --> SALE_HEADERS
+    SALE_HEADERS --> SALE_DETAILS
+    SALE_HEADERS --> PAYMENTS
+    PRODUCT_VARIANTS --> SALE_DETAILS
 
-    CUSTOMERS ||--o{ SALE_HEADERS : "places"
-    EMPLOYEES ||--o{ SALE_HEADERS : "processes"
-    SALE_HEADERS ||--|{ SALE_DETAILS : "contains lines"
-    PRODUCT_VARIANTS ||--o{ SALE_DETAILS : "sold in"
-    SALE_HEADERS ||--|{ PAYMENTS : "settled with"
+    SUPPLIERS --> PURCHASE_HEADERS
+    EMPLOYEES --> PURCHASE_HEADERS
+    PURCHASE_HEADERS --> PURCHASE_DETAILS
+    PRODUCT_VARIANTS --> PURCHASE_DETAILS
+    PRODUCT_VARIANTS --> STOCK_MOVEMENTS
 
-    SUPPLIERS {
-        bigint id PK
-        string supplier_name
-        string contact_person
-        string phone
-        string email
-        text address
-        string status
-    }
-
-    CUSTOMERS {
-        bigint id PK
-        string customer_name
-        string gender
-        string phone
-        string email
-        text address
-        integer total_points
-    }
-
-    PURCHASE_HEADERS {
-        bigint id PK
-        bigint supplier_id FK
-        bigint employee_id FK
-        string reference_number
-        date purchase_date
-        decimal total_amount
-        string status
-    }
-
-    PURCHASE_DETAILS {
-        bigint id PK
-        bigint purchase_id FK
-        bigint variant_id FK
-        integer quantity
-        decimal unit_cost
-        decimal subtotal
-    }
-
-    SALE_HEADERS {
-        bigint id PK
-        string invoice_number
-        bigint customer_id FK
-        bigint employee_id FK
-        timestamp sale_date
-        decimal subtotal
-        decimal discount_amount
-        decimal tax_amount
-        decimal total_amount
-        string status
-    }
-
-    SALE_DETAILS {
-        bigint id PK
-        bigint sale_id FK
-        bigint variant_id FK
-        integer quantity
-        decimal unit_price
-        decimal discount_amount
-        decimal subtotal
-    }
-
-    PAYMENTS {
-        bigint id PK
-        bigint sale_id FK
-        string payment_method
-        decimal amount_paid
-        decimal change_amount
-        string payment_status
-        timestamp payment_date
-    }
-```
-
-### 3. Administration and Audit Domain
-```mermaid
-erDiagram
-    EMPLOYEES ||--o{ PURCHASE_HEADERS : "creates"
-    EMPLOYEES ||--o{ SALE_HEADERS : "processes"
-    EMPLOYEES ||--o{ STOCK_MOVEMENTS : "adjusts"
-    USERS ||--o{ AUDIT_LOGS : "triggers"
-    USERS ||--o{ PERSONAL_ACCESS_TOKENS : "owns"
-
-    EMPLOYEES {
-        bigint id PK
-        string username
-        string password_hash
-        string employee_name
-        string email
-        string phone
-        string gender
-        string position
-        string role
-        decimal salary
-        string status
-    }
-
-    USERS {
-        bigint id PK
-        string name
-        string email
-        string password
-        boolean is_admin
-    }
-
-    PERSONAL_ACCESS_TOKENS {
-        bigint id PK
-        string tokenable_type
-        bigint tokenable_id
-        string name
-        string token
-        text abilities
-    }
-
-    AUDIT_LOGS {
-        bigint id PK
-        bigint user_id FK
-        string action
-        string entity_type
-        bigint entity_id
-        json old_values
-        json new_values
-        string ip_address
-        text user_agent
-    }
+    USERS --> ROLES
+    ROLES --> PERMISSIONS
+    EMPLOYEES --> POS_SHIFTS
 ```
 
 ---
 
-## Role-Based Access Control
+## 3. Entity Domain Breakdown
 
-| Role | Access Level | Description |
-|---|---|---|
-| Public / Guest | Level 1 | Read-only catalog, sizes, colors, and stock lookup |
-| Cashier | Level 2 | POS checkout, customer management, invoice viewing |
-| Manager | Level 3 | Catalog CRUD, suppliers, purchase orders, stock adjustment, dashboard |
-| Admin | Level 4 | Employee administration, developer accounts, audit logs |
+### 3.1 Catalog and Product Domain
+The foundation of merchandise categorization, luxury sizing, color palettes, and stockable Stock Keeping Units (SKUs).
 
----
+- Categories: Organizes physical apparel and FMCG merchandise into Tops, Dresses, Pants, Jackets, Skirts, Polos, Bags, Shoes, and Beer.
+- Brands: Tracks manufacturers and luxury fashion labels.
+- Products: Master item records holding high-level product descriptions, fabric composition, and season collections.
+- Clothing Sizes: Standardized luxury apparel sizes (S, M, L, XL, OS).
+- Colors: Luxury palette definitions with hex color representations (Black, White, Gold).
+- Product Variants: Atomic matrix intersections of Product, Size, and Color holding exact inventory counts, costs, retail prices, and barcodes.
+- Product Images: CDN photo gallery records associated with product headers.
 
-## Core Endpoints
+### 3.2 Sales and Point-of-Sale Domain
+Manages real-time cash register shifts, retail transactions, customer loyalty balances, and payment processing.
 
-### Public (Level 0 and 1)
-- GET / - API route index
-- GET /api/v1/health - System and database status
-- POST /api/v1/auth/login - User authentication
-- GET /api/v1/categories - List product categories
-- GET /api/v1/products - List products with variant info
-- GET /api/v1/variants - List inventory variants
-- GET /api/v1/variants/barcode/{barcode} - Scan barcode lookup
+- Store Branches: Retail store and warehouse facility records.
+- Customers: Walk-in and registered VIP clientele tracking accumulated loyalty points and credit accounts.
+- POS Shifts: Daily cash drawer reconciliation, opening cash float, safe drops, and closing Z-reports.
+- Sale Headers: Immutable financial invoice master records calculating Net Amount, 10 percent VAT Tax Amount, and Grand Total.
+- Sale Details: Individual line items preserving the historical unit sale price at the exact second of checkout.
+- Payments: Multi-tender payment transactions (Cash USD, Cash KHR, ABA KHQR, Card).
 
-### Cashier (Level 2)
-- GET /api/v1/auth/me - Authenticated user profile
-- POST /api/v1/auth/logout - Invalidate current token
-- GET /api/v1/customers - Search customer records
-- POST /api/v1/customers - Register new customer
-- POST /api/v1/sales/checkout - Process sale transaction
-- GET /api/v1/sales - List sales receipts
+### 3.3 Purchasing and Inventory Domain
+Controls warehouse replenishment, vendor purchase orders, and stock audit ledgers.
 
-### Manager (Level 3)
-- GET /api/v1/dashboard/stats - Sales and request metrics
-- POST, PUT, DELETE /api/v1/products - Manage products
-- POST, PUT, DELETE /api/v1/variants - Manage SKU variants
-- POST, PUT, DELETE /api/v1/categories - Manage categories
-- GET, POST, PUT /api/v1/suppliers - Manage suppliers
-- GET, POST /api/v1/purchases - Purchase orders and restock
-- GET, POST /api/v1/stock-movements - Inventory tracking and manual adjustment
-- POST /api/v1/sales/{id}/void - Void sale transaction
+- Suppliers: Master records of fabric mills, apparel distributors, and beverage suppliers.
+- Purchase Headers and Details: Procurement transactions tracking cost prices, order quantities, and delivery statuses.
+- Stock Movements: Append-only audit ledger tracking every stock addition (Purchase Receipt, Adjustment In) and deduction (POS Sale, Adjustment Out).
 
-### Admin (Level 4)
-- GET, POST, PUT, DELETE /api/v1/employees - Manage employee accounts
-- POST /api/v1/auth/register - Register developer access
+### 3.4 Administration and Security Domain
+Manages role-based authentication, staff timesheets, emergency broadcast announcements, and audit inspection.
+
+- Users, Roles, and Permissions: Granular access control defining permissions across 4 user hierarchy levels.
+- Employees: Staff profiles assigned to specific store branches and job positions.
+- System Broadcast Alerts: Real-time broadcast messages dispatched by Admin to all users or specific roles.
+- Audit Logs: Immutable system activity trail recording payload changes, timestamps, and IP addresses.
 
 ---
 
-## Error Response Format
+## 4. Tax Calculation Standard
 
-All error responses follow standard REST API schema with Khmer localization text:
+The system enforces a 10.00 percent Tax-Exclusive Value Added Tax (VAT) formula:
 
-```json
-{
-  "message": "Custom message in Khmer",
-  "status": "401"
-}
-```
+1. Net Amount = Total Amount - Overall Discount
+2. Tax Amount (10 percent VAT) = Round(Net Amount * 0.10, 2)
+3. Grand Total = Net Amount + Tax Amount
 
-Common status codes:
-- 401: Unauthorized (missing or invalid Bearer token)
-- 403: Forbidden (insufficient role permissions)
-- 404: Not Found (resource does not exist)
-- 422: Unprocessable Content (validation failure)
-- 429: Too Many Requests (rate limit exceeded)
-- 500: Internal Server Error
-
----
-
-## Installation and Local Setup
-
-1. Clone repository and install dependencies:
-```bash
-composer install
-```
-
-2. Copy environment file and generate application key:
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-3. Configure database settings in .env:
-```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=ssmis_db
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-```
-
-4. Run migrations and seed default data:
-```bash
-php artisan migrate --seed
-```
-
-5. Start local development server:
-```bash
-php artisan serve
-```
+Historical Unit Price Rule: Unit prices stored in Sale Details are stamped permanently at checkout from Product Variants and are never modified by subsequent price changes in the product catalog.
