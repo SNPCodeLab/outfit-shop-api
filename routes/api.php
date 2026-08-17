@@ -329,6 +329,7 @@ Route::prefix('v1')->group(function () {
 
             // Admin Master Tracking Pulse & Broadcast Alert System
             Route::get('/admin/master-pulse',          [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'masterPulse']);
+            Route::get('/admin/performance',           [\App\Http\Controllers\Api\V1\AdminPerformanceController::class, 'performance']);
             Route::post('/admin/broadcast-alert',      [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'broadcastAlert']);
         });
     });
