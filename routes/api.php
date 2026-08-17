@@ -268,6 +268,16 @@ Route::prefix('v1')->group(function () {
             Route::get('/exports/sales-report/pdf',      [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportSalesReport']);
             Route::get('/exports/z-report/{id}/thermal', [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportZReportThermal']);
 
+            // Multi-Store Stock Transfers (5-Stage Lifecycle: Request -> Approve -> Pick -> Ship -> Receive)
+            Route::get('/stock-transfers',                 [\App\Http\Controllers\Api\V1\StockTransferController::class, 'index']);
+            Route::get('/stock-transfers/{id}',            [\App\Http\Controllers\Api\V1\StockTransferController::class, 'show']);
+            Route::post('/stock-transfers',                [\App\Http\Controllers\Api\V1\StockTransferController::class, 'store']);
+            Route::post('/stock-transfers/{id}/approve',   [\App\Http\Controllers\Api\V1\StockTransferController::class, 'approve']);
+            Route::post('/stock-transfers/{id}/pick',      [\App\Http\Controllers\Api\V1\StockTransferController::class, 'pick']);
+            Route::post('/stock-transfers/{id}/ship',      [\App\Http\Controllers\Api\V1\StockTransferController::class, 'ship']);
+            Route::post('/stock-transfers/{id}/receive',   [\App\Http\Controllers\Api\V1\StockTransferController::class, 'receive']);
+            Route::post('/stock-transfers/{id}/cancel',    [\App\Http\Controllers\Api\V1\StockTransferController::class, 'cancel']);
+
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
