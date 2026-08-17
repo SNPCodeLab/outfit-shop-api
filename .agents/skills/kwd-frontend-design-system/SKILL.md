@@ -6,6 +6,7 @@ description: >
   1. Internal Admin & Staff Controller Portal (Dashboard, Inventory, Sales, Reports, Audit, Employees) using Modern Enterprise UI (shadcn/ui + SalesBinder-style inventory matrices; NEVER use Neo-Brutalism in Portal 1).
   2. Customer-Facing Storefront & Product Showcase using Ralph Lauren-style luxury 3:4 catalog cards with micro color swatches and quick-shop drawers, fused with Neo-Brutalist design tokens.
   STRICT RULES:
+  - BRAND SCOPE: The brand name "KhmeRiel (Clothing MIS & POS)" is strictly for FRONTEND use only. NEVER use or mention this brand name in Backend API responses, endpoints, routes, status responses, or backend guides.
   - NEO-BRUTALISM SCOPE: Apply Neo-Brutalism ONLY to PORTAL 2 (Store Showcase / Public). NEVER use Neo-Brutalism in PORTAL 1 (Admin/Staff Portal).
   - NO black shadows (shadow-none or subtle tonal elevation only; no hard pitch-black drop shadows).
   - NEVER use emoji in UI, copy, buttons, badges, or code.

@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\SaleDetail;
 use App\Models\SaleHeader;
+use App\Models\StockMovement;
 use App\Services\AuditLogService;
 use App\Services\POSService;
 use Exception;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class InvoiceEstimateController extends BaseApiController
 {
@@ -30,7 +32,7 @@ class InvoiceEstimateController extends BaseApiController
     {
         $query = SaleHeader::with(['customer', 'employee', 'details.variant.product', 'details.variant.size', 'details.variant.color', 'payments']);
 
-        // Filter by Document Status (ESTIMATE, INVOICE, PAID, PENDING, VOIDED)
+        // Filter by Document Status (ESTIMATE, INVOICE, PAID, PENDING, VOIDED, COMPLETED)
         if ($status = $request->input('status')) {
             $query->where('status', strtoupper($status));
         }
@@ -52,7 +54,7 @@ class InvoiceEstimateController extends BaseApiController
 
         // Financial Totals Summary
         $totalInvoiced = (float) SaleHeader::where('status', '!=', 'VOIDED')->sum('grand_total');
-        $totalCollected = (float) Payment::where('status', 'COMPLETED')->sum('amount');
+        $totalCollected = (float) Payment::whereIn('payment_status', ['PAID', 'COMPLETED'])->sum('amount');
         $outstandingBalance = max(0, $totalInvoiced - $totalCollected);
 
         $summary = [
@@ -95,6 +97,7 @@ class InvoiceEstimateController extends BaseApiController
 
             $totalAmount = 0.0;
             $detailsData = [];
+            $stockWarnings = [];
 
             foreach ($validated['items'] as $item) {
                 $variant = ProductVariant::with(['product', 'size', 'color'])->findOrFail($item['variant_id']);
@@ -103,14 +106,18 @@ class InvoiceEstimateController extends BaseApiController
                 $unitPrice = (float) $variant->sale_price;
                 $lineTotal = max(0, ($unitPrice * $qty) - $itemDiscount);
 
+                if ($variant->quantity < $qty) {
+                    $stockWarnings[] = "SKU [{$variant->sku}] has {$variant->quantity} units available (requested {$qty}).";
+                }
+
                 $totalAmount += $lineTotal;
 
                 $detailsData[] = [
-                    'variant_id' => $variant->variant_id,
-                    'quantity'   => $qty,
-                    'unit_price' => $unitPrice,
-                    'discount'   => $itemDiscount,
-                    'sub_total'  => $lineTotal,
+                    'variant_id'      => $variant->variant_id,
+                    'quantity'        => $qty,
+                    'unit_price'      => $unitPrice,
+                    'discount_amount' => $itemDiscount,
+                    'sub_total'       => $lineTotal,
                 ];
             }
 
@@ -119,16 +126,21 @@ class InvoiceEstimateController extends BaseApiController
             $grandTotal = round($netAmount + $taxAmount, 2);
 
             $estimate = SaleHeader::create([
-                'customer_id'  => $validated['customer_id'],
-                'employee_id'  => $employeeId,
-                'sale_date'    => now(),
-                'total_amount' => $totalAmount,
-                'discount'     => $overallDiscount,
-                'tax_rate'     => $taxRate,
-                'tax_amount'   => $taxAmount,
-                'grand_total'  => $grandTotal,
-                'status'       => 'ESTIMATE',
+                'customer_id'     => $validated['customer_id'],
+                'employee_id'     => $employeeId,
+                'sale_date'       => now(),
+                'total_amount'    => $totalAmount,
+                'discount'        => $overallDiscount,
+                'tax_rate'        => $taxRate,
+                'tax_amount'      => $taxAmount,
+                'grand_total'     => $grandTotal,
+                'payment_status'  => 'UNPAID',
+                'status'          => 'ESTIMATE',
+                'notes'           => $validated['notes'] ?? null,
             ]);
+
+            $estimateNo = 'EST-' . now()->format('Ymd') . '-' . str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+            $estimate->update(['invoice_no' => $estimateNo]);
 
             foreach ($detailsData as $detail) {
                 SaleDetail::create(array_merge($detail, ['sale_id' => $estimate->sale_id]));
@@ -138,7 +150,7 @@ class InvoiceEstimateController extends BaseApiController
                 action: 'CREATE_ESTIMATE',
                 entity: 'SaleHeader',
                 entityId: $estimate->sale_id,
-                newValues: ['status' => 'ESTIMATE', 'grand_total' => $grandTotal]
+                newValues: ['status' => 'ESTIMATE', 'invoice_no' => $estimateNo, 'grand_total' => $grandTotal]
             );
 
             return $this->successResponse(
@@ -150,7 +162,7 @@ class InvoiceEstimateController extends BaseApiController
     }
 
     /**
-     * 1-Click Convert an approved Estimate into an Official Invoice & deduct stock.
+     * 1-Click Convert an approved Estimate into an Official Invoice & deduct stock with full movement ledger.
      *
      * @param Request $request
      * @param int $id
@@ -158,34 +170,70 @@ class InvoiceEstimateController extends BaseApiController
      */
     public function convertEstimateToInvoice(Request $request, int $id): JsonResponse
     {
-        $estimate = SaleHeader::with(['details.variant'])->findOrFail($id);
+        $estimate = SaleHeader::with(['details.variant.product'])->findOrFail($id);
 
         if ($estimate->status === 'COMPLETED' || $estimate->status === 'PAID') {
-            return $this->errorResponse('This document is already an active/paid invoice.', 400);
+            return $this->errorResponse('This document is already an active/paid invoice.', 400, 'ERR_ALREADY_CONVERTED');
         }
 
         try {
             return DB::transaction(function () use ($estimate, $request) {
-                // Deduct physical inventory and verify stock availability
+                $employeeId = $request->user()?->employee_id ?? $request->user()?->id ?? 1;
+
+                // Deduct physical inventory, verify stock availability, and write StockMovement audit trail
                 foreach ($estimate->details as $detail) {
                     $variant = ProductVariant::lockForUpdate()->find($detail->variant_id);
-                    if ($variant->quantity < $detail->quantity) {
-                        throw new Exception("Insufficient stock for SKU [{$variant->sku}]. Available: {$variant->quantity}, Required: {$detail->quantity}.");
+                    if (!$variant) {
+                        throw new Exception("Product variant ID {$detail->variant_id} not found.");
                     }
-                    $variant->decrement('quantity', $detail->quantity);
+
+                    $isDigital = ($variant->product->product_type ?? 'PHYSICAL_APPAREL') === 'DIGITAL_DOWNLOAD';
+
+                    if (!$isDigital) {
+                        if ($variant->quantity < $detail->quantity) {
+                            throw new Exception("Insufficient stock for SKU [{$variant->sku}]. Available: {$variant->quantity}, Required: {$detail->quantity}.");
+                        }
+
+                        $stockBefore = (int) $variant->quantity;
+                        $variant->decrement('quantity', $detail->quantity);
+                        $stockAfter = $stockBefore - $detail->quantity;
+
+                        StockMovement::create([
+                            'variant_id'     => $variant->variant_id,
+                            'movement_type'  => 'SALE',
+                            'quantity'       => -$detail->quantity,
+                            'stock_before'   => $stockBefore,
+                            'stock_after'    => $stockAfter,
+                            'movement_date'  => now(),
+                            'reference_type' => 'SaleHeader',
+                            'reference_id'   => $estimate->sale_id,
+                            'note'           => "Converted from Estimate #{$estimate->sale_id}",
+                            'created_by'     => $employeeId,
+                        ]);
+                    }
                 }
 
-                $estimate->update(['status' => 'COMPLETED']);
+                $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+                $paymentMethod = $request->input('payment_method');
+                $paymentStatus = $paymentMethod ? 'PAID' : 'UNPAID';
+
+                $estimate->update([
+                    'status'         => 'COMPLETED',
+                    'invoice_no'     => $invoiceNo,
+                    'payment_status' => $paymentStatus,
+                ]);
 
                 // Auto-register payment if provided
-                if ($paymentMethod = $request->input('payment_method')) {
+                if ($paymentMethod) {
                     Payment::create([
-                        'sale_id'               => $estimate->sale_id,
-                        'payment_method'        => strtoupper($paymentMethod),
-                        'amount'                => $estimate->grand_total,
-                        'payment_date'          => now(),
-                        'transaction_reference' => 'CONV-' . strtoupper(uniqid()),
-                        'status'                => 'COMPLETED',
+                        'sale_id'         => $estimate->sale_id,
+                        'payment_method'  => strtoupper($paymentMethod),
+                        'amount'          => $estimate->grand_total,
+                        'amount_tendered' => $estimate->grand_total,
+                        'change_due'      => 0.00,
+                        'payment_date'    => now(),
+                        'transaction_ref' => 'CONV-' . strtoupper(Str::random(8)),
+                        'payment_status'  => 'PAID',
                     ]);
                 }
 
@@ -194,16 +242,17 @@ class InvoiceEstimateController extends BaseApiController
                     entity: 'SaleHeader',
                     entityId: $estimate->sale_id,
                     oldValues: ['status' => 'ESTIMATE'],
-                    newValues: ['status' => 'COMPLETED']
+                    newValues: ['status' => 'COMPLETED', 'invoice_no' => $invoiceNo, 'payment_status' => $paymentStatus],
+                    userId: $employeeId
                 );
 
                 return $this->successResponse(
                     $estimate->fresh(['customer', 'employee', 'details.variant.product', 'payments']),
-                    'Estimate #' . $estimate->sale_id . ' successfully converted to official Invoice!'
+                    'Estimate #' . $estimate->sale_id . " successfully converted to official Invoice [{$invoiceNo}]!"
                 );
             });
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400);
+            return $this->errorResponse($e->getMessage(), 400, 'ERR_CONVERT_FAILED');
         }
     }
 

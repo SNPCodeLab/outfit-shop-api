@@ -1,0 +1,282 @@
+{
+	"info": {
+		"_postman_id": "a91b2c3d-e4f5-4678-90ab-cdef12345678",
+		"name": "Retail Clothing Store MIS & POS API (SS-MIS / CSMS)",
+		"description": "Master Postman Collection for Retail Clothing Store Management System with 4-Tier RBAC (ADMIN, MANAGER, CASHIER, STAFF).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api.kesararamwithdigital.tech/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "bearer_token",
+			"value": "1|demo_token_here",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication & System",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "Cashier / Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"cashier1\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Current Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Storefront & Catalog",
+			"item": [
+				{
+					"name": "List Products (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["products"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "per_page", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "2D Variant Matrix (Size x Color)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products/1/matrix",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1", "matrix"]
+						}
+					}
+				},
+				{
+					"name": "Barcode Scanner Lookup",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/variants/barcode/SHIRT-BLK-M-001",
+							"host": ["{{base_url}}"],
+							"path": ["variants", "barcode", "SHIRT-BLK-M-001"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. POS & Cash Shifts",
+			"item": [
+				{
+					"name": "Open Shift (Cash Float)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"opening_float_usd\": 100.00,\n  \"opening_float_khr\": 410000.00,\n  \"notes\": \"Morning shift\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shifts/open",
+							"host": ["{{base_url}}"],
+							"path": ["shifts", "open"]
+						}
+					}
+				},
+				{
+					"name": "Execute POS Checkout (10% VAT)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Idempotency-Key", "value": "POS-TXN-20260817-001" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 150.00,\n  \"tax_rate\": 10.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/checkout",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "checkout"]
+						}
+					}
+				},
+				{
+					"name": "Close Shift & Z-Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"closing_cash_usd\": 221.00,\n  \"notes\": \"End of day closing\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/shifts/close",
+							"host": ["{{base_url}}"],
+							"path": ["shifts", "close"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Inventory & Purchasing",
+			"item": [
+				{
+					"name": "Stock Movement Ledger",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/stock-movements?page=1&per_page=25",
+							"host": ["{{base_url}}"],
+							"path": ["stock-movements"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "per_page", "value": "25" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Restock Recommendations Forecast",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/inventory/restock-recommendations",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", "restock-recommendations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Telemetry & Admin Command",
+			"item": [
+				{
+					"name": "API Telemetry & APM Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "stats"]
+						}
+					}
+				},
+				{
+					"name": "Role-Pulse Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/role-pulse",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "role-pulse"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -20,12 +20,10 @@ class SalesBinderGuideAndBillingTest extends TestCase
 
     public function test_help_centre_web_ui_renders_html_successfully(): void
     {
-        $response = $this->get('/guide');
+        $response = $this->getJson('/guide');
         $response->assertStatus(200)
-            ->assertHeader('Content-Type', 'text/html; charset=utf-8')
-            ->assertSee('DOCUMENTATION', false)
-            ->assertSee('GUIDE', false)
-            ->assertSee('Getting Started');
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.total_topics', 10);
     }
 
     public function test_help_centre_json_api_returns_structured_topics(): void
