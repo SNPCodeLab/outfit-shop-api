@@ -18,8 +18,6 @@ class SystemSettingController extends Controller
                 'scanner_beep'   => 'https://res.cloudinary.com/od8t271n/video/upload/v1786898754/khmeriel/audio/KHMERIEL_POS_SCANNER_AUDIO_FX_SMS_audio_001.wav',
                 'success_chime'  => 'https://res.cloudinary.com/od8t271n/video/upload/v1786898754/khmeriel/audio/KHMERIEL_POS_SCANNER_AUDIO_FX_SOUNDWARNING_audio_002.wav',
                 'warning_buzz'   => 'https://res.cloudinary.com/od8t271n/video/upload/v1786898754/khmeriel/audio/KHMERIEL_POS_SCANNER_AUDIO_FX_WARNING_audio_003.wav',
-                'brand_name'     => 'KhmeRiel',
-                'brand_tagline'  => 'KhmeRiel • Clothing & POS MIS',
                 'currency'       => 'USD',
                 'currency_khmer' => 'KHR',
                 'khr_exchange_rate' => 4100,
