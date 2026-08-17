@@ -278,6 +278,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/stock-transfers/{id}/receive',   [\App\Http\Controllers\Api\V1\StockTransferController::class, 'receive']);
             Route::post('/stock-transfers/{id}/cancel',    [\App\Http\Controllers\Api\V1\StockTransferController::class, 'cancel']);
 
+            // Advanced MIS Financial & Operational Reports
+            Route::get('/reports/sales',                     [\App\Http\Controllers\Api\V1\ReportController::class, 'sales']);
+            Route::get('/reports/inventory-valuation',       [\App\Http\Controllers\Api\V1\ReportController::class, 'inventoryValuation']);
+            Route::get('/reports/stock-aging',               [\App\Http\Controllers\Api\V1\ReportController::class, 'stockAging']);
+            Route::get('/reports/customer-purchase-history', [\App\Http\Controllers\Api\V1\ReportController::class, 'customerPurchaseHistory']);
+            Route::get('/reports/supplier-performance',      [\App\Http\Controllers\Api\V1\ReportController::class, 'supplierPerformance']);
+            Route::get('/reports/profit-margin',             [\App\Http\Controllers\Api\V1\ReportController::class, 'profitMargin']);
+            Route::get('/reports/cash-flow',                 [\App\Http\Controllers\Api\V1\ReportController::class, 'cashFlow']);
+
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
