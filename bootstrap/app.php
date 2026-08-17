@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\LogApiRequests::class,
+            \App\Http\Middleware\SetLocaleFromHeaderMiddleware::class,
         ]);
 
         $middleware->web(append: [
