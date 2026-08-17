@@ -1,7 +1,7 @@
-# KhmeRiel MIS & POS — SalesBinder Help Centre & Knowledge Base
+# Store Stock & Point-of-Sale MIS — Help Centre & Operations Guide
 
 > **How can we help?**  
-> Find clear answers, step-by-step guides, and practical tips to help you get more from KhmeRiel Store Stock & Point-of-Sale Information System.
+> Find clear answers, step-by-step guides, and practical tips to help you get more from Store Stock & Point-of-Sale Information System.
 
 ---
 
