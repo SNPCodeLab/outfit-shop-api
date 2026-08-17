@@ -44,6 +44,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/status', [StatusController::class, 'index']);
     Route::get('/guide',  [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
     Route::get('/docs',   [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+    Route::get('/openapi.json', function () {
+        $path = base_path('API-Delivery-Package/openapi_spec.json');
+        return response()->file($path, ['Content-Type' => 'application/json']);
+    });
+    Route::get('/postman.json', function () {
+        $path = base_path('API-Delivery-Package/postman_collection.json');
+        return response()->file($path, ['Content-Type' => 'application/json']);
+    });
 
     // Authentication — rate-limited to prevent brute-force (10 attempts / min)
     Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
