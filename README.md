@@ -1,163 +1,253 @@
-# KhmeRiel MIS & POS — Enterprise Backend Web API
+# Store Stock and Point-of-Sale Information System (SS-MIS) API
 
-> **System Name**: KhmeRiel Store Stock & Point-of-Sale Information System  
-> **Production API**: `https://api.kesararamwithdigital.tech/api/v1`  
-> **Local API**: `http://127.0.0.1:8000/api/v1`  
-> **Frontend App**: `https://app.kesararamwithdigital.tech`  
-> **Repository**: [`SNPbuilds/csms-backend-api`](https://github.com/SNPbuilds/csms-backend-api)  
-> **Default Tax**: `10.00% Tax-Exclusive (VAT)`
+RESTful API backend for retail clothing store inventory, supplier purchasing, POS checkout, and role-based administrative control.
 
 ---
 
-## 1. Documentation Index
+## 1. System Classification
 
-- 📋 **[Product Catalog & Variant Matrix](file:///Users/Apple16/Desktop/SS_MIS/PRODUCT_CATALOG_DATA_DOCUMENT.md)**: Full breakdown of all 10 products, 26 variants, SKUs, barcodes, pricing, and 2D stock matrices.
-- 🔐 **[Frontend API Service & RBAC Guide](file:///Users/Apple16/Desktop/SS_MIS/FRONTEND_API_SERVICE_RBAC_GUIDE.md)**: Frontend contract for Next.js client developers covering all 122 API routes and role guards.
-- ⚡ **[Postman Collection & Quickstart](file:///Users/Apple16/Desktop/SS_MIS/postman/README.md)**: Ready-to-import Postman v2.1.0 collection with pre-filled bearer tokens.
-- 🧠 **[Master API Skill Guide](file:///Users/Apple16/Desktop/SS_MIS/.agents/skills/ssmis-api-master-guide/SKILL.md)**: Architecture design rules and mathematical tax formulations.
+IS Type: Transaction Processing System (TPS / OLTP) with embedded Management Information System (MIS) Reporting  
+Architecture: Monolithic, Headless REST API Backend  
+Access Model: 4-Tier Role-Based Access Control (Admin, Manager, Cashier, Staff)
+
+SS-MIS processes routine retail transactions in real-time (POS checkout, stock deduction, purchase receiving) qualifying it as a TPS/OLTP system. It also exposes structured management analytics (staff timesheets, financial waterfall, low-stock forecasts, audit logs), functioning as an MIS control layer.
 
 ---
 
-## 2. System Architecture & Tech Stack
+## 2. Complete Database Entity Mindmap Diagram
 
 ```mermaid
-graph TD
-    Client["🖥️ Frontend Client (Next.js / POS Terminal)"] -->|HTTPS / JSON REST| GW["⚡ API Gateway (Laravel 11 / Sanctum)"]
-    GW -->|RBAC Guard| Spatie["🛡️ Spatie Permission (Admin, Manager, Cashier, Staff)"]
-    GW -->|Primary DB| PG["🐘 Neon Cloud Managed PostgreSQL 17 (AWS)"]
-    GW -->|Media Assets| CDN["☁️ Cloudinary Edge CDN (od8t271n)"]
-    GW -->|Analytics Engine| AP["📊 Admin Master Pulse & Role Pulse"]
+mindmap
+  root((SS-MIS Database Architecture))
+    Catalog and Product Domain
+      CATEGORIES
+        category_id PK
+        category_name
+        department_type
+        description
+      BRANDS
+        brand_id PK
+        brand_name
+        country_of_origin
+        description
+      PRODUCTS
+        product_id PK
+        category_id FK
+        brand_id FK
+        product_name
+        product_type
+        gender
+        material_fabric
+        season_collection
+        featured_badge
+        author_artist
+        isbn_code
+        description
+        status
+      PRODUCT_IMAGES
+        image_id PK
+        product_id FK
+        image_url
+        is_primary
+        sort_order
+      CLOTHING_SIZES
+        size_id PK
+        size_name
+        description
+      COLORS
+        color_id PK
+        color_name
+        description
+      PRODUCT_VARIANTS
+        variant_id PK
+        product_id FK
+        size_id FK
+        color_id FK
+        sku
+        barcode
+        cost_price
+        sale_price
+        wholesale_price
+        quantity
+        reorder_level
+        unit_of_measure
+        volume_or_weight
+        alcohol_by_volume
+        download_file_url
+    Sales and POS Domain
+      STORE_BRANCHES
+        branch_id PK
+        branch_name
+        branch_code
+        address
+        phone
+      CUSTOMERS
+        customer_id PK
+        customer_name
+        phone
+        email
+        customer_type
+        loyalty_points
+        credit_balance
+      POS_SHIFTS
+        shift_id PK
+        employee_id FK
+        branch_id FK
+        opened_at
+        closed_at
+        opening_float_usd
+        opening_float_khr
+        closing_cash_usd
+        status
+      SALE_HEADERS
+        sale_id PK
+        branch_id FK
+        employee_id FK
+        customer_id FK
+        sale_date
+        total_amount
+        discount
+        tax_rate
+        tax_amount
+        grand_total
+        status
+      SALE_DETAILS
+        detail_id PK
+        sale_id FK
+        variant_id FK
+        quantity
+        unit_price
+        discount
+        line_total
+      PAYMENTS
+        payment_id PK
+        sale_id FK
+        payment_method
+        amount
+        currency
+        status
+    Purchasing and Inventory Domain
+      SUPPLIERS
+        supplier_id PK
+        supplier_name
+        contact_person
+        phone
+        email
+        address
+      PURCHASE_HEADERS
+        purchase_id PK
+        supplier_id FK
+        employee_id FK
+        purchase_date
+        total_amount
+        status
+      PURCHASE_DETAILS
+        detail_id PK
+        purchase_id FK
+        variant_id FK
+        quantity
+        cost_price
+        line_total
+      STOCK_MOVEMENTS
+        movement_id PK
+        variant_id FK
+        movement_type
+        quantity
+        previous_quantity
+        new_quantity
+        reference_type
+        reference_id
+    Administration and Security Domain
+      USERS
+        id PK
+        name
+        email
+        password
+      ROLES
+        id PK
+        name
+        guard_name
+      PERMISSIONS
+        id PK
+        name
+        guard_name
+      EMPLOYEES
+        employee_id PK
+        branch_id FK
+        employee_name
+        gender
+        phone
+        email
+        position
+        status
+      SYSTEM_BROADCAST_ALERTS
+        alert_id PK
+        created_by_user_id FK
+        title
+        message
+        priority
+        target_role
+        is_active
+        expires_at
+      AUDIT_LOGS
+        log_id PK
+        user_id FK
+        action
+        table_name
+        record_id
+        old_values
+        new_values
+        ip_address
 ```
-
-- **Framework**: Laravel 11 / PHP 8.3 & 8.5
-- **Primary Database**: PostgreSQL 17 on Neon Serverless Cloud (`neondb` on AWS us-east-1)
-- **Media CDN**: Cloudinary Edge Delivery (`https://res.cloudinary.com/od8t271n/image/upload/`)
-- **Authentication**: Laravel Sanctum Bearer Tokens (Multi-guard)
-- **Authorization**: Spatie Role-Based Access Control (RBAC)
-- **Tax Model**: 10.00% Tax-Exclusive Standard VAT Formula
 
 ---
 
-## 3. Comprehensive Database Entity Architecture
+## 3. Entity Domain Breakdown
 
-```mermaid
-erDiagram
-    BRANDS ||--o{ PRODUCTS : manufactures
-    CATEGORIES ||--o{ PRODUCTS : classifies
-    PRODUCTS ||--|{ PRODUCT_VARIANTS : has
-    CLOTHING_SIZES ||--o{ PRODUCT_VARIANTS : sizes
-    COLORS ||--o{ PRODUCT_VARIANTS : colors
-    PRODUCT_VARIANTS ||--o{ SALE_DETAILS : sold_in
-    PRODUCT_VARIANTS ||--o{ PURCHASE_DETAILS : bought_in
-    PRODUCT_VARIANTS ||--o{ STOCK_MOVEMENTS : tracks
+### 3.1 Catalog and Product Domain
+The foundation of merchandise categorization, luxury sizing, color palettes, and stockable Stock Keeping Units (SKUs).
 
-    CUSTOMERS ||--o{ SALE_HEADERS : places
-    EMPLOYEES ||--o{ SALE_HEADERS : operates
-    STORE_BRANCHES ||--o{ SALE_HEADERS : transacts_at
-    SALE_HEADERS ||--|{ SALE_DETAILS : contains
-    SALE_HEADERS ||--o{ PAYMENTS : paid_by
+- Categories: Organizes physical apparel and FMCG merchandise into Tops, Dresses, Pants, Jackets, Skirts, Polos, Bags, Shoes, and Beer.
+- Brands: Tracks manufacturers and luxury fashion labels.
+- Products: Master item records holding high-level product descriptions, fabric composition, and season collections.
+- Clothing Sizes: Standardized luxury apparel sizes (S, M, L, XL, OS).
+- Colors: Luxury palette definitions with hex color representations (Black, White, Gold).
+- Product Variants: Atomic matrix intersections of Product, Size, and Color holding exact inventory counts, costs, retail prices, and barcodes.
+- Product Images: CDN photo gallery records associated with product headers.
 
-    SUPPLIERS ||--o{ PURCHASE_HEADERS : supplies
-    EMPLOYEES ||--o{ PURCHASE_HEADERS : approves
-    PURCHASE_HEADERS ||--|{ PURCHASE_DETAILS : contains
+### 3.2 Sales and Point-of-Sale Domain
+Manages real-time cash register shifts, retail transactions, customer loyalty balances, and payment processing.
 
-    USERS ||--o{ MODEL_HAS_ROLES : assigned
-    ROLES ||--o{ MODEL_HAS_ROLES : grants
-    ROLES ||--o{ ROLE_HAS_PERMISSIONS : contains
-    PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS : defines
+- Store Branches: Retail store and warehouse facility records.
+- Customers: Walk-in and registered VIP clientele tracking accumulated loyalty points and credit accounts.
+- POS Shifts: Daily cash drawer reconciliation, opening cash float, safe drops, and closing Z-reports.
+- Sale Headers: Immutable financial invoice master records calculating Net Amount, 10 percent VAT Tax Amount, and Grand Total.
+- Sale Details: Individual line items preserving the historical unit sale price at the exact second of checkout.
+- Payments: Multi-tender payment transactions (Cash USD, Cash KHR, ABA KHQR, Card).
 
-    EMPLOYEES ||--o{ POS_SHIFTS : logs_shift
-    STORE_BRANCHES ||--o{ POS_SHIFTS : hosts
-    USERS ||--o{ SYSTEM_BROADCAST_ALERTS : dispatches
-```
+### 3.3 Purchasing and Inventory Domain
+Controls warehouse replenishment, vendor purchase orders, and stock audit ledgers.
 
----
+- Suppliers: Master records of fabric mills, apparel distributors, and beverage suppliers.
+- Purchase Headers and Details: Procurement transactions tracking cost prices, order quantities, and delivery statuses.
+- Stock Movements: Append-only audit ledger tracking every stock addition (Purchase Receipt, Adjustment In) and deduction (POS Sale, Adjustment Out).
 
-## 4. Master Data Entities & Schema Dictionary
+### 3.4 Administration and Security Domain
+Manages role-based authentication, staff timesheets, emergency broadcast announcements, and audit inspection.
 
-### 4.1 Master Catalog Entities
-| Table Name | Primary Key | Foreign Keys | Key Attributes | Purpose |
-| :--- | :---: | :--- | :--- | :--- |
-| **`brands`** | `brand_id` | — | `brand_name`, `country_of_origin`, `description` | 5 verified fashion and beverage brands |
-| **`categories`** | `category_id` | `parent_id` | `category_name`, `department_type`, `description` | 9 departments (Tops, Dresses, Beer...) |
-| **`clothing_sizes`** | `size_id` | — | `size_name`, `description` | Luxury sizes (`S`, `M`, `L`, `XL`, `OS`) |
-| **`colors`** | `color_id` | — | `color_name`, `description` | Luxury palette (`Black`, `White`, `Gold`) |
-| **`products`** | `product_id` | `brand_id`, `category_id` | `product_name`, `gender`, `material_fabric`, `image_url` | 10 master product styles |
-| **`product_variants`** | `variant_id` | `product_id`, `size_id`, `color_id` | `sku`, `barcode`, `cost_price`, `sale_price`, `quantity`, `volume_or_weight`, `alcohol_by_volume` | 26 active sellable item combinations |
-| **`product_images`** | `image_id` | `product_id` | `image_url`, `is_primary`, `sort_order` | Multi-shot high-res product photos |
-
-### 4.2 Point-of-Sale & Financial Entities
-| Table Name | Primary Key | Foreign Keys | Key Attributes | Purpose |
-| :--- | :---: | :--- | :--- | :--- |
-| **`sale_headers`** | `sale_id` | `customer_id`, `employee_id`, `branch_id` | `sale_date`, `total_amount`, `discount`, `tax_rate`, `tax_amount`, `grand_total`, `status` | Header invoice record with 10% VAT |
-| **`sale_details`** | `detail_id` | `sale_id`, `variant_id` | `quantity`, `unit_price`, `discount`, `subtotal` | Stamped historical sales lines |
-| **`payments`** | `payment_id` | `sale_id` | `payment_method`, `amount_paid`, `reference_number` | Tender ledger (Cash, ABA, Card, KHQR) |
-| **`pos_shifts`** | `shift_id` | `employee_id`, `branch_id` | `opened_at`, `closed_at`, `opening_float_usd`, `closing_cash_usd`, `status`, `z_report_summary` | Cash drawer register tracking |
-
-### 4.3 Supply Chain & Inventory Entities
-| Table Name | Primary Key | Foreign Keys | Key Attributes | Purpose |
-| :--- | :---: | :--- | :--- | :--- |
-| **`suppliers`** | `supplier_id` | — | `supplier_name`, `phone`, `email`, `address` | Master supplier and factory contacts |
-| **`purchase_headers`**| `purchase_id`| `supplier_id`, `employee_id` | `purchase_date`, `total_amount`, `status` | Purchase orders sent to suppliers |
-| **`purchase_details`**| `detail_id` | `purchase_id`, `variant_id` | `quantity_ordered`, `quantity_received`, `cost_price`, `subtotal` | Stamped PO lines |
-| **`stock_movements`** | `movement_id`| `variant_id`, `employee_id` | `movement_type`, `quantity`, `reference_type`, `reference_id` | Immutable inventory deduction audit trail |
-
-### 4.4 Enterprise RBAC & Security Entities
-| Table Name | Primary Key | Foreign Keys | Key Attributes | Purpose |
-| :--- | :---: | :--- | :--- | :--- |
-| **`users`** | `id` | — | `name`, `email`, `password`, `created_at` | Authenticated portal user accounts |
-| **`employees`** | `employee_id` | `branch_id`, `user_id` | `employee_name`, `phone`, `email`, `position`, `role` | Staff and employee personnel directory |
-| **`store_branches`** | `branch_id` | — | `branch_name`, `branch_code`, `address`, `phone` | Retail store and warehouse locations |
-| **`roles`** | `id` | — | `name`, `guard_name` | Spatie RBAC Roles (`admin`, `manager`, `cashier`, `staff`) |
-| **`permissions`** | `id` | — | `name`, `guard_name` | 42 granular system permissions |
-| **`system_broadcast_alerts`**| `alert_id`| `created_by_user_id`| `title`, `message`, `priority`, `target_role`, `is_active` | Real-time broadcast alerts & reminders |
-| **`audit_logs`** | `audit_id` | `user_id` | `action`, `model_type`, `model_id`, `ip_address`, `changes_payload` | Immutable security audit trail |
+- Users, Roles, and Permissions: Granular access control defining permissions across 4 user hierarchy levels.
+- Employees: Staff profiles assigned to specific store branches and job positions.
+- System Broadcast Alerts: Real-time broadcast messages dispatched by Admin to all users or specific roles.
+- Audit Logs: Immutable system activity trail recording payload changes, timestamps, and IP addresses.
 
 ---
 
-## 5. Role-Based Access Control (4 Levels)
+## 4. Tax Calculation Standard
 
-```
-┌─────────────────┬──────────┬───────────────────────────────┬───────────────────────────────────────┐
-│ User Role       │ Level    │ Primary Interface             │ Permissions Scope                     │
-├─────────────────┼──────────┼───────────────────────────────┼───────────────────────────────────────┤
-│ 🌐 PUBLIC       │ Level 1  │ Luxury Storefront Catalog     │ Read-only products, categories, matrix│
-│ 💳 CASHIER      │ Level 2  │ POS Touch Register & Scanner  │ Checkout, receipt, KHQR, open shift   │
-│ 📦 STAFF        │ Level 2  │ Showroom & Floor Lookup       │ Barcode scan, stock lookup, low-stock │
-│ 👔 MANAGER      │ Level 3  │ Store Management & Inventory  │ CRUD products/variants, void, POs     │
-│ 👑 ADMIN        │ Level 4  │ Master Command & Security     │ Full system CRUD, staff timesheets,   │
-│                 │          │                               │ financial waterfall, broadcast alerts │
-└─────────────────┴──────────┴───────────────────────────────┴───────────────────────────────────────┘
-```
+The system enforces a 10.00 percent Tax-Exclusive Value Added Tax (VAT) formula:
 
----
+1. Net Amount = Total Amount - Overall Discount
+2. Tax Amount (10 percent VAT) = Round(Net Amount * 0.10, 2)
+3. Grand Total = Net Amount + Tax Amount
 
-## 6. Financial VAT Formula (10% Tax-Exclusive)
-
-$$\text{Net Amount} = \text{Total Amount} - \text{Overall Discount}$$
-$$\text{Tax Amount (10\% VAT)} = \text{Round}\left(\text{Net Amount} \times 0.10, 2\right)$$
-$$\text{Grand Total Payable} = \text{Net Amount} + \text{Tax Amount}$$
-
-*Example: Selling 1 Silk Shirt ($65.00) $\to$ Net = $65.00 $\to$ 10% VAT = $6.50 $\to$ Grand Total = **$71.50**.*
-
----
-
-## 7. Quickstart & Local Setup
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/SNPbuilds/csms-backend-api.git
-cd csms-backend-api
-
-# 2. Install PHP dependencies
-composer install
-
-# 3. Configure environment
-cp .env.example .env
-
-# 4. Start local development server
-php artisan serve --host=127.0.0.1 --port=8000
-```
-
-- API Base: `http://127.0.0.1:8000/api/v1`
-- Postman Collection: [`postman/khmeriel_ssmis_postman_collection.json`](file:///Users/Apple16/Desktop/SS_MIS/postman/khmeriel_ssmis_postman_collection.json)
+Historical Unit Price Rule: Unit prices stored in Sale Details are stamped permanently at checkout from Product Variants and are never modified by subsequent price changes in the product catalog.
