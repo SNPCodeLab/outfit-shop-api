@@ -4,8 +4,12 @@ description: >
   Frontend design system, architectural specification, and UI/UX styling rules for KhmeRiel (Khmer + Riel) Clothing MIS & POS.
   Covers the dual-interface architecture:
   1. Internal Admin & Staff Controller Portal (Dashboard, Inventory, Sales, Reports, Audit, Employees) using SalesBinder-style inventory matrices + shadcn/ui + Neo-Brutalist design tokens.
-  2. Customer-Facing Storefront & Product Showcase using Ralph Lauren-style luxury 3:4 catalog cards with micro color swatches and quick-shop drawers, fused with the nadanada.me Neo-Brutalism aesthetic.
-  Includes RBAC route guards, component specifications, color tokens, and the master copy-ready Next.js build prompt.
+  2. Customer-Facing Storefront & Product Showcase using Ralph Lauren-style luxury 3:4 catalog cards with micro color swatches and quick-shop drawers, fused with Neo-Brutalist structural tokens.
+  STRICT RULES:
+  - NO black shadows (shadow-none or subtle tonal elevation only; no hard pitch-black drop shadows).
+  - NEVER use emoji in UI, copy, buttons, badges, or code.
+  - USE FontAwesome icons library (@fortawesome/react-fontawesome & @fortawesome/free-solid-svg-icons).
+  - BORDER-RADIUS: 3px across all containers, cards, inputs, buttons, dialogs, and swatches.
 ---
 
 # KhmeRiel — Frontend Architecture & Neo-Brutalism Design System
@@ -14,12 +18,12 @@ description: >
 
 | Property | Value |
 |---|---|
-| **Brand Name** | **KhmeRiel** (*Khmer Culture + Riel Currency*) |
+| **Brand Name** | **KhmeRiel** (Khmer Culture + Riel Currency) |
 | **Official Brand Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png` |
 | **Subtitle / Domain** | **KhmeRiel • Clothing & POS MIS** |
 | **Frontend Portal URL** | `https://app.kesararamwithdigital.tech` |
 | **Backend REST API Gateway**| `https://api.kesararamwithdigital.tech/api/v1` |
-| **Visual Identity** | Fusion of **Ralph Lauren luxury fashion catalog UX** (3:4 portrait tiles, micro color swatches, quick view) + **SalesBinder apparel matrices** + **nadanada.me / shadcn Neo-Brutalist design tokens**. |
+| **Visual Identity** | Fusion of **Ralph Lauren luxury fashion catalog UX** (3:4 portrait tiles, micro color swatches, quick view) + **SalesBinder apparel matrices** + **Neo-Brutalist structure (2.5px solid border, 3px border radius, no black shadows, FontAwesome icons, zero emojis)**. |
 
 ---
 
@@ -37,12 +41,12 @@ description: >
     │   PHASE 1: CONTROLLER PORTAL │                            │   PHASE 2: STORE SHOWCASE    │
     │   (Admin / Manager / Staff)  │                            │      (Customer / Public)     │
     │                              │                            │                              │
-    │ • SalesBinder-style Size ×   │                            │ • Ralph Lauren-style Luxury  │
-    │   Color Variant Matrices     │                            │   Catalog Grid (3:4 Ratio)   │
+    │ • SalesBinder Size × Color   │                            │ • Ralph Lauren Luxury 3:4    │
+    │   Variant 2D Matrices        │                            │   Portrait Catalog Grid      │
     │ • Continuous Barcode Scanner │                            │ • Interactive Color Swatches │
     │ • RBAC Role-Gated Controller │                            │ • Quick-Shop Slide-Up Drawer │
     │ • Dashboard, Inventory, POS, │                            │ • Category & Size Filters    │
-    │   Sales, Reports, Audit Logs │                            │ • Tactile Neo-Brutalist Look │
+    │   Sales, Reports, Audit Logs │                            │ • FontAwesome Icons & 3px R  │
     └──────────────┬───────────────┘                            └──────────────┬───────────────┘
                    │                                                           │
                    └─────────────────────────────┬─────────────────────────────┘
@@ -63,29 +67,40 @@ From analyzing **Ralph Lauren (`ralphlauren.com/men-clothing`)**, we adopt these
 
 ### 3.1 Luxury Catalog Principles
 1. **3:4 Portrait Image Tiles**: Every clothing item renders in a high-resolution 3:4 portrait aspect ratio on clean studio backgrounds (`#F0EFED` / `#FAF7F0`).
-2. **Interactive Color Swatches**: Micro circular color swatches (`COLORS` table) positioned directly under the title. Hovering or clicking a swatch switches the preview image and updates active variant SKU.
-3. **Quick Shop / ជ្រើសរើសទំហំ Bar**: A canary yellow action button (`#FEE227`) that opens a bottom drawer or modal to select sizes (S, M, L, XL, 2XL) and add to cart without leaving the catalog page.
+2. **Interactive Color Swatches**: Micro circular color swatches (`COLORS` table) positioned directly under the title with `rounded-[3px]` or circular bounds. Hovering or clicking a swatch switches the preview image and updates the active variant SKU.
+3. **Quick Shop Bar**: A canary yellow action button (`#FEE227`) with `rounded-[3px]` and FontAwesome icon that opens a bottom drawer or modal to select sizes (S, M, L, XL, 2XL) and add to cart without leaving the catalog page.
 4. **Sticky Filter & Sort Toolbar**: Top sticky bar with clean Neo-Brutalist dropdowns:
-   - `Category` (Shirts, Polos, Trousers, Hoodies)
-   - `Size (S - 2XL)`
-   - `Color Swatches`
-   - `Price Range`
-   - `Sort By` (Newest, Price: Low to High, Bestselling)
+   - Category (Shirts, Polos, Trousers, Hoodies)
+   - Size (S - 2XL)
+   - Color Swatches
+   - Price Range
+   - Sort By (Newest, Price: Low to High, Bestselling)
 
 ---
 
-## 4. Visual Design DNA: Neo-Brutalism (nadanada.me & shadcn-retro)
+## 4. Visual Design DNA & Strict Styling Rules
+
+### 4.1 Strict Styling Directives
+* **NEVER USE EMOJIS**: Do not use any emoji characters anywhere in UI components, headers, buttons, toast alerts, status badges, or copy. Always use FontAwesome icons.
+* **DO NOT USE BLACK SHADOWS**: Absolutely no pitch-black drop shadows (`shadow-[..._#000000]`). Use clean, stark `border-2 border-black` / `border-[2.5px] border-black` with flat tactile surfaces (`shadow-none`) or subtle tonal borders.
+* **BORDER-RADIUS: 3px**: Every container, card, modal, input, button, badge, table row container, and dropdown must use `border-radius: 3px;` (`rounded-[3px]`).
+* **FONTAWESOME ICON LIBRARY**: All iconography must use the official FontAwesome React library (`@fortawesome/react-fontawesome` & `@fortawesome/free-solid-svg-icons` / `@fortawesome/free-brands-svg-icons`).
+
+### 4.2 Design Tokens & Tailwind Utilities
 
 | Element | Specification | Tailwind CSS Utility |
 |---|---|---|
-| **Borders** | Solid 2.5px stark pitch black on every container and button | `border-2 border-black` or `border-[2.5px] border-black` |
-| **Drop Shadows** | Hard offset rectangular shadow (**0px blur radius**) | `shadow-[4px_4px_0px_0px_#000000]` |
-| **Active Click** | Physical 3D push-down translation | `hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all` |
+| **Borders** | Solid 2px to 2.5px stark pitch black on every container, card, and button | `border-2 border-black` or `border-[2.5px] border-black` |
+| **Border Radius** | Exactly 3px on all elements | `rounded-[3px]` |
+| **Shadows** | Flat, crisp surfaces with **NO black drop shadows** | `shadow-none` |
+| **Active Click** | Subtle tactile border-inset or tonal press | `hover:bg-amber-100/40 active:translate-y-[1px] transition-all` |
 | **Canvas Background** | Warm Cream / Off-White with faint subtle grid | `bg-[#FAF7F0]` with `bg-grid-slate-200/50` |
 | **Primary Accent** | Canary Yellow | `#FEE227` / `#FFE600` |
-| **Typography** | Kantumruy Pro / Siemreap (Khmer) + Inter (English) | `font-black uppercase tracking-tight` |
+| **Surface** | Pure White | `bg-white` |
+| **Typography** | Kantumruy Pro (Khmer) + Inter / Geist (English) | `font-black uppercase tracking-tight` |
+| **Icon Library** | FontAwesome Solid Icons | `<FontAwesomeIcon icon={fa...} className="w-4 h-4" />` |
 
-### Color Tokens
+### 4.3 Color Tokens
 
 ```css
 :root {
@@ -94,7 +109,7 @@ From analyzing **Ralph Lauren (`ralphlauren.com/men-clothing`)**, we adopt these
   --ink: #000000;
   --accent-yellow: #FEE227;
   
-  /* Status & Role Badges */
+  /* Status & Role Badges (with 3px border-radius and 1.5px black border) */
   --badge-green: #86EFAC;   /* Success / Cashier Role / Paid / In Stock */
   --badge-blue: #93C5FD;    /* Info / Manager Role / Purchase / API */
   --badge-amber: #FDE047;   /* Warning / Low Stock / Adjustment / Pending */
@@ -117,17 +132,19 @@ Act as a Principal Full-Stack Engineer and World-Class UI/UX Designer. Build a c
 - Brand Logo URL: https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png
 - Tagline: KhmeRiel • Clothing & POS MIS
 - Web App URL: https://app.kesararamwithdigital.tech
-- Design Style: Fusion of Ralph Lauren Luxury Catalog UX + SalesBinder Inventory Matrix + nadanada.me / shadcn Neo-Brutalism.
+- Design Style: Fusion of Ralph Lauren Luxury Catalog UX + SalesBinder Inventory Matrix + Neo-Brutalism.
 - Canvas: Warm Cream background (#FAF7F0) with a subtle 20px grid line pattern.
 - Primary Accent: Canary Yellow (#FEE227 / #FFE600) for CTAs, active badges, and highlight cards.
 - Surface: Pure White (#FFFFFF) for tables, dialogs, modals, and product cards.
 - Outlines: Solid 2.5px stark pitch black (border-2 border-black).
-- Shadows: Hard rectangular box shadows with ZERO blur (shadow-[4px_4px_0px_0px_#000]).
-- Micro-Interactions: 3D physical tactile push-down effect on all buttons and cards (hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all).
-- Status Badges: Mint Green (#86EFAC: Paid/Cashier/In Stock), Soft Blue (#93C5FD: Manager/Purchase), Pastel Amber (#FDE047: Low Stock/Pending), Pastel Red (#FCA5A5: Admin/Void/Out of Stock).
+- Border Radius (MANDATORY): Exactly 3px (rounded-[3px]) across all cards, buttons, inputs, modals, swatches, and badges.
+- Shadow Rule (MANDATORY): DO NOT use black drop shadows. Maintain crisp flat surfaces (shadow-none) with stark 2.5px borders.
+- Icon Rule (MANDATORY): Use FontAwesome icons (@fortawesome/react-fontawesome & @fortawesome/free-solid-svg-icons).
+- Emoji Rule (MANDATORY): NEVER use emojis in UI text, buttons, badges, navigation, or messages. Use FontAwesome icons instead.
+- Status Badges: Mint Green (#86EFAC: Paid/Cashier/In Stock), Soft Blue (#93C5FD: Manager/Purchase), Pastel Amber (#FDE047: Low Stock/Pending), Pastel Red (#FCA5A5: Admin/Void/Out of Stock) - all styled with rounded-[3px] and border-[1.5px] border-black.
 - Typography: Kantumruy Pro / Siemreap (Khmer) + Inter (English) with bold uppercase tracking.
-- Product Image Rendering Standard (CRITICAL): ALL product photos MUST render in their full ORIGINAL natural aspect ratio without artificial stretching, squishing, distortion, or clipping (use `object-contain` / natural bounds with pure white backgrounds so full-length gowns, coats, bags, and shoes retain their pristine original editorial framing).
-- Top Ticker Tape: Full-width black marquee bar with bold white uppercase text (⚡ KHMERIEL • REAL-TIME POS ENGINE • ACID-COMPLIANT STOCK • REST API v1).
+- Product Image Rendering Standard: ALL product photos MUST render in their full ORIGINAL natural aspect ratio without artificial stretching, squishing, distortion, or clipping (use `object-contain` / natural bounds with pure white backgrounds so full-length gowns, coats, bags, and shoes retain their pristine original editorial framing).
+- Top Ticker Tape: Full-width black marquee bar with bold white uppercase text (KHMERIEL • REAL-TIME POS ENGINE • ACID-COMPLIANT STOCK • REST API v1).
 
 ### 2. BACKEND API INTEGRATION & AUTHENTICATION
 - Production Base URL: https://api.kesararamwithdigital.tech/api/v1
@@ -146,11 +163,11 @@ Implement a strict useRoleGuard(minRole) client-side route guard enforcing the 4
 - STAFF (Rank 1): Read-only product catalog lookup.
 
 ### 4. CORE SCREENS & MODULES TO BUILD
-1. Authentication Portal (app/(auth)/login/page.tsx): Neo-Brutalist card with username/email and password fields, validation error banners, and loading button. Consumes POST /auth/login.
-2. Executive MIS Dashboard (app/(dashboard)/dashboard/page.tsx - Manager+): 4 Neo-Brutalist Stat Cards consuming GET /dashboard/stats, 7-Day API Request Traffic chart, and 20 Recent Requests Data Table with latency and HTTP status pills.
+1. Authentication Portal (app/(auth)/login/page.tsx): Neo-Brutalist card with 3px border-radius, username/email and password fields, validation error banners with FontAwesome icons, and loading button. Consumes POST /auth/login.
+2. Executive MIS Dashboard (app/(dashboard)/dashboard/page.tsx - Manager+): 4 Neo-Brutalist Stat Cards with rounded-[3px] consuming GET /dashboard/stats, 7-Day API Request Traffic chart, and 20 Recent Requests Data Table with latency and HTTP status pills.
 3. High-Speed POS Checkout Counter (app/(dashboard)/pos/page.tsx - Cashier+): Continuous auto-focus Barcode/SKU scanner input consuming GET /variants/barcode/{barcode}, audio feedback cues from GET /settings/audio-cues, coupon voucher verification via POST /promotions/verify-coupon, real-time cart manager, customer selector, payment method selector (CASH, CARD, QR, ABA) with change calculation, and checkout submission consuming POST /sales/checkout with instant printable receipt modal.
 4. SalesBinder-Style Matrix Inventory Controller (app/(dashboard)/inventory/page.tsx - Manager+): Searchable catalog table from GET /products and GET /variants, Apparel Size (S-2XL) × Color Matrix Grid with real-time stock balances consuming GET /products/{id}/matrix, low-stock warnings from GET /variants/low-stock, batch expiry monitor from GET /inventory/expiring-soon, and stock adjustment dialog consuming POST /stock-movements/adjust.
-5. Ralph Lauren-Style Storefront Catalog (app/(dashboard)/shop/page.tsx - Public / All): 4-column luxury product grid with tall 3:4 portrait aspect ratio clothing photography, interactive micro color swatches, hover "Quick View / ជ្រើសរើសទំហំ" size drawer, hero banner carousels from GET /marketing/banners, brand directory from GET /brands, combo bundles from GET /bundles, and sticky filter bar.
+5. Ralph Lauren-Style Storefront Catalog (app/(dashboard)/shop/page.tsx - Public / All): 4-column luxury product grid with tall 3:4 portrait aspect ratio clothing photography, interactive micro color swatches with rounded-[3px], hover "Quick View" size drawer, hero banner carousels from GET /marketing/banners, brand directory from GET /brands, combo bundles from GET /bundles, and sticky filter bar with FontAwesome icons.
 6. Product Detail & Lookbook Showcase (app/(dashboard)/shop/[id]/page.tsx - Public / All): Multi-angle photo gallery from GET /products/{id}/images, colorway swatches from GET /products/{id}/colorways, customer reviews & star ratings from GET /products/{id}/reviews, and one-click wishlist saving via POST /wishlist/toggle.
 7. Sales History & Void Manager (app/(dashboard)/sales/page.tsx - Cashier / Manager): Paginated transactions from GET /sales with expandable line items and manager void action consuming POST /sales/{id}/void.
 8. Multi-Branch & Store Management (app/(dashboard)/branches/page.tsx - Manager+): Branch locator and inventory levels across stores from GET /branches and GET /branches/{id}/stock.
@@ -173,7 +190,7 @@ Implement a strict useRoleGuard(minRole) client-side route guard enforcing the 4
 | **POS Sales** | `POST /sales/checkout`, `GET /sales`, `POST /sales/{id}/void` | ACID transactional checkout & receipts |
 | **Inventory** | `GET /variants`, `GET /variants/low-stock`, `POST /stock-movements/adjust` | Stock movements & adjustments |
 
-### 5. PROJECT FILE STRUCTURE TO GENERATE
+### 6. PROJECT FILE STRUCTURE TO GENERATE
 ```text
 src/
 ├── app/
@@ -265,4 +282,3 @@ Digital eBooks & Audio:
 • KHMERIEL_DIGITAL_BOOK_PUBLICATION_EN_*.pdf (26+ Full eBooks)
 • KHMERIEL_POS_SCANNER_AUDIO_FX_*.wav (3 POS Audio Cues)
 ```
-
