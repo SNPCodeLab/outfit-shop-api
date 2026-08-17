@@ -262,6 +262,12 @@ Route::prefix('v1')->group(function () {
             Route::post('/products/bulk-import',       [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkImport']);
             Route::post('/purchases/bulk-receive',     [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkReceive']);
 
+            // File Exports (PDF, Excel, CSV, Thermal POS format)
+            Route::get('/exports/inventory/excel',       [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportInventory']);
+            Route::get('/exports/stock-movements/csv',    [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportStockMovements']);
+            Route::get('/exports/sales-report/pdf',      [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportSalesReport']);
+            Route::get('/exports/z-report/{id}/thermal', [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportZReportThermal']);
+
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
