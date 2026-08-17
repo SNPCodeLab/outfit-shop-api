@@ -255,6 +255,12 @@ Route::prefix('v1')->group(function () {
             // Audit Logs (Accessible by Manager and Admin)
             Route::get('/audit-logs',                  [AuditLogController::class,      'index']);
             Route::get('/audit-logs/{id}',             [AuditLogController::class,      'show']);
+
+            // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
+            Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
+            Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
+            Route::post('/webhooks/test',               [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'test']);
+            Route::delete('/webhooks/{id}',            [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'destroy']);
         });
 
 
