@@ -1,0 +1,433 @@
+{
+  "info": {
+    "_postman_id": "khmeriel-ssmis-master-api-v1",
+    "name": "KhmeRiel MIS & POS — Master API Collection (All 4 RBAC Levels)",
+    "description": "Complete Postman collection for KhmeRiel / CSMS Store Stock & Point-of-Sale API with all 4 RBAC levels (Public, Cashier/Staff, Manager, Admin), 10% Tax calculation, and Broadcast Messaging.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.kesararamwithdigital.tech/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "manager_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashier_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "staff_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Level 1: Public & Guest (Storefront & Catalog)",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+          }
+        },
+        {
+          "name": "System Status & Logo",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/status", "host": ["{{base_url}}"], "path": ["status"] }
+          }
+        },
+        {
+          "name": "POS Audio Cue Sounds",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/settings/audio-cues", "host": ["{{base_url}}"], "path": ["settings", "audio-cues"] }
+          }
+        },
+        {
+          "name": "Staff / Admin Login (Get Sanctum Token)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"superadmin@ssmis.local\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Get All Brands",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/brands", "host": ["{{base_url}}"], "path": ["brands"] }
+          }
+        },
+        {
+          "name": "Get Clothing Sizes",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/clothing-sizes", "host": ["{{base_url}}"], "path": ["clothing-sizes"] }
+          }
+        },
+        {
+          "name": "Get Colors & Hex Swatches",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/colors", "host": ["{{base_url}}"], "path": ["colors"] }
+          }
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] }
+          }
+        },
+        {
+          "name": "Get Single Product with Variants",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/products/19", "host": ["{{base_url}}"], "path": ["products", "19"] }
+          }
+        },
+        {
+          "name": "Get Product 2D Variant Matrix",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/products/19/matrix", "host": ["{{base_url}}"], "path": ["products", "19", "matrix"] }
+          }
+        },
+        {
+          "name": "Get Marketing Banners",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/marketing/banners", "host": ["{{base_url}}"], "path": ["marketing", "banners"] }
+          }
+        },
+        {
+          "name": "Get Active Promotions",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/promotions/active", "host": ["{{base_url}}"], "path": ["promotions", "active"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level 2: Cashier & Staff (POS Checkout, Shifts & Scanning)",
+      "item": [
+        {
+          "name": "Live Role-Pulse Analytics (Pie & Agile Graph)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/dashboard/role-pulse", "host": ["{{base_url}}"], "path": ["dashboard", "role-pulse"] }
+          }
+        },
+        {
+          "name": "Get Active Broadcast Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/alerts/active", "host": ["{{base_url}}"], "path": ["alerts", "active"] }
+          }
+        },
+        {
+          "name": "Scan Barcode Lookup",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/variants/barcode/885000001901", "host": ["{{base_url}}"], "path": ["variants", "barcode", "885000001901"] }
+          }
+        },
+        {
+          "name": "Get Low Stock Variants",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staff_token}}" }],
+            "url": { "raw": "{{base_url}}/variants/low-stock?threshold=10", "host": ["{{base_url}}"], "path": ["variants", "low-stock"] }
+          }
+        },
+        {
+          "name": "Open Cash Drawer Shift",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{cashier_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"opening_float_usd\": 100.00,\n  \"opening_float_khr\": 400000.00\n}"
+            },
+            "url": { "raw": "{{base_url}}/shifts/open", "host": ["{{base_url}}"], "path": ["shifts", "open"] }
+          }
+        },
+        {
+          "name": "POS Sale Checkout (10% Tax-Exclusive)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{cashier_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 1,\n  \"payment_method\": \"ABA\",\n  \"payment_amount\": 74.25,\n  \"overall_discount\": 0.00,\n  \"tax_rate\": 10.00,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 1,\n      \"discount\": 0.00\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/sales/checkout", "host": ["{{base_url}}"], "path": ["sales", "checkout"] }
+          }
+        },
+        {
+          "name": "Get Thermal Receipt (ESC/POS)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/sales/1/receipt-thermal", "host": ["{{base_url}}"], "path": ["sales", "1", "receipt-thermal"] }
+          }
+        },
+        {
+          "name": "Generate Dynamic KHQR Payment Code",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/sales/1/khqr", "host": ["{{base_url}}"], "path": ["sales", "1", "khqr"] }
+          }
+        },
+        {
+          "name": "Close Shift & Print Z-Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{cashier_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"closing_cash_usd\": 1845.00,\n  \"notes\": \"Evening shift closed successfully\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/shifts/close", "host": ["{{base_url}}"], "path": ["shifts", "close"] }
+          }
+        },
+        {
+          "name": "Customer Search by Phone",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cashier_token}}" }],
+            "url": { "raw": "{{base_url}}/customers?search=012888999", "host": ["{{base_url}}"], "path": ["customers"] }
+          }
+        },
+        {
+          "name": "Register New Customer at POS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{cashier_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_name\": \"Molyka Seng\",\n  \"phone\": \"012999111\",\n  \"gender\": \"Female\",\n  \"email\": \"molyka@gmail.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/customers", "host": ["{{base_url}}"], "path": ["customers"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level 3: Manager (Catalog, Inventory, Purchasing & Voiding)",
+      "item": [
+        {
+          "name": "Manager Role Pulse Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }],
+            "url": { "raw": "{{base_url}}/dashboard/role-pulse", "host": ["{{base_url}}"], "path": ["dashboard", "role-pulse"] }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_name\": \"Silk Evening Gown\",\n  \"category_id\": 17,\n  \"brand_id\": 13,\n  \"product_type\": \"PHYSICAL_APPAREL\",\n  \"gender\": \"WOMEN\",\n  \"material_fabric\": \"100% Raw Silk\",\n  \"description\": \"Luxury evening dress\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] }
+          }
+        },
+        {
+          "name": "Create Product Variant",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 19,\n  \"size_id\": 37,\n  \"color_id\": 12,\n  \"sku\": \"SILK-M-BLK-019\",\n  \"barcode\": \"885000001901\",\n  \"cost_price\": 30.00,\n  \"sale_price\": 65.00,\n  \"quantity\": 50\n}"
+            },
+            "url": { "raw": "{{base_url}}/variants", "host": ["{{base_url}}"], "path": ["variants"] }
+          }
+        },
+        {
+          "name": "Void Mistaken Sale Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer requested immediate refund before leaving\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/sales/1/void", "host": ["{{base_url}}"], "path": ["sales", "1", "void"] }
+          }
+        },
+        {
+          "name": "Adjust Inventory Stock Count",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variant_id\": 1,\n  \"type\": \"IN\",\n  \"quantity\": 25,\n  \"reference_type\": \"PURCHASE_RECEIPT\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/stock-movements/adjust", "host": ["{{base_url}}"], "path": ["stock-movements", "adjust"] }
+          }
+        },
+        {
+          "name": "Restock Forecast Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }],
+            "url": { "raw": "{{base_url}}/inventory/restock-recommendations", "host": ["{{base_url}}"], "path": ["inventory", "restock-recommendations"] }
+          }
+        },
+        {
+          "name": "Auto-Generate Purchase Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{manager_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/purchases/auto-generate", "host": ["{{base_url}}"], "path": ["purchases", "auto-generate"] }
+          }
+        },
+        {
+          "name": "Get Cloudinary Media Gallery",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{manager_token}}" }],
+            "url": { "raw": "{{base_url}}/uploads/gallery", "host": ["{{base_url}}"], "path": ["uploads", "gallery"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level 4: Admin (Master Command, Staff Timesheets & Broadcast)",
+      "item": [
+        {
+          "name": "Admin Master Controller Pulse (Staff Timesheets & Waterfall)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base_url}}/admin/master-pulse", "host": ["{{base_url}}"], "path": ["admin", "master-pulse"] }
+          }
+        },
+        {
+          "name": "Broadcast Alert / Reminder to Staff",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Evening Restock & Tax Verification\",\n  \"message\": \"All cashiers verify 10% VAT on receipts. Floor staff restock Silk Shirts.\",\n  \"priority\": \"HIGH\",\n  \"target_role\": \"ALL\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/admin/broadcast-alert", "host": ["{{base_url}}"], "path": ["admin", "broadcast-alert"] }
+          }
+        },
+        {
+          "name": "List All Employees",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "Create New Employee Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_name\": \"Kosal Meas\",\n  \"gender\": \"Male\",\n  \"phone\": \"+85512777888\",\n  \"email\": \"kosal.meas@ssmis.local\",\n  \"position\": \"Senior Cashier\",\n  \"role\": \"CASHIER\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "Register User Account with RBAC Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kosal Meas\",\n  \"email\": \"kosal@ssmis.local\",\n  \"password\": \"password123\",\n  \"role\": \"cashier\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Inspect Immutable Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base_url}}/audit-logs", "host": ["{{base_url}}"], "path": ["audit-logs"] }
+          }
+        }
+      ]
+    }
+  ]
+}
