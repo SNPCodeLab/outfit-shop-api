@@ -19,6 +19,8 @@ class SaleHeader extends Model
         'sale_date',
         'total_amount',
         'discount',
+        'tax_rate',
+        'tax_amount',
         'grand_total',
         'status',
     ];

@@ -9,7 +9,6 @@
 # Postman, API Collections & Client Environments
 /postman_collections/
 postman_collections/
-*postman*
 *hoppscotch*
 
 # PHP & Composer Dependencies
@@ -39,11 +38,17 @@ database/*.sqlite
 database/*.sqlite-journal
 .dataconnect/
 
-# macOS / Windows OS System Files
+# macOS / Windows# OS Generated Files
 .DS_Store
-.AppleDouble
-.LSOverride
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Raw Media Assets (Managed in Cloudinary CDN)
+KHMERIEL/
 Desktop.ini
 
 # Vercel & Cloud Deployments

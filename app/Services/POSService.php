@@ -30,7 +30,8 @@ class POSService
         array $items,
         string $paymentMethod = 'CASH',
         float $paymentAmount = 0.0,
-        float $overallDiscount = 0.0
+        float $overallDiscount = 0.0,
+        float $taxRate = 10.00
     ): SaleHeader {
         return DB::transaction(function () use (
             $employeeId,
@@ -38,7 +39,8 @@ class POSService
             $items,
             $paymentMethod,
             $paymentAmount,
-            $overallDiscount
+            $overallDiscount,
+            $taxRate
         ) {
             $totalAmount = 0.0;
             $saleDetailsData = [];
@@ -82,7 +84,10 @@ class POSService
                 ];
             }
 
-            $grandTotal = max(0, $totalAmount - $overallDiscount);
+            // 10% Tax-Exclusive Calculation: Tax added on top of net amount
+            $netAmount = max(0, $totalAmount - $overallDiscount);
+            $taxAmount = round($netAmount * ($taxRate / 100), 2);
+            $grandTotal = round($netAmount + $taxAmount, 2);
 
             // 2. Create Sale Header
             $saleHeader = SaleHeader::create([
@@ -91,6 +96,8 @@ class POSService
                 'sale_date'    => now(),
                 'total_amount' => $totalAmount,
                 'discount'     => $overallDiscount,
+                'tax_rate'     => $taxRate,
+                'tax_amount'   => $taxAmount,
                 'grand_total'  => $grandTotal,
                 'status'       => 'COMPLETED',
             ]);
