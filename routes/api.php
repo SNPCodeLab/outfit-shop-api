@@ -115,12 +115,14 @@ Route::prefix('v1')->group(function () {
     // =========================================================================
     // TIER 2 — AUTHENTICATED (CASHIER, STAFF, MANAGER, ADMIN)
     // =========================================================================
-    Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:role-based'])->group(function () {
 
-        // -- Session Management --
+        // -- Session Management & Token Rotation --
         Route::prefix('auth')->group(function () {
-            Route::get('/me',       [AuthController::class, 'me']);
-            Route::post('/logout',  [AuthController::class, 'logout']);
+            Route::get('/me',          [AuthController::class, 'me']);
+            Route::post('/logout',     [AuthController::class, 'logout']);
+            Route::post('/refresh',    [AuthController::class, 'refresh']);
+            Route::post('/revoke-all', [AuthController::class, 'revokeAll']);
         });
 
         // -- Customer Management & Loyalty Points --

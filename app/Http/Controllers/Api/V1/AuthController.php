@@ -112,7 +112,8 @@ class AuthController extends BaseApiController
             }
 
             $role        = $this->resolveRole($employee);
-            $token       = $employee->createToken('ssmis-api-token')->plainTextToken;
+            $deviceName  = $request->input('device_name', 'Web Client / POS Terminal');
+            $token       = $employee->createToken($deviceName)->plainTextToken;
             $permissions = $this->permissionsFor($role);
 
             if (class_exists(AuditLogService::class)) {
@@ -127,6 +128,7 @@ class AuthController extends BaseApiController
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
+                'device_name'  => $deviceName,
                 'account_type' => 'employee',
                 'employee'     => [
                     'employee_id' => $employee->employee_id,
@@ -151,12 +153,14 @@ class AuthController extends BaseApiController
         if ($user && Hash::check($request->password, $user->password)) {
 
             $role        = $this->resolveRole($user);
-            $token       = $user->createToken('ssmis-api-token')->plainTextToken;
+            $deviceName  = $request->input('device_name', 'Web Client / POS Terminal');
+            $token       = $user->createToken($deviceName)->plainTextToken;
             $permissions = $this->permissionsFor($role);
 
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
+                'device_name'  => $deviceName,
                 'account_type' => 'user',
                 'user' => [
                     'id'          => $user->id,
@@ -171,6 +175,55 @@ class AuthController extends BaseApiController
         throw ValidationException::withMessages([
             'username' => ['Invalid credentials. Please check your username/email and password.'],
         ]);
+    }
+
+    // =========================================================================
+    // POST /api/v1/auth/refresh (Token Rotation)
+    // =========================================================================
+
+    public function refresh(Request $request): JsonResponse
+    {
+        $account = $request->user();
+
+        if (!$account) {
+            return $this->errorResponse('Unauthenticated', 401, 'ERR_UNAUTHENTICATED');
+        }
+
+        $currentToken = $account->currentAccessToken();
+        $deviceName   = $currentToken ? ($currentToken->name ?? 'Rotated Token') : 'Refreshed Device';
+
+        // Revoke current token (Token Rotation pattern)
+        if ($currentToken) {
+            $currentToken->delete();
+        }
+
+        // Issue fresh access token
+        $newToken    = $account->createToken($deviceName)->plainTextToken;
+        $role        = $this->resolveRole($account);
+        $permissions = $this->permissionsFor($role);
+
+        return $this->successResponse([
+            'access_token' => $newToken,
+            'token_type'   => 'Bearer',
+            'device_name'  => $deviceName,
+            'role'         => $role,
+            'permissions'  => $permissions,
+        ], 'Token refreshed successfully with rotation');
+    }
+
+    // =========================================================================
+    // POST /api/v1/auth/revoke-all (Security Kill Switch / Password Change)
+    // =========================================================================
+
+    public function revokeAll(Request $request): JsonResponse
+    {
+        $account = $request->user();
+
+        if ($account && method_exists($account, 'tokens')) {
+            $account->tokens()->delete();
+        }
+
+        return $this->successResponse(null, 'All active device sessions and tokens revoked successfully');
     }
 
     // =========================================================================
