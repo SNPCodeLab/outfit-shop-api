@@ -63,3 +63,8 @@ Route::get('/', function () {
         'employees_url'          => "{$base}/api/v1/employees",
     ], 200, ['Content-Type' => 'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 });
+
+// SalesBinder-style Help Centre & Interactive Guide
+Route::get('/guide', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+Route::get('/kb', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+
