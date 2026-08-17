@@ -15,8 +15,10 @@ return new class extends Migration
             $table->timestamp('sale_date')->useCurrent();
             $table->decimal('total_amount', 12, 2)->default(0.00);
             $table->decimal('discount', 12, 2)->default(0.00);
+            $table->decimal('tax_rate', 5, 2)->default(10.00);
+            $table->decimal('tax_amount', 12, 2)->default(0.00);
             $table->decimal('grand_total', 12, 2)->default(0.00);
-            $table->string('status')->default('COMPLETED'); // COMPLETED, VOIDED, REFUNDED
+            $table->string('status')->default('COMPLETED'); // COMPLETED, ESTIMATE, VOIDED, REFUNDED
             $table->timestamps();
         });
     }
