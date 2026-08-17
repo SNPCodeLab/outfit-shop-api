@@ -14,11 +14,16 @@ class PurchaseHeader extends Model
     protected $primaryKey = 'purchase_id';
 
     protected $fillable = [
+        'reference_no',
         'supplier_id',
         'employee_id',
+        'store_id',
         'purchase_date',
         'total_amount',
+        'tax_amount',
+        'grand_total',
         'status',
+        'notes',
     ];
 
     public function supplier(): BelongsTo

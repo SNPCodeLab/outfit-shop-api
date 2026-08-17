@@ -13,13 +13,17 @@ class StockMovement extends Model
     protected $primaryKey = 'movement_id';
 
     protected $fillable = [
+        'store_id',
         'variant_id',
         'movement_type',
         'quantity',
+        'stock_before',
+        'stock_after',
         'movement_date',
         'reference_type',
         'reference_id',
         'note',
+        'created_by',
         'employee_id',
     ];
 

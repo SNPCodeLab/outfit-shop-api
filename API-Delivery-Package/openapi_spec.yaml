@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: Retail Clothing Store MIS & POS REST API
+  description: Monolithic, Headless RESTful API Backend for Retail Clothing Store Management System.
+  version: 1.0.0
+servers:
+  - url: https://api.kesararamwithdigital.tech/api/v1
+    description: Production API Gateway
+  - url: http://127.0.0.1:8000/api/v1
+    description: Local Development Server
+
+paths:
+  /health:
+    get:
+      summary: System Health & Database Ping
+      responses:
+        '200':
+          description: System is online and database is responsive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+
+  /auth/login:
+    post:
+      summary: Staff & Cashier Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: cashier1
+                password:
+                  type: string
+                  example: Password123!
+      responses:
+        '200':
+          description: Login successful with Sanctum Bearer Token
+        '401':
+          description: Invalid username or password
+
+  /products:
+    get:
+      summary: List Products with Pagination
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated product list
+
+  /products/{id}/matrix:
+    get:
+      summary: 2D Size x Color Variant Matrix
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 2D Matrix grid for apparel stock
+
+  /sales/checkout:
+    post:
+      summary: Process Atomic POS Checkout
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items, payment_method]
+              properties:
+                customer_id:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [variant_id, quantity]
+                    properties:
+                      variant_id:
+                        type: integer
+                      quantity:
+                        type: integer
+                      discount:
+                        type: number
+                payment_method:
+                  type: string
+                  enum: [CASH, CARD, QR, ABA, BAKONG, GIFT_CARD]
+                payment_amount:
+                  type: number
+                tax_rate:
+                  type: number
+                  default: 10.0
+      responses:
+        '201':
+          description: Sale completed with 10% VAT calculation and stock deduction
+        '400':
+          description: Insufficient stock or invalid payload
+
+  /shifts/open:
+    post:
+      summary: Open POS Cash Register Shift
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opening_float_usd]
+              properties:
+                opening_float_usd:
+                  type: number
+                opening_float_khr:
+                  type: number
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Shift opened successfully
+
+  /shifts/close:
+    post:
+      summary: Close POS Shift and Generate Z-Report
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [closing_cash_usd]
+              properties:
+                closing_cash_usd:
+                  type: number
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Shift closed and Z-Report generated
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+
+  schemas:
+    SuccessEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully
+        data:
+          type: object
+        request_id:
+          type: string
+          format: uuid
+          example: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Error description
+        error_code:
+          type: string
+          example: ERR_INSUFFICIENT_STOCK
+        errors:
+          type: object
+        request_id:
+          type: string
+          format: uuid

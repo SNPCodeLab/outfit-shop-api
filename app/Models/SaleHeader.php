@@ -14,15 +14,22 @@ class SaleHeader extends Model
     protected $primaryKey = 'sale_id';
 
     protected $fillable = [
+        'invoice_no',
+        'store_id',
         'customer_id',
         'employee_id',
         'sale_date',
+        'sub_total',
         'total_amount',
         'discount',
+        'discount_amount',
         'tax_rate',
         'tax_amount',
         'grand_total',
+        'payment_status',
         'status',
+        'notes',
+        'idempotency_key',
     ];
 
     public function customer(): BelongsTo

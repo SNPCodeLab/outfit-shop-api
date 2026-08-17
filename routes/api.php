@@ -24,10 +24,10 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Access Tiers:
-|   PUBLIC      — No token required. Read-only catalog endpoints.
-|   AUTHENTICATED— Requires valid Bearer token (any role).
-|   MANAGER     — Requires token + role MANAGER or ADMIN.
-|   ADMIN       — Requires token + role ADMIN only.
+|   TIER 1 (PUBLIC)        — No token required. Read-only storefront & catalog.
+|   TIER 2 (AUTHENTICATED) — Requires valid Bearer token (CASHIER, STAFF, MANAGER, ADMIN).
+|   TIER 3 (MANAGER)       — Requires token + role MANAGER or ADMIN.
+|   TIER 4 (ADMIN)         — Requires token + role ADMIN only.
 |
 | Base URL: https://api.kesararamwithdigital.tech/api/v1
 |
@@ -39,13 +39,13 @@ Route::prefix('v1')->group(function () {
     // TIER 1 — PUBLIC (No authentication required)
     // =========================================================================
 
-    // Health & Status — always open
+    // Health, Status & Developer Knowledge Base — always open
     Route::get('/health', [StatusController::class, 'index']);
     Route::get('/status', [StatusController::class, 'index']);
     Route::get('/guide',  [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
     Route::get('/docs',   [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
 
-    // Authentication — rate-limited to prevent brute-force
+    // Authentication — rate-limited to prevent brute-force (10 attempts / min)
     Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login');
     });
@@ -85,11 +85,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/variants',                            [ProductVariantController::class,'index']);
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
     Route::get('/variants/barcode/{barcode}',          [ProductVariantController::class,'lookupBarcode']);
-    Route::get('/variants/{id}',                       [ProductVariantController::class,'show']);
+    Route::get('/variants/{id}',                       [ProductVariantController::class,'show'])->whereNumber('id');
     Route::get('/variants/{id}/tiers',                 [\App\Http\Controllers\Api\V1\VariantPricingTierController::class, 'index']);
     Route::get('/variants/{id}/barcode-label',         [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'barcodeLabel']);
 
-    // SalesBinder Inventory Statistics & Financial Valuation (On-Hand, Reserved, Available, Incoming, Purchased vs Resale Value)
+    // SalesBinder Inventory Statistics & Valuation (High-speed cached)
     Route::get('/inventory/statistics',                [\App\Http\Controllers\Api\V1\InventoryValuationController::class, 'statistics']);
 
     // Payments, KHQR & Hardware Print Services
@@ -99,13 +99,13 @@ Route::prefix('v1')->group(function () {
     Route::get('/sales/{id}/invoice-pdf',              [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'renderInvoiceHtml']);
     Route::post('/gift-cards/check',                   [\App\Http\Controllers\Api\V1\GiftCardController::class, 'check']);
 
-    // Storefront CMS Banners & System Settings
+    // Storefront CMS Banners & System Audio Settings
     Route::get('/marketing/banners',                   [\App\Http\Controllers\Api\V1\MarketingBannerController::class, 'index']);
     Route::get('/settings/audio-cues',                 [\App\Http\Controllers\Api\V1\SystemSettingController::class, 'audioCues']);
 
 
     // =========================================================================
-    // TIER 2 — AUTHENTICATED (Any valid Bearer token)
+    // TIER 2 — AUTHENTICATED (CASHIER, STAFF, MANAGER, ADMIN)
     // =========================================================================
     Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
@@ -115,7 +115,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout',  [AuthController::class, 'logout']);
         });
 
-        // -- Customer Management & Loyalty (Cashier, Manager, Admin) --
+        // -- Customer Management & Loyalty Points --
         Route::get('/customers',                       [CustomerController::class, 'index']);
         Route::get('/customers/{id}',                  [CustomerController::class, 'show']);
         Route::post('/customers',                      [CustomerController::class, 'store']);
@@ -129,10 +129,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/shifts/drop-cash',               [\App\Http\Controllers\Api\V1\PosShiftController::class, 'dropCash']);
         Route::post('/shifts/close',                   [\App\Http\Controllers\Api\V1\PosShiftController::class, 'close']);
 
-        // -- POS Sales, Invoices & Estimates (SalesBinder Billing Engine) --
+        // -- POS Sales, Invoices & Estimates (SalesBinder Engine) --
         Route::post('/sales/checkout',                 [SaleController::class, 'checkout']);
         Route::get('/sales',                           [SaleController::class, 'index']);
         Route::get('/sales/{id}',                      [SaleController::class, 'show']);
+
         Route::get('/invoices',                        [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'index']);
         Route::post('/estimates',                      [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'createEstimate']);
         Route::post('/estimates/{id}/convert',         [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'convertEstimateToInvoice']);
@@ -145,6 +146,15 @@ Route::prefix('v1')->group(function () {
 
         // -- Live Role-Pulse Analytics (Pie & Agile Graph tracking per role) --
         Route::get('/dashboard/role-pulse',            [\App\Http\Controllers\Api\DashboardController::class, 'rolePulse']);
+
+        // Active Broadcast Alerts feed for all logged-in staff
+        Route::get('/alerts/active', function () {
+            $alerts = \Illuminate\Support\Facades\DB::table('system_broadcast_alerts')
+                ->where('is_active', true)
+                ->orderBy('alert_id', 'DESC')
+                ->get();
+            return response()->json(['success' => true, 'data' => $alerts]);
+        });
 
 
         // =====================================================================
@@ -217,22 +227,22 @@ Route::prefix('v1')->group(function () {
             Route::get('/purchases/{id}',              [PurchaseController::class,      'show']);
             Route::post('/purchases',                  [PurchaseController::class,      'store']);
 
-            // Inventory
+            // Inventory Stock Ledger & Adjustments
             Route::get('/stock-movements',             [StockMovementController::class, 'index']);
             Route::post('/stock-movements/adjust',     [StockMovementController::class, 'adjust']);
 
             // Cloudinary Image Media Management
-            Route::get('/uploads/gallery',                   [ImageUploadController::class,   'gallery']);
-            Route::post('/uploads/image',                    [ImageUploadController::class,   'upload']);
-            Route::post('/uploads/batch',                    [ImageUploadController::class,   'uploadBatch']);
-            Route::delete('/uploads/image',                  [ImageUploadController::class,   'destroy']);
-            Route::post('/products/{id}/image',              [ImageUploadController::class,   'uploadForProduct']);
-            Route::post('/variants/{id}/image',              [ImageUploadController::class,   'uploadForVariant']);
+            Route::get('/uploads/gallery',             [ImageUploadController::class,   'gallery']);
+            Route::post('/uploads/image',              [ImageUploadController::class,   'upload']);
+            Route::post('/uploads/batch',              [ImageUploadController::class,   'uploadBatch']);
+            Route::delete('/uploads/image',            [ImageUploadController::class,   'destroy']);
+            Route::post('/products/{id}/image',        [ImageUploadController::class,   'uploadForProduct']);
+            Route::post('/variants/{id}/image',        [ImageUploadController::class,   'uploadForVariant']);
 
-            // Sales Management
+            // Sales Voiding
             Route::post('/sales/{id}/void',            [SaleController::class,          'void']);
 
-            // Audit Logs
+            // Audit Logs (Accessible by Manager and Admin)
             Route::get('/audit-logs',                  [AuditLogController::class,      'index']);
             Route::get('/audit-logs/{id}',             [AuditLogController::class,      'show']);
         });
@@ -250,7 +260,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/employees/{id}',              [EmployeeController::class,      'update']);
             Route::delete('/employees/{id}',           [EmployeeController::class,      'destroy']);
 
-            // User Account Management (create accounts for frontend team)
+            // User Account Management
             Route::prefix('auth')->group(function () {
                 Route::post('/register', [AuthController::class, 'register']);
             });
@@ -259,14 +269,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/admin/master-pulse',          [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'masterPulse']);
             Route::post('/admin/broadcast-alert',      [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'broadcastAlert']);
         });
-
-        // Active Broadcast Alerts feed for all logged-in staff
-        Route::get('/alerts/active', function () {
-            $alerts = \Illuminate\Support\Facades\DB::table('system_broadcast_alerts')
-                ->where('is_active', true)
-                ->orderBy('alert_id', 'DESC')
-                ->get();
-            return response()->json(['success' => true, 'data' => $alerts]);
-        });
     });
 });
+
