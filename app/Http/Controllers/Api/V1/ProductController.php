@@ -87,7 +87,11 @@ class ProductController extends BaseApiController
 
     public function show(int $id): JsonResponse
     {
-        $product = Product::with(['category', 'variants.size', 'variants.color'])->findOrFail($id);
+        // ── High-Speed Caching Layer (Cache hot products for 1 hour) ──────────
+        $product = \Illuminate\Support\Facades\Cache::remember("product:{$id}", 3600, function () use ($id) {
+            return Product::with(['category', 'variants.size', 'variants.color', 'images', 'primaryImage'])->findOrFail($id);
+        });
+
         return $this->successResponse($product, 'Product details');
     }
 
@@ -108,6 +112,10 @@ class ProductController extends BaseApiController
 
         $product->update($validated);
 
+        // Cache Invalidation
+        \Illuminate\Support\Facades\Cache::forget("product:{$id}");
+        \Illuminate\Support\Facades\Cache::forget("product_matrix:{$id}");
+
         AuditLogService::log('UPDATE', 'Product', $id, $old, $product->toArray());
 
         return $this->successResponse($product->load('category'), 'Product updated');
@@ -118,6 +126,10 @@ class ProductController extends BaseApiController
         $product = Product::findOrFail($id);
         $old = $product->toArray();
         $product->delete();
+
+        // Cache Invalidation
+        \Illuminate\Support\Facades\Cache::forget("product:{$id}");
+        \Illuminate\Support\Facades\Cache::forget("product_matrix:{$id}");
 
         AuditLogService::log('DELETE', 'Product', $id, $old, null);
 
