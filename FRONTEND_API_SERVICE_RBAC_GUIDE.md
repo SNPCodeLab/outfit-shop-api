@@ -10,11 +10,11 @@
 
 | Role | Hierarchy Level | Primary Client Portal Interface | Allowed CRUD Operations |
 | :--- | :---: | :--- | :--- |
-| **🌐 PUBLIC / GUEST** | Level 0 | Luxury Storefront Showcase (Catalog & Swatches) | **R** on public products, categories, brands, marketing banners |
-| **📦 STAFF** | Level 1 | Floor & Warehouse Stock Lookup (Mobile / Tablet) | **R** on inventory, products, variants, customer lookup, stock pulse |
-| **💳 CASHIER** | Level 2 | Touch & Barcode POS Cash Register | **CR** on POS checkout, customer creation, receipt printing, shifts |
-| **👔 MANAGER** | Level 3 | Store Controller (Catalog, Purchasing, Reports) | **CRUD** on catalog, suppliers, purchases, stock adjustments, void sales |
-| **👑 ADMIN** | Level 4 | Master Command & Security Executive Console | **CRUD** on all entities + staff timesheets, RBAC users, tax & broadcast |
+| **PUBLIC / GUEST** | Level 0 | Luxury Storefront Showcase (Catalog & Swatches) | **R** on public products, categories, brands, marketing banners |
+| **STAFF** | Level 1 | Floor & Warehouse Stock Lookup (Mobile / Tablet) | **R** on inventory, products, variants, customer lookup, stock pulse |
+| **CASHIER** | Level 2 | Touch & Barcode POS Cash Register | **CR** on POS checkout, customer creation, receipt printing, shifts |
+| **MANAGER** | Level 3 | Store Controller (Catalog, Purchasing, Reports) | **CRUD** on catalog, suppliers, purchases, stock adjustments, void sales |
+| **ADMIN** | Level 4 | Master Command & Security Executive Console | **CRUD** on all entities + staff timesheets, RBAC users, tax & broadcast |
 
 ---
 
