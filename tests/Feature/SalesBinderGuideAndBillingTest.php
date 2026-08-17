@@ -23,7 +23,8 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $response = $this->get('/guide');
         $response->assertStatus(200)
             ->assertHeader('Content-Type', 'text/html; charset=utf-8')
-            ->assertSee('STORE STOCK &amp; POS', false)
+            ->assertSee('DOCUMENTATION', false)
+            ->assertSee('GUIDE', false)
             ->assertSee('Getting Started');
     }
 
