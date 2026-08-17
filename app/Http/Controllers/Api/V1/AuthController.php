@@ -125,6 +125,15 @@ class AuthController extends BaseApiController
                 );
             }
 
+            \Illuminate\Support\Facades\Log::channel('security')->info('Employee authenticated successfully', [
+                'employee_id' => $employee->employee_id,
+                'username'    => $employee->username,
+                'role'        => $role,
+                'device'      => $deviceName,
+                'ip'          => $request->ip(),
+                'user_agent'  => $request->userAgent(),
+            ]);
+
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
@@ -157,6 +166,14 @@ class AuthController extends BaseApiController
             $token       = $user->createToken($deviceName)->plainTextToken;
             $permissions = $this->permissionsFor($role);
 
+            \Illuminate\Support\Facades\Log::channel('security')->info('User account authenticated', [
+                'user_id'    => $user->id,
+                'email'      => $user->email,
+                'role'       => $role,
+                'device'     => $deviceName,
+                'ip'         => $request->ip(),
+            ]);
+
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type'   => 'Bearer',
@@ -171,6 +188,12 @@ class AuthController extends BaseApiController
                 ],
             ], 'Login successful');
         }
+
+        \Illuminate\Support\Facades\Log::channel('security')->warning('Failed authentication attempt', [
+            'identifier' => $identifier,
+            'ip'         => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         throw ValidationException::withMessages([
             'username' => ['Invalid credentials. Please check your username/email and password.'],
