@@ -85,6 +85,9 @@ description: >
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | None | API uptime, DB ping, Cloudinary CDN connection |
 | `GET` | `/status` | None | Brand metadata, logo URL, software version |
+| `GET` | `/guide` | None | SalesBinder-style Help Centre Knowledge Base Web UI |
+| `GET` | `/docs` | None | Programmatic JSON API Documentation Guide |
+| `GET` | `/inventory/statistics` | `?only_in_stock=true` | SalesBinder Total Valuation (Cost vs Resale), Margins & Quantities |
 | `GET` | `/settings/audio-cues` | None | POS Scanner wav audio URLs (beep, chime, buzz) |
 | `POST`| `/auth/login` | `{"email": "...", "password": "..."}` | Sanctum Bearer Token, User Object, Role Name |
 | `GET` | `/categories` | `?department=APPAREL` | List of 9 product categories |
@@ -127,6 +130,10 @@ description: >
 | `POST`| `/sales/checkout` | **CASHIER** | Items array, customer_id, payment_method, tax_rate | Execute POS sale with atomic stock deduction |
 | `GET` | `/sales` | **CASHIER** | `?date=today` | Today's register transactions |
 | `GET` | `/sales/{id}` | **CASHIER** | None | Invoice details with 10% VAT breakdown |
+| `GET` | `/sales/{id}/invoice-pdf` | **CASHIER** | None | High-res SalesBinder-style A4 Printable Tax Invoice View |
+| `GET` | `/invoices` | **CASHIER** | `?status=ESTIMATE` | List Sales Orders, Invoices & Estimates with billing totals |
+| `POST`| `/estimates` | **CASHIER** | Items, customer_id, discount, tax_rate | Create formal quotation estimate without deducting stock |
+| `POST`| `/estimates/{id}/convert` | **CASHIER** | `{"payment_method": "ABA"}` | 1-Click Convert Estimate to Invoice & deduct stock |
 | `GET` | `/sales/{id}/receipt-thermal` | **CASHIER** | None | 80mm ESC/POS thermal receipt format |
 | `GET` | `/sales/{id}/khqr` | **CASHIER** | None | Dynamic ABA / Bakong KHQR payment string |
 | `GET` | `/customers` | **CASHIER, STAFF** | `?search=012888999` | Search customer directory by phone or name |

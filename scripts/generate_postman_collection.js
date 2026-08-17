@@ -974,6 +974,64 @@ const collectionItems = [
         }
       },
       {
+        name: 'Invoices - List Sales Orders & Estimates (SalesBinder)',
+        request: {
+          method: 'GET',
+          header: authHeader('token'),
+          url: makeUrl('invoices', [
+            { key: 'status', value: 'ESTIMATE', disabled: true },
+            { key: 'per_page', value: '20', disabled: false }
+          ]),
+          description: 'SalesBinder-style Billing Dashboard with financial totals and status filters.'
+        }
+      },
+      {
+        name: 'Estimates - Create Estimate Quote (SalesBinder)',
+        request: {
+          method: 'POST',
+          header: jsonHeaders('token'),
+          body: {
+            mode: 'raw',
+            raw: JSON.stringify({
+              customer_id: 1,
+              items: [
+                { variant_id: 1, quantity: 2, discount: 0.00 },
+                { variant_id: 2, quantity: 1, discount: 0.00 }
+              ],
+              overall_discount: 5.00,
+              tax_rate: 10.00,
+              notes: 'Official wholesale quote valid for 14 days'
+            }, null, 2)
+          },
+          url: makeUrl('estimates'),
+          description: 'Creates a quotation/estimate and calculates 10% VAT without immediately deducting stock.'
+        }
+      },
+      {
+        name: 'Estimates - 1-Click Convert to Invoice (SalesBinder)',
+        request: {
+          method: 'POST',
+          header: jsonHeaders('token'),
+          body: {
+            mode: 'raw',
+            raw: JSON.stringify({
+              payment_method: 'ABA'
+            }, null, 2)
+          },
+          url: makeUrl('estimates/1/convert'),
+          description: '1-Click converts an approved estimate into an active invoice, validates & deducts inventory.'
+        }
+      },
+      {
+        name: 'Invoices - SalesBinder A4 Printable PDF/HTML Invoice View',
+        request: {
+          method: 'GET',
+          header: [{ key: 'Accept', value: 'text/html' }],
+          url: makeUrl('sales/1/invoice-pdf'),
+          description: 'Renders a beautiful, high-res SalesBinder-style A4 invoice ready to save as PDF or print.'
+        }
+      },
+      {
         name: 'Gift Cards - Check Balance',
         request: {
           method: 'POST',
@@ -1113,6 +1171,18 @@ const collectionItems = [
     name: '09. Inventory Forecasting, Suppliers & Purchasing',
     description: 'Smart restock forecasting, auto purchase orders, stock movement adjustments, and supplier management.',
     item: [
+      {
+        name: 'Inventory - SalesBinder Financial Valuation & Statistics',
+        request: {
+          method: 'GET',
+          header: [{ key: 'Accept', value: 'application/json' }],
+          url: makeUrl('inventory/statistics', [
+            { key: 'only_in_stock', value: 'true', disabled: true },
+            { key: 'category_id', value: '1', disabled: true }
+          ]),
+          description: 'SalesBinder-style Total Valuation (Purchased Value vs Resale Value), Gross Margin, and On-Hand / Reserved / Available / Incoming unit breakdown.'
+        }
+      },
       {
         name: 'Forecasting - Restock Recommendations (AI/Velocity)',
         request: {

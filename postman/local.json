@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "khmeriel-ssmis-master-local-api-v1",
-    "name": "KhmeRiel MIS & POS — Local Dev (127.0.0.1:8000) [124 Endpoints]",
-    "description": "Complete Master Postman Collection containing 100% of all 124 API endpoints across all RBAC Access Tiers (Public/Storefront, Cashier, Manager, Admin). Includes automated token management, 10% VAT tax calculations, KHQR, shifts, inventory FIFO batches, and media uploads.",
+    "name": "KhmeRiel MIS & POS — Local Dev (127.0.0.1:8000) [129 Endpoints]",
+    "description": "Complete Master Postman Collection containing 100% of all 129 API endpoints across all RBAC Access Tiers (Public/Storefront, Cashier, Manager, Admin). Includes automated token management, 10% VAT tax calculations, KHQR, shifts, inventory FIFO batches, and media uploads.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -2368,6 +2368,148 @@
           }
         },
         {
+          "name": "Invoices - List Sales Orders & Estimates (SalesBinder)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/invoices?status=ESTIMATE&per_page=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "invoices"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ESTIMATE",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "description": "",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "SalesBinder-style Billing Dashboard with financial totals and status filters."
+          }
+        },
+        {
+          "name": "Estimates - Create Estimate Quote (SalesBinder)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0\n    },\n    {\n      \"variant_id\": 2,\n      \"quantity\": 1,\n      \"discount\": 0\n    }\n  ],\n  \"overall_discount\": 5,\n  \"tax_rate\": 10,\n  \"notes\": \"Official wholesale quote valid for 14 days\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estimates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estimates"
+              ]
+            },
+            "description": "Creates a quotation/estimate and calculates 10% VAT without immediately deducting stock."
+          }
+        },
+        {
+          "name": "Estimates - 1-Click Convert to Invoice (SalesBinder)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method\": \"ABA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estimates/1/convert",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estimates",
+                "1",
+                "convert"
+              ]
+            },
+            "description": "1-Click converts an approved estimate into an active invoice, validates & deducts inventory."
+          }
+        },
+        {
+          "name": "Invoices - SalesBinder A4 Printable PDF/HTML Invoice View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sales/1/invoice-pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sales",
+                "1",
+                "invoice-pdf"
+              ]
+            },
+            "description": "Renders a beautiful, high-res SalesBinder-style A4 invoice ready to save as PDF or print."
+          }
+        },
+        {
           "name": "Gift Cards - Check Balance",
           "request": {
             "method": "POST",
@@ -2712,6 +2854,43 @@
       "name": "09. Inventory Forecasting, Suppliers & Purchasing",
       "description": "Smart restock forecasting, auto purchase orders, stock movement adjustments, and supplier management.",
       "item": [
+        {
+          "name": "Inventory - SalesBinder Financial Valuation & Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inventory/statistics?only_in_stock=true&category_id=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inventory",
+                "statistics"
+              ],
+              "query": [
+                {
+                  "key": "only_in_stock",
+                  "value": "true",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "SalesBinder-style Total Valuation (Purchased Value vs Resale Value), Gross Margin, and On-Hand / Reserved / Available / Incoming unit breakdown."
+          }
+        },
         {
           "name": "Forecasting - Restock Recommendations (AI/Velocity)",
           "request": {

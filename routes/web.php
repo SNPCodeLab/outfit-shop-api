@@ -28,7 +28,8 @@ Route::get('/', function () {
         'version'            => '1.0.0',
         'status'             => 'online',
         'frontend_url'       => 'https://app.kesararamwithdigital.tech',
-        'documentation_url'  => 'https://github.com/SNPbuilds/csms-backend-api',
+        'documentation_url'  => "{$base}/guide",
+        'guide_api_url'      => "{$base}/api/v1/guide",
 
         // ── Public (no token) ─────────────────────────────────────────────
         'health_url'             => "{$base}/api/v1/health",
@@ -63,3 +64,8 @@ Route::get('/', function () {
         'employees_url'          => "{$base}/api/v1/employees",
     ], 200, ['Content-Type' => 'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 });
+
+// SalesBinder-style Help Centre & Interactive Guide
+Route::get('/guide', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+Route::get('/kb', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
+
