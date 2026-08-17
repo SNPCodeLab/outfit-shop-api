@@ -24,7 +24,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $response->assertStatus(200)
             ->assertHeader('Content-Type', 'text/html; charset=utf-8')
             ->assertSee('STORE STOCK &amp; POS', false)
-            ->assertSee('How can we help?');
+            ->assertSee('Getting Started');
     }
 
     public function test_help_centre_json_api_returns_structured_topics(): void
@@ -40,7 +40,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
                     'tagline',
                     'total_topics',
                     'categories' => [
-                        '*' => ['id', 'icon', 'title', 'tagline', 'overview', 'sections', 'tips']
+                        '*' => ['id', 'title', 'tagline', 'icon', 'description', 'sections', 'tips']
                     ],
                     'popular_topics',
                 ],
