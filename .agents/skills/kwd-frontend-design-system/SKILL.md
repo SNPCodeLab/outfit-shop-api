@@ -24,7 +24,7 @@ description: >
 | **Subtitle / Domain** | **KhmeRiel • Clothing & POS MIS** |
 | **Frontend Portal URL** | `https://app.kesararamwithdigital.tech` |
 | **Backend REST API Gateway**| `https://api.kesararamwithdigital.tech/api/v1` |
-| **Visual Architecture** | Strict separation of concerns between **Portal 1 (Modern Enterprise)** and **Portal 2 (Ralph Lauren + Neo-Brutalism)**. |
+| **Visual Architecture** | Strict separation of concerns between **Portal 1 (Modern Enterprise via shadcn/ui)** and **Portal 2 (Ralph Lauren + Neo-Brutalism)**. |
 
 ---
 
@@ -50,6 +50,8 @@ description: >
     │ • NEVER USE NEO-BRUTALISM    │                            │ • ONLY APPLY NEO-BRUTALISM   │
     │   IN PORTAL 1                │                            │   IN PORTAL 2                │
     │ • FontAwesome & 3px Radius   │                            │ • FontAwesome & 3px Radius   │
+    │ • NO black shadows           │                            │ • NO black shadows           │
+    │ • Zero emojis                │                            │ • Zero emojis                │
     └──────────────┬───────────────┘                            └──────────────┬───────────────┘
                    │                                                           │
                    └─────────────────────────────┬─────────────────────────────┘
@@ -64,106 +66,93 @@ description: >
 
 ---
 
-## 3. Strict Interface Styling Rules
+## 3. Strict Universal Styling Directives (Both Portals)
 
-### 3.1 Universal Rules (Applies to BOTH Portal 1 and Portal 2)
-* **NEVER USE EMOJIS**: Do not use any emoji characters anywhere in UI components, headers, buttons, toast alerts, status badges, or copy. Always use FontAwesome icons.
-* **DO NOT USE BLACK SHADOWS**: Absolutely no pitch-black drop shadows (`shadow-[..._#000000]`). Maintain flat crisp surfaces (`shadow-none`) or minimal tonal elevation.
-* **BORDER-RADIUS: 3px**: Every container, card, modal, input, button, badge, table row container, and dropdown must use `border-radius: 3px;` (`rounded-[3px]`).
-* **FONTAWESOME ICON LIBRARY**: All iconography must use the official FontAwesome React library (`@fortawesome/react-fontawesome` & `@fortawesome/free-solid-svg-icons` / `@fortawesome/free-brands-svg-icons`).
-
----
-
-### 3.2 Portal 1: Internal Admin & Staff Controller Portal (Admin / Manager / Staff)
-> **CRITICAL DIRECTIVE**: **NEVER USE NEO-BRUTALISM IN PORTAL 1.**
-
-* **Target Routes**: `/dashboard`, `/pos`, `/inventory`, `/purchases`, `/sales`, `/employees`, `/audit-logs`, `/admin/*`
-* **Design Philosophy**: High-density, professional, modern enterprise SaaS UI (inspired by Linear, Vercel Dashboard, and SalesBinder).
-* **Styling Tokens**:
-  * **Canvas & Surface**: Crisp clean white (`bg-white`) and soft neutral backgrounds (`bg-slate-50` / `bg-zinc-50`).
-  * **Borders**: Clean, subtle 1px border outlines (`border border-slate-200` or `border-zinc-200`).
-  * **Border Radius**: `rounded-[3px]`.
-  * **Shadows**: `shadow-none` or subtle neutral elevation (`shadow-sm`).
-  * **Tables & Matrices**: Compact, high-density 2D Size × Color inventory matrix with muted gridlines and monospaced numeric stock counters.
-  * **Buttons & Inputs**: Professional shadcn/ui style components with `rounded-[3px]` and subtle focus rings.
+1. **NEVER USE EMOJIS**: Do not use any emoji characters anywhere in UI components, headers, buttons, toast alerts, status badges, or copy. Always use FontAwesome icons.
+2. **DO NOT USE BLACK SHADOWS**: Absolutely no pitch-black drop shadows (`shadow-[..._#000000]`). Maintain flat crisp surfaces (`shadow-none`) or minimal tonal elevation (`shadow-sm`).
+3. **BORDER-RADIUS: 3px**: Every container, card, modal, input, button, badge, table row container, and dropdown must use `border-radius: 3px;` (`rounded-[3px]`).
+4. **FONTAWESOME ICON LIBRARY**: All iconography must use the official FontAwesome React library (`@fortawesome/react-fontawesome` & `@fortawesome/free-solid-svg-icons` / `@fortawesome/free-brands-svg-icons`).
 
 ---
 
-### 3.3 Portal 2: Customer-Facing Storefront & Product Showcase (Customer / Public)
-> **CRITICAL DIRECTIVE**: **ONLY APPLY NEO-BRUTALISM DESIGN TOKENS TO PORTAL 2.**
+## 4. shadcn/ui Component Recommendations for Portal 1 (Controller & POS)
 
-* **Target Routes**: `/` (Storefront Home), `/shop`, `/product/[id]`, `/lookbook`, `/cart`, `/checkout`
-* **Design Philosophy**: Fusion of **Ralph Lauren luxury fashion catalog UX** + **Tactile Neo-Brutalist structural tokens**.
-* **Styling Tokens**:
-  * **3:4 Portrait Image Tiles**: Every clothing item renders in a high-resolution 3:4 portrait aspect ratio on clean studio backgrounds (`#F0EFED` / `#FAF7F0`) using `object-contain`.
-  * **Canvas Background**: Warm Cream / Off-White (`bg-[#FAF7F0]`) with a subtle 20px grid line pattern.
-  * **Primary Accent**: Canary Yellow (`#FEE227` / `#FFE600`) for CTAs, hero badges, and quick-shop triggers.
-  * **Borders**: Solid 2.5px stark pitch black (`border-[2.5px] border-black`).
-  * **Border Radius**: Exactly 3px (`rounded-[3px]`).
-  * **Shadows**: **NO BLACK SHADOWS** (`shadow-none`).
-  * **Interactive Color Swatches**: Micro circular color swatches (`COLORS` table) positioned directly under the title with `rounded-[3px]` and 1.5px black border.
-  * **Quick Shop Bar**: Canary yellow action button with FontAwesome shopping bag icon that triggers a bottom drawer or modal to select sizes (S, M, L, XL, 2XL).
+> **CRITICAL RULE**: Portal 1 must look like a sleek, ultra-fast modern SaaS enterprise application (Linear, Vercel Dashboard, Stripe, SalesBinder). **DO NOT apply Neo-Brutalism to Portal 1.**
 
----
+### 4.1 Recommended shadcn/ui Theme Configuration (`globals.css`)
+Configure Tailwind and shadcn CSS variables with `--radius: 3px` and clean Slate/Zinc neutrals:
 
-## 4. Master Single-Prompt to Generate the Next.js Frontend
-
-*(Copy this prompt into any AI/coding environment to build the entire KhmeRiel frontend)*
-
-```markdown
-Act as a Principal Full-Stack Engineer and World-Class UI/UX Designer. Build a complete, production-ready Next.js 14+ (App Router, TypeScript) frontend application for "KhmeRiel" (Clothing & POS MIS) deployed at `https://app.kesararamwithdigital.tech` connecting to `https://api.kesararamwithdigital.tech/api/v1`.
-
-### 1. DUAL-INTERFACE ARCHITECTURAL RULES (STRICT SEPARATION)
-The application has TWO distinctly styled interfaces:
-
-A. PORTAL 1: Internal Admin & Staff Controller (/dashboard, /pos, /inventory, /sales, /admin)
-- Style: Modern Enterprise SaaS UI (shadcn/ui + SalesBinder matrix).
-- NEVER use Neo-Brutalism in Portal 1.
-- Canvas: Clean white (bg-white) and subtle neutral slate (bg-slate-50).
-- Borders: Subtle 1px neutral borders (border border-slate-200).
-- Border Radius: Exactly 3px (rounded-[3px]).
-- Shadows: Flat (shadow-none) or subtle soft elevation (shadow-sm). No black drop shadows.
-- Icons: FontAwesome solid icons.
-- Emojis: NEVER use emojis anywhere.
-
-B. PORTAL 2: Customer-Facing Store Showcase (/shop, /product/[id], /)
-- Style: Ralph Lauren Luxury Catalog UX + Neo-Brutalism.
-- ONLY apply Neo-Brutalism tokens to Portal 2.
-- Canvas: Warm Cream (#FAF7F0) with subtle grid background.
-- Primary Accent: Canary Yellow (#FEE227 / #FFE600).
-- Borders: Solid 2.5px stark black (border-[2.5px] border-black).
-- Border Radius: Exactly 3px (rounded-[3px]).
-- Shadows: NO black drop shadows (shadow-none).
-- Photography: 3:4 portrait aspect ratio images with object-contain.
-- Swatches: Micro interactive color swatches with rounded-[3px].
-- Icons: FontAwesome solid icons.
-- Emojis: NEVER use emojis anywhere.
-
-### 2. BACKEND API INTEGRATION & AUTHENTICATION
-- Production Base URL: https://api.kesararamwithdigital.tech/api/v1
-- Authentication: Laravel Sanctum Bearer Token via Authorization: Bearer <token> header.
-- Token Persistence: Store access_token in localStorage.getItem('auth_token') and authenticated user profile in auth_user.
-- Global Axios Interceptor (lib/api.ts):
-  - Automatically inject Bearer token on every outgoing request.
-  - Intercept 401 Unauthorized responses to clear local storage and redirect user to /login.
-  - Handle standard JSON error schema: { success: false, message: "...", error_code: "..." }.
-
-### 3. ROLE-BASED ACCESS CONTROL (RBAC) MATRIX
-Implement a strict useRoleGuard(minRole) client-side route guard enforcing the 4-tier access ladder:
-- ADMIN (Rank 4): Full access to Employee CRUD (/admin/employees), Security Audit Logs (/admin/audit), and User Account Creation.
-- MANAGER (Rank 3): Access to MIS Analytics Dashboard (/dashboard), Catalog & Variant Matrix CRUD (/inventory), Supplier Purchasing (/reports), Stock Adjustments (/inventory/adjust), and Transaction Voiding (/sales/void).
-- CASHIER (Rank 2): Access to POS Barcode Checkout Counter (/pos), Customer Registration (/customers), and Sales Receipts (/sales).
-- STAFF (Rank 1): Read-only product catalog lookup.
-
-### 4. CORE SCREENS TO BUILD
-1. Authentication Portal (app/(auth)/login/page.tsx): Clean card with 3px border-radius, email/password fields, FontAwesome icons, and POST /auth/login.
-2. Executive MIS Dashboard (app/(dashboard)/dashboard/page.tsx - Portal 1 Enterprise Style): 4 stat cards consuming GET /dashboard/stats, 7-Day API Request Traffic chart, and Recent Requests Data Table.
-3. High-Speed POS Checkout Counter (app/(dashboard)/pos/page.tsx - Portal 1 Enterprise Style): Continuous auto-focus Barcode scanner input (GET /variants/barcode/{barcode}), sound cues (GET /settings/audio-cues), coupon verify (POST /promotions/verify-coupon), cart manager, payment methods (KHQR, Cash, Card), and checkout submission (POST /sales/checkout).
-4. SalesBinder-Style Matrix Inventory (app/(dashboard)/inventory/page.tsx - Portal 1 Enterprise Style): Searchable table (GET /products), 2D Size × Color Grid (GET /products/{id}/matrix), low-stock warning (GET /variants/low-stock), and adjustment dialog (POST /stock-movements/adjust).
-5. Ralph Lauren Luxury Storefront (app/(shop)/page.tsx - Portal 2 Neo-Brutalist Style): 4-column luxury grid with 3:4 portrait images, micro color swatches, Quick-Shop drawer, banners (GET /marketing/banners), brands (GET /brands), and bundles (GET /bundles).
-6. Product Detail (app/(shop)/[id]/page.tsx - Portal 2 Neo-Brutalist Style): Multi-angle photo gallery (GET /products/{id}/images), colorways (GET /products/{id}/colorways), reviews (GET /products/{id}/reviews), and wishlist toggle (POST /wishlist/toggle).
-7. Sales History (app/(dashboard)/sales/page.tsx - Portal 1 Enterprise Style): Paginated sales from GET /sales and void action POST /sales/{id}/void.
-8. Employees & Audit (app/(dashboard)/admin/page.tsx - Portal 1 Enterprise Style): Staff CRUD and audit logs (GET /audit-logs).
-
-Provide the complete, copy-paste ready code for tailwind.config.js, globals.css, lib/api.ts, hooks/useRoleGuard.ts, and screen components.
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 3px; /* Locked 3px radius */
+  }
+}
 ```
+
+---
+
+### 4.2 Module-by-Module shadcn/ui Component Breakdown
+
+#### A. POS Cash Register Screen (`/pos`)
+* **`Input` (Barcode Scanner)**: Large, auto-focus input with prefix FontAwesome barcode icon (`faBarcode`), styled with `h-12 text-lg font-mono rounded-[3px] border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-900`.
+* **`Card` & `CardContent` (Cart Manager)**: Structured cart container with `rounded-[3px] border border-slate-200 shadow-none`.
+* **`ScrollArea`**: Smooth, non-overflowing scrolling container for high-speed cart item listing.
+* **`Badge`**: Clean status pills for 10% VAT (`variant="outline" className="rounded-[3px] font-mono text-xs"`).
+* **`Tabs`, `TabsList`, `TabsTrigger`**: Clean tabbed switcher for tender payment methods (`Cash USD`, `Cash KHR`, `ABA KHQR`, `Card`) with `rounded-[3px]`.
+* **`Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`**:
+  * **Bakong Dynamic KHQR Modal**: Centered modal with high-res QR code, live total amount display, countdown timer, and status spinner.
+  * **Thermal Receipt Preview Modal**: Monospaced 80mm ESC/POS layout preview with one-click thermal print button.
+
+#### B. Inventory 2D Matrix Screen (`/inventory`)
+* **`Table`, `TableHeader`, `TableRow`, `TableHead`, `TableBody`, `TableCell`**: SalesBinder-style 2D grid matrix. Size columns (S, M, L, XL, 2XL) across Color rows with high-density compact cells (`py-2 px-3 text-sm font-mono`).
+* **`Popover`, `PopoverTrigger`, `PopoverContent`**: Quick-adjust stock drawer on cell click without reloading the full page.
+* **`Sheet`, `SheetContent`, `SheetHeader`**: Slide-out drawer on the right side for creating new product SKUs, uploading gallery images, and managing FIFO batches.
+* **`Tooltip`, `TooltipTrigger`, `TooltipContent`**: Shows reorder levels, cost prices, and margin percentages on cell hover.
+
+#### C. Executive MIS Dashboard (`/dashboard`)
+* **`Card` (KPI Stat Tiles)**: 4 clean KPI cards with subtle top border highlight, displaying Daily Revenue, Total Orders, Average Basket Size, and Low Stock Alerts.
+* **`Separator`**: Clean horizontal dividers between sections.
+* **`DropdownMenu`**: Date range selector (`Today`, `Last 7 Days`, `This Month`, `Custom Range`).
+* **Recharts Integration**: Clean line, bar, and donut charts styled with Tailwind slate/neutral palettes.
+
+#### D. Admin & Security Console (`/admin/*`)
+* **`DataTable` (TanStack Table)**: Paginated table with multi-column sorting, search filters, and row selection.
+* **`AlertDialog`, `AlertDialogAction`, `AlertDialogCancel`**: Confirmation prompt for destructive operations (Voiding invoices, deleting employees).
+* **`Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage`**: Integrated with `react-hook-form` + `zod` for strictly typed employee creation and coupon provisioning.
+
+---
+
+## 5. Summary Table: Portal 1 vs. Portal 2 Component Specification
+
+| UI Component | Portal 1: Controller & POS (Admin/Manager/Staff) | Portal 2: Storefront Showcase (Customer/Public) |
+| :--- | :--- | :--- |
+| **Framework Style** | **shadcn/ui Enterprise SaaS** | **Ralph Lauren Luxury + Neo-Brutalism** |
+| **Borders** | Subtle `1px` neutral (`border border-slate-200`) | Solid `2.5px` stark black (`border-[2.5px] border-black`) |
+| **Border Radius** | Exactly `3px` (`rounded-[3px]`) | Exactly `3px` (`rounded-[3px]`) |
+| **Canvas Background** | Pure White (`bg-white`) / Soft Slate (`bg-slate-50`) | Warm Cream (`bg-[#FAF7F0]`) with 20px grid lines |
+| **Accent Color** | Slate 900 (`bg-slate-900 text-white`) | Canary Yellow (`#FEE227` / `#FFE600`) |
+| **Shadows** | `shadow-none` or subtle `shadow-sm` (**NO black shadows**) | `shadow-none` (**NO black shadows**) |
+| **Icons** | FontAwesome Solid Icons (`@fortawesome/...`) | FontAwesome Solid Icons (`@fortawesome/...`) |
+| **Emojis** | **STRICTLY PROHIBITED** | **STRICTLY PROHIBITED** |
+| **Product Layout** | SalesBinder 2D Matrix Table Grid | 3:4 Portrait Aspect Ratio Luxury Fashion Cards |
+| **Cart Interaction** | High-speed POS Barcode Counter | Quick-Shop Slide-Up Drawer with Color Swatches |
