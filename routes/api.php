@@ -53,6 +53,10 @@ Route::prefix('v1')->group(function () {
         return response()->file($path, ['Content-Type' => 'application/json']);
     });
 
+    // Multi-Currency (USD Primary + KHR Secondary with NBC Official Benchmarks)
+    Route::get('/currencies/rates',    [\App\Http\Controllers\Api\V1\CurrencyController::class, 'rates']);
+    Route::post('/currencies/convert',  [\App\Http\Controllers\Api\V1\CurrencyController::class, 'convert']);
+
     // Authentication — rate-limited to prevent brute-force (10 attempts / min)
     Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login');
