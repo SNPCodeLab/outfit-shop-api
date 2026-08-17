@@ -302,6 +302,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/ai/customer-segmentation',          [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'customerSegmentation']);
             Route::get('/ai/dynamic-pricing',                [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'dynamicPricing']);
 
+            // GDPR & PCI-DSS Compliance & Data Portability
+            Route::post('/compliance/customers/{id}/export-data', [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'exportData']);
+            Route::post('/compliance/customers/{id}/forget-me',   [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'forgetMe']);
+            Route::get('/compliance/audit-retention-policy',      [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'policy']);
+
             // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
             Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
