@@ -39,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
 
         $exceptions->render(function (Throwable $e, Request $request) {
-            $docUrl = 'https://github.com/SNPbuilds/csms-backend-api';
+            $docUrl = rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide';
             $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
 
             if ($e instanceof AuthenticationException) {
