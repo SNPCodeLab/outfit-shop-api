@@ -148,6 +148,15 @@ class InventoryService
                 userId: $employeeId
             );
 
+            \Illuminate\Support\Facades\Log::channel('purchasing')->info('Purchase order received and inventory updated', [
+                'purchase_id'  => $purchaseHeader->purchase_id,
+                'reference_no' => $referenceNo,
+                'supplier_id'  => $supplierId,
+                'employee_id'  => $employeeId,
+                'items_count'  => count($items),
+                'grand_total'  => (float) $grandTotal,
+            ]);
+
             return $purchaseHeader->load(['details.variant.product', 'supplier', 'employee']);
         });
     }
@@ -213,17 +222,27 @@ class InventoryService
 
             AuditLogService::log(
                 action:    'ADJUSTMENT',
-                entity:    'ProductVariant',
-                entityId:  $variant->variant_id,
-                oldValues: ['quantity' => $stockBefore],
+                entity:    'StockMovement',
+                entityId:  $movement->movement_id,
                 newValues: [
-                    'quantity'      => $stockAfter,
-                    'adjustment'    => $quantity,
+                    'variant_id'    => $variantId,
+                    'quantity'      => $quantity,
                     'movement_type' => $movementType,
-                    'reason'        => $note,
+                    'stock_before'  => $stockBefore,
+                    'stock_after'   => $stockAfter,
                 ],
                 userId: $employeeId
             );
+
+            \Illuminate\Support\Facades\Log::channel('inventory')->info('Stock adjusted manually', [
+                'movement_id'   => $movement->movement_id,
+                'variant_id'    => $variantId,
+                'movement_type' => $movementType,
+                'quantity'      => $quantity,
+                'stock_before'  => $stockBefore,
+                'stock_after'   => $stockAfter,
+                'employee_id'   => $employeeId,
+            ]);
 
             return $movement;
         });

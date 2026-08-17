@@ -53,8 +53,12 @@ Route::prefix('v1')->group(function () {
         return response()->file($path, ['Content-Type' => 'application/json']);
     });
 
-    // Authentication — rate-limited to prevent brute-force (10 attempts / min)
-    Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
+    // Multi-Currency (USD Primary + KHR Secondary with NBC Official Benchmarks)
+    Route::get('/currencies/rates',    [\App\Http\Controllers\Api\V1\CurrencyController::class, 'rates']);
+    Route::post('/currencies/convert',  [\App\Http\Controllers\Api\V1\CurrencyController::class, 'convert']);
+
+    // Authentication — rate-limited to prevent brute-force (5 attempts / min)
+    Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login');
     });
 
@@ -115,12 +119,16 @@ Route::prefix('v1')->group(function () {
     // =========================================================================
     // TIER 2 — AUTHENTICATED (CASHIER, STAFF, MANAGER, ADMIN)
     // =========================================================================
-    Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:role-based'])->group(function () {
 
-        // -- Session Management --
+        // -- Session Management & Token Rotation --
         Route::prefix('auth')->group(function () {
-            Route::get('/me',       [AuthController::class, 'me']);
-            Route::post('/logout',  [AuthController::class, 'logout']);
+            Route::get('/me',          [AuthController::class, 'me']);
+            Route::post('/logout',     [AuthController::class, 'logout']);
+            Route::post('/refresh',    [AuthController::class, 'refresh']);
+            Route::post('/revoke-all', [AuthController::class, 'revokeAll']);
+            Route::post('/2fa/setup',  [AuthController::class, 'setup2FA']);
+            Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
         });
 
         // -- Customer Management & Loyalty Points --
@@ -151,6 +159,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/shipping/orders',                 [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'index']);
         Route::post('/shipping/create',                [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'create']);
         Route::post('/shipping/{id}/status',           [\App\Http\Controllers\Api\V1\ShippingOrderController::class, 'updateStatus']);
+
+        // -- Offline POS Mode Synchronization & Conflict Resolution --
+        Route::get('/offline/manifest',                [\App\Http\Controllers\Api\V1\OfflineSyncController::class, 'manifest']);
+        Route::post('/offline/push-transactions',       [\App\Http\Controllers\Api\V1\OfflineSyncController::class, 'pushTransactions']);
 
         // -- Live Role-Pulse Analytics (Pie & Agile Graph tracking per role) --
         Route::get('/dashboard/role-pulse',            [\App\Http\Controllers\Api\DashboardController::class, 'rolePulse']);
@@ -253,6 +265,55 @@ Route::prefix('v1')->group(function () {
             // Audit Logs (Accessible by Manager and Admin)
             Route::get('/audit-logs',                  [AuditLogController::class,      'index']);
             Route::get('/audit-logs/{id}',             [AuditLogController::class,      'show']);
+
+            // Bulk / Batch Operations (1 Request vs 100)
+            Route::post('/inventory/bulk-adjust',      [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkAdjust']);
+            Route::post('/variants/bulk-price-update', [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkPriceUpdate']);
+            Route::post('/products/bulk-import',       [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkImport']);
+            Route::post('/purchases/bulk-receive',     [\App\Http\Controllers\Api\V1\BulkOperationController::class, 'bulkReceive']);
+
+            // File Exports (PDF, Excel, CSV, Thermal POS format)
+            Route::get('/exports/inventory/excel',       [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportInventory']);
+            Route::get('/exports/stock-movements/csv',    [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportStockMovements']);
+            Route::get('/exports/sales-report/pdf',      [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportSalesReport']);
+            Route::get('/exports/z-report/{id}/thermal', [\App\Http\Controllers\Api\V1\FileExportController::class, 'exportZReportThermal']);
+
+            // Multi-Store Stock Transfers (5-Stage Lifecycle: Request -> Approve -> Pick -> Ship -> Receive)
+            Route::get('/stock-transfers',                 [\App\Http\Controllers\Api\V1\StockTransferController::class, 'index']);
+            Route::get('/stock-transfers/{id}',            [\App\Http\Controllers\Api\V1\StockTransferController::class, 'show']);
+            Route::post('/stock-transfers',                [\App\Http\Controllers\Api\V1\StockTransferController::class, 'store']);
+            Route::post('/stock-transfers/{id}/approve',   [\App\Http\Controllers\Api\V1\StockTransferController::class, 'approve']);
+            Route::post('/stock-transfers/{id}/pick',      [\App\Http\Controllers\Api\V1\StockTransferController::class, 'pick']);
+            Route::post('/stock-transfers/{id}/ship',      [\App\Http\Controllers\Api\V1\StockTransferController::class, 'ship']);
+            Route::post('/stock-transfers/{id}/receive',   [\App\Http\Controllers\Api\V1\StockTransferController::class, 'receive']);
+            Route::post('/stock-transfers/{id}/cancel',    [\App\Http\Controllers\Api\V1\StockTransferController::class, 'cancel']);
+
+            // Advanced MIS Financial & Operational Reports
+            Route::get('/reports/sales',                     [\App\Http\Controllers\Api\V1\ReportController::class, 'sales']);
+            Route::get('/reports/inventory-valuation',       [\App\Http\Controllers\Api\V1\ReportController::class, 'inventoryValuation']);
+            Route::get('/reports/stock-aging',               [\App\Http\Controllers\Api\V1\ReportController::class, 'stockAging']);
+            Route::get('/reports/customer-purchase-history', [\App\Http\Controllers\Api\V1\ReportController::class, 'customerPurchaseHistory']);
+            Route::get('/reports/supplier-performance',      [\App\Http\Controllers\Api\V1\ReportController::class, 'supplierPerformance']);
+            Route::get('/reports/profit-margin',             [\App\Http\Controllers\Api\V1\ReportController::class, 'profitMargin']);
+            Route::get('/reports/cash-flow',                 [\App\Http\Controllers\Api\V1\ReportController::class, 'cashFlow']);
+
+            // AI Predictive Retail Intelligence & Fraud Anomaly Detection
+            Route::get('/ai/sales-forecast',                 [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'salesForecast']);
+            Route::get('/ai/anomaly-detection',              [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'anomalyDetection']);
+            Route::get('/ai/smart-restock',                  [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'smartRestock']);
+            Route::get('/ai/customer-segmentation',          [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'customerSegmentation']);
+            Route::get('/ai/dynamic-pricing',                [\App\Http\Controllers\Api\V1\AiIntelligenceController::class, 'dynamicPricing']);
+
+            // GDPR & PCI-DSS Compliance & Data Portability
+            Route::post('/compliance/customers/{id}/export-data', [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'exportData']);
+            Route::post('/compliance/customers/{id}/forget-me',   [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'forgetMe']);
+            Route::get('/compliance/audit-retention-policy',      [\App\Http\Controllers\Api\V1\PrivacyComplianceController::class, 'policy']);
+
+            // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
+            Route::get('/webhooks',                    [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'index']);
+            Route::post('/webhooks/subscribe',          [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'subscribe']);
+            Route::post('/webhooks/test',               [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'test']);
+            Route::delete('/webhooks/{id}',            [\App\Http\Controllers\Api\V1\WebhookSubscriptionController::class, 'destroy']);
         });
 
 
@@ -273,8 +334,10 @@ Route::prefix('v1')->group(function () {
                 Route::post('/register', [AuthController::class, 'register']);
             });
 
-            // Admin Master Tracking Pulse & Broadcast Alert System
+            // Admin Master Tracking Pulse, APM Performance & API Traffic Analytics
             Route::get('/admin/master-pulse',          [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'masterPulse']);
+            Route::get('/admin/performance',           [\App\Http\Controllers\Api\V1\AdminPerformanceController::class, 'performance']);
+            Route::get('/admin/api-analytics',          [\App\Http\Controllers\Api\V1\AdminAnalyticsController::class, 'analytics']);
             Route::post('/admin/broadcast-alert',      [\App\Http\Controllers\Api\V1\AdminMasterController::class, 'broadcastAlert']);
         });
     });
