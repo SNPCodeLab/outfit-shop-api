@@ -28,6 +28,7 @@ Route::get('/', function () {
         'version'            => '1.0.0',
         'status'             => 'online',
         'frontend_url'       => 'https://app.kesararamwithdigital.tech',
+        'guide_url'          => "{$base}/guide",
         'documentation_url'  => "{$base}/guide",
         'guide_api_url'      => "{$base}/api/v1/guide",
 
