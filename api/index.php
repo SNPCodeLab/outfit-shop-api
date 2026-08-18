@@ -46,7 +46,7 @@ foreach ($overrides as $key => $value) {
 }
 
 // Ensure APP_KEY exists
-if (!getenv('APP_KEY') && isset($_ENV['APP_KEY'])) {
+if (! getenv('APP_KEY') && isset($_ENV['APP_KEY'])) {
     putenv("APP_KEY={$_ENV['APP_KEY']}");
 }
 
