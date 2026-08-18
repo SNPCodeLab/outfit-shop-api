@@ -41,7 +41,7 @@ class AdminPerformanceController extends BaseApiController
                     'method',
                     'path',
                     DB::raw('COUNT(*) as total_calls'),
-                    DB::raw('ROUND(AVG(duration_ms)::numeric, 2) as avg_duration_ms'),
+                    DB::raw('ROUND(CAST(AVG(duration_ms) AS numeric), 2) as avg_duration_ms'),
                     DB::raw('MAX(duration_ms) as max_duration_ms')
                 )
                 ->groupBy('method', 'path')

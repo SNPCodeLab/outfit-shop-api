@@ -37,7 +37,7 @@ class DashboardController extends BaseApiController
             'path',
             'method',
             DB::raw('COUNT(*) as call_count'),
-            DB::raw('ROUND(AVG(duration_ms), 2) as avg_duration_ms')
+            DB::raw('ROUND(CAST(AVG(duration_ms) AS numeric), 2) as avg_duration_ms')
         )
             ->groupBy('path', 'method')
             ->orderBy('call_count', 'DESC')
@@ -48,7 +48,7 @@ class DashboardController extends BaseApiController
             'path',
             'method',
             DB::raw('COUNT(*) as call_count'),
-            DB::raw('ROUND(AVG(duration_ms), 2) as avg_duration_ms'),
+            DB::raw('ROUND(CAST(AVG(duration_ms) AS numeric), 2) as avg_duration_ms'),
             DB::raw('MAX(duration_ms) as max_duration_ms')
         )
             ->groupBy('path', 'method')
