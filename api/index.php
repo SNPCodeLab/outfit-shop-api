@@ -21,6 +21,35 @@ $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/logs', 0755, true);
 @mkdir($cachePath, 0755, true);
 
+// 1. Detect and Parse DATABASE_URL (Mandatory for Neon/Vercel)
+$dbUrl = getenv('DATABASE_URL') ?: getenv('POSTGRES_URL');
+if ($dbUrl && str_contains($dbUrl, '://')) {
+    $parsedUrl = parse_url($dbUrl);
+    $query = [];
+    if (isset($parsedUrl['query'])) {
+        parse_str($parsedUrl['query'], $query);
+    }
+
+    $dbConfig = [
+        'DB_CONNECTION' => 'pgsql',
+        'DB_HOST' => $parsedUrl['host'] ?? null,
+        'DB_PORT' => $parsedUrl['port'] ?? 5432,
+        'DB_DATABASE' => ltrim($parsedUrl['path'] ?? '', '/'),
+        'DB_USERNAME' => $parsedUrl['user'] ?? null,
+        'DB_PASSWORD' => $parsedUrl['pass'] ?? null,
+        'DB_SSLMODE' => $query['sslmode'] ?? 'require',
+    ];
+
+    foreach ($dbConfig as $key => $value) {
+        if ($value !== null) {
+            putenv("{$key}={$value}");
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+    }
+}
+
+// 2. Set App Overrides
 $overrides = [
     'APP_ENV' => 'production',
     'APP_DEBUG' => 'true',
@@ -29,7 +58,6 @@ $overrides = [
     'CACHE_DRIVER' => 'database',
     'SESSION_DRIVER' => 'database',
     'QUEUE_CONNECTION' => 'database',
-    'DB_CONNECTION' => 'pgsql',
     'APP_STORAGE' => $storagePath,
     'APP_SERVICES_CACHE' => $cachePath.'/services.php',
     'APP_PACKAGES_CACHE' => $cachePath.'/packages.php',
@@ -38,7 +66,7 @@ $overrides = [
     'APP_EVENTS_CACHE' => $cachePath.'/events.php',
 ];
 
-// Emergency Fallback Key if Vercel ENV is missing
+// Emergency Fallback Key
 if (! getenv('APP_KEY') && ! isset($_ENV['APP_KEY']) && ! isset($_SERVER['APP_KEY'])) {
     $overrides['APP_KEY'] = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
 }
@@ -62,7 +90,6 @@ try {
 
     Facade::setFacadeApplication($app);
 
-    // Standardize Server Variables for Vercel
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
     $_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
