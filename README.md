@@ -229,14 +229,6 @@ SOFTWARE.
 
 ---
 
-## 11. Support
-
-- **Organization**: SNPCodeLab
-- **Support Email**: support@kesararamwithdigital.tech
-- **API Documentation Portal**: [https://api.kesararamwithdigital.tech/guide](https://api.kesararamwithdigital.tech/guide)
-- **Frontend Application**: [https://app.kesararamwithdigital.tech](https://app.kesararamwithdigital.tech)
-
----
 
 ## 12. Acknowledgments
 
