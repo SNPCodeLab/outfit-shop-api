@@ -73,7 +73,7 @@ class FileExportController extends BaseApiController
                     foreach ($movements as $m) {
                         fputcsv($handle, [
                             $m->movement_id,
-                            $m->movement_date ? $m->movement_date->toIso8601String() : '',
+                            $m->movement_date ? $m->movement_date->toISOString() : '',
                             $m->variant->sku ?? 'N/A',
                             $m->movement_type,
                             $m->quantity,

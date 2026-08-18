@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a91b2c3d-e4f5-4678-90ab-cdef12345678",
-		"name": "Retail Clothing Store MIS & POS API (SS-MIS / CSMS)",
-		"description": "Master Postman Collection for Retail Clothing Store Management System with 4-Tier RBAC (ADMIN, MANAGER, CASHIER, STAFF).",
+		"name": "OutfitShop API (Ecommerce Clothing & POS)",
+		"description": "Master Postman Collection for OutfitShop Ecommerce Clothing API with 4-Tier RBAC, Orders, Cart, Wishlist, POS Shifts, and Inventory.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -36,7 +36,21 @@
 					}
 				},
 				{
-					"name": "Cashier / Admin Login",
+					"name": "System Status & Brand Assets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["status"]
+						}
+					}
+				},
+				{
+					"name": "Cashier / Admin / Customer Login",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -87,7 +101,7 @@
 			]
 		},
 		{
-			"name": "2. Storefront & Catalog",
+			"name": "2. Storefront, Catalog, Cart & Wishlist",
 			"item": [
 				{
 					"name": "List Products (Paginated)",
@@ -135,12 +149,136 @@
 							"path": ["variants", "barcode", "SHIRT-BLK-M-001"]
 						}
 					}
+				},
+				{
+					"name": "Get Active Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/cart",
+							"host": ["{{base_url}}"],
+							"path": ["cart"]
+						}
+					}
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"variant_id\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cart/items",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "items"]
+						}
+					}
+				},
+				{
+					"name": "Get Customer Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/wishlist?customer_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["wishlist"],
+							"query": [
+								{ "key": "customer_id", "value": "1" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Toggle Wishlist Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_id\": 1,\n  \"product_id\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wishlist/toggle",
+							"host": ["{{base_url}}"],
+							"path": ["wishlist", "toggle"]
+						}
+					}
 				}
 			]
 		},
 		{
-			"name": "3. POS & Cash Shifts",
+			"name": "3. Orders & POS Checkout",
 			"item": [
+				{
+					"name": "Execute Order Checkout (10% VAT)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-Idempotency-Key", "value": "ORD-TXN-20260818-001" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 150.00,\n  \"tax_rate\": 10.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/checkout",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "checkout"]
+						}
+					}
+				},
+				{
+					"name": "List Order History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/orders?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "per_page", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "1"]
+						}
+					}
+				},
 				{
 					"name": "Open Shift (Cash Float)",
 					"request": {
@@ -158,27 +296,6 @@
 							"raw": "{{base_url}}/shifts/open",
 							"host": ["{{base_url}}"],
 							"path": ["shifts", "open"]
-						}
-					}
-				},
-				{
-					"name": "Execute POS Checkout (10% VAT)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "X-Idempotency-Key", "value": "POS-TXN-20260817-001" },
-							{ "key": "Accept", "value": "application/json" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"customer_id\": 1,\n  \"items\": [\n    {\n      \"variant_id\": 1,\n      \"quantity\": 2,\n      \"discount\": 0.00\n    }\n  ],\n  \"payment_method\": \"CASH\",\n  \"payment_amount\": 150.00,\n  \"tax_rate\": 10.00\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/sales/checkout",
-							"host": ["{{base_url}}"],
-							"path": ["sales", "checkout"]
 						}
 					}
 				},

@@ -26,7 +26,7 @@ class ClothingSizeController extends BaseApiController
 
         AuditLogService::log('CREATE', 'ClothingSize', $size->size_id, null, $size->toArray());
 
-        return $this->successResponse($size, 'Clothing size created', 201);
+        return $this->createdResponse($size, 'Clothing size created successfully', '/api/v1/clothing-sizes/' . $size->size_id);
     }
 
     public function show(int $id): JsonResponse

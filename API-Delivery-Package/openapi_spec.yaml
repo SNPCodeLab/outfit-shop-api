@@ -1,8 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Retail Clothing Store MIS & POS REST API
-  description: Monolithic, Headless RESTful API Backend for Retail Clothing Store Management System.
+  title: OutfitShop API
+  description: Enterprise RESTful API Backend for OutfitShop Ecommerce Clothing & Point-of-Sale System.
   version: 1.0.0
+  contact:
+    name: OutfitShop API Engineering Lead
+    email: support@kesararamwithdigital.tech
 servers:
   - url: https://api.kesararamwithdigital.tech/api/v1
     description: Production API Gateway
@@ -15,15 +18,16 @@ paths:
       summary: System Health & Database Ping
       responses:
         '200':
-          description: System is online and database is responsive
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelope'
-
+          description: System is healthy
+  /status:
+    get:
+      summary: OutfitShop System Status & Brand Assets
+      responses:
+        '200':
+          description: System status retrieved
   /auth/login:
     post:
-      summary: Staff & Cashier Login
+      summary: Staff & Customer Authentication
       requestBody:
         required: true
         content:
@@ -34,16 +38,11 @@ paths:
               properties:
                 username:
                   type: string
-                  example: cashier1
                 password:
                   type: string
-                  example: Password123!
       responses:
         '200':
-          description: Login successful with Sanctum Bearer Token
-        '401':
-          description: Invalid username or password
-
+          description: Login successful with token
   /products:
     get:
       summary: List Products with Pagination
@@ -52,32 +51,69 @@ paths:
           in: query
           schema:
             type: integer
-            default: 1
         - name: per_page
           in: query
           schema:
             type: integer
-            default: 20
       responses:
         '200':
           description: Paginated product list
-
-  /products/{id}/matrix:
+  /cart:
     get:
-      summary: 2D Size x Color Variant Matrix
+      summary: Retrieve Active Shopping Cart
+      responses:
+        '200':
+          description: Cart retrieved
+  /cart/items:
+    post:
+      summary: Add Item to Shopping Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variant_id]
+              properties:
+                variant_id:
+                  type: integer
+                quantity:
+                  type: integer
+      responses:
+        '201':
+          description: Item added to cart
+  /wishlist:
+    get:
+      summary: Get Customer Wishlist
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: customer_id
+          in: query
           schema:
             type: integer
       responses:
         '200':
-          description: 2D Matrix grid for apparel stock
-
-  /sales/checkout:
+          description: Wishlist items
+  /wishlist/toggle:
     post:
-      summary: Process Atomic POS Checkout
+      summary: Toggle Product in Wishlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, product_id]
+              properties:
+                customer_id:
+                  type: integer
+                product_id:
+                  type: integer
+      responses:
+        '200':
+          description: Toggled
+  /orders/checkout:
+    post:
+      summary: Atomic Order Checkout (10% VAT + Pessimistic Row-Locking)
       security:
         - BearerAuth: []
       parameters:
@@ -86,85 +122,39 @@ paths:
           required: false
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [items, payment_method]
-              properties:
-                customer_id:
-                  type: integer
-                items:
-                  type: array
-                  items:
-                    type: object
-                    required: [variant_id, quantity]
-                    properties:
-                      variant_id:
-                        type: integer
-                      quantity:
-                        type: integer
-                      discount:
-                        type: number
-                payment_method:
-                  type: string
-                  enum: [CASH, CARD, QR, ABA, BAKONG, GIFT_CARD]
-                payment_amount:
-                  type: number
-                tax_rate:
-                  type: number
-                  default: 10.0
       responses:
         '201':
-          description: Sale completed with 10% VAT calculation and stock deduction
-        '400':
-          description: Insufficient stock or invalid payload
-
-  /shifts/open:
-    post:
-      summary: Open POS Cash Register Shift
+          description: Order completed successfully
+  /orders:
+    get:
+      summary: List Order History
       security:
         - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [opening_float_usd]
-              properties:
-                opening_float_usd:
-                  type: number
-                opening_float_khr:
-                  type: number
-                notes:
-                  type: string
-      responses:
-        '201':
-          description: Shift opened successfully
-
-  /shifts/close:
-    post:
-      summary: Close POS Shift and Generate Z-Report
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [closing_cash_usd]
-              properties:
-                closing_cash_usd:
-                  type: number
-                notes:
-                  type: string
       responses:
         '200':
-          description: Shift closed and Z-Report generated
+          description: Order history
+  /orders/{id}:
+    get:
+      summary: Get Order Details
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Order details
+  /dashboard/stats:
+    get:
+      summary: API Observability Metrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: APM telemetry
 
 components:
   securitySchemes:
@@ -172,38 +162,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: Sanctum
-
-  schemas:
-    SuccessEnvelope:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: Operation completed successfully
-        data:
-          type: object
-        request_id:
-          type: string
-          format: uuid
-          example: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
-
-    ErrorEnvelope:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: Error description
-        error_code:
-          type: string
-          example: ERR_INSUFFICIENT_STOCK
-        errors:
-          type: object
-        request_id:
-          type: string
-          format: uuid

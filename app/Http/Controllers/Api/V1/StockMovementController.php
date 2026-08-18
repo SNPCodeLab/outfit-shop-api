@@ -94,7 +94,7 @@ class StockMovementController extends BaseApiController
                 'Inventory stock adjusted successfully'
             );
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_STOCK_ADJUST_FAILED');
+            return $this->errorResponse($e->getMessage(), 400, 'STOCK_ADJUSTMENT_FAILED');
         }
     }
 }

@@ -38,10 +38,9 @@ class WebhookSubscriptionController extends BaseApiController
             'created_by' => $request->user()?->id ?? $request->user()?->employee_id,
         ]);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             $subscription,
-            "Successfully subscribed {$subscription->url} to [{$subscription->event_type}] events",
-            201
+            "Successfully subscribed to [{$subscription->event_type}] events"
         );
     }
 
@@ -56,7 +55,7 @@ class WebhookSubscriptionController extends BaseApiController
 
         WebhookDispatcherService::dispatch('PING_TEST', [
             'message'    => 'Webhook test ping from CSMS / SS-MIS backend gateway',
-            'timestamp'  => now()->toIso8601String(),
+            'timestamp'  => now()->toISOString(),
             'status'     => 'OK',
         ]);
 

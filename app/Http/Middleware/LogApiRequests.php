@@ -34,8 +34,20 @@ class LogApiRequests
         $content = $response->getContent();
         $responseSize = is_string($content) ? strlen($content) : 0;
 
+        // Extract request_id from the JSON response body so it links back to what was returned to the client
+        $requestId = null;
+        if (is_string($content) && str_contains($content, 'request_id')) {
+            $decoded = json_decode($content, true);
+            $requestId = $decoded['request_id'] ?? null;
+        }
+        // Fallback: use X-Request-Id header sent by the client (frontend interceptor)
+        if (!$requestId) {
+            $requestId = $request->header('X-Request-Id');
+        }
+
         try {
             ApiLog::create([
+                'request_id'    => $requestId,
                 'user_id'       => $userId ? (string) $userId : null,
                 'token_name'    => $tokenName,
                 'method'        => $request->method(),

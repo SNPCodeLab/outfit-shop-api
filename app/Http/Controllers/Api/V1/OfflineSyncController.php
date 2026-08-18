@@ -50,8 +50,8 @@ class OfflineSyncController extends BaseApiController
 
         return $this->successResponse([
             'sync_token'        => $syncToken,
-            'expires_at'        => now()->addHours(72)->toIso8601String(),
-            'server_timestamp'  => now()->toIso8601String(),
+            'expires_at'        => now()->addHours(72)->toISOString(),
+            'server_timestamp'  => now()->toISOString(),
             'tax_rate_percent'  => 10.00,
             'exchange_rate_khr' => 4100.00,
             'total_variants'    => $variants->count(),

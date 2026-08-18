@@ -104,7 +104,7 @@ class AdminMasterController extends BaseApiController
             'agile_sprint_velocity'  => $agileSprintVelocity,
             'inventory_matrix_stats' => $matrixOverview,
             'active_broadcast_alerts'=> $activeAlerts,
-            'system_timestamp'       => now()->toIso8601String(),
+            'system_timestamp'       => now()->toISOString(),
         ], 'Admin Master Controller Pulse generated successfully');
     }
 
@@ -133,11 +133,11 @@ class AdminMasterController extends BaseApiController
             'updated_at'         => now(),
         ], 'alert_id');
 
-        return $this->successResponse([
+        return $this->createdResponse([
             'alert_id'    => $alertId,
             'title'       => $validated['title'],
             'target_role' => $validated['target_role'] ?? 'ALL',
             'priority'    => $validated['priority'] ?? 'HIGH',
-        ], 'Broadcast alert sent successfully to all users', 201);
+        ], 'Broadcast alert sent successfully to all users');
     }
 }
