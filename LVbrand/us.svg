@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="618px" height="480px" viewBox="0 0 618 480" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="US-Flag-NoStars-618x480">
+            <g id="Lines">
+                <polygon id="Red-Base" fill="#B22234" points="0 0 618 0 618 480 0 480"></polygon>
+                <path d="M0,74.3 L0,37.5 L618,37.5 L618,74.3 L0,74.3 Z M618,111.3 L618,148.1 L0,148.1 L0,111.3 L618,111.3 Z M0,221.9 L0,185.1 L618,185.1 L618,221.9 L0,221.9 Z M618,258.9 L618,295.7 L0,295.7 L0,258.9 L618,258.9 Z M0,369.5 L0,332.7 L618,332.7 L618,369.5 L0,369.5 Z M618,406.5 L618,443.3 L0,443.3 L0,406.5 L618,406.5 Z" id="White-Lines" fill="#FFFFFF" fill-rule="nonzero"></path>
+            </g>
+            <polygon id="Blue-Rectangle" fill="#38368B" points="8.52651283e-14 0 258 0 258 258.9 8.52651283e-14 258.9"></polygon>
+        </g>
+    </g>
+</svg>
