@@ -16,20 +16,14 @@ Enterprise ecommerce clothing backend API built with Laravel.
 2. [Key Features](#2-key-features)
 3. [Architecture](#3-architecture)
 4. [Requirements](#4-requirements)
-5. [Installation](#5-installation)
-6. [Environment Variables](#6-environment-variables)
-7. [API Documentation](#7-api-documentation)
-8. [Response Standards](#8-response-standards)
-9. [Authentication](#9-authentication)
-10. [Testing](#10-testing)
-11. [Deployment](#11-deployment)
-12. [Security](#12-security)
-13. [Performance](#13-performance)
-14. [Monitoring](#14-monitoring)
-15. [Contributing](#15-contributing)
-16. [License](#16-license)
-17. [Support](#17-support)
-18. [Acknowledgments](#18-acknowledgments)
+5. [API Documentation](#5-api-documentation)
+6. [Authentication](#6-authentication)
+7. [Security](#7-security)
+8. [Monitoring](#8-monitoring)
+9. [Contributing](#9-contributing)
+10. [License](#10-license)
+11. [Support](#11-support)
+12. [Acknowledgments](#12-acknowledgments)
 
 ---
 
@@ -117,63 +111,7 @@ flowchart LR
 
 ---
 
-## 5. Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/SNPCodeLab/outfit-shop-api.git
-cd outfit-shop-api
-```
-
-### 2. Install PHP Dependencies
-
-```bash
-composer install --optimize-autoloader --no-dev
-```
-
-### 3. Configure Environment
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-### 4. Run Migrations & Seeders
-
-```bash
-php artisan migrate --force
-php artisan db:seed
-```
-
-### 5. Start Local Development Server
-
-```bash
-php artisan serve --port=8000
-```
-
----
-
-## 6. Environment Variables
-
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `APP_NAME` | `OutfitShop API` | Application identifier |
-| `APP_ENV` | `production` / `local` | Application runtime environment |
-| `APP_KEY` | *(Generated base64 key)* | Encryption key for sessions and tokens |
-| `APP_DEBUG` | `false` | Enable/disable detailed debug traces |
-| `APP_URL` | `https://api.kesararamwithdigital.tech` | Base URL for API and asset routing |
-| `DB_CONNECTION` | `pgsql` | Primary database driver (`pgsql` or `mysql`) |
-| `DB_HOST` | `127.0.0.1` | Database host server |
-| `DB_PORT` | `5432` | Database port |
-| `DB_DATABASE` | `ss_mis` | Database name |
-| `DB_USERNAME` | `postgres` | Database username |
-| `DB_PASSWORD` | `secret` | Database password |
-| `SANCTUM_STATEFUL_DOMAINS` | `app.kesararamwithdigital.tech` | Stateful domains for SPA authentication |
-
----
-
-## 7. API Documentation
+## 5. API Documentation
 
 ### Public Catalog Endpoints (Level 1: Public / Guest)
 
@@ -217,74 +155,7 @@ php artisan serve --port=8000
 
 ---
 
-## 8. Response Standards
-
-All API responses strictly adhere to uniform JSON envelopes.
-
-### Success Response (`200 OK` / `201 Created`)
-
-```json
-{
-  "success": true,
-  "status_code": 200,
-  "request_id": "e4a7df35-d570-46fa-ba35-e85929fe4973",
-  "timestamp": "2026-08-18T15:23:17.694651Z",
-  "message": "Products catalog retrieved",
-  "data": [
-    {
-      "id": 1,
-      "product_code": "PROD-001",
-      "name": "Classic Oxford Cotton Shirt",
-      "retail_price": "45.00",
-      "category": "Shirts",
-      "variants_count": 4
-    }
-  ],
-  "meta": {
-    "system": "OutfitShop Ecommerce Clothing API",
-    "api_version": "1.0.0",
-    "processing_time_ms": 12,
-    "pagination": {
-      "total": 1,
-      "count": 1,
-      "per_page": 15,
-      "current_page": 1,
-      "total_pages": 1
-    }
-  }
-}
-```
-
-### Error Response (RFC 7807 Problem Details)
-
-```json
-{
-  "success": false,
-  "status_code": 422,
-  "request_id": "93b1d723-5ec9-4672-885e-63f572a1be42",
-  "timestamp": "2026-08-18T15:24:02.102341Z",
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "The given data was invalid.",
-    "details": {
-      "items.0.variant_id": ["The selected variant is out of stock."]
-    }
-  },
-  "meta": {
-    "system": "OutfitShop Ecommerce Clothing API",
-    "api_version": "1.0.0",
-    "processing_time_ms": 8,
-    "documentation": "/api/v1/guide#validation_error",
-    "retry_allowed": true,
-    "retry_after_seconds": 0,
-    "support_contact": "support@kesararamwithdigital.tech"
-  }
-}
-```
-
----
-
-## 9. Authentication
+## 6. Authentication
 
 Authentication is handled via **Laravel Sanctum** Bearer tokens passed in the `Authorization` header:
 
@@ -302,49 +173,7 @@ Accept: application/json
 
 ---
 
-## 10. Testing
-
-OutfitShop API contains a full automated test suite covering unit models, API feature routes, transactional POS checkouts, and 4-tier RBAC security boundaries.
-
-### Run Test Suite
-
-```bash
-php artisan test
-```
-
-### Test Coverage Highlights
-
-- **Unit Tests**: Data integrity, price calculations, 10% tax exclusive engines.
-- **Feature Tests**: Multi-tier authentication, token invalidation, profile access.
-- **POS & Order Tests**: Concurrent checkout simulations, negative stock rejection, payment ledger auditing.
-- **RBAC Tests**: Strict verification that non-privileged roles are rejected with `403 Forbidden`.
-
----
-
-## 11. Deployment
-
-### Production Deployment Checklist
-
-1. **Optimize Autoloader & Cache Configurations**:
-   ```bash
-   composer install --no-dev --optimize-autoloader
-   php artisan config:cache
-   php artisan route:cache
-   php artisan view:cache
-   ```
-2. **Execute Database Migrations**:
-   ```bash
-   php artisan migrate --force
-   ```
-3. **Configure Web Server**: Direct root document directory to `/public` using Nginx or Apache.
-4. **Queue Worker Daemon**:
-   ```bash
-   php artisan queue:work --tries=3 --timeout=90
-   ```
-
----
-
-## 12. Security
+## 7. Security
 
 - **Strict Prepared Statements**: All database operations use Eloquent ORM or parameterized PDO bindings, eliminating SQL injection.
 - **Idempotent Row-Level Locking**: High-concurrency checkouts utilize `DB::transaction()` and pessimistic locking (`lockForUpdate()`) to prevent race conditions.
@@ -354,16 +183,7 @@ php artisan test
 
 ---
 
-## 13. Performance
-
-- **Eager Loading**: All relational endpoints utilize `with()` clauses to eliminate N+1 query bottlenecks.
-- **Database Indexing**: Foreign keys, composite variant attributes, and timestamp columns are indexed for sub-millisecond query execution.
-- **Query Caching**: Static catalog definitions (categories, sizes, colors) are cached using Redis/database cache stores.
-- **Lightweight Response Pipeline**: Sub-10ms processing times across core catalog endpoints.
-
----
-
-## 14. Monitoring
+## 8. Monitoring
 
 - **Distributed Tracing**: Every inbound request is tagged with a unique `X-Request-Id` UUID for end-to-end log correlation.
 - **Audit Logs**: Mutations to stock, prices, roles, and order records generate automatic audit log entries.
@@ -371,7 +191,7 @@ php artisan test
 
 ---
 
-## 15. Contributing
+## 9. Contributing
 
 We welcome contributions to the OutfitShop API platform:
 
@@ -383,7 +203,7 @@ We welcome contributions to the OutfitShop API platform:
 
 ---
 
-## 16. License
+## 10. License
 
 MIT License
 
@@ -409,7 +229,7 @@ SOFTWARE.
 
 ---
 
-## 17. Support
+## 11. Support
 
 - **Organization**: SNPCodeLab
 - **Support Email**: support@kesararamwithdigital.tech
@@ -418,7 +238,7 @@ SOFTWARE.
 
 ---
 
-## 18. Acknowledgments
+## 12. Acknowledgments
 
 - **Laravel Framework**: The PHP framework for web artisans.
 - **Laravel Sanctum**: Featherweight authentication system for SPAs and mobile APIs.
