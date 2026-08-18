@@ -10,7 +10,9 @@ define('LARAVEL_START', microtime(true));
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 ini_set('display_errors', '0');
 
-// Create writable /tmp paths for Laravel storage (Vercel is read-only except /tmp)
+/**
+ * Vercel Serverless Environment Hardening
+ */
 $storagePath = '/tmp/storage';
 $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/framework/views', 0755, true);
@@ -19,9 +21,6 @@ $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/logs', 0755, true);
 @mkdir($cachePath, 0755, true);
 
-/**
- * Vercel Serverless Environment Hardening
- */
 $overrides = [
     'APP_ENV' => 'production',
     'APP_DEBUG' => 'true',
@@ -39,15 +38,17 @@ $overrides = [
     'APP_EVENTS_CACHE' => $cachePath.'/events.php',
 ];
 
-foreach ($overrides as $key => $value) {
-    putenv("{$key}={$value}");
-    $_ENV[$key] = $value;
-    $_SERVER[$key] = $value;
+// Emergency Fallback Key if Vercel ENV is missing
+if (!getenv('APP_KEY') && !isset($_ENV['APP_KEY']) && !isset($_SERVER['APP_KEY'])) {
+    $overrides['APP_KEY'] = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
 }
 
-// Ensure APP_KEY exists
-if (! getenv('APP_KEY') && isset($_ENV['APP_KEY'])) {
-    putenv("APP_KEY={$_ENV['APP_KEY']}");
+foreach ($overrides as $key => $value) {
+    if (!getenv($key)) {
+        putenv("{$key}={$value}");
+    }
+    $_ENV[$key] = $_ENV[$key] ?? $value;
+    $_SERVER[$key] = $_SERVER[$key] ?? $value;
 }
 
 // Register Autoloader & Bootstrap App
@@ -57,8 +58,6 @@ try {
     /** @var Application $app */
     $app = require_once __DIR__.'/../bootstrap/app.php';
     $app->useStoragePath($storagePath);
-
-    // Force the application to use our /tmp cache path
     $app->useBootstrapPath($cachePath);
 
     Facade::setFacadeApplication($app);
