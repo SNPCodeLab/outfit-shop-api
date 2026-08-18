@@ -24,7 +24,8 @@ description: >
 {
   "success": true,
   "message": "Human readable action summary",
-  "data": { ... }
+  "data": { ... },
+  "request_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
 }
 ```
 
@@ -35,10 +36,12 @@ description: >
 {
   "success": false,
   "message": "The given data was invalid.",
+  "error_code": "ERR_VALIDATION_FAILED",
   "errors": {
     "items.0.quantity": ["The items.0.quantity must be at least 1."],
     "payment_method": ["The selected payment method is invalid."]
-  }
+  },
+  "request_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
 }
 ```
 
@@ -46,7 +49,9 @@ description: >
 ```json
 {
   "success": false,
-  "message": "Unauthenticated or invalid Sanctum bearer token."
+  "message": "Unauthenticated or invalid Sanctum bearer token.",
+  "error_code": "ERR_UNAUTHENTICATED",
+  "request_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
 }
 ```
 
@@ -54,7 +59,9 @@ description: >
 ```json
 {
   "success": false,
-  "message": "Unauthorized. You do not have the required role [MANAGER, ADMIN] to perform this action."
+  "message": "Unauthorized. You do not have the required role [MANAGER, ADMIN] to perform this action.",
+  "error_code": "ERR_FORBIDDEN",
+  "request_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
 }
 ```
 

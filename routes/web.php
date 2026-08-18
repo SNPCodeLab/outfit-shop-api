@@ -4,66 +4,72 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes — GitHub-Style JSON Root API Gateway Entrypoint
+| Web Routes — OutfitShop API Gateway Root Entrypoint
 |--------------------------------------------------------------------------
 |
-| Access Tiers:
-|   PUBLIC   — No token. Read-only catalog (products, categories, variants).
-|   AUTH     — Bearer token required (any role).
-|   MANAGER  — Bearer token + role MANAGER or ADMIN.
-|   ADMIN    — Bearer token + role ADMIN only.
-|
-| Login: POST /api/v1/auth/login  → returns access_token + permissions[]
+| This file serves the JSON root index and the help centre guide routes.
+| All API routes are defined in routes/api.php under the /api/v1 prefix.
 |
 */
 
 Route::get('/', function () {
     $base = rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/');
 
-    return response()->json([
-        'system'             => 'Store Stock & Point-of-Sale MIS API',
-        'version'            => '1.0.0',
-        'status'             => 'online',
-        'frontend_url'       => 'https://app.kesararamwithdigital.tech',
-        'guide_url'          => "{$base}/guide",
-        'documentation_url'  => "{$base}/guide",
-        'guide_api_url'      => "{$base}/api/v1/guide",
-
-        // ── Public (no token) ─────────────────────────────────────────────
-        'health_url'             => "{$base}/api/v1/health",
-        'products_url'           => "{$base}/api/v1/products",
-        'categories_url'         => "{$base}/api/v1/categories",
-        'variants_url'           => "{$base}/api/v1/variants",
-        'clothing_sizes_url'     => "{$base}/api/v1/clothing-sizes",
-        'colors_url'             => "{$base}/api/v1/colors",
-
-        // ── Authentication ────────────────────────────────────────────────
-        'auth_login_url'         => "{$base}/api/v1/auth/login",
-        'auth_me_url'            => "{$base}/api/v1/auth/me",
-        'auth_logout_url'        => "{$base}/api/v1/auth/logout",
-        'auth_register_url'      => "{$base}/api/v1/auth/register",   // ADMIN only
-
-        // ── Authenticated (any role) ──────────────────────────────────────
-        'customers_url'          => "{$base}/api/v1/customers",
-        'sales_url'              => "{$base}/api/v1/sales",
-        'pos_checkout_url'       => "{$base}/api/v1/sales/checkout",
-
-        // ── Manager & Admin ───────────────────────────────────────────────
-        'suppliers_url'          => "{$base}/api/v1/suppliers",
-        'purchases_url'          => "{$base}/api/v1/purchases",
-        'stock_movements_url'    => "{$base}/api/v1/stock-movements",
-        'media_gallery_url'      => "{$base}/api/v1/uploads/gallery",
-        'media_upload_url'       => "{$base}/api/v1/uploads/image",
-        'media_batch_upload_url' => "{$base}/api/v1/uploads/batch",
-        'dashboard_stats_url'    => "{$base}/api/v1/dashboard/stats",
-        'audit_logs_url'         => "{$base}/api/v1/audit-logs",
-
-        // ── Admin only ────────────────────────────────────────────────────
-        'employees_url'          => "{$base}/api/v1/employees",
-    ], 200, ['Content-Type' => 'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return \App\Http\Response\ApiResponse::success([
+        'system'       => 'OutfitShop Ecommerce Clothing API',
+        'version'      => config('api.version', '1.0.0'),
+        'status'       => 'online',
+        'frontend_url' => 'https://app.kesararamwithdigital.tech',
+        'endpoints' => [
+            'guide'        => "{$base}/guide",
+            'health'       => "{$base}/api/v1/health",
+            'status'       => "{$base}/api/v1/status",
+            'openapi_spec' => "{$base}/api/v1/openapi.json",
+            'postman'      => "{$base}/api/v1/postman.json",
+        ],
+        'public_catalog' => [
+            'products'       => "{$base}/api/v1/products",
+            'categories'     => "{$base}/api/v1/categories",
+            'variants'       => "{$base}/api/v1/variants",
+            'clothing_sizes' => "{$base}/api/v1/clothing-sizes",
+            'colors'         => "{$base}/api/v1/colors",
+            'brands'         => "{$base}/api/v1/brands",
+            'cart'           => "{$base}/api/v1/cart",
+            'wishlist'       => "{$base}/api/v1/wishlist",
+        ],
+        'authentication' => [
+            'login'    => "{$base}/api/v1/auth/login",
+            'me'       => "{$base}/api/v1/auth/me",
+            'logout'   => "{$base}/api/v1/auth/logout",
+            'refresh'  => "{$base}/api/v1/auth/refresh",
+            'register' => "{$base}/api/v1/auth/register",
+        ],
+        'authenticated' => [
+            'customers'       => "{$base}/api/v1/customers",
+            'orders'          => "{$base}/api/v1/orders",
+            'orders_checkout' => "{$base}/api/v1/orders/checkout",
+            'sales'           => "{$base}/api/v1/orders",          // Legacy alias
+            'pos_checkout'    => "{$base}/api/v1/orders/checkout", // Legacy alias
+            'shifts'          => "{$base}/api/v1/shifts/current",
+        ],
+        'manager_admin' => [
+            'suppliers'       => "{$base}/api/v1/suppliers",
+            'purchases'       => "{$base}/api/v1/purchases",
+            'stock_movements' => "{$base}/api/v1/stock-movements",
+            'stock_transfers' => "{$base}/api/v1/stock-transfers",
+            'media_gallery'   => "{$base}/api/v1/uploads/gallery",
+            'dashboard_stats' => "{$base}/api/v1/dashboard/stats",
+            'audit_logs'      => "{$base}/api/v1/audit-logs",
+            'reports_sales'   => "{$base}/api/v1/reports/sales",
+        ],
+        'admin_only' => [
+            'employees'     => "{$base}/api/v1/employees",
+            'admin_pulse'   => "{$base}/api/v1/admin/master-pulse",
+            'api_analytics' => "{$base}/api/v1/admin/api-analytics",
+        ],
+    ], 'OutfitShop API gateway is operational');
 });
 
-// SalesBinder-style Help Centre & Interactive Guide
+// Help Centre and Interactive Knowledge Base
 Route::get('/guide', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
-Route::get('/kb', [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);
-
+Route::get('/kb',    [\App\Http\Controllers\Api\V1\HelpCentreGuideController::class, 'index']);

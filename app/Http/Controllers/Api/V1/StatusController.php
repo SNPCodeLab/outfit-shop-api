@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class StatusController extends BaseApiController
 {
     /**
-     * Display the status and version information of the SS-MIS Backend Web API.
+     * Display the status and version information of the OutfitShop Ecommerce Clothing API.
      *
      * @return JsonResponse
      */
@@ -26,8 +26,8 @@ class StatusController extends BaseApiController
         }
 
         $data = [
-            'system'            => 'Store Stock & Point-of-Sale MIS API',
-            'version'           => 'v1.0.0',
+            'system'            => 'OutfitShop Ecommerce Clothing API',
+            'version'           => config('api.version', 'v1.0.0'),
             'api_status'        => 'Operational',
             'database'          => $dbStatus,
             'environment'       => config('app.env', 'production'),
@@ -35,13 +35,14 @@ class StatusController extends BaseApiController
             'guide_url'         => url('/guide'),
             'guide_api_url'     => url('/api/v1/guide'),
             'documentation_url' => url('/guide'),
-            'timestamp'         => now()->toIso8601String(),
+            'timestamp'         => now()->toISOString(),
         ];
 
-        if ($dbStatus === 'Disconnected') {
+        // Only expose database error detail in non-production environments.
+        if ($dbStatus === 'Disconnected' && config('app.debug')) {
             $data['db_error'] = $dbError;
         }
 
-        return $this->successResponse($data, 'API is operational');
+        return $this->successResponse($data, 'OutfitShop API is operational');
     }
 }

@@ -16,8 +16,11 @@ class Payment extends Model
         'sale_id',
         'payment_date',
         'amount',
+        'amount_tendered',
+        'change_due',
         'payment_method',
         'payment_status',
+        'transaction_ref',
         'reference_number',
     ];
 

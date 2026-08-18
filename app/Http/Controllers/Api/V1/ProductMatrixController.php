@@ -2,70 +2,68 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
-class ProductMatrixController extends Controller
+class ProductMatrixController extends BaseApiController
 {
     /**
-     * Get Size x Color Inventory Matrix for a Product (SalesBinder / Luxury POS Grid)
+     * Get the Size x Color inventory matrix for a product.
+     * Results are cached for 1 hour.
+     * Public - no authentication required.
      */
     public function matrix(int $productId): JsonResponse
     {
-        $product = Product::with(['category', 'images', 'variants.size', 'variants.color'])
-            ->findOrFail($productId);
+        $payload = Cache::remember("product_matrix:{$productId}", 3600, function () use ($productId) {
+            $product  = Product::with(['category', 'images', 'variants.size', 'variants.color'])->findOrFail($productId);
+            $variants = $product->variants;
 
-        $variants = $product->variants;
+            $sizes      = [];
+            $colors     = [];
+            $matrixGrid = [];
 
-        // Collect unique sizes & colors
-        $sizes = [];
-        $colors = [];
-        $matrixGrid = [];
+            foreach ($variants as $v) {
+                $sizeKey  = $v->size ? $v->size->size_name : 'Standard';
+                $sizeId   = $v->size_id ?? 0;
+                $colorKey = $v->color ? $v->color->color_name : 'Default';
+                $colorId  = $v->color_id ?? 0;
+                $colorHex = $v->color ? $v->color->hex_code : '#000000';
 
-        foreach ($variants as $v) {
-            $sizeKey = $v->size ? $v->size->size_name : 'Standard';
-            $sizeId  = $v->size_id ?? 0;
-            $colorKey = $v->color ? $v->color->color_name : 'Default';
-            $colorId  = $v->color_id ?? 0;
-            $colorHex = $v->color ? $v->color->hex_code : '#000000';
+                if (!isset($sizes[$sizeId])) {
+                    $sizes[$sizeId] = [
+                        'size_id'   => $sizeId,
+                        'size_name' => $sizeKey,
+                        'size_code' => $v->size->size_code ?? 'STD',
+                    ];
+                }
 
-            if (!isset($sizes[$sizeId])) {
-                $sizes[$sizeId] = [
-                    'size_id'   => $sizeId,
-                    'size_name' => $sizeKey,
-                    'size_code' => $v->size->size_code ?? 'STD',
+                if (!isset($colors[$colorId])) {
+                    $colors[$colorId] = [
+                        'color_id'   => $colorId,
+                        'color_name' => $colorKey,
+                        'hex_code'   => $colorHex,
+                        'color_code' => $v->color->color_code ?? 'DFT',
+                    ];
+                }
+
+                $matrixGrid[$colorId][$sizeId] = [
+                    'variant_id'      => $v->variant_id,
+                    'sku'             => $v->sku,
+                    'barcode'         => $v->barcode,
+                    'quantity'        => $v->quantity,
+                    'sale_price'      => (float) $v->sale_price,
+                    'cost_price'      => (float) $v->cost_price,
+                    'wholesale_price' => (float) ($v->wholesale_price ?? $v->sale_price),
+                    'unit_of_measure' => $v->unit_of_measure ?? 'PIECE',
+                    'in_stock'        => $v->quantity > 0,
+                    'is_low_stock'    => $v->quantity <= ($v->reorder_level ?? 5),
+                    'image_url'       => $v->image_url ?? $product->image_url,
                 ];
             }
 
-            if (!isset($colors[$colorId])) {
-                $colors[$colorId] = [
-                    'color_id'   => $colorId,
-                    'color_name' => $colorKey,
-                    'hex_code'   => $colorHex,
-                    'color_code' => $v->color->color_code ?? 'DFT',
-                ];
-            }
-
-            $matrixGrid[$colorId][$sizeId] = [
-                'variant_id'       => $v->variant_id,
-                'sku'              => $v->sku,
-                'barcode'          => $v->barcode,
-                'quantity'         => $v->quantity,
-                'sale_price'       => (float) $v->sale_price,
-                'cost_price'       => (float) $v->cost_price,
-                'wholesale_price'  => (float) ($v->wholesale_price ?? $v->sale_price),
-                'unit_of_measure'  => $v->unit_of_measure ?? 'PIECE',
-                'in_stock'         => $v->quantity > 0,
-                'is_low_stock'     => $v->quantity <= $v->reorder_level,
-                'image_url'        => $v->image_url ?? $product->image_url,
-            ];
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => [
+            return [
                 'product_id'        => $product->product_id,
                 'product_name'      => $product->product_name,
                 'brand'             => $product->brand,
@@ -77,38 +75,41 @@ class ProductMatrixController extends Controller
                 'sizes_available'   => array_values($sizes),
                 'colors_available'  => array_values($colors),
                 'matrix'            => $matrixGrid,
-            ],
-            'message' => 'Product inventory matrix generated successfully',
-        ]);
+            ];
+        });
+
+        return $this->successResponse($payload, 'Product inventory matrix generated successfully');
     }
 
     /**
-     * Get Colorways with Swatches and Gallery photos
+     * Get colorways with swatch colors and total availability per color.
+     * Results are cached for 1 hour.
+     * Public - no authentication required.
      */
     public function colorways(int $productId): JsonResponse
     {
-        $product = Product::with(['variants.color', 'images'])->findOrFail($productId);
+        $colorways = Cache::remember("product_colorways:{$productId}", 3600, function () use ($productId) {
+            $product = Product::with(['variants.color', 'images'])->findOrFail($productId);
+            $result  = [];
 
-        $colorways = [];
-        foreach ($product->variants->groupBy('color_id') as $colorId => $variants) {
-            $sample = $variants->first();
-            $colorName = $sample->color ? $sample->color->color_name : 'Standard';
-            $hexCode = $sample->color ? $sample->color->hex_code : '#000000';
+            foreach ($product->variants->groupBy('color_id') as $colorId => $variants) {
+                $sample    = $variants->first();
+                $colorName = $sample->color ? $sample->color->color_name : 'Standard';
+                $hexCode   = $sample->color ? $sample->color->hex_code : '#000000';
 
-            $colorways[] = [
-                'color_id'        => $colorId,
-                'color_name'      => $colorName,
-                'hex_code'        => $hexCode,
-                'swatch_image'    => $sample->image_url ?? $product->image_url,
-                'variants_count'  => $variants->count(),
-                'total_available' => $variants->sum('quantity'),
-            ];
-        }
+                $result[] = [
+                    'color_id'        => $colorId,
+                    'color_name'      => $colorName,
+                    'hex_code'        => $hexCode,
+                    'swatch_image'    => $sample->image_url ?? $product->image_url,
+                    'variants_count'  => $variants->count(),
+                    'total_available' => $variants->sum('quantity'),
+                ];
+            }
 
-        return response()->json([
-            'success' => true,
-            'data'    => $colorways,
-            'message' => 'Product colorways retrieved successfully',
-        ]);
+            return $result;
+        });
+
+        return $this->successResponse($colorways, 'Product colorways retrieved successfully');
     }
 }

@@ -7,12 +7,18 @@ use App\Models\Category;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends BaseApiController
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Category::all(), 'Categories retrieved');
+        // ── High-Speed Caching Layer (Categories rarely change) ───────────────
+        $categories = Cache::rememberForever('categories:all', function () {
+            return Category::all();
+        });
+
+        return $this->successResponse($categories, 'Categories retrieved');
     }
 
     public function store(Request $request): JsonResponse
@@ -24,14 +30,20 @@ class CategoryController extends BaseApiController
 
         $category = Category::create($validated);
 
+        // Cache Invalidation
+        Cache::forget('categories:all');
+
         AuditLogService::log('CREATE', 'Category', $category->category_id, null, $category->toArray());
 
-        return $this->successResponse($category, 'Category created', 201);
+        return $this->createdResponse($category, 'Category created successfully', '/api/v1/categories/' . $category->category_id);
     }
 
     public function show(int $id): JsonResponse
     {
-        $category = Category::with('products.variants')->findOrFail($id);
+        $category = Cache::remember("category:{$id}", 3600, function () use ($id) {
+            return Category::with('products.variants')->findOrFail($id);
+        });
+
         return $this->successResponse($category, 'Category details retrieved');
     }
 
@@ -47,6 +59,10 @@ class CategoryController extends BaseApiController
 
         $category->update($validated);
 
+        // Cache Invalidation
+        Cache::forget('categories:all');
+        Cache::forget("category:{$id}");
+
         AuditLogService::log('UPDATE', 'Category', $category->category_id, $oldValues, $category->toArray());
 
         return $this->successResponse($category, 'Category updated');
@@ -57,6 +73,10 @@ class CategoryController extends BaseApiController
         $category = Category::findOrFail($id);
         $oldValues = $category->toArray();
         $category->delete();
+
+        // Cache Invalidation
+        Cache::forget('categories:all');
+        Cache::forget("category:{$id}");
 
         AuditLogService::log('DELETE', 'Category', $id, $oldValues, null);
 
