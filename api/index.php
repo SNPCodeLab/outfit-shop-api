@@ -21,7 +21,7 @@ $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/logs', 0755, true);
 @mkdir($cachePath, 0755, true);
 
-// 1. Force Application Encryption Key (Critical Fix)
+// 1. Force Application Encryption Key
 $appKey = getenv('APP_KEY') ?: ($_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? '');
 if (empty($appKey) || strlen($appKey) < 32) {
     $appKey = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
@@ -30,8 +30,9 @@ putenv("APP_KEY=$appKey");
 $_ENV['APP_KEY'] = $appKey;
 $_SERVER['APP_KEY'] = $appKey;
 
-// 2. Force Database Environment Variables to bypass problematic DATABASE_URL parsing
-$dbUrl = getenv('DATABASE_URL') ?: getenv('POSTGRES_URL');
+// 2. Database Discovery (Neon / Vercel)
+$dbUrl = getenv('DATABASE_URL') ?: (getenv('POSTGRES_URL') ?: 'postgresql://neondb_owner:npg_SsC0GRvWm1Bz@ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require');
+
 if ($dbUrl && str_contains($dbUrl, '://')) {
     $parsedUrl = parse_url($dbUrl);
     $query = [];
@@ -57,19 +58,17 @@ if ($dbUrl && str_contains($dbUrl, '://')) {
         }
     }
 
-    // Clear raw URL variables to prevent re-parsing
+    // Force clear noisy variables
     putenv('DATABASE_URL=');
     putenv('DB_URL=');
-    putenv('POSTGRES_URL=');
 }
 
 // 3. Set App Overrides
 $overrides = [
     'APP_ENV' => 'production',
-    'APP_DEBUG' => 'true',
+    'APP_DEBUG' => 'false',
     'LOG_CHANNEL' => 'stderr',
     'CACHE_STORE' => 'database',
-    'CACHE_DRIVER' => 'database',
     'SESSION_DRIVER' => 'database',
     'QUEUE_CONNECTION' => 'database',
     'APP_STORAGE' => $storagePath,
@@ -114,6 +113,5 @@ try {
         'exception' => get_class($e),
         'file' => $e->getFile(),
         'line' => $e->getLine(),
-        'trace' => explode("\n", $e->getTraceAsString()),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
