@@ -21,7 +21,7 @@ $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/logs', 0755, true);
 @mkdir($cachePath, 0755, true);
 
-// 1. Detect and Parse DATABASE_URL (Mandatory for Neon/Vercel)
+// 1. Force Database Environment Variables to bypass problematic DATABASE_URL parsing
 $dbUrl = getenv('DATABASE_URL') ?: getenv('POSTGRES_URL');
 if ($dbUrl && str_contains($dbUrl, '://')) {
     $parsedUrl = parse_url($dbUrl);
@@ -43,10 +43,18 @@ if ($dbUrl && str_contains($dbUrl, '://')) {
     foreach ($dbConfig as $key => $value) {
         if ($value !== null) {
             putenv("{$key}={$value}");
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
+            $_ENV[$key] = (string) $value;
+            $_SERVER[$key] = (string) $value;
         }
     }
+
+    // CRITICAL: Clear the raw URL variables so Laravel doesn't try to re-parse the messy string
+    putenv('DATABASE_URL=');
+    putenv('DB_URL=');
+    putenv('POSTGRES_URL=');
+    $_ENV['DATABASE_URL'] = null;
+    $_ENV['DB_URL'] = null;
+    $_SERVER['DATABASE_URL'] = null;
 }
 
 // 2. Set App Overrides
@@ -72,9 +80,7 @@ if (! getenv('APP_KEY') && ! isset($_ENV['APP_KEY']) && ! isset($_SERVER['APP_KE
 }
 
 foreach ($overrides as $key => $value) {
-    if (! getenv($key)) {
-        putenv("{$key}={$value}");
-    }
+    putenv("{$key}={$value}");
     $_ENV[$key] = $_ENV[$key] ?? $value;
     $_SERVER[$key] = $_SERVER[$key] ?? $value;
 }
