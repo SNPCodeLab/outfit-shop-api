@@ -63,7 +63,6 @@ class ApiResponse
             'system'             => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
             'api_version'        => config('api.version', '1.0.0'),
             'processing_time_ms' => $processingTime,
-            'brand'              => config('api.brand'),
         ];
 
         if ($data instanceof LengthAwarePaginator) {
@@ -186,7 +185,6 @@ class ApiResponse
                 'api_version'         => config('api.version', '1.0.0'),
                 'processing_time_ms'  => $processingTime,
                 'documentation'       => config('api.docs_base', '/api/v1/guide') . '#' . strtolower($errorCode),
-                'brand'               => config('api.brand'),
                 'retry_allowed'       => $retryAllowed,
                 'retry_after_seconds' => $retryAfterSeconds,
                 'support_contact'     => config('api.support_email', 'support@kesararamwithdigital.tech'),
