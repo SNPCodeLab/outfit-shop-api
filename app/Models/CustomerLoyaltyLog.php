@@ -11,6 +11,7 @@ class CustomerLoyaltyLog extends Model
     use HasFactory;
 
     protected $table = 'customer_loyalty_logs';
+
     protected $primaryKey = 'log_id';
 
     protected $fillable = [
@@ -23,7 +24,7 @@ class CustomerLoyaltyLog extends Model
     ];
 
     protected $casts = [
-        'points'        => 'integer',
+        'points' => 'integer',
         'balance_after' => 'integer',
     ];
 

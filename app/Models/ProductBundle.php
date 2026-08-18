@@ -11,6 +11,7 @@ class ProductBundle extends Model
     use HasFactory;
 
     protected $table = 'product_bundles';
+
     protected $primaryKey = 'bundle_id';
 
     protected $fillable = [
@@ -25,9 +26,9 @@ class ProductBundle extends Model
     ];
 
     protected $casts = [
-        'bundle_price'         => 'float',
+        'bundle_price' => 'float',
         'original_total_price' => 'float',
-        'is_active'            => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function items(): HasMany

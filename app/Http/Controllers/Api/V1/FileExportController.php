@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\PosShift;
 use App\Models\ProductVariant;
-use App\Models\PurchaseHeader;
 use App\Models\SaleHeader;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class FileExportController extends BaseApiController
      */
     public function exportInventory(): StreamedResponse
     {
-        $fileName = 'inventory_valuation_' . now()->format('Ymd_His') . '.csv';
+        $fileName = 'inventory_valuation_'.now()->format('Ymd_His').'.csv';
 
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');
@@ -50,7 +49,7 @@ class FileExportController extends BaseApiController
 
             fclose($handle);
         }, $fileName, [
-            'Content-Type'        => 'text/csv',
+            'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ]);
     }
@@ -61,7 +60,7 @@ class FileExportController extends BaseApiController
      */
     public function exportStockMovements(Request $request): StreamedResponse
     {
-        $fileName = 'stock_movements_ledger_' . now()->format('Ymd_His') . '.csv';
+        $fileName = 'stock_movements_ledger_'.now()->format('Ymd_His').'.csv';
 
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'w');
@@ -87,7 +86,7 @@ class FileExportController extends BaseApiController
 
             fclose($handle);
         }, $fileName, [
-            'Content-Type'        => 'text/csv',
+            'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ]);
     }
@@ -123,8 +122,8 @@ class FileExportController extends BaseApiController
         </head>
         <body>
             <h1>Executive Sales Summary Report</h1>
-            <div class='subtitle'>Generated on: " . now()->format('Y-m-d H:i:s') . " | SS-MIS Retail Gateway</div>
-            <div class='total-card'>Total Recorded Revenue: $" . number_format($totalRevenue, 2) . " (" . count($sales) . " Transactions)</div>
+            <div class='subtitle'>Generated on: ".now()->format('Y-m-d H:i:s')." | SS-MIS Retail Gateway</div>
+            <div class='total-card'>Total Recorded Revenue: $".number_format($totalRevenue, 2).' ('.count($sales)." Transactions)</div>
             <table>
                 <thead>
                     <tr>
@@ -139,22 +138,22 @@ class FileExportController extends BaseApiController
                 <tbody>";
 
         foreach ($sales as $s) {
-            $html .= "
+            $html .= '
                     <tr>
-                        <td><strong>" . ($s->invoice_no ?? "INV-{$s->sale_id}") . "</strong></td>
-                        <td>" . ($s->sale_date ? $s->sale_date->format('Y-m-d H:i') : '') . "</td>
-                        <td>" . ($s->customer->customer_name ?? 'Guest') . "</td>
-                        <td>" . ($s->employee->employee_name ?? 'Staff') . "</td>
-                        <td>" . $s->payment_status . "</td>
-                        <td style='text-align:right;'>$" . number_format($s->grand_total, 2) . "</td>
-                    </tr>";
+                        <td><strong>'.($s->invoice_no ?? "INV-{$s->sale_id}").'</strong></td>
+                        <td>'.($s->sale_date ? $s->sale_date->format('Y-m-d H:i') : '').'</td>
+                        <td>'.($s->customer->customer_name ?? 'Guest').'</td>
+                        <td>'.($s->employee->employee_name ?? 'Staff').'</td>
+                        <td>'.$s->payment_status."</td>
+                        <td style='text-align:right;'>$".number_format($s->grand_total, 2).'</td>
+                    </tr>';
         }
 
-        $html .= "
+        $html .= '
                 </tbody>
             </table>
         </body>
-        </html>";
+        </html>';
 
         return response($html, 200, [
             'Content-Type' => 'text/html; charset=UTF-8',
@@ -170,28 +169,28 @@ class FileExportController extends BaseApiController
         $shift = PosShift::with(['employee', 'sales.payments'])->findOrFail($shiftId);
 
         $totalSales = $shift->sales->sum('grand_total');
-        $cashSales  = $shift->sales->filter(fn($s) => $s->payments->contains('payment_method', 'CASH'))->sum('grand_total');
-        $cardSales  = $shift->sales->filter(fn($s) => $s->payments->contains('payment_method', 'CARD'))->sum('grand_total');
-        $qrSales    = $shift->sales->filter(fn($s) => in_array($s->payments->first()?->payment_method, ['QR', 'ABA', 'BAKONG']))->sum('grand_total');
+        $cashSales = $shift->sales->filter(fn ($s) => $s->payments->contains('payment_method', 'CASH'))->sum('grand_total');
+        $cardSales = $shift->sales->filter(fn ($s) => $s->payments->contains('payment_method', 'CARD'))->sum('grand_total');
+        $qrSales = $shift->sales->filter(fn ($s) => in_array($s->payments->first()?->payment_method, ['QR', 'ABA', 'BAKONG']))->sum('grand_total');
 
         $receipt = "================================\n";
         $receipt .= "      END-OF-DAY Z-REPORT      \n";
         $receipt .= "   RETAIL CLOTHING STORE POS    \n";
         $receipt .= "================================\n";
         $receipt .= "Shift ID:     #{$shift->shift_id}\n";
-        $receipt .= "Cashier:      " . ($shift->employee->employee_name ?? 'Staff') . "\n";
-        $receipt .= "Opened:       " . ($shift->opened_at ? $shift->opened_at->format('Y-m-d H:i') : 'N/A') . "\n";
-        $receipt .= "Closed:       " . ($shift->closed_at ? $shift->closed_at->format('Y-m-d H:i') : 'ACTIVE') . "\n";
+        $receipt .= 'Cashier:      '.($shift->employee->employee_name ?? 'Staff')."\n";
+        $receipt .= 'Opened:       '.($shift->opened_at ? $shift->opened_at->format('Y-m-d H:i') : 'N/A')."\n";
+        $receipt .= 'Closed:       '.($shift->closed_at ? $shift->closed_at->format('Y-m-d H:i') : 'ACTIVE')."\n";
         $receipt .= "--------------------------------\n";
-        $receipt .= "Opening Float:   $" . number_format($shift->opening_float_usd, 2) . "\n";
-        $receipt .= "Cash Sales:      $" . number_format($cashSales, 2) . "\n";
-        $receipt .= "Card Sales:      $" . number_format($cardSales, 2) . "\n";
-        $receipt .= "KHQR/ABA Sales:  $" . number_format($qrSales, 2) . "\n";
+        $receipt .= 'Opening Float:   $'.number_format($shift->opening_float_usd, 2)."\n";
+        $receipt .= 'Cash Sales:      $'.number_format($cashSales, 2)."\n";
+        $receipt .= 'Card Sales:      $'.number_format($cardSales, 2)."\n";
+        $receipt .= 'KHQR/ABA Sales:  $'.number_format($qrSales, 2)."\n";
         $receipt .= "--------------------------------\n";
-        $receipt .= "TOTAL GROSS:     $" . number_format($totalSales, 2) . "\n";
-        $receipt .= "Expected Drawer: $" . number_format($shift->expected_cash_usd, 2) . "\n";
-        $receipt .= "Closing Cash:    $" . number_format($shift->closing_cash_usd, 2) . "\n";
-        $receipt .= "Variance:        $" . number_format($shift->discrepancy_usd, 2) . " (" . $shift->reconciliation_status . ")\n";
+        $receipt .= 'TOTAL GROSS:     $'.number_format($totalSales, 2)."\n";
+        $receipt .= 'Expected Drawer: $'.number_format($shift->expected_cash_usd, 2)."\n";
+        $receipt .= 'Closing Cash:    $'.number_format($shift->closing_cash_usd, 2)."\n";
+        $receipt .= 'Variance:        $'.number_format($shift->discrepancy_usd, 2).' ('.$shift->reconciliation_status.")\n";
         $receipt .= "================================\n";
         $receipt .= "   PRINTED FOR AUDIT & SAFE     \n";
         $receipt .= "================================\n\n\n";

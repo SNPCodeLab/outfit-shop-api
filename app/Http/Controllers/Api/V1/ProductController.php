@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends BaseApiController
 {
@@ -16,16 +17,24 @@ class ProductController extends BaseApiController
         // ── 1. Dynamic Relationship Inclusion (?include=category,variants,images) ─
         $allowedIncludes = ['category', 'variants.size', 'variants.color', 'images', 'primaryImage'];
         $requestedIncludes = $request->input('include');
-        
+
         if ($requestedIncludes) {
             $includes = array_filter(explode(',', $requestedIncludes));
             $withRelations = [];
             foreach ($includes as $inc) {
                 $inc = trim($inc);
-                if ($inc === 'variants') $withRelations[] = 'variants.size';
-                if ($inc === 'variants') $withRelations[] = 'variants.color';
-                if ($inc === 'category') $withRelations[] = 'category';
-                if ($inc === 'images')   $withRelations[] = 'images';
+                if ($inc === 'variants') {
+                    $withRelations[] = 'variants.size';
+                }
+                if ($inc === 'variants') {
+                    $withRelations[] = 'variants.color';
+                }
+                if ($inc === 'category') {
+                    $withRelations[] = 'category';
+                }
+                if ($inc === 'images') {
+                    $withRelations[] = 'images';
+                }
             }
             $query = Product::with(array_unique($withRelations ?: $allowedIncludes));
         } else {
@@ -40,10 +49,10 @@ class ProductController extends BaseApiController
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('product_name', 'ILIKE', "%{$search}%")
-                  ->orWhere('brand', 'ILIKE', "%{$search}%")
-                  ->orWhere('description', 'ILIKE', "%{$search}%")
-                  ->orWhere('author_artist', 'ILIKE', "%{$search}%")
-                  ->orWhere('isbn_code', 'ILIKE', "%{$search}%");
+                    ->orWhere('brand', 'ILIKE', "%{$search}%")
+                    ->orWhere('description', 'ILIKE', "%{$search}%")
+                    ->orWhere('author_artist', 'ILIKE', "%{$search}%")
+                    ->orWhere('isbn_code', 'ILIKE', "%{$search}%");
             });
         }
 
@@ -57,8 +66,12 @@ class ProductController extends BaseApiController
         $priceMax = $request->input('price_max') ?? ($filter['price_max'] ?? null);
         if ($priceMin !== null || $priceMax !== null) {
             $query->whereHas('variants', function ($v) use ($priceMin, $priceMax) {
-                if ($priceMin !== null) $v->where('sale_price', '>=', (float) $priceMin);
-                if ($priceMax !== null) $v->where('sale_price', '<=', (float) $priceMax);
+                if ($priceMin !== null) {
+                    $v->where('sale_price', '>=', (float) $priceMin);
+                }
+                if ($priceMax !== null) {
+                    $v->where('sale_price', '<=', (float) $priceMax);
+                }
             });
         }
 
@@ -67,9 +80,9 @@ class ProductController extends BaseApiController
         if ($hasStock !== null) {
             $inStock = filter_var($hasStock, FILTER_VALIDATE_BOOLEAN);
             if ($inStock) {
-                $query->whereHas('variants', fn($v) => $v->where('quantity', '>', 0));
+                $query->whereHas('variants', fn ($v) => $v->where('quantity', '>', 0));
             } else {
-                $query->whereDoesntHave('variants', fn($v) => $v->where('quantity', '>', 0));
+                $query->whereDoesntHave('variants', fn ($v) => $v->where('quantity', '>', 0));
             }
         }
 
@@ -94,7 +107,7 @@ class ProductController extends BaseApiController
             $sizeList = is_array($sizes) ? $sizes : explode(',', $sizes);
             $query->whereHas('variants.size', function ($s) use ($sizeList) {
                 $s->whereIn('size_name', array_map('trim', $sizeList))
-                  ->orWhereIn('size_code', array_map('trim', $sizeList));
+                    ->orWhereIn('size_code', array_map('trim', $sizeList));
             });
         }
 
@@ -153,14 +166,14 @@ class ProductController extends BaseApiController
         return $this->createdResponse(
             $product->load('category'),
             'Product created successfully',
-            '/api/v1/products/' . $product->product_id
+            '/api/v1/products/'.$product->product_id
         );
     }
 
     public function show(int $id): JsonResponse
     {
         // ── High-Speed Caching Layer (Cache hot products for 1 hour) ──────────
-        $product = \Illuminate\Support\Facades\Cache::remember("product:{$id}", 3600, function () use ($id) {
+        $product = Cache::remember("product:{$id}", 3600, function () use ($id) {
             return Product::with(['category', 'variants.size', 'variants.color', 'images', 'primaryImage'])->findOrFail($id);
         });
 
@@ -173,20 +186,20 @@ class ProductController extends BaseApiController
         $old = $product->toArray();
 
         $validated = $request->validate([
-            'category_id'     => 'required|exists:categories,category_id',
-            'product_name'    => 'required|string|max:150',
-            'brand'           => 'nullable|string',
-            'description'     => 'nullable|string',
-            'image_url'       => 'nullable|string|max:500',
+            'category_id' => 'required|exists:categories,category_id',
+            'product_name' => 'required|string|max:150',
+            'brand' => 'nullable|string',
+            'description' => 'nullable|string',
+            'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'status'          => 'nullable|string|in:ACTIVE,INACTIVE',
+            'status' => 'nullable|string|in:ACTIVE,INACTIVE',
         ]);
 
         $product->update($validated);
 
         // Cache Invalidation
-        \Illuminate\Support\Facades\Cache::forget("product:{$id}");
-        \Illuminate\Support\Facades\Cache::forget("product_matrix:{$id}");
+        Cache::forget("product:{$id}");
+        Cache::forget("product_matrix:{$id}");
 
         AuditLogService::log('UPDATE', 'Product', $id, $old, $product->toArray());
 
@@ -200,8 +213,8 @@ class ProductController extends BaseApiController
         $product->delete();
 
         // Cache Invalidation
-        \Illuminate\Support\Facades\Cache::forget("product:{$id}");
-        \Illuminate\Support\Facades\Cache::forget("product_matrix:{$id}");
+        Cache::forget("product:{$id}");
+        Cache::forget("product_matrix:{$id}");
 
         AuditLogService::log('DELETE', 'Product', $id, $old, null);
 

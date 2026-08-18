@@ -11,7 +11,7 @@ class SecurityHeadersMiddleware
     /**
      * Handle an incoming request and enforce enterprise security headers.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {

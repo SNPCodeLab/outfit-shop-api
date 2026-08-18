@@ -11,6 +11,7 @@ class PosShift extends Model
     use HasFactory;
 
     protected $table = 'pos_shifts';
+
     protected $primaryKey = 'shift_id';
 
     protected $fillable = [
@@ -34,19 +35,19 @@ class PosShift extends Model
     ];
 
     protected $casts = [
-        'opened_at'            => 'datetime',
-        'closed_at'            => 'datetime',
-        'opening_float_usd'    => 'float',
-        'opening_float_khr'    => 'float',
-        'cash_sales_usd'       => 'float',
-        'cash_sales_khr'       => 'float',
-        'card_sales_usd'       => 'float',
-        'qr_sales_usd'         => 'float',
+        'opened_at' => 'datetime',
+        'closed_at' => 'datetime',
+        'opening_float_usd' => 'float',
+        'opening_float_khr' => 'float',
+        'cash_sales_usd' => 'float',
+        'cash_sales_khr' => 'float',
+        'card_sales_usd' => 'float',
+        'qr_sales_usd' => 'float',
         'petty_cash_drops_usd' => 'float',
-        'expected_cash_usd'    => 'float',
-        'closing_cash_usd'     => 'float',
-        'discrepancy_usd'      => 'float',
-        'z_report_summary'     => 'array',
+        'expected_cash_usd' => 'float',
+        'closing_cash_usd' => 'float',
+        'discrepancy_usd' => 'float',
+        'z_report_summary' => 'array',
     ];
 
     public function employee(): BelongsTo

@@ -17,24 +17,24 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'nullable|string|in:admin,manager,cashier,staff,viewer',
+            'role' => 'nullable|string|in:admin,manager,cashier,staff,viewer',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required'     => 'Full name is required.',
-            'email.required'    => 'Email address is required.',
-            'email.email'       => 'The email address format is invalid.',
-            'email.unique'      => 'This email address is already registered.',
+            'name.required' => 'Full name is required.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'The email address format is invalid.',
+            'email.unique' => 'This email address is already registered.',
             'password.required' => 'Password is required.',
-            'password.min'      => 'Password must be at least 8 characters.',
-            'password.confirmed'=> 'Password confirmation does not match.',
-            'role.in'           => 'Role must be one of: admin, manager, cashier, staff, viewer.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'role.in' => 'Role must be one of: admin, manager, cashier, staff, viewer.',
         ];
     }
 

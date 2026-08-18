@@ -11,6 +11,7 @@ class StoreBranch extends Model
     use HasFactory;
 
     protected $table = 'store_branches';
+
     protected $primaryKey = 'branch_id';
 
     protected $fillable = [
@@ -26,7 +27,7 @@ class StoreBranch extends Model
 
     protected $casts = [
         'is_warehouse' => 'boolean',
-        'is_active'    => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function inventories(): HasMany

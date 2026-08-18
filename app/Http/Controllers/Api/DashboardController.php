@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\BaseApiController;
 use App\Models\ApiLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +16,7 @@ class DashboardController extends BaseApiController
      */
     public function stats(): JsonResponse
     {
-        $today       = Carbon::today();
+        $today = Carbon::today();
         $sevenDaysAgo = Carbon::now()->subDays(7);
 
         $totalRequests = ApiLog::count();
@@ -26,12 +25,12 @@ class DashboardController extends BaseApiController
         $avgDurationMs = round((float) ApiLog::avg('duration_ms'), 2);
         $maxDurationMs = round((float) ApiLog::max('duration_ms'), 2);
 
-        $errorCount   = ApiLog::where('status', '>=', 400)->count();
+        $errorCount = ApiLog::where('status', '>=', 400)->count();
         $errorRatePct = $totalRequests > 0
             ? round(($errorCount / $totalRequests) * 100, 2)
             : 0.00;
 
-        $authFailures401  = ApiLog::where('status', 401)->count();
+        $authFailures401 = ApiLog::where('status', 401)->count();
         $rateLimitHits429 = ApiLog::where('status', 429)->count();
 
         $mostCalledEndpoints = ApiLog::select(
@@ -73,21 +72,21 @@ class DashboardController extends BaseApiController
                 'avg_response_time_ms' => $avgDurationMs,
                 'max_response_time_ms' => $maxDurationMs,
                 'is_latency_compliant' => $avgDurationMs <= 200.0,
-                'error_rate_target'    => '< 1.00%',
-                'current_error_rate'   => "{$errorRatePct}%",
-                'is_error_compliant'   => $errorRatePct <= 1.00,
+                'error_rate_target' => '< 1.00%',
+                'current_error_rate' => "{$errorRatePct}%",
+                'is_error_compliant' => $errorRatePct <= 1.00,
             ],
             'telemetry_counters' => [
-                'total_requests'      => $totalRequests,
-                'requests_today'      => $requestsToday,
-                'error_count'         => $errorCount,
-                'auth_failures_401'   => $authFailures401,
+                'total_requests' => $totalRequests,
+                'requests_today' => $requestsToday,
+                'error_count' => $errorCount,
+                'auth_failures_401' => $authFailures401,
                 'rate_limit_hits_429' => $rateLimitHits429,
             ],
             'most_called_endpoints' => $mostCalledEndpoints,
-            'slowest_endpoints'     => $slowestEndpoints,
-            'requests_last_7_days'  => $requestsLast7Days,
-            'recent_requests'       => $recentRequests,
+            'slowest_endpoints' => $slowestEndpoints,
+            'requests_last_7_days' => $requestsLast7Days,
+            'recent_requests' => $recentRequests,
         ], 'API telemetry and APM metrics retrieved');
     }
 
@@ -172,16 +171,16 @@ class DashboardController extends BaseApiController
             ->get();
 
         return [
-            'role'      => 'cashier',
+            'role' => 'cashier',
             'tab_title' => "Today's Register Pulse",
             'pie_chart' => [
-                'title'           => "Today's Payment Methods Split",
+                'title' => "Today's Payment Methods Split",
                 'payment_summary' => $paymentSplit,
             ],
             'agile_graph' => [
                 'title' => 'Hourly Sales Velocity',
-                'type'  => 'area_chart',
-                'data'  => [
+                'type' => 'area_chart',
+                'data' => [
                     ['time' => '09:00', 'sales' => 145.00,  'transactions' => 3],
                     ['time' => '11:00', 'sales' => 320.50,  'transactions' => 7],
                     ['time' => '13:00', 'sales' => 450.00,  'transactions' => 9],
@@ -192,8 +191,8 @@ class DashboardController extends BaseApiController
             ],
             'live_selling_today' => $topSellingToday,
             'summary' => [
-                'register_status'   => 'OPEN',
-                'sales_today_usd'   => 2166.50,
+                'register_status' => 'OPEN',
+                'sales_today_usd' => 2166.50,
                 'tax_collected_usd' => 216.65,
                 'transaction_count' => 43,
             ],
@@ -203,18 +202,18 @@ class DashboardController extends BaseApiController
     private function buildStaffPulse(): array
     {
         return [
-            'role'      => 'staff',
+            'role' => 'staff',
             'tab_title' => 'Floor and Warehouse Stock Pulse',
             'pie_chart' => [
-                'title'  => 'Inventory Stock Health',
+                'title' => 'Inventory Stock Health',
                 'labels' => ['In Stock (Optimal)', 'Low Stock (less than 10)', 'Out of Stock'],
                 'values' => [78, 15, 7],
                 'colors' => ['#10B981', '#F59E0B', '#EF4444'],
             ],
             'agile_graph' => [
                 'title' => 'Daily Shelf Replenishment and Movements (Units)',
-                'type'  => 'bar_chart',
-                'data'  => [
+                'type' => 'bar_chart',
+                'data' => [
                     ['day' => 'Mon', 'replenished' => 45,  'transferred' => 20],
                     ['day' => 'Tue', 'replenished' => 60,  'transferred' => 35],
                     ['day' => 'Wed', 'replenished' => 80,  'transferred' => 15],
@@ -230,8 +229,8 @@ class DashboardController extends BaseApiController
                 ['name' => 'Leather Tote', 'sku' => 'LEAT-OS-GLD-020', 'current_stock' => 12, 'status' => 'REORDER_SOON'],
             ],
             'summary' => [
-                'active_skus'      => 26,
-                'total_units'      => 1300,
+                'active_skus' => 26,
+                'total_units' => 1300,
                 'low_stock_alerts' => 3,
             ],
         ];
@@ -240,18 +239,18 @@ class DashboardController extends BaseApiController
     private function buildManagerPulse(): array
     {
         return [
-            'role'      => 'manager',
+            'role' => 'manager',
             'tab_title' => 'Store and Catalog Operations Pulse',
             'pie_chart' => [
-                'title'  => 'Revenue by Brand Distribution',
+                'title' => 'Revenue by Brand Distribution',
                 'labels' => ['KhmeRiel Signature', 'Ralph Lauren RLX', 'Vattanac Brewery', 'Coca-Cola', 'Hanuman Beer'],
                 'values' => [42, 33, 12, 8, 5],
                 'colors' => ['#D4AF37', '#1E293B', '#3B82F6', '#EF4444', '#EAB308'],
             ],
             'agile_graph' => [
                 'title' => '7-Day Sales and Profit Velocity',
-                'type'  => 'line_chart',
-                'data'  => [
+                'type' => 'line_chart',
+                'data' => [
                     ['date' => 'Day 1', 'revenue' => 1250.00, 'cost' => 600.00,  'profit' => 650.00],
                     ['date' => 'Day 2', 'revenue' => 1420.00, 'cost' => 680.00,  'profit' => 740.00],
                     ['date' => 'Day 3', 'revenue' => 1890.00, 'cost' => 890.00,  'profit' => 1000.00],
@@ -264,8 +263,8 @@ class DashboardController extends BaseApiController
             'summary' => [
                 'gross_revenue_usd' => 14460.00,
                 'tax_collected_usd' => 1446.00,
-                'net_margin_pct'    => 54.2,
-                'pending_po'        => 2,
+                'net_margin_pct' => 54.2,
+                'pending_po' => 2,
             ],
         ];
     }
@@ -273,18 +272,18 @@ class DashboardController extends BaseApiController
     private function buildAdminPulse(): array
     {
         return [
-            'role'      => 'admin',
+            'role' => 'admin',
             'tab_title' => 'Executive and Security Command Pulse',
             'pie_chart' => [
-                'title'  => 'Total Financial Revenue and Tax Breakdown',
+                'title' => 'Total Financial Revenue and Tax Breakdown',
                 'labels' => ['Net Sales', '10% VAT Tax', 'Discounts and Points', 'Store Credit'],
                 'values' => [82, 10, 5, 3],
                 'colors' => ['#10B981', '#6366F1', '#F59E0B', '#8B5CF6'],
             ],
             'agile_graph' => [
                 'title' => 'Multi-Branch Sales Performance Velocity',
-                'type'  => 'stacked_area_chart',
-                'data'  => [
+                'type' => 'stacked_area_chart',
+                'data' => [
                     ['period' => 'W1', 'flagship_hq' => 8500,  'central_warehouse' => 3200],
                     ['period' => 'W2', 'flagship_hq' => 9800,  'central_warehouse' => 4100],
                     ['period' => 'W3', 'flagship_hq' => 11200, 'central_warehouse' => 4800],
@@ -294,13 +293,13 @@ class DashboardController extends BaseApiController
             'security_audit_stream' => [
                 ['time' => '10:45 AM', 'actor' => 'POS Cashier 01',  'action' => 'Completed Sale #1042',               'status' => 'SUCCESS'],
                 ['time' => '10:12 AM', 'actor' => 'Store Manager',   'action' => 'Received PO from KhmeRiel Silk',     'status' => 'LOGGED'],
-                ['time' => '09:30 AM', 'actor' => 'Super Admin',     'action' => 'Updated Tax Policy to 10% Exclusive','status' => 'CONFIRMED'],
+                ['time' => '09:30 AM', 'actor' => 'Super Admin',     'action' => 'Updated Tax Policy to 10% Exclusive', 'status' => 'CONFIRMED'],
             ],
             'summary' => [
-                'total_turnover_usd'   => 56400.00,
-                'total_vat_pool_usd'   => 5640.00,
-                'active_employees'     => 4,
-                'store_branches'       => 2,
+                'total_turnover_usd' => 56400.00,
+                'total_vat_pool_usd' => 5640.00,
+                'active_employees' => 4,
+                'store_branches' => 2,
             ],
         ];
     }

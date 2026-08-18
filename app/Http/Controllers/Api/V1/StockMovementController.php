@@ -49,7 +49,7 @@ class StockMovementController extends BaseApiController
             $query->whereDate('movement_date', '<=', $toDate);
         }
 
-        $perPage   = (int) $request->input('per_page', 50);
+        $perPage = (int) $request->input('per_page', 50);
         $movements = $query->orderBy('movement_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($movements, 'Stock movement audit ledger retrieved');
@@ -73,20 +73,20 @@ class StockMovementController extends BaseApiController
         $allowedList = implode(',', $allowed);
 
         $validated = $request->validate([
-            'variant_id'    => 'required|exists:product_variants,variant_id',
-            'quantity'      => 'required|integer|not_in:0',
+            'variant_id' => 'required|exists:product_variants,variant_id',
+            'quantity' => 'required|integer|not_in:0',
             'movement_type' => "required|string|in:{$allowedList}",
-            'note'          => 'nullable|string|max:500',
+            'note' => 'nullable|string|max:500',
         ]);
 
         try {
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
-            $movement   = $this->inventoryService->adjustStock(
-                variantId:    $validated['variant_id'],
-                quantity:     $validated['quantity'],
+            $movement = $this->inventoryService->adjustStock(
+                variantId: $validated['variant_id'],
+                quantity: $validated['quantity'],
                 movementType: $validated['movement_type'],
-                employeeId:   $employeeId,
-                note:         $validated['note'] ?? null
+                employeeId: $employeeId,
+                note: $validated['note'] ?? null
             );
 
             return $this->successResponse(

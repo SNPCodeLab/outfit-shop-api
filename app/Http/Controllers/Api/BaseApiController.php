@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Response\ApiResponse;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -21,20 +20,20 @@ abstract class BaseApiController extends Controller
     // =========================================================================
 
     protected function successResponse(
-        mixed  $data       = null,
-        string $message    = 'Operation completed successfully',
-        int    $code       = 200,
-        array  $meta       = [],
-        array  $filters    = []
+        mixed $data = null,
+        string $message = 'Operation completed successfully',
+        int $code = 200,
+        array $meta = [],
+        array $filters = []
     ): JsonResponse {
         return ApiResponse::success($data, $message, $meta, [], $code, $filters);
     }
 
     protected function createdResponse(
-        mixed   $data        = null,
-        string  $message     = 'Resource created successfully',
+        mixed $data = null,
+        string $message = 'Resource created successfully',
         ?string $locationUrl = null,
-        array   $meta        = []
+        array $meta = []
     ): JsonResponse {
         return ApiResponse::created($data, $message, $locationUrl, $meta);
     }
@@ -46,7 +45,7 @@ abstract class BaseApiController extends Controller
     }
 
     protected function acceptedResponse(
-        mixed  $data    = null,
+        mixed $data = null,
         string $message = 'Request accepted and queued for processing'
     ): JsonResponse {
         return ApiResponse::accepted($data, $message);
@@ -57,11 +56,11 @@ abstract class BaseApiController extends Controller
     // =========================================================================
 
     protected function errorResponse(
-        string  $message          = 'An error occurred.',
-        int     $code             = 400,
-        ?string $errorCode        = null,
-        mixed   $errors           = null,
-        ?string $hint             = null
+        string $message = 'An error occurred.',
+        int $code = 400,
+        ?string $errorCode = null,
+        mixed $errors = null,
+        ?string $hint = null
     ): JsonResponse {
         return ApiResponse::error(
             $errorCode ?? 'BAD_REQUEST',
@@ -74,14 +73,14 @@ abstract class BaseApiController extends Controller
     }
 
     protected function validationErrorResponse(
-        array  $errors  = [],
+        array $errors = [],
         string $message = 'The provided data failed validation.'
     ): JsonResponse {
         return ApiResponse::validationError($errors, $message);
     }
 
     protected function unauthorizedResponse(
-        string $reason  = 'token_missing',
+        string $reason = 'token_missing',
         string $message = 'Invalid or expired authentication token.'
     ): JsonResponse {
         return ApiResponse::unauthenticated($reason, $message);
@@ -94,9 +93,9 @@ abstract class BaseApiController extends Controller
     }
 
     protected function notFoundResponse(
-        string $resource   = 'Resource',
-        mixed  $identifier = null,
-        string $message    = 'The requested resource was not found.'
+        string $resource = 'Resource',
+        mixed $identifier = null,
+        string $message = 'The requested resource was not found.'
     ): JsonResponse {
         return ApiResponse::notFound($resource, $identifier, $message);
     }
@@ -104,22 +103,22 @@ abstract class BaseApiController extends Controller
     protected function conflictResponse(
         string $message,
         string $errorCode = 'RESOURCE_CONFLICT',
-        mixed  $detail    = null
+        mixed $detail = null
     ): JsonResponse {
         return ApiResponse::conflict($message, $errorCode, $detail);
     }
 
     protected function tooManyRequestsResponse(
-        int    $limit      = 60,
-        int    $remaining  = 0,
-        int    $retryAfter = 60
+        int $limit = 60,
+        int $remaining = 0,
+        int $retryAfter = 60
     ): JsonResponse {
         return ApiResponse::tooManyRequests($limit, $remaining, $retryAfter);
     }
 
     protected function serverErrorResponse(
         string $message = 'An unexpected error occurred.',
-        ?array $debug   = null
+        ?array $debug = null
     ): JsonResponse {
         return ApiResponse::serverError($message, $debug);
     }

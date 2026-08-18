@@ -15,15 +15,15 @@ class RbacApiTest extends TestCase
     {
         $cashier = Employee::create([
             'employee_name' => 'Cashier User',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $token = $cashier->createToken('test-token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/v1/employees');
 
         $response->assertStatus(403)
@@ -34,15 +34,15 @@ class RbacApiTest extends TestCase
     {
         $admin = Employee::create([
             'employee_name' => 'Admin User',
-            'email'         => 'admin@test.local',
-            'username'      => 'admin',
+            'email' => 'admin@test.local',
+            'username' => 'admin',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'ADMIN',
+            'role' => 'ADMIN',
         ]);
 
         $token = $admin->createToken('test-token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/v1/employees');
 
         $response->assertStatus(200)

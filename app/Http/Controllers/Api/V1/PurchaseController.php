@@ -30,7 +30,7 @@ class PurchaseController extends BaseApiController
             'employee',
             'details.variant.product',
             'details.variant.size',
-            'details.variant.color'
+            'details.variant.color',
         ]);
 
         if ($supplierId = $request->input('supplier_id')) {
@@ -61,11 +61,11 @@ class PurchaseController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'supplier_id'          => 'required|exists:suppliers,supplier_id',
-            'items'                => 'required|array|min:1',
-            'items.*.variant_id'   => 'required|exists:product_variants,variant_id',
-            'items.*.quantity'     => 'required|integer|min:1',
-            'items.*.cost_price'   => 'required|numeric|min:0',
+            'supplier_id' => 'required|exists:suppliers,supplier_id',
+            'items' => 'required|array|min:1',
+            'items.*.variant_id' => 'required|exists:product_variants,variant_id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.cost_price' => 'required|numeric|min:0',
         ]);
 
         try {
@@ -76,7 +76,7 @@ class PurchaseController extends BaseApiController
                 items: $validated['items']
             );
 
-            return $this->createdResponse($purchase, 'Purchase order received successfully', '/api/v1/purchases/' . $purchase->purchase_id);
+            return $this->createdResponse($purchase, 'Purchase order received successfully', '/api/v1/purchases/'.$purchase->purchase_id);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), 400, 'PURCHASE_RECEIVE_FAILED');
         }
@@ -92,7 +92,7 @@ class PurchaseController extends BaseApiController
             'employee',
             'details.variant.product',
             'details.variant.size',
-            'details.variant.color'
+            'details.variant.color',
         ])->findOrFail($id);
 
         return $this->successResponse($purchase, 'Purchase order details retrieved');

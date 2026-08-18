@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\ClothingSize;
 use App\Models\Color;
-use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -21,43 +20,43 @@ class POSCheckoutApiTest extends TestCase
     {
         $cashier = Employee::create([
             'employee_name' => 'Cashier One',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier1',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier1',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $category = Category::firstOrCreate(['category_name' => 'Tops']);
-        $size     = ClothingSize::firstOrCreate(['size_name' => 'M']);
-        $color    = Color::firstOrCreate(['color_name' => 'Black']);
+        $size = ClothingSize::firstOrCreate(['size_name' => 'M']);
+        $color = Color::firstOrCreate(['color_name' => 'Black']);
 
         $product = Product::create([
-            'category_id'  => $category->category_id,
-            'product_name' => 'Classic Polo Shirt ' . uniqid(),
+            'category_id' => $category->category_id,
+            'product_name' => 'Classic Polo Shirt '.uniqid(),
         ]);
 
         $variant = ProductVariant::create([
             'product_id' => $product->product_id,
-            'size_id'    => $size->size_id,
-            'color_id'   => $color->color_id,
-            'sku'        => 'POLO-BLK-M-' . uniqid(),
+            'size_id' => $size->size_id,
+            'color_id' => $color->color_id,
+            'sku' => 'POLO-BLK-M-'.uniqid(),
             'cost_price' => 15.00,
             'sale_price' => 30.00,
-            'quantity'   => 20,
+            'quantity' => 20,
         ]);
 
         $token = $cashier->createToken('pos-token')->plainTextToken;
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/v1/sales/checkout', [
                 'items' => [
                     [
                         'variant_id' => $variant->variant_id,
-                        'quantity'   => 3,
-                        'discount'   => 0.00,
-                    ]
+                        'quantity' => 3,
+                        'discount' => 0.00,
+                    ],
                 ],
-                'tax_rate'       => 0.00,
+                'tax_rate' => 0.00,
                 'payment_method' => 'CASH',
                 'payment_amount' => 90.00,
             ]);
@@ -69,13 +68,13 @@ class POSCheckoutApiTest extends TestCase
         // Verify stock quantity was decremented atomically (20 - 3 = 17)
         $this->assertDatabaseHas('product_variants', [
             'variant_id' => $variant->variant_id,
-            'quantity'   => 17,
+            'quantity' => 17,
         ]);
 
         // Verify payment record
         $this->assertDatabaseHas('payments', [
             'payment_method' => 'CASH',
-            'amount'         => 90.00,
+            'amount' => 90.00,
         ]);
     }
 
@@ -83,41 +82,41 @@ class POSCheckoutApiTest extends TestCase
     {
         $cashier = Employee::create([
             'employee_name' => 'Cashier One',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier1',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier1',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $category = Category::firstOrCreate(['category_name' => 'Tops']);
-        $size     = ClothingSize::firstOrCreate(['size_name' => 'M']);
-        $color    = Color::firstOrCreate(['color_name' => 'Black']);
+        $size = ClothingSize::firstOrCreate(['size_name' => 'M']);
+        $color = Color::firstOrCreate(['color_name' => 'Black']);
 
         $product = Product::create([
-            'category_id'  => $category->category_id,
-            'product_name' => 'Classic Polo Shirt ' . uniqid(),
+            'category_id' => $category->category_id,
+            'product_name' => 'Classic Polo Shirt '.uniqid(),
         ]);
 
         $variant = ProductVariant::create([
             'product_id' => $product->product_id,
-            'size_id'    => $size->size_id,
-            'color_id'   => $color->color_id,
-            'sku'        => 'POLO-BLK-M-' . uniqid(),
+            'size_id' => $size->size_id,
+            'color_id' => $color->color_id,
+            'sku' => 'POLO-BLK-M-'.uniqid(),
             'cost_price' => 15.00,
             'sale_price' => 30.00,
-            'quantity'   => 2, // Only 2 in stock
+            'quantity' => 2, // Only 2 in stock
         ]);
 
         $token = $cashier->createToken('pos-token')->plainTextToken;
 
         // Try to buy 5 items when stock is 2
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/v1/sales/checkout', [
                 'items' => [
                     [
                         'variant_id' => $variant->variant_id,
-                        'quantity'   => 5,
-                    ]
+                        'quantity' => 5,
+                    ],
                 ],
                 'payment_method' => 'CASH',
             ]);
@@ -128,7 +127,7 @@ class POSCheckoutApiTest extends TestCase
         // Verify stock remains untouched at 2
         $this->assertDatabaseHas('product_variants', [
             'variant_id' => $variant->variant_id,
-            'quantity'   => 2,
+            'quantity' => 2,
         ]);
     }
 }

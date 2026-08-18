@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\ProductVariant;
 use App\Services\InventoryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,14 +16,13 @@ class BulkStockOpnameJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 600;
 
     /**
      * Create a new job instance.
      *
-     * @param array $auditItems Array of ['variant_id' => 1, 'physical_count' => 50]
-     * @param int $employeeId
-     * @param string $sessionReference
+     * @param  array  $auditItems  Array of ['variant_id' => 1, 'physical_count' => 50]
      */
     public function __construct(
         public array $auditItems,
@@ -35,7 +35,7 @@ class BulkStockOpnameJob implements ShouldQueue
      */
     public function handle(InventoryService $inventoryService): void
     {
-        Log::info("Starting batch Stock Opname reconciliation [{$this->sessionReference}] with " . count($this->auditItems) . " items");
+        Log::info("Starting batch Stock Opname reconciliation [{$this->sessionReference}] with ".count($this->auditItems).' items');
 
         $reconciledCount = 0;
 
@@ -44,8 +44,10 @@ class BulkStockOpnameJob implements ShouldQueue
                 $variantId = $item['variant_id'];
                 $physicalCount = (int) $item['physical_count'];
 
-                $variant = \App\Models\ProductVariant::find($variantId);
-                if (!$variant) continue;
+                $variant = ProductVariant::find($variantId);
+                if (! $variant) {
+                    continue;
+                }
 
                 $currentQty = (int) $variant->quantity;
                 $diff = $physicalCount - $currentQty;
@@ -61,7 +63,7 @@ class BulkStockOpnameJob implements ShouldQueue
                     $reconciledCount++;
                 }
             } catch (\Throwable $e) {
-                Log::error("Failed to reconcile variant ID {$item['variant_id']}: " . $e->getMessage());
+                Log::error("Failed to reconcile variant ID {$item['variant_id']}: ".$e->getMessage());
             }
         }
 

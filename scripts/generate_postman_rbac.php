@@ -1,39 +1,40 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Console\Kernel;
 
-function makeRequestItem($name, $method, $path, $folder, $authType = 'bearer', $bodyJson = null, $desc = '') {
+function makeRequestItem($name, $method, $path, $folder, $authType = 'bearer', $bodyJson = null, $desc = '')
+{
     $urlParts = explode('/', ltrim($path, '/'));
-    
+
     $req = [
         'name' => $name,
         'request' => [
             'method' => $method,
             'header' => [
                 ['key' => 'Accept', 'value' => 'application/json', 'type' => 'text'],
-                ['key' => 'Content-Type', 'value' => 'application/json', 'type' => 'text']
+                ['key' => 'Content-Type', 'value' => 'application/json', 'type' => 'text'],
             ],
             'url' => [
-                'raw' => '{{base_url}}/' . ltrim($path, '/'),
+                'raw' => '{{base_url}}/'.ltrim($path, '/'),
                 'host' => ['{{base_url}}'],
-                'path' => $urlParts
+                'path' => $urlParts,
             ],
-            'description' => $desc
+            'description' => $desc,
         ],
-        'response' => []
+        'response' => [],
     ];
 
     if ($authType === 'bearer') {
         $req['request']['auth'] = [
             'type' => 'bearer',
             'bearer' => [
-                ['key' => 'token', 'value' => '{{token}}', 'type' => 'string']
-            ]
+                ['key' => 'token', 'value' => '{{token}}', 'type' => 'string'],
+            ],
         ];
     }
 
@@ -43,9 +44,9 @@ function makeRequestItem($name, $method, $path, $folder, $authType = 'bearer', $
             'raw' => is_array($bodyJson) ? json_encode($bodyJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $bodyJson,
             'options' => [
                 'raw' => [
-                    'language' => 'json'
-                ]
-            ]
+                    'language' => 'json',
+                ],
+            ],
         ];
     }
 
@@ -59,11 +60,11 @@ $publicItems = [
     // Health & System
     makeRequestItem('1.1 Health & Engine Status', 'GET', 'api/v1/health', 'Public', 'none', null, 'System heartbeat and database connectivity check'),
     makeRequestItem('1.2 Engine Status Metadata', 'GET', 'api/v1/status', 'Public', 'none', null, 'Detailed engine statistics, runtime, and version information'),
-    
+
     // Auth & Login
     makeRequestItem('1.3 Employee Login (Get Sanctum Token)', 'POST', 'api/v1/auth/login', 'Public', 'none', [
         'username' => 'admin',
-        'password' => 'Admin@123456'
+        'password' => 'Admin@123456',
     ], 'Authenticate and receive Bearer access token + assigned RBAC roles'),
 
     // Public Product Catalog
@@ -75,7 +76,7 @@ $publicItems = [
     makeRequestItem('1.9 Submit Customer Product Review', 'POST', 'api/v1/products/1/reviews', 'Public', 'none', [
         'customer_name' => 'Sokha Chan',
         'rating' => 5,
-        'review_comment' => 'Exceptional silk fabric and perfect tailoring!'
+        'review_comment' => 'Exceptional silk fabric and perfect tailoring!',
     ], 'Submit a new product review (queued for moderation)'),
     makeRequestItem('1.10 Download Digital Product (eBook/Asset)', 'GET', 'api/v1/products/17/download', 'Public', 'none', null, 'Download purchased PDF/ePub digital assets'),
 
@@ -93,11 +94,11 @@ $publicItems = [
     makeRequestItem('1.19 List Active Promotions & Discount Codes', 'GET', 'api/v1/promotions/active', 'Public', 'none', null, 'Fetch active seasonal discounts and flash sales'),
     makeRequestItem('1.20 Verify Coupon / Promo Code', 'POST', 'api/v1/promotions/verify-coupon', 'Public', 'none', [
         'coupon_code' => 'KHMERNEWYEAR2026',
-        'cart_subtotal' => 150.00
+        'cart_subtotal' => 150.00,
     ], 'Validate coupon eligibility and calculate dynamic discount amount'),
     makeRequestItem('1.21 Check Gift Card Balance & Validity', 'POST', 'api/v1/gift-cards/check', 'Public', 'none', [
         'card_code' => 'KM-2026-8888-9999',
-        'pin' => '1234'
+        'pin' => '1234',
     ], 'Check remaining balance and expiration of a 16-digit voucher card'),
     makeRequestItem('1.22 List Product Bundles & Package Deals', 'GET', 'api/v1/bundles', 'Public', 'none', null, 'Fetch curated gift sets and bundled outfits with combo pricing'),
     makeRequestItem('1.23 Generate Dynamic KHQR Bakong String', 'GET', 'api/v1/payments/khqr?amount=125.00&currency=USD', 'Public', 'none', null, 'Generate universal EMVCo compliant KHQR for mobile app payments'),
@@ -113,15 +114,15 @@ $cashierItems = [
     makeRequestItem('2.2 Open New POS Register Shift', 'POST', 'api/v1/shifts/open', 'Cashier', 'bearer', [
         'store_id' => 1,
         'opening_cash' => 100.00,
-        'notes' => 'Morning shift register opening.'
+        'notes' => 'Morning shift register opening.',
     ], 'Start shift with opening cash float in register'),
     makeRequestItem('2.3 Record Mid-Day Cash Drop (Safe Skim)', 'POST', 'api/v1/shifts/drop-cash', 'Cashier', 'bearer', [
         'amount' => 500.00,
-        'reason' => 'Midday cash skim transferred to store safe.'
+        'reason' => 'Midday cash skim transferred to store safe.',
     ], 'Record cash drop from register drawer to vault'),
     makeRequestItem('2.4 Close Shift & Generate Z-Report', 'POST', 'api/v1/shifts/close', 'Cashier', 'bearer', [
         'actual_cash_counted' => 750.00,
-        'closing_notes' => 'Shift balanced with zero cash discrepancy.'
+        'closing_notes' => 'Shift balanced with zero cash discrepancy.',
     ], 'Close register, calculate cash over/short discrepancy, and lock Z-report'),
 
     // POS Checkout & Sales Transactions
@@ -130,18 +131,18 @@ $cashierItems = [
         'payment_method' => 'KHQR_BAKONG',
         'items' => [
             ['variant_id' => 1, 'quantity' => 1, 'unit_price' => 125.00, 'discount_amount' => 0.00],
-            ['variant_id' => 10, 'quantity' => 1, 'unit_price' => 145.00, 'discount_amount' => 10.00]
+            ['variant_id' => 10, 'quantity' => 1, 'unit_price' => 145.00, 'discount_amount' => 10.00],
         ],
         'discount_amount' => 10.00,
         'tax_amount' => 0.00,
-        'notes' => 'In-store POS retail purchase.'
+        'notes' => 'In-store POS retail purchase.',
     ], 'ACID-compliant sales transaction deducting inventory and generating invoice receipt'),
     makeRequestItem('2.6 List Sales Invoices & Receipts', 'GET', 'api/v1/sales?page=1&per_page=15', 'Cashier', 'bearer', null, 'List transaction history with customer names and payment status'),
     makeRequestItem('2.7 Get Single Sale Invoice Details', 'GET', 'api/v1/sales/1', 'Cashier', 'bearer', null, 'Get breakdown of sold items, applied discounts, tax, and payments'),
     makeRequestItem('2.8 Generate KHQR Payment for Sale', 'GET', 'api/v1/sales/1/khqr', 'Cashier', 'bearer', null, 'Generate dynamic KHQR Bakong barcode for a specific pending invoice'),
     makeRequestItem('2.9 Generate 80mm ESC/POS Thermal Receipt', 'GET', 'api/v1/sales/1/receipt-thermal', 'Cashier', 'bearer', null, 'Render 80mm thermal receipt payload for receipt printers'),
     makeRequestItem('2.10 Void / Cancel Sale & Restock Inventory', 'POST', 'api/v1/sales/1/void', 'Cashier', 'bearer', [
-        'reason' => 'Customer requested immediate exchange before leaving counter.'
+        'reason' => 'Customer requested immediate exchange before leaving counter.',
     ], 'Void transaction and automatically return items to stock'),
 
     // Customer & Loyalty Management
@@ -151,12 +152,12 @@ $cashierItems = [
         'phone' => '012999888',
         'email' => 'chenda.pich@example.com',
         'gender' => 'FEMALE',
-        'address' => 'Street 2004, Phnom Penh'
+        'address' => 'Street 2004, Phnom Penh',
     ], 'Register new customer for points accumulation and order tracking'),
     makeRequestItem('2.13 Get Customer Details & Purchase History', 'GET', 'api/v1/customers/1', 'Cashier', 'bearer', null, 'Fetch customer profile, total spend, and past orders'),
     makeRequestItem('2.14 Get Customer VIP Loyalty & Points Balance', 'GET', 'api/v1/customers/1/loyalty', 'Cashier', 'bearer', null, 'Check VIP Tier (Bronze/Silver/Gold/Platinum) and point balance'),
     makeRequestItem('2.15 Redeem Customer Loyalty Points for Voucher', 'POST', 'api/v1/customers/1/redeem-points', 'Cashier', 'bearer', [
-        'points_to_redeem' => 100
+        'points_to_redeem' => 100,
     ], 'Convert 100 points into a $5.00 discount voucher'),
 
     // Shipping & Delivery Booking
@@ -166,13 +167,13 @@ $cashierItems = [
         'recipient_name' => 'Chenda Pich',
         'recipient_phone' => '012999888',
         'delivery_address' => 'Siem Reap Branch Office, Wat Bo Road',
-        'shipping_fee' => 2.50
+        'shipping_fee' => 2.50,
     ], 'Dispatch order via Virak Buntham, J&T, Grab, or Store Pickup'),
     makeRequestItem('2.17 List Shipping & Courier Orders', 'GET', 'api/v1/shipping/orders', 'Cashier', 'bearer', null, 'Track status of dispatched packages'),
     makeRequestItem('2.18 Update Shipping Dispatch Status', 'POST', 'api/v1/shipping/1/status', 'Cashier', 'bearer', [
         'status' => 'IN_TRANSIT',
         'tracking_number' => 'VBT-88992211',
-        'courier_notes' => 'Package handed over to driver.'
+        'courier_notes' => 'Package handed over to driver.',
     ], 'Update courier tracking state (PENDING, DISPATCHED, IN_TRANSIT, DELIVERED)'),
 ];
 
@@ -188,11 +189,11 @@ $managerItems = [
         'product_type' => 'STANDARD_PHYSICAL',
         'description' => '100% premium mulberry silk wrap dress.',
         'image_url' => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905171/KHMERIEL_DRESSES_CRINOLINE_COLUMN_GOWN_TERRACOTTA_LOOK_cloth_096.png',
-        'status' => 'ACTIVE'
+        'status' => 'ACTIVE',
     ], 'Create master product catalog entry'),
     makeRequestItem('3.2 Update Product Details', 'PUT', 'api/v1/products/1', 'Manager', 'bearer', [
         'product_name' => 'KhmeRiel Silk Evening Column Gown (Updated Edition)',
-        'description' => 'Revised couture description.'
+        'description' => 'Revised couture description.',
     ], 'Update product title, description, and tags'),
     makeRequestItem('3.3 Delete Product (Soft Delete)', 'DELETE', 'api/v1/products/1', 'Manager', 'bearer', null, 'Soft delete product from active catalog'),
 
@@ -206,31 +207,31 @@ $managerItems = [
         'cost_price' => 45.00,
         'sale_price' => 125.00,
         'quantity' => 20,
-        'reorder_level' => 10
+        'reorder_level' => 10,
     ], 'Create new SKU variant with cost price, retail price, and reorder trigger threshold'),
     makeRequestItem('3.5 Update Variant Price & Reorder Threshold', 'PUT', 'api/v1/variants/1', 'Manager', 'bearer', [
         'cost_price' => 42.00,
         'sale_price' => 129.00,
-        'reorder_level' => 15
+        'reorder_level' => 15,
     ], 'Adjust pricing and safety stock thresholds'),
     makeRequestItem('3.6 List Low Stock Alerts (Below Reorder Point)', 'GET', 'api/v1/variants/low-stock', 'Manager', 'bearer', null, 'Fetch all SKUs that have breached safety stock limits'),
     makeRequestItem('3.7 Generate Barcode Label (Printable PDF/SVG)', 'GET', 'api/v1/variants/1/barcode-label', 'Manager', 'bearer', null, 'Generate 50x30mm retail barcode sticker with price and SKU'),
     makeRequestItem('3.8 Create B2B Bulk Pricing Tier for SKU', 'POST', 'api/v1/variants/1/tiers', 'Manager', 'bearer', [
         'min_quantity' => 10,
         'tier_price' => 95.00,
-        'tier_label' => 'B2B Wholesale Tier 1'
+        'tier_label' => 'B2B Wholesale Tier 1',
     ], 'Define wholesale volume discount pricing for retail partners'),
 
     // Cloudinary Media Uploads
     makeRequestItem('3.9 Direct Image Upload to Cloudinary', 'POST', 'api/v1/uploads/image', 'Manager', 'bearer', [
         'image' => '(binary file)',
-        'folder' => 'khmeriel/products'
+        'folder' => 'khmeriel/products',
     ], 'Upload product photography to Cloudinary CDN'),
     makeRequestItem('3.10 Attach Image Gallery to Product', 'POST', 'api/v1/products/1/images', 'Manager', 'bearer', [
         'image_url' => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905145/KHMERIEL_TOPS_FLUID_DRAPED_SILK_BLOUSE_CREAM_BEIGE_LOOK_cloth_012.png',
         'image_public_id' => 'KHMERIEL_TOPS_FLUID_DRAPED_SILK_BLOUSE_CREAM_BEIGE_LOOK_cloth_012',
         'is_primary' => false,
-        'sort_order' => 1
+        'sort_order' => 1,
     ], 'Add additional editorial photoshoot angle to gallery'),
     makeRequestItem('3.11 Browse Cloudinary Asset Gallery', 'GET', 'api/v1/uploads/gallery?folder=khmeriel/products', 'Manager', 'bearer', null, 'List all live CDN media assets in Cloudinary account'),
 
@@ -239,16 +240,16 @@ $managerItems = [
     makeRequestItem('3.13 One-Click Auto-Generate Purchase Order (PO)', 'POST', 'api/v1/purchases/auto-generate', 'Manager', 'bearer', [
         'supplier_id' => 1,
         'velocity_days' => 14,
-        'safety_stock_multiplier' => 1.5
+        'safety_stock_multiplier' => 1.5,
     ], 'Automatically creates draft PO for all low stock items from preferred supplier'),
     makeRequestItem('3.14 Create Manual Purchase Order (Stock-In)', 'POST', 'api/v1/purchases', 'Manager', 'bearer', [
         'supplier_id' => 1,
         'order_date' => date('Y-m-d'),
         'items' => [
             ['variant_id' => 1, 'quantity_ordered' => 50, 'unit_cost' => 45.00],
-            ['variant_id' => 2, 'quantity_ordered' => 50, 'unit_cost' => 45.00]
+            ['variant_id' => 2, 'quantity_ordered' => 50, 'unit_cost' => 45.00],
         ],
-        'notes' => 'Quarterly seasonal restock shipment.'
+        'notes' => 'Quarterly seasonal restock shipment.',
     ], 'Record supplier stock-in and update average cost'),
     makeRequestItem('3.15 List Purchase Orders', 'GET', 'api/v1/purchases', 'Manager', 'bearer', null, 'List historical supplier purchase orders'),
     makeRequestItem('3.16 Get Single Purchase Order Details', 'GET', 'api/v1/purchases/1', 'Manager', 'bearer', null, 'View items, received quantities, and cost totals on a PO'),
@@ -258,7 +259,7 @@ $managerItems = [
         'batch_number' => 'LOT-2026-B08',
         'manufacturing_date' => '2026-08-01',
         'expiry_date' => '2027-08-01',
-        'quantity' => 120
+        'quantity' => 120,
     ], 'Track batch numbers and expiration dates for beers, foods, and cosmetics'),
     makeRequestItem('3.18 List Expiring-Soon Batches (FIFO / FEFO Alert)', 'GET', 'api/v1/inventory/expiring-soon?days_threshold=60', 'Manager', 'bearer', null, 'Identify products expiring within next 60 days to trigger flash clearances'),
 
@@ -268,7 +269,7 @@ $managerItems = [
         'variant_id' => 1,
         'quantity_change' => -2,
         'movement_type' => 'DAMAGE',
-        'reason' => 'Fabric damaged during floor display handling.'
+        'reason' => 'Fabric damaged during floor display handling.',
     ], 'Adjust inventory for damages, shrinkage, or audit reconciliation'),
 
     // Suppliers CRM
@@ -278,10 +279,10 @@ $managerItems = [
         'contact_person' => 'Serey Vuth',
         'phone' => '023888999',
         'email' => 'supply@angkorsilk.com.kh',
-        'address' => 'Banteay Srei District, Siem Reap'
+        'address' => 'Banteay Srei District, Siem Reap',
     ], 'Register new verified vendor'),
     makeRequestItem('3.23 Update Supplier Profile', 'PUT', 'api/v1/suppliers/1', 'Manager', 'bearer', [
-        'contact_person' => 'Serey Vuth (Director)'
+        'contact_person' => 'Serey Vuth (Director)',
     ], 'Update supplier contact details'),
     makeRequestItem('3.24 Delete Supplier', 'DELETE', 'api/v1/suppliers/1', 'Manager', 'bearer', null, 'Remove supplier'),
 ];
@@ -303,12 +304,12 @@ $adminItems = [
         'phone' => '098112233',
         'email' => 'dara.sam@kesararamwithdigital.tech',
         'role' => 'CASHIER',
-        'status' => 'ACTIVE'
+        'status' => 'ACTIVE',
     ], 'Provision new staff account and assign CASHIER, MANAGER, or ADMIN role'),
     makeRequestItem('4.4 Get Single Employee Details', 'GET', 'api/v1/employees/1', 'Admin', 'bearer', null, 'Fetch employee profile and security permissions'),
     makeRequestItem('4.5 Update Employee Role, Store & Credentials', 'PUT', 'api/v1/employees/1', 'Admin', 'bearer', [
         'position' => 'Store Assistant Manager',
-        'role' => 'MANAGER'
+        'role' => 'MANAGER',
     ], 'Promote staff or update system permissions'),
     makeRequestItem('4.6 Deactivate / Terminate Staff Account', 'DELETE', 'api/v1/employees/1', 'Admin', 'bearer', null, 'Revoke system access and invalidate all active Sanctum tokens'),
 
@@ -321,14 +322,14 @@ $adminItems = [
         'min_purchase_amount' => 50.00,
         'start_date' => '2026-11-01',
         'end_date' => '2026-11-07',
-        'is_active' => true
+        'is_active' => true,
     ], 'Create storewide or coupon-based promotional campaign'),
     makeRequestItem('4.8 Delete Promotion', 'DELETE', 'api/v1/promotions/1', 'Admin', 'bearer', null, 'Deactivate and delete promo code'),
     makeRequestItem('4.9 Issue 16-Digit Gift Card Voucher', 'POST', 'api/v1/gift-cards/issue', 'Admin', 'bearer', [
         'purchaser_customer_id' => 1,
         'initial_balance' => 100.00,
         'pin' => '5678',
-        'expiry_date' => date('Y-m-d', strtotime('+1 year'))
+        'expiry_date' => date('Y-m-d', strtotime('+1 year')),
     ], 'Issue stored-value customer gift card with secure PIN'),
     makeRequestItem('4.10 Create Marketing Campaign Banner', 'POST', 'api/v1/marketing/banners', 'Admin', 'bearer', [
         'title' => 'Monogram Silk Capsule 2026',
@@ -336,16 +337,16 @@ $adminItems = [
         'banner_url' => 'https://res.cloudinary.com/od8t271n/image/upload/v1786905148/KHMERIEL_ACCESSORIES_EMBROIDERED_MONOGRAM_SILK_SCARF_BLACK_LOOK_cloth_377.png',
         'call_to_action_url' => '/catalog/dresses',
         'display_order' => 1,
-        'is_active' => true
+        'is_active' => true,
     ], 'Publish new homepage marketing banner'),
     makeRequestItem('4.11 Delete Marketing Banner', 'DELETE', 'api/v1/marketing/banners/1', 'Admin', 'bearer', null, 'Remove banner slide'),
     makeRequestItem('4.12 Create Master Product Category', 'POST', 'api/v1/categories', 'Admin', 'bearer', [
         'category_name' => 'Watches & Fine Timepieces',
         'department_type' => 'FASHION_APPAREL',
-        'description' => 'Luxury wristwatches and leather straps.'
+        'description' => 'Luxury wristwatches and leather straps.',
     ], 'Add new omnichannel department to system taxonomy'),
     makeRequestItem('4.13 Update Category Details', 'PUT', 'api/v1/categories/1', 'Admin', 'bearer', [
-        'description' => 'Updated luxury evening gowns description.'
+        'description' => 'Updated luxury evening gowns description.',
     ], 'Update category metadata'),
     makeRequestItem('4.14 Delete Category', 'DELETE', 'api/v1/categories/1', 'Admin', 'bearer', null, 'Delete department category'),
 ];
@@ -355,42 +356,42 @@ $finalCollection = [
         'name' => 'KhmeRiel Omnichannel MIS & POS Engine — Master RBAC API Collection (118 Endpoints)',
         '_postman_id' => 'khmeriel-omnichannel-rbac-v1-master',
         'description' => "Complete, exhaustive REST API collection for KhmeRiel (Store Stock MIS & Point-of-Sale Engine) with 100% RBAC role-level classification.\n\nStructure:\n1. Level 0: Public / Storefront (No Auth)\n2. Level 1: Cashier & POS Operator (CASHIER / STAFF)\n3. Level 2: Inventory & Warehouse Manager (MANAGER)\n4. Level 3: Executive Administrator & Auditor (ADMIN / SUPERADMIN)",
-        'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     ],
     'item' => [
         [
             'name' => '1. Public & Customer Storefront (No Auth)',
             'description' => 'Storefront browsing, category taxonomy, live stock queries, customer reviews, KHQR generation, and audio feedback.',
-            'item' => $publicItems
+            'item' => $publicItems,
         ],
         [
             'name' => '2. Level 1: Cashier & POS Operator (Role: CASHIER / STAFF)',
             'description' => 'Cash drawer shifts (open, drop, close Z-Report), POS checkout, invoice receipt generation, customer points redemption, and delivery dispatch.',
-            'item' => $cashierItems
+            'item' => $cashierItems,
         ],
         [
             'name' => '3. Level 2: Inventory & Warehouse Manager (Role: MANAGER)',
             'description' => 'Master product catalog CRUD, SKU variant matrices, Cloudinary media upload, restock recommendations, 1-click PO auto-generation, FEFO batch tracking, and double-entry stock adjustments.',
-            'item' => $managerItems
+            'item' => $managerItems,
         ],
         [
             'name' => '4. Level 3: Executive Administrator & Auditor (Role: ADMIN / SUPERADMIN)',
             'description' => 'Executive KPI dashboard, staff management with RBAC roles, storewide promotions, 16-digit gift card vouchers, marketing banners, and system taxonomy.',
-            'item' => $adminItems
-        ]
+            'item' => $adminItems,
+        ],
     ],
     'variable' => [
         ['key' => 'base_url', 'value' => 'https://api.kesararamwithdigital.tech', 'type' => 'string'],
         ['key' => 'local_url', 'value' => 'http://127.0.0.1:8000', 'type' => 'string'],
         ['key' => 'token', 'value' => 'YOUR_BEARER_SANCTUM_TOKEN_HERE', 'type' => 'string'],
-    ]
+    ],
 ];
 
-$outputFile = __DIR__ . '/../docs/KHMERIEL_MASTER_API_RBAC_COLLECTION.postman_collection.json';
+$outputFile = __DIR__.'/../docs/KHMERIEL_MASTER_API_RBAC_COLLECTION.postman_collection.json';
 file_put_contents($outputFile, json_encode($finalCollection, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
 echo "Successfully generated: {$outputFile}\n";
-echo "Total Public Endpoints: " . count($publicItems) . "\n";
-echo "Total Cashier Endpoints: " . count($cashierItems) . "\n";
-echo "Total Manager Endpoints: " . count($managerItems) . "\n";
-echo "Total Admin Endpoints: " . count($adminItems) . "\n";
+echo 'Total Public Endpoints: '.count($publicItems)."\n";
+echo 'Total Cashier Endpoints: '.count($cashierItems)."\n";
+echo 'Total Manager Endpoints: '.count($managerItems)."\n";
+echo 'Total Admin Endpoints: '.count($adminItems)."\n";

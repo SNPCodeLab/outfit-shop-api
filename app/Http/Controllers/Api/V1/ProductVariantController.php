@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductVariantController extends BaseApiController
 {
@@ -18,10 +19,10 @@ class ProductVariantController extends BaseApiController
         if ($search = $request->input('q') ?? $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('sku', 'ILIKE', "%{$search}%")
-                  ->orWhere('barcode', 'ILIKE', "%{$search}%")
-                  ->orWhereHas('product', function ($p) use ($search) {
-                      $p->where('product_name', 'ILIKE', "%{$search}%");
-                  });
+                    ->orWhere('barcode', 'ILIKE', "%{$search}%")
+                    ->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('product_name', 'ILIKE', "%{$search}%");
+                    });
             });
         }
 
@@ -47,13 +48,13 @@ class ProductVariantController extends BaseApiController
 
         $variants = $query->orderBy('variant_id', 'desc')->get()->map(function ($variant) {
             $onHand = (int) $variant->quantity;
-            $reserved = (int) \Illuminate\Support\Facades\DB::table('sale_details')
+            $reserved = (int) DB::table('sale_details')
                 ->join('sale_headers', 'sale_details.sale_id', '=', 'sale_headers.sale_id')
                 ->where('sale_details.variant_id', $variant->variant_id)
                 ->whereIn('sale_headers.status', ['PENDING', 'ESTIMATE', 'DRAFT'])
                 ->sum('sale_details.quantity');
             $available = max(0, $onHand - $reserved);
-            $incoming = (int) \Illuminate\Support\Facades\DB::table('purchase_details')
+            $incoming = (int) DB::table('purchase_details')
                 ->join('purchase_headers', 'purchase_details.purchase_id', '=', 'purchase_headers.purchase_id')
                 ->where('purchase_details.variant_id', $variant->variant_id)
                 ->whereIn('purchase_headers.status', ['PENDING', 'ORDERED', 'SHIPPED'])
@@ -61,18 +62,19 @@ class ProductVariantController extends BaseApiController
 
             $variantArray = $variant->toArray();
             $variantArray['quantity_overview'] = [
-                'on_hand'   => $onHand,
-                'reserved'  => $reserved,
+                'on_hand' => $onHand,
+                'reserved' => $reserved,
                 'available' => $available,
-                'incoming'  => $incoming,
+                'incoming' => $incoming,
             ];
             $variantArray['valuation'] = [
-                'cost_price'      => (float) $variant->cost_price,
-                'selling_price'   => (float) $variant->sale_price,
+                'cost_price' => (float) $variant->cost_price,
+                'selling_price' => (float) $variant->sale_price,
                 'purchased_value' => round($onHand * (float) $variant->cost_price, 2),
-                'resale_value'    => round($onHand * (float) $variant->sale_price, 2),
-                'margin_percent'  => $variant->sale_price > 0 ? round((((float)$variant->sale_price - (float)$variant->cost_price) / (float)$variant->sale_price) * 100, 2) : 0,
+                'resale_value' => round($onHand * (float) $variant->sale_price, 2),
+                'margin_percent' => $variant->sale_price > 0 ? round((((float) $variant->sale_price - (float) $variant->cost_price) / (float) $variant->sale_price) * 100, 2) : 0,
             ];
+
             return $variantArray;
         });
 
@@ -88,10 +90,11 @@ class ProductVariantController extends BaseApiController
                 $onHand = (int) $variant->quantity;
                 $variantArray = $variant->toArray();
                 $variantArray['quantity_overview'] = [
-                    'on_hand'   => $onHand,
+                    'on_hand' => $onHand,
                     'available' => $onHand,
-                    'status'    => $onHand <= 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
+                    'status' => $onHand <= 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
                 ];
+
                 return $variantArray;
             });
 
@@ -106,7 +109,7 @@ class ProductVariantController extends BaseApiController
             ->firstOrFail();
 
         $onHand = (int) $variant->quantity;
-        $reserved = (int) \Illuminate\Support\Facades\DB::table('sale_details')
+        $reserved = (int) DB::table('sale_details')
             ->join('sale_headers', 'sale_details.sale_id', '=', 'sale_headers.sale_id')
             ->where('sale_details.variant_id', $variant->variant_id)
             ->whereIn('sale_headers.status', ['PENDING', 'ESTIMATE', 'DRAFT'])
@@ -115,8 +118,8 @@ class ProductVariantController extends BaseApiController
 
         $variantArray = $variant->toArray();
         $variantArray['quantity_overview'] = [
-            'on_hand'   => $onHand,
-            'reserved'  => $reserved,
+            'on_hand' => $onHand,
+            'reserved' => $reserved,
             'available' => $available,
         ];
 
@@ -126,17 +129,17 @@ class ProductVariantController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'product_id'    => 'required|exists:products,product_id',
-            'size_id'       => 'required|exists:clothing_sizes,size_id',
-            'color_id'      => 'required|exists:colors,color_id',
-            'sku'             => 'required|string|unique:product_variants,sku',
-            'barcode'         => 'nullable|string|unique:product_variants,barcode',
-            'image_url'       => 'nullable|string|max:500',
+            'product_id' => 'required|exists:products,product_id',
+            'size_id' => 'required|exists:clothing_sizes,size_id',
+            'color_id' => 'required|exists:colors,color_id',
+            'sku' => 'required|string|unique:product_variants,sku',
+            'barcode' => 'nullable|string|unique:product_variants,barcode',
+            'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'cost_price'      => 'required|numeric|min:0',
-            'sale_price'      => 'required|numeric|min:0',
-            'quantity'        => 'required|integer|min:0',
-            'reorder_level'   => 'nullable|integer|min:0',
+            'cost_price' => 'required|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'reorder_level' => 'nullable|integer|min:0',
         ]);
 
         // Validate unique combination of product_id, size_id, color_id
@@ -153,12 +156,13 @@ class ProductVariantController extends BaseApiController
 
         AuditLogService::log('CREATE', 'ProductVariant', $variant->variant_id, null, $variant->toArray());
 
-        return $this->createdResponse($variant->load(['product', 'size', 'color']), 'Product variant created successfully', '/api/v1/variants/' . $variant->variant_id);
+        return $this->createdResponse($variant->load(['product', 'size', 'color']), 'Product variant created successfully', '/api/v1/variants/'.$variant->variant_id);
     }
 
     public function show(int $id): JsonResponse
     {
         $variant = ProductVariant::with(['product', 'size', 'color', 'stockMovements'])->findOrFail($id);
+
         return $this->successResponse($variant, 'Product variant details');
     }
 
@@ -168,17 +172,17 @@ class ProductVariantController extends BaseApiController
         $old = $variant->toArray();
 
         $validated = $request->validate([
-            'product_id'      => 'required|exists:products,product_id',
-            'size_id'         => 'required|exists:clothing_sizes,size_id',
-            'color_id'        => 'required|exists:colors,color_id',
-            'sku'             => 'required|string|unique:product_variants,sku,' . $id . ',variant_id',
-            'barcode'         => 'nullable|string|unique:product_variants,barcode,' . $id . ',variant_id',
-            'image_url'       => 'nullable|string|max:500',
+            'product_id' => 'required|exists:products,product_id',
+            'size_id' => 'required|exists:clothing_sizes,size_id',
+            'color_id' => 'required|exists:colors,color_id',
+            'sku' => 'required|string|unique:product_variants,sku,'.$id.',variant_id',
+            'barcode' => 'nullable|string|unique:product_variants,barcode,'.$id.',variant_id',
+            'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'cost_price'      => 'required|numeric|min:0',
-            'sale_price'      => 'required|numeric|min:0',
-            'quantity'        => 'required|integer|min:0',
-            'reorder_level'   => 'nullable|integer|min:0',
+            'cost_price' => 'required|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'reorder_level' => 'nullable|integer|min:0',
         ]);
 
         $variant->update($validated);

@@ -32,12 +32,12 @@ class CartController extends BaseApiController
                 ->latest()
                 ->first();
 
-            if (!$cart) {
+            if (! $cart) {
                 $cart = Cart::create([
                     'customer_id' => $customerId,
-                    'session_id'  => $sessionId ?? (string) Str::uuid(),
-                    'status'      => 'ACTIVE',
-                    'currency'    => 'USD',
+                    'session_id' => $sessionId ?? (string) Str::uuid(),
+                    'status' => 'ACTIVE',
+                    'currency' => 'USD',
                 ]);
             }
         } elseif ($sessionId) {
@@ -46,19 +46,19 @@ class CartController extends BaseApiController
                 ->latest()
                 ->first();
 
-            if (!$cart) {
+            if (! $cart) {
                 $cart = Cart::create([
                     'session_id' => $sessionId,
-                    'status'     => 'ACTIVE',
-                    'currency'   => 'USD',
+                    'status' => 'ACTIVE',
+                    'currency' => 'USD',
                 ]);
             }
         } else {
             $newSession = (string) Str::uuid();
             $cart = Cart::create([
                 'session_id' => $newSession,
-                'status'     => 'ACTIVE',
-                'currency'   => 'USD',
+                'status' => 'ACTIVE',
+                'currency' => 'USD',
             ]);
         }
 
@@ -89,23 +89,23 @@ class CartController extends BaseApiController
 
             $itemsList[] = [
                 'cart_item_id' => $item->cart_item_id,
-                'cart_id'      => $item->cart_id,
-                'variant_id'   => $item->variant_id,
-                'quantity'     => $item->quantity,
-                'unit_price'   => $unitPrice,
-                'line_total'   => round($lineTotal, 2),
-                'product'      => [
-                    'product_id'   => $item->variant?->product?->product_id,
+                'cart_id' => $item->cart_id,
+                'variant_id' => $item->variant_id,
+                'quantity' => $item->quantity,
+                'unit_price' => $unitPrice,
+                'line_total' => round($lineTotal, 2),
+                'product' => [
+                    'product_id' => $item->variant?->product?->product_id,
                     'product_name' => $item->variant?->product?->product_name,
-                    'category'     => $item->variant?->product?->category?->category_name,
-                    'image_url'    => $item->variant?->product?->primary_image_url ?? $item->variant?->image_url,
+                    'category' => $item->variant?->product?->category?->category_name,
+                    'image_url' => $item->variant?->product?->primary_image_url ?? $item->variant?->image_url,
                 ],
-                'variant'      => [
-                    'sku'      => $item->variant?->sku,
-                    'barcode'  => $item->variant?->barcode,
-                    'size'     => $item->variant?->size?->size_name,
-                    'color'    => $item->variant?->color?->color_name,
-                    'color_hex'=> $item->variant?->color?->hex_code,
+                'variant' => [
+                    'sku' => $item->variant?->sku,
+                    'barcode' => $item->variant?->barcode,
+                    'size' => $item->variant?->size?->size_name,
+                    'color' => $item->variant?->color?->color_name,
+                    'color_hex' => $item->variant?->color?->hex_code,
                     'in_stock' => $item->variant?->quantity ?? 0,
                 ],
             ];
@@ -116,17 +116,17 @@ class CartController extends BaseApiController
         $grandTotal = round($subtotal + $taxAmount, 2);
 
         return [
-            'cart_id'       => $cart->cart_id,
-            'session_id'    => $cart->session_id,
-            'customer_id'   => $cart->customer_id,
-            'status'        => $cart->status,
-            'currency'      => $cart->currency ?? 'USD',
-            'total_items'   => $totalItems,
-            'subtotal'      => round($subtotal, 2),
-            'tax_rate'      => $taxRate,
-            'tax_amount'    => $taxAmount,
-            'grand_total'   => $grandTotal,
-            'items'         => $itemsList,
+            'cart_id' => $cart->cart_id,
+            'session_id' => $cart->session_id,
+            'customer_id' => $cart->customer_id,
+            'status' => $cart->status,
+            'currency' => $cart->currency ?? 'USD',
+            'total_items' => $totalItems,
+            'subtotal' => round($subtotal, 2),
+            'tax_rate' => $taxRate,
+            'tax_amount' => $taxAmount,
+            'grand_total' => $grandTotal,
+            'items' => $itemsList,
         ];
     }
 
@@ -137,6 +137,7 @@ class CartController extends BaseApiController
     public function index(Request $request): JsonResponse
     {
         $cart = $this->resolveCart($request);
+
         return $this->successResponse($this->formatCart($cart), 'Cart retrieved successfully');
     }
 
@@ -146,10 +147,10 @@ class CartController extends BaseApiController
     public function addItem(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'variant_id'  => 'required|exists:product_variants,variant_id',
-            'quantity'    => 'nullable|integer|min:1|max:100',
+            'variant_id' => 'required|exists:product_variants,variant_id',
+            'quantity' => 'nullable|integer|min:1|max:100',
             'customer_id' => 'nullable|integer|exists:customers,customer_id',
-            'session_id'  => 'nullable|string|max:100',
+            'session_id' => 'nullable|string|max:100',
         ]);
 
         $cart = $this->resolveCart($request);
@@ -166,9 +167,9 @@ class CartController extends BaseApiController
             $cartItem->save();
         } else {
             $cartItem = CartItem::create([
-                'cart_id'    => $cart->cart_id,
+                'cart_id' => $cart->cart_id,
                 'variant_id' => $variant->variant_id,
-                'quantity'   => $quantity,
+                'quantity' => $quantity,
                 'unit_price' => $variant->price,
             ]);
         }
@@ -193,6 +194,7 @@ class CartController extends BaseApiController
         if ($validated['quantity'] === 0) {
             $cart = $cartItem->cart;
             $cartItem->delete();
+
             return $this->successResponse($this->formatCart($cart), 'Item removed from cart');
         }
 

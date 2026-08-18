@@ -57,7 +57,7 @@ class OrderController extends BaseApiController
         }
 
         $perPage = (int) $request->input('per_page', 20);
-        $orders  = $query->orderBy('sale_id', 'desc')->paginate($perPage);
+        $orders = $query->orderBy('sale_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($orders, 'Orders history retrieved successfully');
     }
@@ -71,16 +71,16 @@ class OrderController extends BaseApiController
     public function checkout(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'customer_id'        => 'nullable|exists:customers,customer_id',
-            'items'              => 'required|array|min:1',
+            'customer_id' => 'nullable|exists:customers,customer_id',
+            'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,variant_id',
-            'items.*.quantity'   => 'required|integer|min:1',
-            'items.*.discount'   => 'nullable|numeric|min:0',
-            'payment_method'     => 'nullable|string|in:CASH,CARD,QR,ABA,BAKONG,GIFT_CARD',
-            'payment_amount'     => 'nullable|numeric|min:0',
-            'overall_discount'   => 'nullable|numeric|min:0',
-            'tax_rate'           => 'nullable|numeric|min:0|max:100',
-            'idempotency_key'    => 'nullable|string|max:64',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.discount' => 'nullable|numeric|min:0',
+            'payment_method' => 'nullable|string|in:CASH,CARD,QR,ABA,BAKONG,GIFT_CARD',
+            'payment_amount' => 'nullable|numeric|min:0',
+            'overall_discount' => 'nullable|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'idempotency_key' => 'nullable|string|max:64',
         ]);
 
         // Accept idempotency key from request body OR X-Idempotency-Key header
@@ -91,13 +91,13 @@ class OrderController extends BaseApiController
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
 
             $order = $this->posService->checkout(
-                employeeId:     $employeeId,
-                customerId:     $validated['customer_id'] ?? null,
-                items:          $validated['items'],
-                paymentMethod:  $validated['payment_method'] ?? 'CASH',
-                paymentAmount:  (float) ($validated['payment_amount'] ?? 0.0),
-                overallDiscount:(float) ($validated['overall_discount'] ?? 0.0),
-                taxRate:        (float) ($validated['tax_rate'] ?? 10.00),
+                employeeId: $employeeId,
+                customerId: $validated['customer_id'] ?? null,
+                items: $validated['items'],
+                paymentMethod: $validated['payment_method'] ?? 'CASH',
+                paymentAmount: (float) ($validated['payment_amount'] ?? 0.0),
+                overallDiscount: (float) ($validated['overall_discount'] ?? 0.0),
+                taxRate: (float) ($validated['tax_rate'] ?? 10.00),
                 idempotencyKey: $idempotencyKey,
             );
 
@@ -141,7 +141,7 @@ class OrderController extends BaseApiController
 
         try {
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
-            $order      = $this->posService->voidSale($id, $employeeId, $request->reason);
+            $order = $this->posService->voidSale($id, $employeeId, $request->reason);
 
             return $this->successResponse($order, "Order #{$id} voided successfully and inventory restored");
         } catch (Exception $e) {

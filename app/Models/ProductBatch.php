@@ -11,6 +11,7 @@ class ProductBatch extends Model
     use HasFactory;
 
     protected $table = 'product_batches';
+
     protected $primaryKey = 'batch_id';
 
     protected $fillable = [
@@ -25,8 +26,8 @@ class ProductBatch extends Model
 
     protected $casts = [
         'manufacturing_date' => 'date',
-        'expiry_date'        => 'date',
-        'quantity_received'  => 'integer',
+        'expiry_date' => 'date',
+        'quantity_received' => 'integer',
         'quantity_remaining' => 'integer',
     ];
 

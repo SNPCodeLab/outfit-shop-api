@@ -26,7 +26,7 @@ class AiIntelligenceController extends BaseApiController
             ->where('sale_date', '>=', now()->subDays(60))
             ->select(
                 DB::raw("TO_CHAR(sale_date, 'YYYY-MM-DD') as day"),
-                DB::raw("SUM(grand_total) as daily_revenue")
+                DB::raw('SUM(grand_total) as daily_revenue')
             )
             ->groupBy('day')
             ->orderBy('day', 'asc')
@@ -41,27 +41,27 @@ class AiIntelligenceController extends BaseApiController
         for ($i = 1; $i <= $days; $i++) {
             $date = now()->addDays($i)->format('Y-m-d');
             $dayOfWeek = now()->addDays($i)->dayOfWeek;
-            
+
             // Weekend multiplier (Saturday/Sunday retail traffic spike +35%)
             $weekendMultiplier = in_array($dayOfWeek, [0, 6]) ? 1.35 : 1.0;
-            
+
             $predictedRevenue = round($avgDailyRevenue * $trendGrowthRate * $weekendMultiplier, 2);
             $accumulatedProjected += $predictedRevenue;
 
             $forecast[] = [
-                'date'               => $date,
-                'day_of_week'        => now()->addDays($i)->format('l'),
-                'projected_revenue'  => $predictedRevenue,
-                'confidence_score'   => 0.88,
+                'date' => $date,
+                'day_of_week' => now()->addDays($i)->format('l'),
+                'projected_revenue' => $predictedRevenue,
+                'confidence_score' => 0.88,
             ];
         }
 
         return $this->successResponse([
-            'forecast_period_days'     => $days,
+            'forecast_period_days' => $days,
             'historical_daily_average' => round($avgDailyRevenue, 2),
-            'projected_total_revenue'  => round($accumulatedProjected, 2),
-            'projected_growth_rate'    => '+5.0%',
-            'daily_predictions'        => $forecast,
+            'projected_total_revenue' => round($accumulatedProjected, 2),
+            'projected_growth_rate' => '+5.0%',
+            'daily_predictions' => $forecast,
         ], 'AI 30-day sales forecast model generated');
     }
 
@@ -83,13 +83,13 @@ class AiIntelligenceController extends BaseApiController
 
         foreach ($highDiscountSales as $s) {
             $anomalies[] = [
-                'type'           => 'EXCESSIVE_DISCOUNT_ALERT',
-                'severity'       => 'HIGH',
-                'reference_id'   => $s->invoice_no ?? "SALE-#{$s->sale_id}",
-                'cashier'        => $s->employee->employee_name ?? 'Staff',
-                'discount_given' => '$' . number_format($s->discount, 2),
-                'grand_total'    => '$' . number_format($s->grand_total, 2),
-                'risk_score'     => 0.85,
+                'type' => 'EXCESSIVE_DISCOUNT_ALERT',
+                'severity' => 'HIGH',
+                'reference_id' => $s->invoice_no ?? "SALE-#{$s->sale_id}",
+                'cashier' => $s->employee->employee_name ?? 'Staff',
+                'discount_given' => '$'.number_format($s->discount, 2),
+                'grand_total' => '$'.number_format($s->grand_total, 2),
+                'risk_score' => 0.85,
                 'recommendation' => 'Review manager authorization PIN for high-value discount',
             ];
         }
@@ -104,20 +104,20 @@ class AiIntelligenceController extends BaseApiController
 
         foreach ($voidSales as $v) {
             $anomalies[] = [
-                'type'           => 'SUSPICIOUS_HIGH_VALUE_VOID',
-                'severity'       => 'MEDIUM',
-                'reference_id'   => $v->invoice_no ?? "VOID-#{$v->sale_id}",
-                'cashier'        => $v->employee->employee_name ?? 'Staff',
-                'amount_voided'  => '$' . number_format($v->grand_total, 2),
-                'risk_score'     => 0.72,
+                'type' => 'SUSPICIOUS_HIGH_VALUE_VOID',
+                'severity' => 'MEDIUM',
+                'reference_id' => $v->invoice_no ?? "VOID-#{$v->sale_id}",
+                'cashier' => $v->employee->employee_name ?? 'Staff',
+                'amount_voided' => '$'.number_format($v->grand_total, 2),
+                'risk_score' => 0.72,
                 'recommendation' => 'Inspect cash drawer audit log and CCTV at transaction time',
             ];
         }
 
         return $this->successResponse([
             'total_anomalies_flagged' => count($anomalies),
-            'system_health_status'    => count($anomalies) > 5 ? 'ELEVATED_RISK' : 'NORMAL',
-            'anomalies'               => $anomalies,
+            'system_health_status' => count($anomalies) > 5 ? 'ELEVATED_RISK' : 'NORMAL',
+            'anomalies' => $anomalies,
         ], 'AI anomaly detection scan completed');
     }
 
@@ -141,21 +141,21 @@ class AiIntelligenceController extends BaseApiController
             $suggestedOrderQty = max(20, (int) round($dailyVelocity * 45)); // 45-day safety buffer
 
             $recommendations[] = [
-                'variant_id'               => $v->variant_id,
-                'sku'                      => $v->sku,
-                'product_name'             => $v->product->product_name ?? 'Product',
-                'current_stock'            => (int) $v->quantity,
-                'daily_sales_velocity'     => $dailyVelocity,
-                'days_until_stockout'      => $daysOfStockRemaining,
-                'stockout_urgency'         => $daysOfStockRemaining < 7 ? 'CRITICAL' : 'MODERATE',
-                'recommended_reorder_qty'  => $suggestedOrderQty,
-                'estimated_reorder_cost'   => round($suggestedOrderQty * (float) $v->cost_price, 2),
+                'variant_id' => $v->variant_id,
+                'sku' => $v->sku,
+                'product_name' => $v->product->product_name ?? 'Product',
+                'current_stock' => (int) $v->quantity,
+                'daily_sales_velocity' => $dailyVelocity,
+                'days_until_stockout' => $daysOfStockRemaining,
+                'stockout_urgency' => $daysOfStockRemaining < 7 ? 'CRITICAL' : 'MODERATE',
+                'recommended_reorder_qty' => $suggestedOrderQty,
+                'estimated_reorder_cost' => round($suggestedOrderQty * (float) $v->cost_price, 2),
             ];
         }
 
         return $this->successResponse([
             'items_requiring_reorder' => count($recommendations),
-            'recommendations'         => $recommendations,
+            'recommendations' => $recommendations,
         ], 'AI smart restock recommendations generated');
     }
 
@@ -165,15 +165,15 @@ class AiIntelligenceController extends BaseApiController
      */
     public function customerSegmentation(): JsonResponse
     {
-        $customers = Customer::withCount(['sales as orders_count' => fn($q) => $q->where('status', 'COMPLETED')])
-            ->withSum(['sales as total_spent' => fn($q) => $q->where('status', 'COMPLETED')], 'grand_total')
+        $customers = Customer::withCount(['sales as orders_count' => fn ($q) => $q->where('status', 'COMPLETED')])
+            ->withSum(['sales as total_spent' => fn ($q) => $q->where('status', 'COMPLETED')], 'grand_total')
             ->get();
 
         $segments = [
             'champions_vip' => [],
             'loyal_regular' => [],
-            'at_risk'       => [],
-            'new_one_time'  => [],
+            'at_risk' => [],
+            'new_one_time' => [],
         ];
 
         foreach ($customers as $c) {
@@ -192,21 +192,21 @@ class AiIntelligenceController extends BaseApiController
 
             $segments[$category][] = [
                 'customer_id' => $c->customer_id,
-                'name'        => $c->customer_name,
+                'name' => $c->customer_name,
                 'total_spent' => $spent,
-                'orders'      => $orders,
+                'orders' => $orders,
             ];
         }
 
         return $this->successResponse([
-            'total_analyzed'     => $customers->count(),
-            'segment_counts'     => [
-                'champions_vip'  => count($segments['champions_vip']),
-                'loyal_regular'  => count($segments['loyal_regular']),
-                'new_one_time'   => count($segments['new_one_time']),
-                'at_risk'        => count($segments['at_risk']),
+            'total_analyzed' => $customers->count(),
+            'segment_counts' => [
+                'champions_vip' => count($segments['champions_vip']),
+                'loyal_regular' => count($segments['loyal_regular']),
+                'new_one_time' => count($segments['new_one_time']),
+                'at_risk' => count($segments['at_risk']),
             ],
-            'segments'           => $segments,
+            'segments' => $segments,
         ], 'AI RFM customer segmentation model computed');
     }
 
@@ -230,22 +230,22 @@ class AiIntelligenceController extends BaseApiController
             $suggestedMarkdownPrice = round($currentPrice * (1 - ($discountPct / 100)), 2);
 
             $suggestions[] = [
-                'variant_id'               => $v->variant_id,
-                'sku'                      => $v->sku,
-                'product_name'             => $v->product->product_name ?? 'N/A',
-                'current_retail_price'     => $currentPrice,
-                'cost_price'               => $costPrice,
-                'stock_on_hand'            => (int) $v->quantity,
-                'suggested_discount_pct'   => $discountPct,
-                'suggested_promo_price'    => $suggestedMarkdownPrice,
-                'retained_margin_pct'      => round((($suggestedMarkdownPrice - $costPrice) / $suggestedMarkdownPrice) * 100, 2),
-                'strategy'                 => 'Clearance Markdown to accelerate inventory turnover',
+                'variant_id' => $v->variant_id,
+                'sku' => $v->sku,
+                'product_name' => $v->product->product_name ?? 'N/A',
+                'current_retail_price' => $currentPrice,
+                'cost_price' => $costPrice,
+                'stock_on_hand' => (int) $v->quantity,
+                'suggested_discount_pct' => $discountPct,
+                'suggested_promo_price' => $suggestedMarkdownPrice,
+                'retained_margin_pct' => round((($suggestedMarkdownPrice - $costPrice) / $suggestedMarkdownPrice) * 100, 2),
+                'strategy' => 'Clearance Markdown to accelerate inventory turnover',
             ];
         }
 
         return $this->successResponse([
             'slow_moving_skus_count' => count($suggestions),
-            'pricing_suggestions'    => $suggestions,
+            'pricing_suggestions' => $suggestions,
         ], 'AI dynamic pricing markdown suggestions computed');
     }
 }

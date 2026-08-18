@@ -16,16 +16,16 @@ class AdminPerformanceController extends BaseApiController
      */
     public function performance(Request $request): JsonResponse
     {
-        $hasApiLogs      = DB::getSchemaBuilder()->hasTable('api_logs');
+        $hasApiLogs = DB::getSchemaBuilder()->hasTable('api_logs');
         $avgResponseTime = 42.0;
         $p95ResponseTime = 118.0;
-        $errorRate       = 0.15;
+        $errorRate = 0.15;
         $slowestEndpoints = [];
 
         if ($hasApiLogs) {
-            $totalRequests   = DB::table('api_logs')->count() ?: 1;
-            $errorRequests   = DB::table('api_logs')->where('status', '>=', 400)->count();
-            $errorRate       = round(($errorRequests / $totalRequests) * 100, 2);
+            $totalRequests = DB::table('api_logs')->count() ?: 1;
+            $errorRequests = DB::table('api_logs')->where('status', '>=', 400)->count();
+            $errorRate = round(($errorRequests / $totalRequests) * 100, 2);
             $avgResponseTime = round(DB::table('api_logs')->avg('duration_ms') ?: 42, 1);
 
             $p95ResponseTime = round(
@@ -64,7 +64,7 @@ class AdminPerformanceController extends BaseApiController
         $activeDbConnections = 12;
         try {
             $dbStat = DB::select("SELECT count(*) as count FROM pg_stat_activity WHERE state = 'active'");
-            if (!empty($dbStat)) {
+            if (! empty($dbStat)) {
                 $activeDbConnections = (int) $dbStat[0]->count;
             }
         } catch (\Throwable) {
@@ -79,7 +79,7 @@ class AdminPerformanceController extends BaseApiController
 
         // Redis memory and cache hit ratio
         $cacheHitRatioPct = 89.4;
-        $redisMemory      = '256MB';
+        $redisMemory = '256MB';
         try {
             if (class_exists(Redis::class)) {
                 $info = Redis::info();
@@ -87,9 +87,9 @@ class AdminPerformanceController extends BaseApiController
                     $redisMemory = $info['used_memory_human'];
                 }
                 if (isset($info['keyspace_hits'], $info['keyspace_misses'])) {
-                    $hits   = (int) $info['keyspace_hits'];
+                    $hits = (int) $info['keyspace_hits'];
                     $misses = (int) $info['keyspace_misses'];
-                    $total  = $hits + $misses;
+                    $total = $hits + $misses;
                     if ($total > 0) {
                         $cacheHitRatioPct = round(($hits / $total) * 100, 1);
                     }
@@ -102,17 +102,17 @@ class AdminPerformanceController extends BaseApiController
         $peakMemoryMb = round(memory_get_peak_usage(true) / 1024 / 1024, 2);
 
         return $this->successResponse([
-            'health_status'     => 'HEALTHY_OPTIMAL',
+            'health_status' => 'HEALTHY_OPTIMAL',
             'avg_response_time_ms' => $avgResponseTime,
             'p95_response_time_ms' => $p95ResponseTime,
-            'error_rate_pct'    => $errorRate,
+            'error_rate_pct' => $errorRate,
             'cache_hit_ratio_pct' => $cacheHitRatioPct,
-            'queue_depth'       => $queueDepth,
+            'queue_depth' => $queueDepth,
             'db_active_connections' => $activeDbConnections,
-            'db_connection_limit'   => 100,
+            'db_connection_limit' => 100,
             'redis_memory_used' => $redisMemory,
-            'php_peak_memory_mb'=> $peakMemoryMb,
-            'php_version'       => PHP_VERSION,
+            'php_peak_memory_mb' => $peakMemoryMb,
+            'php_version' => PHP_VERSION,
             'slowest_endpoints' => $slowestEndpoints,
         ], 'Enterprise APM performance monitoring telemetry retrieved');
     }

@@ -25,7 +25,7 @@ class CategoryController extends BaseApiController
     {
         $validated = $request->validate([
             'category_name' => 'required|string|unique:categories,category_name',
-            'description'   => 'nullable|string',
+            'description' => 'nullable|string',
         ]);
 
         $category = Category::create($validated);
@@ -35,7 +35,7 @@ class CategoryController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Category', $category->category_id, null, $category->toArray());
 
-        return $this->createdResponse($category, 'Category created successfully', '/api/v1/categories/' . $category->category_id);
+        return $this->createdResponse($category, 'Category created successfully', '/api/v1/categories/'.$category->category_id);
     }
 
     public function show(int $id): JsonResponse
@@ -53,8 +53,8 @@ class CategoryController extends BaseApiController
         $oldValues = $category->toArray();
 
         $validated = $request->validate([
-            'category_name' => 'required|string|unique:categories,category_name,' . $id . ',category_id',
-            'description'   => 'nullable|string',
+            'category_name' => 'required|string|unique:categories,category_name,'.$id.',category_id',
+            'description' => 'nullable|string',
         ]);
 
         $category->update($validated);

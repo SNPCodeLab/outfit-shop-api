@@ -27,7 +27,7 @@ class ShippingOrderController extends BaseApiController
         }
 
         $perPage = (int) $request->input('per_page', 20);
-        $orders  = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return $this->successResponse($orders, 'Fulfillment and shipping orders retrieved successfully');
     }
@@ -39,16 +39,16 @@ class ShippingOrderController extends BaseApiController
     public function create(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'sale_id'          => 'required|exists:sale_headers,sale_id',
-            'branch_id'        => 'nullable|exists:store_branches,branch_id',
+            'sale_id' => 'required|exists:sale_headers,sale_id',
+            'branch_id' => 'nullable|exists:store_branches,branch_id',
             'fulfillment_type' => 'required|string|in:IN_STORE_PICKUP,COURIER_DELIVERY',
-            'courier_name'     => 'nullable|string|in:VIRAK_BUNTHAM,J_AND_T,GRAB_EXPRESS,OWN_DELIVERY',
-            'tracking_number'  => 'nullable|string|max:100',
-            'recipient_name'   => 'required|string|max:100',
-            'recipient_phone'  => 'required|string|max:30',
+            'courier_name' => 'nullable|string|in:VIRAK_BUNTHAM,J_AND_T,GRAB_EXPRESS,OWN_DELIVERY',
+            'tracking_number' => 'nullable|string|max:100',
+            'recipient_name' => 'required|string|max:100',
+            'recipient_phone' => 'required|string|max:30',
             'shipping_address' => 'nullable|string',
-            'shipping_city'    => 'nullable|string|max:50',
-            'shipping_cost'    => 'nullable|numeric|min:0',
+            'shipping_city' => 'nullable|string|max:50',
+            'shipping_cost' => 'nullable|numeric|min:0',
         ]);
 
         $order = ShippingOrder::create($validated);
@@ -66,7 +66,7 @@ class ShippingOrderController extends BaseApiController
         $order = ShippingOrder::findOrFail($id);
 
         $validated = $request->validate([
-            'status'          => 'required|string|in:PENDING,PACKED,DISPATCHED,DELIVERED,RETURNED',
+            'status' => 'required|string|in:PENDING,PACKED,DISPATCHED,DELIVERED,RETURNED',
             'tracking_number' => 'nullable|string|max:100',
         ]);
 

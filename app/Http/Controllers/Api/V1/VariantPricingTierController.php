@@ -24,10 +24,10 @@ class VariantPricingTierController extends BaseApiController
             ->get();
 
         return $this->successResponse([
-            'variant_id'   => $variant->variant_id,
-            'sku'          => $variant->sku,
+            'variant_id' => $variant->variant_id,
+            'sku' => $variant->sku,
             'retail_price' => (float) $variant->sale_price,
-            'tiers'        => $tiers,
+            'tiers' => $tiers,
         ], 'Wholesale pricing tiers retrieved successfully');
     }
 
@@ -40,15 +40,15 @@ class VariantPricingTierController extends BaseApiController
         $variant = ProductVariant::findOrFail($variantId);
 
         $validated = $request->validate([
-            'min_quantity'        => 'required|integer|min:2',
-            'max_quantity'        => 'nullable|integer|gt:min_quantity',
-            'unit_price'          => 'required|numeric|min:0',
+            'min_quantity' => 'required|integer|min:2',
+            'max_quantity' => 'nullable|integer|gt:min_quantity',
+            'unit_price' => 'required|numeric|min:0',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $validated['variant_id'] = $variantId;
 
-        if (!isset($validated['discount_percentage']) && $variant->sale_price > 0) {
+        if (! isset($validated['discount_percentage']) && $variant->sale_price > 0) {
             $validated['discount_percentage'] = round(
                 (($variant->sale_price - $validated['unit_price']) / $variant->sale_price) * 100,
                 2
@@ -59,6 +59,6 @@ class VariantPricingTierController extends BaseApiController
 
         AuditLogService::log('CREATE', 'VariantPricingTier', $tier->id, null, $tier->toArray());
 
-        return $this->createdResponse($tier, 'Wholesale pricing tier created successfully', '/api/v1/variants/' . $variantId . '/tiers');
+        return $this->createdResponse($tier, 'Wholesale pricing tier created successfully', '/api/v1/variants/'.$variantId.'/tiers');
     }
 }

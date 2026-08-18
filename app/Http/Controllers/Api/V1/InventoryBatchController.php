@@ -19,8 +19,8 @@ class InventoryBatchController extends BaseApiController
      */
     public function expiringSoon(Request $request): JsonResponse
     {
-        $days           = (int) $request->input('days', 60);
-        $thresholdDate  = Carbon::now()->addDays($days);
+        $days = (int) $request->input('days', 60);
+        $thresholdDate = Carbon::now()->addDays($days);
 
         $batches = ProductBatch::with(['variant.product', 'variant.size', 'variant.color'])
             ->whereNotNull('expiry_date')
@@ -32,18 +32,18 @@ class InventoryBatchController extends BaseApiController
                 $daysRemaining = Carbon::now()->diffInDays($batch->expiry_date, false);
 
                 return [
-                    'batch_id'           => $batch->batch_id,
-                    'batch_number'       => $batch->batch_number,
-                    'product_name'       => $batch->variant->product->product_name ?? null,
-                    'brand'              => $batch->variant->product->brand ?? null,
-                    'sku'                => $batch->variant->sku ?? null,
-                    'barcode'            => $batch->variant->barcode ?? null,
-                    'unit_of_measure'    => $batch->variant->unit_of_measure ?? 'PIECE',
-                    'expiry_date'        => $batch->expiry_date->toISOString(),
-                    'days_remaining'     => (int) $daysRemaining,
-                    'is_expired'         => $daysRemaining < 0,
+                    'batch_id' => $batch->batch_id,
+                    'batch_number' => $batch->batch_number,
+                    'product_name' => $batch->variant->product->product_name ?? null,
+                    'brand' => $batch->variant->product->brand ?? null,
+                    'sku' => $batch->variant->sku ?? null,
+                    'barcode' => $batch->variant->barcode ?? null,
+                    'unit_of_measure' => $batch->variant->unit_of_measure ?? 'PIECE',
+                    'expiry_date' => $batch->expiry_date->toISOString(),
+                    'days_remaining' => (int) $daysRemaining,
+                    'is_expired' => $daysRemaining < 0,
                     'quantity_remaining' => $batch->quantity_remaining,
-                    'status'             => $daysRemaining < 0
+                    'status' => $daysRemaining < 0
                         ? 'EXPIRED'
                         : ($daysRemaining <= 15 ? 'CRITICAL' : 'EXPIRING_SOON'),
                 ];
@@ -51,8 +51,8 @@ class InventoryBatchController extends BaseApiController
 
         return $this->successResponse([
             'days_threshold' => $days,
-            'total_batches'  => $batches->count(),
-            'batches'        => $batches,
+            'total_batches' => $batches->count(),
+            'batches' => $batches,
         ], "Expiring batches within {$days} days retrieved successfully");
     }
 
@@ -80,30 +80,30 @@ class InventoryBatchController extends BaseApiController
         $variant = ProductVariant::findOrFail($variantId);
 
         $validated = $request->validate([
-            'batch_number'       => 'required|string|max:100',
+            'batch_number' => 'required|string|max:100',
             'manufacturing_date' => 'nullable|date',
-            'expiry_date'        => 'required|date|after:today',
-            'quantity_received'  => 'required|integer|min:1',
+            'expiry_date' => 'required|date|after:today',
+            'quantity_received' => 'required|integer|min:1',
             'quantity_remaining' => 'nullable|integer|min:0',
         ]);
 
-        $validated['variant_id']         = $variantId;
-        $validated['quantity_remaining']  = $validated['quantity_remaining'] ?? $validated['quantity_received'];
+        $validated['variant_id'] = $variantId;
+        $validated['quantity_remaining'] = $validated['quantity_remaining'] ?? $validated['quantity_received'];
 
         $batch = ProductBatch::create($validated);
 
         $variant->increment('quantity', $validated['quantity_received']);
 
         AuditLogService::log('CREATE', 'ProductBatch', $batch->batch_id, null, [
-            'variant_id'        => $variantId,
-            'batch_number'      => $batch->batch_number,
+            'variant_id' => $variantId,
+            'batch_number' => $batch->batch_number,
             'quantity_received' => $validated['quantity_received'],
         ]);
 
         return $this->createdResponse(
             $batch,
             'Batch received and added to inventory successfully',
-            '/api/v1/variants/' . $variantId . '/batches'
+            '/api/v1/variants/'.$variantId.'/batches'
         );
     }
 }

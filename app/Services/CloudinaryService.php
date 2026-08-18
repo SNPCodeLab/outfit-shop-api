@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\Log;
 class CloudinaryService
 {
     protected string $cloudName;
+
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $defaultFolder;
 
     public function __construct()
@@ -35,10 +38,6 @@ class CloudinaryService
     /**
      * Upload an image file (UploadedFile or local file path) to Cloudinary.
      *
-     * @param UploadedFile|string $file
-     * @param string|null $folder
-     * @param string|null $customPublicId
-     * @return array
      * @throws Exception
      */
     public function upload(UploadedFile|string $file, ?string $folder = null, ?string $customPublicId = null): array
@@ -60,9 +59,9 @@ class CloudinaryService
         $endpoint = "https://api.cloudinary.com/v1_1/{$this->cloudName}/image/upload";
 
         $postData = [
-            'api_key'   => $this->apiKey,
+            'api_key' => $this->apiKey,
             'timestamp' => (string) $timestamp,
-            'folder'    => $folderName,
+            'folder' => $folderName,
             'signature' => $signature,
         ];
 
@@ -79,7 +78,7 @@ class CloudinaryService
             $response = Http::timeout(30)->asForm()->post($endpoint, $postData);
         } else {
             // Local file path
-            if (!file_exists($file)) {
+            if (! file_exists($file)) {
                 throw new Exception("File not found at path: {$file}");
             }
             $response = Http::timeout(30)
@@ -97,12 +96,12 @@ class CloudinaryService
 
         return [
             'secure_url' => $result['secure_url'] ?? $result['url'],
-            'url'        => $result['url'],
-            'public_id'  => $result['public_id'],
-            'format'     => $result['format'] ?? null,
-            'width'      => $result['width'] ?? null,
-            'height'     => $result['height'] ?? null,
-            'bytes'      => $result['bytes'] ?? null,
+            'url' => $result['url'],
+            'public_id' => $result['public_id'],
+            'format' => $result['format'] ?? null,
+            'width' => $result['width'] ?? null,
+            'height' => $result['height'] ?? null,
+            'bytes' => $result['bytes'] ?? null,
             'created_at' => $result['created_at'] ?? now()->toIso8601String(),
         ];
     }
@@ -110,8 +109,6 @@ class CloudinaryService
     /**
      * Delete an image from Cloudinary by public ID or full URL.
      *
-     * @param string $publicIdOrUrl
-     * @return bool
      * @throws Exception
      */
     public function delete(string $publicIdOrUrl): bool
@@ -130,7 +127,7 @@ class CloudinaryService
 
         $response = Http::timeout(20)->asForm()->post($endpoint, [
             'public_id' => $publicId,
-            'api_key'   => $this->apiKey,
+            'api_key' => $this->apiKey,
             'timestamp' => (string) $timestamp,
             'signature' => $signature,
         ]);
@@ -138,10 +135,12 @@ class CloudinaryService
         if ($response->failed()) {
             $errorMsg = $response->json('error.message') ?? $response->body();
             Log::warning("Cloudinary Delete Warning: {$errorMsg}", ['public_id' => $publicId]);
+
             return false;
         }
 
         $result = $response->json();
+
         return ($result['result'] ?? '') === 'ok';
     }
 
@@ -158,7 +157,7 @@ class CloudinaryService
         }
         $queryString = rtrim($queryString, '&');
 
-        return sha1($queryString . $this->apiSecret);
+        return sha1($queryString.$this->apiSecret);
     }
 
     /**
@@ -166,13 +165,13 @@ class CloudinaryService
      */
     public function extractPublicId(string $publicIdOrUrl): string
     {
-        if (!str_contains($publicIdOrUrl, 'cloudinary.com')) {
+        if (! str_contains($publicIdOrUrl, 'cloudinary.com')) {
             return $publicIdOrUrl;
         }
 
         // Example: https://res.cloudinary.com/od8t271n/image/upload/v1234567/khmeriel/products/abc123.jpg
         $path = parse_url($publicIdOrUrl, PHP_URL_PATH);
-        if (!$path) {
+        if (! $path) {
             return $publicIdOrUrl;
         }
 

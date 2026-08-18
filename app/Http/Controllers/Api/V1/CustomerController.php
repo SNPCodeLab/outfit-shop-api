@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class CustomerController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
@@ -16,12 +17,12 @@ class CustomerController extends BaseApiController
         if ($search = $request->input('q') ?? $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('customer_name', 'ILIKE', "%{$search}%")
-                  ->orWhere('phone', 'ILIKE', "%{$search}%")
-                  ->orWhere('email', 'ILIKE', "%{$search}%");
+                    ->orWhere('phone', 'ILIKE', "%{$search}%")
+                    ->orWhere('email', 'ILIKE', "%{$search}%");
             });
         }
 
-        $perPage   = (int) $request->input('per_page', 50);
+        $perPage = (int) $request->input('per_page', 50);
         $customers = $query->orderBy('customer_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($customers, 'Customers retrieved successfully');
@@ -31,22 +32,23 @@ class CustomerController extends BaseApiController
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:150',
-            'gender'        => 'nullable|string',
-            'phone'         => 'nullable|string',
-            'email'         => 'nullable|email',
-            'address'       => 'nullable|string',
+            'gender' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
         ]);
 
         $customer = Customer::create($validated);
 
         AuditLogService::log('CREATE', 'Customer', $customer->customer_id, null, $customer->toArray());
 
-        return $this->createdResponse($customer, 'Customer registered successfully', '/api/v1/customers/' . $customer->customer_id);
+        return $this->createdResponse($customer, 'Customer registered successfully', '/api/v1/customers/'.$customer->customer_id);
     }
 
     public function show(int $id): JsonResponse
     {
         $customer = Customer::with('sales.details')->findOrFail($id);
+
         return $this->successResponse($customer, 'Customer details');
     }
 
@@ -57,10 +59,10 @@ class CustomerController extends BaseApiController
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:150',
-            'gender'        => 'nullable|string',
-            'phone'         => 'nullable|string',
-            'email'         => 'nullable|email',
-            'address'       => 'nullable|string',
+            'gender' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
         ]);
 
         $customer->update($validated);

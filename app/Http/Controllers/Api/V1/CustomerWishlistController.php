@@ -20,9 +20,9 @@ class CustomerWishlistController extends BaseApiController
             ?? $request->input('customer_id')
             ?? $request->header('X-Customer-Id');
 
-        if (!$customerId) {
+        if (! $customerId) {
             return $this->validationErrorResponse([
-                'customer_id' => ['The customer_id field or X-Customer-Id header is required to retrieve wishlist items.']
+                'customer_id' => ['The customer_id field or X-Customer-Id header is required to retrieve wishlist items.'],
             ]);
         }
 
@@ -45,17 +45,17 @@ class CustomerWishlistController extends BaseApiController
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,customer_id',
-            'product_id'  => 'required|exists:products,product_id',
-            'variant_id'  => 'nullable|exists:product_variants,variant_id',
+            'product_id' => 'required|exists:products,product_id',
+            'variant_id' => 'nullable|exists:product_variants,variant_id',
         ]);
 
         $wishlist = CustomerWishlist::firstOrCreate(
             [
                 'customer_id' => $validated['customer_id'],
-                'product_id'  => $validated['product_id'],
+                'product_id' => $validated['product_id'],
             ],
             [
-                'variant_id'  => $validated['variant_id'] ?? null,
+                'variant_id' => $validated['variant_id'] ?? null,
             ]
         );
 
@@ -70,8 +70,8 @@ class CustomerWishlistController extends BaseApiController
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,customer_id',
-            'product_id'  => 'required|exists:products,product_id',
-            'variant_id'  => 'nullable|exists:product_variants,variant_id',
+            'product_id' => 'required|exists:products,product_id',
+            'variant_id' => 'nullable|exists:product_variants,variant_id',
         ]);
 
         $existing = CustomerWishlist::where('customer_id', $validated['customer_id'])

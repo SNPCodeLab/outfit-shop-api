@@ -9,7 +9,6 @@ use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\SaleHeader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -39,7 +38,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
                     'tagline',
                     'total_topics',
                     'categories' => [
-                        '*' => ['id', 'title', 'tagline', 'icon', 'description', 'sections', 'tips']
+                        '*' => ['id', 'title', 'tagline', 'icon', 'description', 'sections', 'tips'],
                     ],
                     'popular_topics',
                 ],
@@ -50,18 +49,18 @@ class SalesBinderGuideAndBillingTest extends TestCase
     public function test_inventory_statistics_endpoint_returns_financial_valuation(): void
     {
         $category = Category::firstOrCreate(['category_name' => 'Shirts']);
-        $size     = ClothingSize::firstOrCreate(['size_name' => 'L']);
-        $color    = Color::firstOrCreate(['color_name' => 'Navy']);
-        $product  = Product::create(['category_id' => $category->category_id, 'product_name' => 'Oxford Shirt']);
-        
+        $size = ClothingSize::firstOrCreate(['size_name' => 'L']);
+        $color = Color::firstOrCreate(['color_name' => 'Navy']);
+        $product = Product::create(['category_id' => $category->category_id, 'product_name' => 'Oxford Shirt']);
+
         ProductVariant::create([
             'product_id' => $product->product_id,
-            'size_id'    => $size->size_id,
-            'color_id'   => $color->color_id,
-            'sku'        => 'OXF-NVY-L-' . uniqid(),
+            'size_id' => $size->size_id,
+            'color_id' => $color->color_id,
+            'sku' => 'OXF-NVY-L-'.uniqid(),
             'cost_price' => 20.00,
             'sale_price' => 50.00,
-            'quantity'   => 10,
+            'quantity' => 10,
         ]);
 
         $response = $this->getJson('/api/v1/inventory/statistics');
@@ -91,47 +90,47 @@ class SalesBinderGuideAndBillingTest extends TestCase
     {
         $cashier = Employee::create([
             'employee_name' => 'Staff Tester',
-            'email'         => 'staff@test.local',
-            'username'      => 'staff1',
+            'email' => 'staff@test.local',
+            'username' => 'staff1',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $customer = Customer::create([
             'customer_name' => 'VIP Client',
-            'phone'         => '012999888',
+            'phone' => '012999888',
         ]);
 
         $category = Category::firstOrCreate(['category_name' => 'Tops']);
-        $size     = ClothingSize::firstOrCreate(['size_name' => 'M']);
-        $color    = Color::firstOrCreate(['color_name' => 'Black']);
-        $product  = Product::create(['category_id' => $category->category_id, 'product_name' => 'Polo Shirt']);
-        
+        $size = ClothingSize::firstOrCreate(['size_name' => 'M']);
+        $color = Color::firstOrCreate(['color_name' => 'Black']);
+        $product = Product::create(['category_id' => $category->category_id, 'product_name' => 'Polo Shirt']);
+
         $variant = ProductVariant::create([
             'product_id' => $product->product_id,
-            'size_id'    => $size->size_id,
-            'color_id'   => $color->color_id,
-            'sku'        => 'POLO-BLK-M-' . uniqid(),
+            'size_id' => $size->size_id,
+            'color_id' => $color->color_id,
+            'sku' => 'POLO-BLK-M-'.uniqid(),
             'cost_price' => 15.00,
             'sale_price' => 30.00,
-            'quantity'   => 15,
+            'quantity' => 15,
         ]);
 
         $token = $cashier->createToken('test-token')->plainTextToken;
 
         // 1. Create Estimate Quote
-        $estimateRes = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $estimateRes = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/v1/estimates', [
-                'customer_id'      => $customer->customer_id,
-                'items'            => [
+                'customer_id' => $customer->customer_id,
+                'items' => [
                     [
                         'variant_id' => $variant->variant_id,
-                        'quantity'   => 2,
-                        'discount'   => 0.00,
-                    ]
+                        'quantity' => 2,
+                        'discount' => 0.00,
+                    ],
                 ],
                 'overall_discount' => 0.00,
-                'tax_rate'         => 10.00,
+                'tax_rate' => 10.00,
             ]);
 
         $estimateRes->assertStatus(201)
@@ -145,7 +144,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $this->assertEquals(15, $variant->fresh()->quantity);
 
         // 2. 1-Click Convert Estimate to Invoice
-        $convertRes = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $convertRes = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson("/api/v1/estimates/{$estimateId}/convert", [
                 'payment_method' => 'CASH',
             ]);

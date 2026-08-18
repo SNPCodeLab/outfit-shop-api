@@ -34,22 +34,22 @@ class ProductImageController extends BaseApiController
         $product = Product::findOrFail($productId);
 
         $validated = $request->validate([
-            'image_url'       => 'required|url|max:500',
+            'image_url' => 'required|url|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'variant_id'      => 'nullable|exists:product_variants,variant_id',
-            'shot_type'       => 'nullable|string|in:LOOK,FLAT,DETAIL,BANNER,COVER,THUMBNAIL',
-            'alt_text'        => 'nullable|string|max:255',
-            'sort_order'      => 'nullable|integer',
-            'is_primary'      => 'nullable|boolean',
+            'variant_id' => 'nullable|exists:product_variants,variant_id',
+            'shot_type' => 'nullable|string|in:LOOK,FLAT,DETAIL,BANNER,COVER,THUMBNAIL',
+            'alt_text' => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer',
+            'is_primary' => 'nullable|boolean',
         ]);
 
         $validated['product_id'] = $productId;
-        $validated['shot_type']  = $validated['shot_type'] ?? 'LOOK';
+        $validated['shot_type'] = $validated['shot_type'] ?? 'LOOK';
 
-        if (!empty($validated['is_primary'])) {
+        if (! empty($validated['is_primary'])) {
             ProductImage::where('product_id', $productId)->update(['is_primary' => false]);
             $product->update([
-                'image_url'       => $validated['image_url'],
+                'image_url' => $validated['image_url'],
                 'image_public_id' => $validated['image_public_id'] ?? $product->image_public_id,
             ]);
         }
@@ -59,7 +59,7 @@ class ProductImageController extends BaseApiController
         return $this->createdResponse(
             $image,
             'Product image attached successfully',
-            '/api/v1/products/' . $productId . '/images'
+            '/api/v1/products/'.$productId.'/images'
         );
     }
 

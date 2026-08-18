@@ -51,13 +51,13 @@ class BrandController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'brand_name'        => 'required|string|max:100|unique:brands,brand_name',
-            'logo_url'          => 'nullable|url|max:500',
-            'banner_url'        => 'nullable|url|max:500',
+            'brand_name' => 'required|string|max:100|unique:brands,brand_name',
+            'logo_url' => 'nullable|url|max:500',
+            'banner_url' => 'nullable|url|max:500',
             'country_of_origin' => 'nullable|string|max:50',
-            'description'       => 'nullable|string',
-            'website_url'       => 'nullable|url|max:255',
-            'is_featured'       => 'nullable|boolean',
+            'description' => 'nullable|string',
+            'website_url' => 'nullable|url|max:255',
+            'is_featured' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['brand_name']);
@@ -69,7 +69,7 @@ class BrandController extends BaseApiController
         return $this->createdResponse(
             $brand,
             'Brand created successfully',
-            '/api/v1/brands/' . $brand->brand_id
+            '/api/v1/brands/'.$brand->brand_id
         );
     }
 
@@ -80,16 +80,16 @@ class BrandController extends BaseApiController
     public function update(Request $request, int $id): JsonResponse
     {
         $brand = Brand::findOrFail($id);
-        $old   = $brand->toArray();
+        $old = $brand->toArray();
 
         $validated = $request->validate([
-            'brand_name'        => 'sometimes|required|string|max:100|unique:brands,brand_name,' . $id . ',brand_id',
-            'logo_url'          => 'nullable|url|max:500',
-            'banner_url'        => 'nullable|url|max:500',
+            'brand_name' => 'sometimes|required|string|max:100|unique:brands,brand_name,'.$id.',brand_id',
+            'logo_url' => 'nullable|url|max:500',
+            'banner_url' => 'nullable|url|max:500',
             'country_of_origin' => 'nullable|string|max:50',
-            'description'       => 'nullable|string',
-            'website_url'       => 'nullable|url|max:255',
-            'is_featured'       => 'nullable|boolean',
+            'description' => 'nullable|string',
+            'website_url' => 'nullable|url|max:255',
+            'is_featured' => 'nullable|boolean',
         ]);
 
         if (isset($validated['brand_name'])) {
@@ -110,7 +110,7 @@ class BrandController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $brand = Brand::findOrFail($id);
-        $old   = $brand->toArray();
+        $old = $brand->toArray();
         $brand->delete();
 
         AuditLogService::log('DELETE', 'Brand', $id, $old, null);

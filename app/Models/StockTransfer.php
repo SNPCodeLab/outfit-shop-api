@@ -12,6 +12,7 @@ class StockTransfer extends Model
     use HasFactory;
 
     protected $primaryKey = 'transfer_id';
+
     protected $table = 'stock_transfers';
 
     protected $fillable = [
@@ -29,7 +30,7 @@ class StockTransfer extends Model
     ];
 
     protected $casts = [
-        'shipped_at'  => 'datetime',
+        'shipped_at' => 'datetime',
         'received_at' => 'datetime',
     ];
 

@@ -13,14 +13,14 @@ class CurrencyService
     public static function convert(float $amount, string $from = 'USD', string $to = 'KHR', float $rate = self::DEFAULT_USD_TO_KHR_RATE): array
     {
         $from = strtoupper($from);
-        $to   = strtoupper($to);
+        $to = strtoupper($to);
 
         if ($from === $to) {
             return [
-                'from_amount'   => $amount,
+                'from_amount' => $amount,
                 'from_currency' => $from,
-                'to_amount'     => $amount,
-                'to_currency'   => $to,
+                'to_amount' => $amount,
+                'to_currency' => $to,
                 'exchange_rate' => 1.0,
             ];
         }
@@ -28,33 +28,35 @@ class CurrencyService
         if ($from === 'USD' && $to === 'KHR') {
             // Round to nearest 100 Riels (standard Cambodian cash rounding)
             $converted = round(($amount * $rate) / 100) * 100;
+
             return [
-                'from_amount'   => $amount,
+                'from_amount' => $amount,
                 'from_currency' => 'USD',
-                'to_amount'     => $converted,
-                'to_currency'   => 'KHR',
+                'to_amount' => $converted,
+                'to_currency' => 'KHR',
                 'exchange_rate' => $rate,
-                'formatted_khr' => number_format($converted) . ' ៛',
+                'formatted_khr' => number_format($converted).' ៛',
             ];
         }
 
         if ($from === 'KHR' && $to === 'USD') {
             $converted = round($amount / $rate, 2);
+
             return [
-                'from_amount'   => $amount,
+                'from_amount' => $amount,
                 'from_currency' => 'KHR',
-                'to_amount'     => $converted,
-                'to_currency'   => 'USD',
+                'to_amount' => $converted,
+                'to_currency' => 'USD',
                 'exchange_rate' => round(1 / $rate, 6),
-                'formatted_usd' => '$' . number_format($converted, 2),
+                'formatted_usd' => '$'.number_format($converted, 2),
             ];
         }
 
         return [
-            'from_amount'   => $amount,
+            'from_amount' => $amount,
             'from_currency' => $from,
-            'to_amount'     => $amount,
-            'to_currency'   => $to,
+            'to_amount' => $amount,
+            'to_currency' => $to,
             'exchange_rate' => 1.0,
         ];
     }

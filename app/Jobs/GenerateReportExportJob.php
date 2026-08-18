@@ -16,6 +16,7 @@ class GenerateReportExportJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 300;
 
     /**
@@ -36,7 +37,7 @@ class GenerateReportExportJob implements ShouldQueue
         Log::info("Starting async report generation [{$this->reportType}] for export ID: {$this->exportId}");
 
         $exportDir = storage_path('app/exports');
-        if (!File::exists($exportDir)) {
+        if (! File::exists($exportDir)) {
             File::makeDirectory($exportDir, 0755, true);
         }
 

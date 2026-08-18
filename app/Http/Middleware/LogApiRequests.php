@@ -12,7 +12,7 @@ class LogApiRequests
     /**
      * Handle an incoming request and log API traffic stats.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -22,7 +22,7 @@ class LogApiRequests
         $response = $next($request);
 
         $durationMs = round((microtime(true) - $startTime) * 1000, 2);
-        
+
         $user = $request->user();
         $userId = $user ? ($user->id ?? $user->employee_id ?? null) : null;
         $tokenName = null;
@@ -41,20 +41,20 @@ class LogApiRequests
             $requestId = $decoded['request_id'] ?? null;
         }
         // Fallback: use X-Request-Id header sent by the client (frontend interceptor)
-        if (!$requestId) {
+        if (! $requestId) {
             $requestId = $request->header('X-Request-Id');
         }
 
         try {
             ApiLog::create([
-                'request_id'    => $requestId,
-                'user_id'       => $userId ? (string) $userId : null,
-                'token_name'    => $tokenName,
-                'method'        => $request->method(),
-                'path'          => '/' . ltrim($request->path(), '/'),
-                'ip'            => $request->ip(),
-                'status'        => $response->getStatusCode(),
-                'duration_ms'   => $durationMs,
+                'request_id' => $requestId,
+                'user_id' => $userId ? (string) $userId : null,
+                'token_name' => $tokenName,
+                'method' => $request->method(),
+                'path' => '/'.ltrim($request->path(), '/'),
+                'ip' => $request->ip(),
+                'status' => $response->getStatusCode(),
+                'duration_ms' => $durationMs,
                 'response_size' => $responseSize,
             ]);
         } catch (\Throwable $e) {

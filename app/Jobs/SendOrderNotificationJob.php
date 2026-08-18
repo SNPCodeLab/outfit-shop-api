@@ -15,6 +15,7 @@ class SendOrderNotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 60;
 
     /**
@@ -31,7 +32,7 @@ class SendOrderNotificationJob implements ShouldQueue
     public function handle(): void
     {
         $sale = SaleHeader::with(['customer', 'payments'])->find($this->saleId);
-        if (!$sale || !$sale->customer) {
+        if (! $sale || ! $sale->customer) {
             return;
         }
 
