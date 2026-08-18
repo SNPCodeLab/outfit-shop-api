@@ -13,12 +13,51 @@ class PurchaseController extends BaseApiController
 {
     public function __construct(protected InventoryService $inventoryService) {}
 
-    public function index(): JsonResponse
+    /**
+     * List purchase orders with pagination, supplier, status, and date range filtering.
+     *
+     * Query params:
+     *   ?supplier_id=1        - Filter by supplier ID
+     *   ?status=RECEIVED      - Filter by status (RECEIVED, PENDING, CANCELLED)
+     *   ?from_date=YYYY-MM-DD - Filter by purchase date start
+     *   ?to_date=YYYY-MM-DD   - Filter by purchase date end
+     *   ?per_page=20          - Pagination items per page (default: 20)
+     */
+    public function index(Request $request): JsonResponse
     {
-        $purchases = PurchaseHeader::with(['supplier', 'employee', 'details.variant.product'])->get();
-        return $this->successResponse($purchases, 'Purchases history');
+        $query = PurchaseHeader::with([
+            'supplier',
+            'employee',
+            'details.variant.product',
+            'details.variant.size',
+            'details.variant.color'
+        ]);
+
+        if ($supplierId = $request->input('supplier_id')) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', strtoupper($status));
+        }
+
+        if ($fromDate = $request->input('from_date')) {
+            $query->whereDate('purchase_date', '>=', $fromDate);
+        }
+
+        if ($toDate = $request->input('to_date')) {
+            $query->whereDate('purchase_date', '<=', $toDate);
+        }
+
+        $perPage = (int) $request->input('per_page', 20);
+        $purchases = $query->orderBy('purchase_id', 'desc')->paginate($perPage);
+
+        return $this->successResponse($purchases, 'Purchases history retrieved');
     }
 
+    /**
+     * Receive and record a new purchase order with atomic stock increment & ledger movements.
+     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -37,17 +76,25 @@ class PurchaseController extends BaseApiController
                 items: $validated['items']
             );
 
-            return $this->successResponse($purchase, 'Purchase order received successfully', 201);
+            return $this->createdResponse($purchase, 'Purchase order received successfully', '/api/v1/purchases/' . $purchase->purchase_id);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400);
+            return $this->errorResponse($e->getMessage(), 400, 'PURCHASE_RECEIVE_FAILED');
         }
     }
 
+    /**
+     * Show single purchase order breakdown.
+     */
     public function show(int $id): JsonResponse
     {
-        $purchase = PurchaseHeader::with(['supplier', 'employee', 'details.variant.product', 'details.variant.size', 'details.variant.color'])
-            ->findOrFail($id);
+        $purchase = PurchaseHeader::with([
+            'supplier',
+            'employee',
+            'details.variant.product',
+            'details.variant.size',
+            'details.variant.color'
+        ])->findOrFail($id);
 
-        return $this->successResponse($purchase, 'Purchase order details');
+        return $this->successResponse($purchase, 'Purchase order details retrieved');
     }
 }

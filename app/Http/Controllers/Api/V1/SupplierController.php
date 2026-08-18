@@ -7,12 +7,27 @@ use App\Models\Supplier;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 class SupplierController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->successResponse(Supplier::all(), 'Suppliers list');
+        $query = Supplier::query();
+
+        if ($search = $request->input('q') ?? $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('supplier_name', 'ILIKE', "%{$search}%")
+                  ->orWhere('email', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', strtoupper($status));
+        }
+
+        $perPage   = (int) $request->input('per_page', 50);
+        $suppliers = $query->orderBy('supplier_id', 'desc')->paginate($perPage);
+
+        return $this->successResponse($suppliers, 'Suppliers retrieved successfully');
     }
 
     public function store(Request $request): JsonResponse
@@ -29,7 +44,7 @@ class SupplierController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Supplier', $supplier->supplier_id, null, $supplier->toArray());
 
-        return $this->successResponse($supplier, 'Supplier created', 201);
+        return $this->createdResponse($supplier, 'Supplier created successfully', '/api/v1/suppliers/' . $supplier->supplier_id);
     }
 
     public function show(int $id): JsonResponse

@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Brand;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class BrandController extends Controller
+class BrandController extends BaseApiController
 {
     /**
-     * List all brands (Public)
+     * List all brands.
+     * Supports optional ?featured=true and ?search= filters.
+     * Public - no authentication required.
      */
     public function index(Request $request): JsonResponse
     {
@@ -27,68 +30,66 @@ class BrandController extends Controller
 
         $brands = $query->orderBy('brand_name', 'asc')->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $brands,
-            'message' => 'Brands retrieved successfully',
-        ]);
+        return $this->successResponse($brands, 'Brands retrieved successfully');
     }
 
     /**
-     * Get single brand details with products
+     * Get single brand with associated products.
+     * Public - no authentication required.
      */
     public function show(int $id): JsonResponse
     {
         $brand = Brand::with(['products.category', 'products.variants'])->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $brand,
-            'message' => 'Brand details retrieved successfully',
-        ]);
+        return $this->successResponse($brand, 'Brand details retrieved successfully');
     }
 
     /**
-     * Create a new brand (Manager / Admin)
+     * Create a new brand.
+     * Restricted to MANAGER or ADMIN.
      */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'brand_name'         => 'required|string|max:100|unique:brands,brand_name',
-            'logo_url'           => 'nullable|url|max:500',
-            'banner_url'         => 'nullable|url|max:500',
-            'country_of_origin'  => 'nullable|string|max:50',
-            'description'        => 'nullable|string',
-            'website_url'        => 'nullable|url|max:255',
-            'is_featured'        => 'nullable|boolean',
+            'brand_name'        => 'required|string|max:100|unique:brands,brand_name',
+            'logo_url'          => 'nullable|url|max:500',
+            'banner_url'        => 'nullable|url|max:500',
+            'country_of_origin' => 'nullable|string|max:50',
+            'description'       => 'nullable|string',
+            'website_url'       => 'nullable|url|max:255',
+            'is_featured'       => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['brand_name']);
 
         $brand = Brand::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $brand,
-            'message' => 'Brand created successfully',
-        ], 201);
+        AuditLogService::log('CREATE', 'Brand', $brand->brand_id, null, $brand->toArray());
+
+        return $this->createdResponse(
+            $brand,
+            'Brand created successfully',
+            '/api/v1/brands/' . $brand->brand_id
+        );
     }
 
     /**
-     * Update brand
+     * Update a brand.
+     * Restricted to MANAGER or ADMIN.
      */
     public function update(Request $request, int $id): JsonResponse
     {
         $brand = Brand::findOrFail($id);
+        $old   = $brand->toArray();
 
         $validated = $request->validate([
-            'brand_name'         => 'sometimes|required|string|max:100|unique:brands,brand_name,' . $id . ',brand_id',
-            'logo_url'           => 'nullable|url|max:500',
-            'banner_url'         => 'nullable|url|max:500',
-            'country_of_origin'  => 'nullable|string|max:50',
-            'description'        => 'nullable|string',
-            'website_url'        => 'nullable|url|max:255',
-            'is_featured'        => 'nullable|boolean',
+            'brand_name'        => 'sometimes|required|string|max:100|unique:brands,brand_name,' . $id . ',brand_id',
+            'logo_url'          => 'nullable|url|max:500',
+            'banner_url'        => 'nullable|url|max:500',
+            'country_of_origin' => 'nullable|string|max:50',
+            'description'       => 'nullable|string',
+            'website_url'       => 'nullable|url|max:255',
+            'is_featured'       => 'nullable|boolean',
         ]);
 
         if (isset($validated['brand_name'])) {
@@ -97,24 +98,23 @@ class BrandController extends Controller
 
         $brand->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $brand,
-            'message' => 'Brand updated successfully',
-        ]);
+        AuditLogService::log('UPDATE', 'Brand', $id, $old, $brand->toArray());
+
+        return $this->successResponse($brand, 'Brand updated successfully');
     }
 
     /**
-     * Delete brand
+     * Delete a brand.
+     * Restricted to MANAGER or ADMIN.
      */
     public function destroy(int $id): JsonResponse
     {
         $brand = Brand::findOrFail($id);
+        $old   = $brand->toArray();
         $brand->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Brand deleted successfully',
-        ]);
+        AuditLogService::log('DELETE', 'Brand', $id, $old, null);
+
+        return $this->deletedResponse('Brand deleted successfully');
     }
 }

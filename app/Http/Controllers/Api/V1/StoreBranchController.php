@@ -2,51 +2,51 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\StoreBranch;
 use App\Models\StoreInventory;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class StoreBranchController extends Controller
+class StoreBranchController extends BaseApiController
 {
     /**
-     * List all store branches
+     * List all active store branches.
+     * Public - no authentication required.
      */
     public function index(): JsonResponse
     {
         $branches = StoreBranch::where('is_active', true)->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $branches,
-            'message' => 'Store branches retrieved successfully',
-        ]);
+        return $this->successResponse($branches, 'Store branches retrieved successfully');
     }
 
     /**
-     * Get branch inventory levels across all variants
+     * Get branch inventory levels across all variants.
+     * Restricted to MANAGER or ADMIN.
      */
     public function branchStock(int $branchId): JsonResponse
     {
         $branch = StoreBranch::findOrFail($branchId);
 
-        $inventories = StoreInventory::with(['variant.product', 'variant.size', 'variant.color'])
+        $inventories = StoreInventory::with([
+            'variant.product',
+            'variant.size',
+            'variant.color',
+        ])
             ->where('branch_id', $branchId)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'branch'      => $branch,
-                'inventories' => $inventories,
-            ],
-            'message' => 'Branch inventory retrieved successfully',
-        ]);
+        return $this->successResponse([
+            'branch'      => $branch,
+            'inventories' => $inventories,
+        ], 'Branch inventory retrieved successfully');
     }
 
     /**
-     * Create a new branch (Manager / Admin)
+     * Create a new store branch.
+     * Restricted to MANAGER or ADMIN.
      */
     public function store(Request $request): JsonResponse
     {
@@ -63,10 +63,8 @@ class StoreBranchController extends Controller
 
         $branch = StoreBranch::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $branch,
-            'message' => 'Store branch created successfully',
-        ], 201);
+        AuditLogService::log('CREATE', 'StoreBranch', $branch->branch_id, null, $branch->toArray());
+
+        return $this->createdResponse($branch, 'Store branch created successfully', '/api/v1/branches/' . $branch->branch_id);
     }
 }

@@ -153,7 +153,7 @@ class ProductVariantController extends BaseApiController
 
         AuditLogService::log('CREATE', 'ProductVariant', $variant->variant_id, null, $variant->toArray());
 
-        return $this->successResponse($variant->load(['product', 'size', 'color']), 'Product variant created', 201);
+        return $this->createdResponse($variant->load(['product', 'size', 'color']), 'Product variant created successfully', '/api/v1/variants/' . $variant->variant_id);
     }
 
     public function show(int $id): JsonResponse

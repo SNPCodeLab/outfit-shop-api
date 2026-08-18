@@ -53,9 +53,9 @@ class ImageUploadController extends BaseApiController
                 );
             }
 
-            return $this->successResponse($uploadResult, 'Image uploaded successfully to Cloudinary', 201);
+            return $this->createdResponse($uploadResult, 'Image uploaded successfully to Cloudinary');
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->serverErrorResponse('Image upload failed. Please try again.');
         }
     }
 
@@ -73,26 +73,26 @@ class ImageUploadController extends BaseApiController
         ]);
 
         try {
-            $target = $request->input('public_id') ?? $request->input('image_url');
+            $target  = $request->input('public_id') ?? $request->input('image_url');
             $deleted = $this->cloudinary->delete($target);
 
             if (!$deleted) {
-                return $this->errorResponse('Image could not be deleted from Cloudinary or was not found.', 404);
+                return $this->notFoundResponse('CloudinaryAsset', $target, 'Image could not be deleted from Cloudinary or was not found.');
             }
 
             if ($request->user()) {
                 AuditLogService::log(
-                    action: 'DELETE_IMAGE',
-                    entity: 'CloudinaryAsset',
-                    entityId: 0,
+                    action:    'DELETE_IMAGE',
+                    entity:    'CloudinaryAsset',
+                    entityId:  0,
                     oldValues: ['target' => $target],
-                    userId: $request->user()->employee_id ?? $request->user()->id ?? null
+                    userId:    $request->user()->employee_id ?? $request->user()->id ?? null
                 );
             }
 
-            return $this->successResponse(null, 'Image deleted successfully from Cloudinary');
+            return $this->deletedResponse('Image deleted successfully from Cloudinary');
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->serverErrorResponse('Image deletion failed. Please try again.');
         }
     }
 
@@ -138,12 +138,12 @@ class ImageUploadController extends BaseApiController
 
             return $this->successResponse($product, 'Product image updated successfully');
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->serverErrorResponse('Product image upload failed. Please try again.');
         }
     }
 
     /**
-     * Upload and directly attach an image to a Product Variant (colorway / specific SKU).
+     * Upload and assign an image directly to a product variant.
      *
      * @param Request $request
      * @param int $variantId
@@ -184,7 +184,7 @@ class ImageUploadController extends BaseApiController
 
             return $this->successResponse($variant->load(['product', 'size', 'color']), 'Variant image updated successfully');
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->serverErrorResponse('Variant image upload failed. Please try again.');
         }
     }
 
@@ -268,7 +268,7 @@ class ImageUploadController extends BaseApiController
             }
         }
 
-        return $this->successResponse($results, 'Batch upload processed', 200);
+        return $this->successResponse($results, 'Batch upload processed');
     }
 
     /**

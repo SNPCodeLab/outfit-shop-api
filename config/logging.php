@@ -73,12 +73,53 @@ return [
 
         'null' => [
             'driver'  => 'monolog',
-            'handler' => NullHandler::class,
+            'handler' => Monolog\Handler\NullHandler::class,
         ],
 
         'emergency' => [
-            'driver'  => 'monolog',
-            'handler' => NullHandler::class,
+            'path' => storage_path('logs/laravel.log'),
+        ],
+
+        // ── Enterprise Domain Dedicated Logging Channels ─────────────────────
+
+        'pos' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/pos.log'),
+            'level'                => 'info',
+            'days'                 => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'inventory' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/inventory.log'),
+            'level'                => 'info',
+            'days'                 => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'purchasing' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/purchasing.log'),
+            'level'                => 'info',
+            'days'                 => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'admin' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/admin.log'),
+            'level'                => 'info',
+            'days'                 => 60,
+            'replace_placeholders' => true,
+        ],
+
+        'security' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/security.log'),
+            'level'                => 'info',
+            'days'                 => 90,
+            'replace_placeholders' => true,
         ],
 
     ],

@@ -128,7 +128,7 @@ class InventoryValuationController extends BaseApiController
                 'only_in_stock'          => $onlyInStock,
             ],
             'currency'                   => 'USD',
-            'timestamp'                  => now()->toIso8601String(),
+            'timestamp'                  => now()->toISOString(),
         ];
 
         return $this->successResponse($data, 'SalesBinder inventory valuation & statistics retrieved');

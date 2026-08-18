@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Models\SaleHeader;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\ShippingOrder;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ShippingOrderController extends Controller
+class ShippingOrderController extends BaseApiController
 {
     /**
-     * List all shipping & click-and-collect orders
+     * List all shipping and click-and-collect orders.
+     * Requires authentication (any role).
      */
     public function index(Request $request): JsonResponse
     {
@@ -26,17 +26,15 @@ class ShippingOrderController extends Controller
             $query->where('fulfillment_type', strtoupper($type));
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->get();
+        $perPage = (int) $request->input('per_page', 20);
+        $orders  = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $orders,
-            'message' => 'Fulfillment & shipping orders retrieved successfully',
-        ]);
+        return $this->successResponse($orders, 'Fulfillment and shipping orders retrieved successfully');
     }
 
     /**
-     * Create shipping order or in-store pickup for a sale
+     * Create a shipping or click-and-collect order for a sale.
+     * Requires authentication (any role).
      */
     public function create(Request $request): JsonResponse
     {
@@ -55,15 +53,13 @@ class ShippingOrderController extends Controller
 
         $order = ShippingOrder::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $order,
-            'message' => 'Shipping / Click-and-Collect order created',
-        ], 201);
+        return $this->createdResponse($order, 'Shipping order created successfully');
     }
 
     /**
-     * Update courier shipping status (PACKED, DISPATCHED, DELIVERED)
+     * Update courier shipping status.
+     * Valid transitions: PENDING, PACKED, DISPATCHED, DELIVERED, RETURNED.
+     * Requires authentication (any role).
      */
     public function updateStatus(Request $request, int $id): JsonResponse
     {
@@ -88,10 +84,9 @@ class ShippingOrderController extends Controller
 
         $order->update($updateData);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $order,
-            'message' => "Order status updated to {$validated['status']}",
-        ]);
+        return $this->successResponse(
+            $order->fresh(['sale.customer', 'branch']),
+            "Shipping order status updated to {$validated['status']}"
+        );
     }
 }
