@@ -1,8 +1,16 @@
-# 📜 CSMS REST API Changelog
+# 📜 OutfitShop API Changelog
 
-All notable changes to the Retail Clothing Store Management System (SS-MIS / CSMS) API are documented here using Semantic Versioning.
+All notable changes to the **OutfitShop Ecommerce Clothing API** are documented here using Semantic Versioning.
 
 ---
+
+## [v1.5.0] — 2026-08-18 (OutfitShop Rebranding & Omnichannel Expansion)
+### Added
+- **OutfitShop Branding & CDN Assets**: Injected official OutfitShop logo, vector icon, animated cycle, and video assets across all API response envelopes (`meta.brand`), email templates, and error pages.
+- **Shopping Cart Module**: Full CRUD for customer and guest session carts (`/api/v1/cart`, `/api/v1/cart/items`, `/api/v1/cart/clear`) with automatic 10% VAT calculation.
+- **Enhanced Wishlist**: Dedicated endpoints for saving, toggling, and managing customer favorites.
+- **Orders Endpoints Migration**: Migrated sales endpoints to `/api/v1/orders/*` with full backward-compatible aliases for `/api/v1/sales/*`.
+- **System Identification**: Updated all response envelopes and status endpoints to `"OutfitShop Ecommerce Clothing API"`.
 
 ## [v1.4.0] — 2026-08-17 (Enterprise Release)
 ### Added

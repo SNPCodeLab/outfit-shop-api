@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\AuditLogService;
@@ -86,22 +88,15 @@ class AuthController extends BaseApiController
     // POST /api/v1/auth/login
     // =========================================================================
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'username' => 'required_without:email|string',
-            'email'    => 'required_without:username|string|email',
-            'password' => 'required|string',
-        ]);
-
         $identifier = $request->input('username') ?? $request->input('email');
-        $lockKey = "login_lockout:{$identifier}";
+        $lockKey    = "login_lockout:{$identifier}";
 
         if (\Illuminate\Support\Facades\Cache::has($lockKey)) {
-            return $this->errorResponse(
-                message:   'Account temporarily locked due to 10 failed login attempts. Please wait 15 minutes before retrying.',
-                code:      423,
-                errorCode: 'ERR_ACCOUNT_LOCKED'
+            return \App\Http\Response\ApiResponse::accountLocked(
+                'Account temporarily locked due to 10 failed login attempts. Please wait 15 minutes before retrying.',
+                900
             );
         }
 
@@ -114,10 +109,8 @@ class AuthController extends BaseApiController
             \Illuminate\Support\Facades\Cache::forget("login_fails:{$identifier}");
 
             if ($employee->status !== 'ACTIVE') {
-                return $this->errorResponse(
-                    message:   'Account is inactive. Please contact your administrator.',
-                    code:      403,
-                    errorCode: 'ERR_ACCOUNT_INACTIVE'
+                return \App\Http\Response\ApiResponse::forbidden(
+                    'Account is inactive. Please contact your administrator.'
                 );
             }
 
@@ -252,7 +245,7 @@ class AuthController extends BaseApiController
 
         return $this->successResponse([
             '2fa_verified' => true,
-            'verified_at'  => now()->toIso8601String(),
+            'verified_at'  => now()->toISOString(),
         ], 'Two-factor authentication verified successfully');
     }
 
@@ -265,7 +258,10 @@ class AuthController extends BaseApiController
         $account = $request->user();
 
         if (!$account) {
-            return $this->errorResponse('Unauthenticated', 401, 'ERR_UNAUTHENTICATED');
+            return \App\Http\Response\ApiResponse::unauthenticated(
+                'token_missing',
+                'Authentication required. Please login to continue.'
+            );
         }
 
         $currentToken = $account->currentAccessToken();
@@ -370,15 +366,8 @@ class AuthController extends BaseApiController
     // POST /api/v1/auth/register  (ADMIN only — creates team accounts)
     // =========================================================================
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role'     => 'nullable|string|in:admin,manager,cashier,staff,viewer',
-        ]);
-
         $roleName = strtolower($request->input('role', 'staff'));
 
         $user = User::create([
@@ -395,7 +384,7 @@ class AuthController extends BaseApiController
         $resolvedRole = $this->resolveRole($user);
         $token        = $user->createToken('ssmis-api-token')->plainTextToken;
 
-        return $this->successResponse([
+        return $this->createdResponse([
             'access_token' => $token,
             'token_type'   => 'Bearer',
             'account_type' => 'user',
@@ -406,6 +395,6 @@ class AuthController extends BaseApiController
                 'role'        => $resolvedRole,
                 'permissions' => $this->permissionsFor($resolvedRole),
             ],
-        ], 'User account created successfully', 201);
+        ], 'User account created successfully', '/api/v1/auth/me');
     }
 }

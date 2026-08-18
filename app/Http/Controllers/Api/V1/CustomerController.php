@@ -7,12 +7,24 @@ use App\Models\Customer;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 class CustomerController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->successResponse(Customer::all(), 'Customers list');
+        $query = Customer::query();
+
+        if ($search = $request->input('q') ?? $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('customer_name', 'ILIKE', "%{$search}%")
+                  ->orWhere('phone', 'ILIKE', "%{$search}%")
+                  ->orWhere('email', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        $perPage   = (int) $request->input('per_page', 50);
+        $customers = $query->orderBy('customer_id', 'desc')->paginate($perPage);
+
+        return $this->successResponse($customers, 'Customers retrieved successfully');
     }
 
     public function store(Request $request): JsonResponse
@@ -29,7 +41,7 @@ class CustomerController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Customer', $customer->customer_id, null, $customer->toArray());
 
-        return $this->successResponse($customer, 'Customer registered', 201);
+        return $this->createdResponse($customer, 'Customer registered successfully', '/api/v1/customers/' . $customer->customer_id);
     }
 
     public function show(int $id): JsonResponse

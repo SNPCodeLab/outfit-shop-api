@@ -153,10 +153,10 @@ class InvoiceEstimateController extends BaseApiController
                 newValues: ['status' => 'ESTIMATE', 'invoice_no' => $estimateNo, 'grand_total' => $grandTotal]
             );
 
-            return $this->successResponse(
+            return $this->createdResponse(
                 $estimate->load(['customer', 'employee', 'details.variant.product', 'details.variant.size', 'details.variant.color']),
-                'Estimate quote created successfully (Stock reserved, not yet deducted)',
-                201
+                'Estimate quote created successfully. Stock is reserved but not yet deducted.',
+                '/api/v1/invoices/' . $estimate->sale_id
             );
         });
     }
@@ -173,7 +173,11 @@ class InvoiceEstimateController extends BaseApiController
         $estimate = SaleHeader::with(['details.variant.product'])->findOrFail($id);
 
         if ($estimate->status === 'COMPLETED' || $estimate->status === 'PAID') {
-            return $this->errorResponse('This document is already an active/paid invoice.', 400, 'ERR_ALREADY_CONVERTED');
+            return $this->conflictResponse(
+                'This document is already an active or paid invoice.',
+                'DOCUMENT_ALREADY_CONVERTED',
+                ['current_status' => $estimate->status, 'invoice_no' => $estimate->invoice_no]
+            );
         }
 
         try {
@@ -252,7 +256,7 @@ class InvoiceEstimateController extends BaseApiController
                 );
             });
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_CONVERT_FAILED');
+            return $this->errorResponse($e->getMessage(), 400, 'ESTIMATE_CONVERSION_FAILED');
         }
     }
 

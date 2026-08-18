@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\MarketingBanner;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class MarketingBannerController extends Controller
+class MarketingBannerController extends BaseApiController
 {
     /**
-     * List active marketing banners for storefront
+     * List active marketing banners for the storefront.
+     * Supports optional ?placement= and ?department= filters.
+     * Public - no authentication required.
      */
     public function index(Request $request): JsonResponse
     {
@@ -28,17 +31,14 @@ class MarketingBannerController extends Controller
             });
         }
 
-        $banners = $query->get();
+        $banners = $query->orderBy('sort_order', 'asc')->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $banners,
-            'message' => 'Marketing banners retrieved successfully',
-        ]);
+        return $this->successResponse($banners, 'Marketing banners retrieved successfully');
     }
 
     /**
-     * Create a new marketing banner (Manager / Admin)
+     * Create a new marketing banner.
+     * Restricted to MANAGER or ADMIN.
      */
     public function store(Request $request): JsonResponse
     {
@@ -56,24 +56,23 @@ class MarketingBannerController extends Controller
 
         $banner = MarketingBanner::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $banner,
-            'message' => 'Marketing banner created successfully',
-        ], 201);
+        AuditLogService::log('CREATE', 'MarketingBanner', $banner->banner_id, null, $banner->toArray());
+
+        return $this->createdResponse($banner, 'Marketing banner created successfully', '/api/v1/marketing/banners/' . $banner->banner_id);
     }
 
     /**
-     * Delete a marketing banner
+     * Delete a marketing banner.
+     * Restricted to MANAGER or ADMIN.
      */
     public function destroy(int $bannerId): JsonResponse
     {
         $banner = MarketingBanner::findOrFail($bannerId);
+
+        AuditLogService::log('DELETE', 'MarketingBanner', $bannerId, $banner->toArray(), null);
+
         $banner->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Marketing banner deleted successfully',
-        ]);
+        return $this->deletedResponse('Marketing banner deleted successfully');
     }
 }

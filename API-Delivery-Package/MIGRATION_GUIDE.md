@@ -1,6 +1,18 @@
-# 🔄 Frontend Migration & Integration Guide
+# 🔄 OutfitShop API — Frontend Migration & Integration Guide
 
-Step-by-step instructions for frontend engineers integrating with the CSMS RESTful API.
+Step-by-step instructions for frontend engineers integrating with the **OutfitShop Ecommerce Clothing API**.
+
+---
+
+## 🎨 Official Brand Assets
+
+| Asset Type | Resource URL |
+| :--- | :--- |
+| **Primary Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png` |
+| **Animated Cycle** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062663/default-cycle-SNPCodeLab.gif` |
+| **Secondary Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062664/bleu-SNPCodeLab.gif` |
+| **Vector Icon** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg` |
+| **Brand Video** | `https://res.cloudinary.com/od8t271n/video/upload/v1787062665/default-cycle-SNPCodeLab.mp4` |
 
 ---
 
@@ -32,7 +44,7 @@ export const apiClient = axios.create({
 
 // Request Interceptor: Attach Token & Trace ID
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('csms_access_token');
+  const token = localStorage.getItem('outfitshop_access_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -41,7 +53,7 @@ apiClient.interceptors.request.use((config) => {
   config.headers['X-Request-Id'] = uuidv4();
   
   // Language Localization
-  const locale = localStorage.getItem('csms_locale') || 'en';
+  const locale = localStorage.getItem('outfitshop_locale') || 'en';
   config.headers['Accept-Language'] = locale;
   
   return config;
@@ -52,11 +64,15 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Attempt token rotation or redirect to login
-      localStorage.removeItem('csms_access_token');
+      localStorage.removeItem('outfitshop_access_token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 ```
+
+---
+
+## 3. Endpoints Migration: Sales to Orders
+Frontend applications should migrate calls from `/api/v1/sales/*` to `/api/v1/orders/*`. Both endpoints are actively supported for complete backward compatibility.

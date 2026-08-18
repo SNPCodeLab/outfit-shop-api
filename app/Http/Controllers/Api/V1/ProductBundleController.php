@@ -2,48 +2,51 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\BundleItem;
 use App\Models\ProductBundle;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ProductBundleController extends Controller
+class ProductBundleController extends BaseApiController
 {
     /**
-     * List all product bundles & combo packs
+     * List all active product bundles and combo packs.
+     * Public - no authentication required.
      */
     public function index(): JsonResponse
     {
-        $bundles = ProductBundle::with(['items.variant.product', 'items.variant.size', 'items.variant.color'])
+        $bundles = ProductBundle::with([
+            'items.variant.product',
+            'items.variant.size',
+            'items.variant.color',
+        ])
             ->where('is_active', true)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $bundles,
-            'message' => 'Product bundles retrieved successfully',
-        ]);
+        return $this->successResponse($bundles, 'Product bundles retrieved successfully');
     }
 
     /**
-     * Get single bundle details
+     * Get a single bundle with all component details.
+     * Public - no authentication required.
      */
     public function show(int $id): JsonResponse
     {
-        $bundle = ProductBundle::with(['items.variant.product', 'items.variant.size', 'items.variant.color'])
-            ->findOrFail($id);
+        $bundle = ProductBundle::with([
+            'items.variant.product',
+            'items.variant.size',
+            'items.variant.color',
+        ])->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $bundle,
-            'message' => 'Product bundle details retrieved successfully',
-        ]);
+        return $this->successResponse($bundle, 'Product bundle details retrieved successfully');
     }
 
     /**
-     * Create a new product bundle (Manager / Admin)
+     * Create a new product bundle.
+     * Restricted to MANAGER or ADMIN.
      */
     public function store(Request $request): JsonResponse
     {
@@ -81,27 +84,30 @@ class ProductBundleController extends Controller
                 ]);
             }
 
+            AuditLogService::log('CREATE', 'ProductBundle', $bundle->bundle_id, null, [
+                'bundle_name' => $bundle->bundle_name,
+                'sku'         => $bundle->sku,
+                'items_count' => count($validated['items']),
+            ]);
+
             return $bundle->load(['items.variant.product']);
         });
 
-        return response()->json([
-            'success' => true,
-            'data'    => $bundle,
-            'message' => 'Product bundle created successfully',
-        ], 201);
+        return $this->createdResponse($bundle, 'Product bundle created successfully', '/api/v1/bundles/' . $bundle->bundle_id);
     }
 
     /**
-     * Delete bundle
+     * Delete a product bundle.
+     * Restricted to MANAGER or ADMIN.
      */
     public function destroy(int $id): JsonResponse
     {
         $bundle = ProductBundle::findOrFail($id);
+
+        AuditLogService::log('DELETE', 'ProductBundle', $id, $bundle->toArray(), null);
+
         $bundle->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product bundle deleted successfully',
-        ]);
+        return $this->deletedResponse('Product bundle deleted successfully');
     }
 }

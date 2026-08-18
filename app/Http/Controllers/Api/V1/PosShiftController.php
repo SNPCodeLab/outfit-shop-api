@@ -39,10 +39,10 @@ class PosShiftController extends BaseApiController
         // Check if shift is already open
         $existing = PosShift::where('employee_id', $employeeId)->where('status', 'OPEN')->first();
         if ($existing) {
-            return $this->errorResponse(
+            return $this->conflictResponse(
                 'You already have an open shift. Please close it before opening a new one.',
-                400,
-                'ERR_SHIFT_ALREADY_OPEN'
+                'SHIFT_ALREADY_OPEN',
+                ['active_shift_id' => $existing->shift_id]
             );
         }
 
@@ -63,7 +63,7 @@ class PosShiftController extends BaseApiController
             'notes'             => $validated['notes'] ?? null,
         ]);
 
-        return $this->successResponse($shift, 'POS Register Shift opened successfully', 201);
+        return $this->createdResponse($shift, 'POS Register Shift opened successfully', '/api/v1/shifts/current');
     }
 
     /**
@@ -75,7 +75,7 @@ class PosShiftController extends BaseApiController
         $shift = PosShift::where('employee_id', $employeeId)->where('status', 'OPEN')->first();
 
         if (!$shift) {
-            return $this->errorResponse('No active open shift found for cash drop.', 404, 'ERR_NO_OPEN_SHIFT');
+            return $this->notFoundResponse('PosShift', null, 'No active open shift found for cash drop.');
         }
 
         $validated = $request->validate([
@@ -98,7 +98,7 @@ class PosShiftController extends BaseApiController
         $shift = PosShift::where('employee_id', $employeeId)->where('status', 'OPEN')->first();
 
         if (!$shift) {
-            return $this->errorResponse('No active open shift found to close.', 404, 'ERR_NO_OPEN_SHIFT');
+            return $this->notFoundResponse('PosShift', null, 'No active open shift found to close.');
         }
 
         $validated = $request->validate([
@@ -137,8 +137,8 @@ class PosShiftController extends BaseApiController
 
         $zReport = [
             'shift_id'           => $shift->shift_id,
-            'opened_at'          => $shift->opened_at->toIso8601String(),
-            'closed_at'          => now()->toIso8601String(),
+            'opened_at'          => $shift->opened_at->toISOString(),
+            'closed_at'          => now()->toISOString(),
             'opening_float'      => (float) $shift->opening_float_usd,
             'total_sales_count'  => $sales->count(),
             'cash_sales'         => round($totalCashSales, 2),

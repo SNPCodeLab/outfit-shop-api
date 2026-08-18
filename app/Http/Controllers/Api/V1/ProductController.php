@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
@@ -141,23 +142,19 @@ class ProductController extends BaseApiController
         return $this->successResponse($products, 'Products catalog retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreProductRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'category_id'  => 'required|exists:categories,category_id',
-            'product_name' => 'required|string|max:150',
-            'brand'           => 'nullable|string',
-            'description'     => 'nullable|string',
-            'image_url'       => 'nullable|string|max:500',
-            'image_public_id' => 'nullable|string|max:255',
-            'status'          => 'nullable|string|in:ACTIVE,INACTIVE',
-        ]);
+        $validated = $request->validated();
 
         $product = Product::create($validated);
 
         AuditLogService::log('CREATE', 'Product', $product->product_id, null, $product->toArray());
 
-        return $this->successResponse($product->load('category'), 'Product created', 201);
+        return $this->createdResponse(
+            $product->load('category'),
+            'Product created successfully',
+            '/api/v1/products/' . $product->product_id
+        );
     }
 
     public function show(int $id): JsonResponse
@@ -208,6 +205,6 @@ class ProductController extends BaseApiController
 
         AuditLogService::log('DELETE', 'Product', $id, $old, null);
 
-        return $this->successResponse(null, 'Product soft deleted');
+        return $this->deletedResponse('Product deleted successfully');
     }
 }

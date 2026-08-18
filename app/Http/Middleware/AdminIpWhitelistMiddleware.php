@@ -24,12 +24,9 @@ class AdminIpWhitelistMiddleware
         $clientIp = $request->ip();
 
         if (!in_array($clientIp, $allowedIps) && !in_array('127.0.0.1', $allowedIps) && !app()->isLocal()) {
-            return response()->json([
-                'success'    => false,
-                'status'     => 'ERR_IP_NOT_WHITELISTED',
-                'message'    => 'Access restricted: Your IP address is not authorized for administrative operations.',
-                'client_ip'  => $clientIp,
-            ], 403);
+            return \App\Http\Response\ApiResponse::forbidden(
+                'Access restricted: Your IP address is not authorized for administrative operations.'
+            );
         }
 
         return $next($request);

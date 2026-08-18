@@ -2,29 +2,28 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Promotion;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PromotionController extends Controller
+class PromotionController extends BaseApiController
 {
     /**
-     * List all promotions
+     * List all promotions (active and inactive).
+     * Restricted to MANAGER or ADMIN.
      */
     public function index(Request $request): JsonResponse
     {
         $promotions = Promotion::orderBy('start_date', 'desc')->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $promotions,
-            'message' => 'Promotions retrieved successfully',
-        ]);
+        return $this->successResponse($promotions, 'Promotions retrieved successfully');
     }
 
     /**
-     * List currently active promotions for storefront & POS
+     * List currently active promotions for storefront and POS.
+     * Public - no authentication required.
      */
     public function active(Request $request): JsonResponse
     {
@@ -40,15 +39,12 @@ class PromotionController extends Controller
 
         $activePromos = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $activePromos,
-            'message' => 'Active promotions retrieved successfully',
-        ]);
+        return $this->successResponse($activePromos, 'Active promotions retrieved successfully');
     }
 
     /**
-     * Verify coupon voucher code and calculate discount
+     * Verify a coupon code and calculate the applicable discount.
+     * Public - no authentication required.
      */
     public function verifyCoupon(Request $request): JsonResponse
     {
@@ -62,43 +58,36 @@ class PromotionController extends Controller
             ->first();
 
         if (!$promo) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid, expired, or inactive coupon code.',
-            ], 404);
+            return $this->notFoundResponse('Promotion', $request->promo_code, 'Invalid, expired, or inactive coupon code.');
         }
 
         if ($request->subtotal < $promo->min_spend) {
-            return response()->json([
-                'success' => false,
-                'message' => "Minimum spend of \${$promo->min_spend} required for this coupon.",
-            ], 400);
+            return $this->errorResponse(
+                "Minimum spend of \${$promo->min_spend} required for this coupon.",
+                422,
+                'MINIMUM_SPEND_NOT_MET',
+                ['min_spend' => (float) $promo->min_spend, 'current_subtotal' => (float) $request->subtotal]
+            );
         }
 
-        $discountAmount = 0.0;
-        if ($promo->discount_type === 'PERCENTAGE') {
-            $discountAmount = round(($request->subtotal * ($promo->discount_value / 100)), 2);
-        } else {
-            $discountAmount = min((float)$promo->discount_value, (float)$request->subtotal);
-        }
+        $discountAmount = $promo->discount_type === 'PERCENTAGE'
+            ? round(($request->subtotal * ($promo->discount_value / 100)), 2)
+            : min((float) $promo->discount_value, (float) $request->subtotal);
 
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'promotion_id'    => $promo->promotion_id,
-                'title'           => $promo->title,
-                'promo_code'      => $promo->promo_code,
-                'discount_type'   => $promo->discount_type,
-                'discount_value'  => $promo->discount_value,
-                'discount_amount' => $discountAmount,
-                'final_total'     => max(0, $request->subtotal - $discountAmount),
-            ],
-            'message' => 'Coupon applied successfully',
-        ]);
+        return $this->successResponse([
+            'promotion_id'    => $promo->promotion_id,
+            'title'           => $promo->title,
+            'promo_code'      => $promo->promo_code,
+            'discount_type'   => $promo->discount_type,
+            'discount_value'  => $promo->discount_value,
+            'discount_amount' => $discountAmount,
+            'final_total'     => max(0, round((float) $request->subtotal - $discountAmount, 2)),
+        ], 'Coupon applied successfully');
     }
 
     /**
-     * Create a new promotion (Manager / Admin)
+     * Create a new promotion campaign.
+     * Restricted to MANAGER or ADMIN.
      */
     public function store(Request $request): JsonResponse
     {
@@ -121,24 +110,23 @@ class PromotionController extends Controller
 
         $promo = Promotion::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $promo,
-            'message' => 'Promotion campaign created successfully',
-        ], 201);
+        AuditLogService::log('CREATE', 'Promotion', $promo->promotion_id, null, $promo->toArray());
+
+        return $this->createdResponse($promo, 'Promotion campaign created successfully', '/api/v1/promotions/' . $promo->promotion_id);
     }
 
     /**
-     * Delete a promotion
+     * Delete a promotion campaign.
+     * Restricted to MANAGER or ADMIN.
      */
     public function destroy(int $id): JsonResponse
     {
         $promo = Promotion::findOrFail($id);
+
+        AuditLogService::log('DELETE', 'Promotion', $id, $promo->toArray(), null);
+
         $promo->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Promotion deleted successfully',
-        ]);
+        return $this->deletedResponse('Promotion deleted successfully');
     }
 }

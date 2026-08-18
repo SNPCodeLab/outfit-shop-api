@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\GiftCard;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class GiftCardController extends Controller
+class GiftCardController extends BaseApiController
 {
     /**
-     * Check gift card balance and validity
+     * Check gift card balance and validity.
+     * Public - no authentication required.
      */
     public function check(Request $request): JsonResponse
     {
@@ -25,33 +26,30 @@ class GiftCardController extends Controller
             ->first();
 
         if (!$card) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid, inactive, or expired gift card code.',
-            ], 404);
+            return $this->notFoundResponse('GiftCard', $request->card_code, 'Invalid, inactive, or expired gift card code.');
         }
 
         if ($card->expiry_date && $card->expiry_date->isPast()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This gift card has expired.',
-            ], 400);
+            return $this->errorResponse(
+                'This gift card has expired.',
+                422,
+                'GIFT_CARD_EXPIRED',
+                ['expiry_date' => $card->expiry_date->toISOString()]
+            );
         }
 
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'card_code'       => $card->card_code,
-                'current_balance' => (float) $card->current_balance,
-                'initial_balance' => (float) $card->initial_balance,
-                'expiry_date'     => $card->expiry_date ? $card->expiry_date->format('Y-m-d') : 'No Expiry',
-            ],
-            'message' => 'Gift card is valid and ready to use',
-        ]);
+        return $this->successResponse([
+            'card_code'       => $card->card_code,
+            'current_balance' => (float) $card->current_balance,
+            'initial_balance' => (float) $card->initial_balance,
+            'expiry_date'     => $card->expiry_date ? $card->expiry_date->toISOString() : null,
+            'is_active'       => true,
+        ], 'Gift card is valid and ready to use');
     }
 
     /**
-     * Issue a new digital gift card
+     * Issue a new digital gift card.
+     * Requires authentication (any role).
      */
     public function issue(Request $request): JsonResponse
     {
@@ -61,9 +59,7 @@ class GiftCardController extends Controller
             'expiry_months'         => 'nullable|integer|min:1|max:36',
         ]);
 
-        // Generate 16-digit card code format: KHMER-XXXX-XXXX-XXXX
-        $code = 'KM-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4));
-
+        $code   = 'KM-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4));
         $months = (int) ($validated['expiry_months'] ?? 12);
         $expiry = Carbon::now()->addMonths($months);
 
@@ -76,10 +72,9 @@ class GiftCardController extends Controller
             'is_active'             => true,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $card,
-            'message' => "Digital Gift Card of \${$validated['amount']} issued successfully",
-        ], 201);
+        return $this->createdResponse(
+            $card,
+            "Digital gift card of \${$validated['amount']} issued successfully"
+        );
     }
 }

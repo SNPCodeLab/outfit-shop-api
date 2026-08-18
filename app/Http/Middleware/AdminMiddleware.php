@@ -18,25 +18,20 @@ class AdminMiddleware
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                'success'           => false,
-                'message'           => 'សូមអភ័យទោស លោកអ្នកត្រូវចូលប្រព័ន្ធ (Login) ជាមុនសិន ទើបអាចដំណើរការបាន',
-                'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
-                'status'            => '401',
-            ], 401, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            return \App\Http\Response\ApiResponse::unauthenticated(
+                'token_missing',
+                'Authentication required. Please login to continue.'
+            );
         }
 
-        $isAdmin = ((bool) ($user->is_admin ?? false)) || 
+        $isAdmin = ((bool) ($user->is_admin ?? false)) ||
                    (isset($user->role) && strtoupper($user->role) === 'ADMIN') ||
                    (isset($user->position) && str_contains(strtoupper($user->position), 'ADMIN'));
 
         if (!$isAdmin) {
-            return response()->json([
-                'success'           => false,
-                'message'           => 'ទាមទារសិទ្ធិជាអ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Admin) ទើបអាចប្រើប្រាស់មុខងារនេះបាន',
-                'documentation_url' => rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/') . '/guide',
-                'status'            => '403',
-            ], 403, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            return \App\Http\Response\ApiResponse::forbidden(
+                'Admin privileges required to access this resource.'
+            );
         }
 
         return $next($request);

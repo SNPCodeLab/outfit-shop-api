@@ -1,6 +1,10 @@
-# KhmeRiel MIS and POS — Product Catalog and Entity Specification Document
+# OutfitShop API — Product Catalog & Entity Specification Document
 
-This document provides the complete data structure, entity mindmap, product directory, and variant stock matrices for all merchandise in the SS-MIS database.
+<div align="center">
+  <img src="https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png" alt="OutfitShop Primary Logo" width="220" />
+</div>
+
+This document provides the complete data structure, entity mindmap, product directory, cart & order relationships, and variant stock matrices for all merchandise in the **OutfitShop Ecommerce Clothing API**.
 
 ---
 

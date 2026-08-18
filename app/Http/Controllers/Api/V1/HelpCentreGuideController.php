@@ -235,11 +235,13 @@ class HelpCentreGuideController extends BaseApiController
         ];
 
         return $this->successResponse([
-            'title'          => 'Documentation & Operations Guide',
-            'tagline'        => 'Clear, Actionable Knowledge Base',
+            'title'          => 'OutfitShop Documentation & Operations Guide',
+            'tagline'        => 'Clear, Actionable Knowledge Base for OutfitShop Ecommerce Clothing API',
+            'brand'          => config('api.brand'),
+            'banner_url'     => 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png',
             'total_topics'   => count($categories),
             'categories'     => $categories,
             'popular_topics' => $popularTopics,
-        ], 'Documentation data retrieved');
+        ], 'OutfitShop documentation data retrieved');
     }
 }
