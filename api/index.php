@@ -21,7 +21,16 @@ $cachePath = '/tmp/cache';
 @mkdir($storagePath.'/logs', 0755, true);
 @mkdir($cachePath, 0755, true);
 
-// 1. Force Database Environment Variables to bypass problematic DATABASE_URL parsing
+// 1. Force Application Encryption Key (Critical Fix)
+$appKey = getenv('APP_KEY') ?: ($_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? '');
+if (empty($appKey) || strlen($appKey) < 32) {
+    $appKey = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
+}
+putenv("APP_KEY=$appKey");
+$_ENV['APP_KEY'] = $appKey;
+$_SERVER['APP_KEY'] = $appKey;
+
+// 2. Force Database Environment Variables to bypass problematic DATABASE_URL parsing
 $dbUrl = getenv('DATABASE_URL') ?: getenv('POSTGRES_URL');
 if ($dbUrl && str_contains($dbUrl, '://')) {
     $parsedUrl = parse_url($dbUrl);
@@ -48,16 +57,13 @@ if ($dbUrl && str_contains($dbUrl, '://')) {
         }
     }
 
-    // CRITICAL: Clear the raw URL variables so Laravel doesn't try to re-parse the messy string
+    // Clear raw URL variables to prevent re-parsing
     putenv('DATABASE_URL=');
     putenv('DB_URL=');
     putenv('POSTGRES_URL=');
-    $_ENV['DATABASE_URL'] = null;
-    $_ENV['DB_URL'] = null;
-    $_SERVER['DATABASE_URL'] = null;
 }
 
-// 2. Set App Overrides
+// 3. Set App Overrides
 $overrides = [
     'APP_ENV' => 'production',
     'APP_DEBUG' => 'true',
@@ -74,15 +80,10 @@ $overrides = [
     'APP_EVENTS_CACHE' => $cachePath.'/events.php',
 ];
 
-// Emergency Fallback Key
-if (! getenv('APP_KEY') && ! isset($_ENV['APP_KEY']) && ! isset($_SERVER['APP_KEY'])) {
-    $overrides['APP_KEY'] = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
-}
-
 foreach ($overrides as $key => $value) {
     putenv("{$key}={$value}");
-    $_ENV[$key] = $_ENV[$key] ?? $value;
-    $_SERVER[$key] = $_SERVER[$key] ?? $value;
+    $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
 }
 
 // Register Autoloader & Bootstrap App
@@ -102,8 +103,10 @@ try {
 
     $app->handleRequest(Request::capture());
 } catch (Throwable $e) {
-    http_response_code(500);
-    header('Content-Type: application/json');
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+    }
     echo json_encode([
         'success' => false,
         'message' => 'Vercel Laravel Boot Error',
