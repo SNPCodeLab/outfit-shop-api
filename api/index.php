@@ -26,6 +26,11 @@ $_ENV['SESSION_DRIVER'] = 'cookie';
 $_ENV['APP_MAINTENANCE_DRIVER'] = 'file';
 $_ENV['APP_MAINTENANCE_STORE'] = 'array';
 
+if (! getenv('APP_DEBUG')) {
+    putenv('APP_DEBUG=true');
+    $_ENV['APP_DEBUG'] = 'true';
+}
+
 if (! getenv('APP_KEY') && isset($_ENV['APP_KEY'])) {
     putenv("APP_KEY={$_ENV['APP_KEY']}");
 }
