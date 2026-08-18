@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use App\Models\Employee;
-use App\Models\User;
 
 /**
  * RolesAndPermissionsSeeder
@@ -27,9 +28,9 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Clear existing role-permission assignments to avoid duplicate key errors on PostgreSQL
-        \Illuminate\Support\Facades\DB::table('role_has_permissions')->delete();
-        \Illuminate\Support\Facades\DB::table('model_has_permissions')->delete();
-        \Illuminate\Support\Facades\DB::table('model_has_roles')->delete();
+        DB::table('role_has_permissions')->delete();
+        DB::table('model_has_permissions')->delete();
+        DB::table('model_has_roles')->delete();
 
         // ─── 1. Permissions ──────────────────────────────────────────────────
         $permissions = [
@@ -40,7 +41,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Catalog (public reads are unrestricted at route level)
             'categories.view',   'categories.create',   'categories.update',   'categories.delete',
-            'clothing-sizes.view','clothing-sizes.create','clothing-sizes.update','clothing-sizes.delete',
+            'clothing-sizes.view', 'clothing-sizes.create', 'clothing-sizes.update', 'clothing-sizes.delete',
             'colors.view',       'colors.create',       'colors.update',       'colors.delete',
             'products.view',     'products.create',     'products.update',     'products.delete',
             'variants.view',     'variants.create',     'variants.update',     'variants.delete',
@@ -93,7 +94,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $managerRole->syncPermissions([
             'status.view', 'dashboard.view', 'audit-logs.view',
             'categories.view',   'categories.create',   'categories.update',   'categories.delete',
-            'clothing-sizes.view','clothing-sizes.create','clothing-sizes.update','clothing-sizes.delete',
+            'clothing-sizes.view', 'clothing-sizes.create', 'clothing-sizes.update', 'clothing-sizes.delete',
             'colors.view',       'colors.create',       'colors.update',       'colors.delete',
             'products.view',     'products.create',     'products.update',     'products.delete',
             'variants.view',     'variants.create',     'variants.update',     'variants.delete',
@@ -116,37 +117,37 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $employees = [
             [
-                'username'      => 'admin',
+                'username' => 'admin',
                 'employee_name' => 'System Administrator',
-                'email'         => 'admin@ssmis.local',
-                'position'      => 'General Manager',
+                'email' => 'admin@ssmis.local',
+                'position' => 'General Manager',
                 'password_hash' => Hash::make('Admin@123456'),
-                'role'          => 'ADMIN',
-                'gender'        => 'Male',
-                'phone'         => '+85512345678',
-                'status'        => 'ACTIVE',
+                'role' => 'ADMIN',
+                'gender' => 'Male',
+                'phone' => '+85512345678',
+                'status' => 'ACTIVE',
             ],
             [
-                'username'      => 'manager',
+                'username' => 'manager',
                 'employee_name' => 'Store Manager',
-                'email'         => 'manager@ssmis.local',
-                'position'      => 'Inventory Manager',
+                'email' => 'manager@ssmis.local',
+                'position' => 'Inventory Manager',
                 'password_hash' => Hash::make('Manager@123456'),
-                'role'          => 'MANAGER',
-                'gender'        => 'Female',
-                'phone'         => '+85512345679',
-                'status'        => 'ACTIVE',
+                'role' => 'MANAGER',
+                'gender' => 'Female',
+                'phone' => '+85512345679',
+                'status' => 'ACTIVE',
             ],
             [
-                'username'      => 'cashier',
+                'username' => 'cashier',
                 'employee_name' => 'Senior Cashier',
-                'email'         => 'cashier@ssmis.local',
-                'position'      => 'POS Cashier',
+                'email' => 'cashier@ssmis.local',
+                'position' => 'POS Cashier',
                 'password_hash' => Hash::make('Cashier@123456'),
-                'role'          => 'CASHIER',
-                'gender'        => 'Female',
-                'phone'         => '+85512345680',
-                'status'        => 'ACTIVE',
+                'role' => 'CASHIER',
+                'gender' => 'Female',
+                'phone' => '+85512345680',
+                'status' => 'ACTIVE',
             ],
         ];
 
@@ -163,18 +164,18 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $devTeam = [
             [
-                'name'     => 'Frontend Developer',
-                'email'    => 'frontend@ssmis.local',
+                'name' => 'Frontend Developer',
+                'email' => 'frontend@ssmis.local',
                 'password' => Hash::make('Frontend@123456'),
                 'is_admin' => false,
-                'role'     => 'manager',
+                'role' => 'manager',
             ],
             [
-                'name'     => 'Admin User',
-                'email'    => 'superadmin@ssmis.local',
+                'name' => 'Admin User',
+                'email' => 'superadmin@ssmis.local',
                 'password' => Hash::make('SuperAdmin@123456'),
                 'is_admin' => true,
-                'role'     => 'admin',
+                'role' => 'admin',
             ],
         ];
 

@@ -25,15 +25,10 @@ class POSService
      *  - 10% Tax-Exclusive formula: Tax = round(Net × 0.10, 2)
      *  - invoice_no auto-generated as INV-YYYYMMDD-{sale_id}
      *
-     * @param int         $employeeId
-     * @param int|null    $customerId
-     * @param array       $items          [['variant_id' => 1, 'quantity' => 2, 'discount' => 0.00], ...]
-     * @param string      $paymentMethod  CASH, CARD, QR, ABA, BAKONG, GIFT_CARD
-     * @param float       $paymentAmount
-     * @param float       $overallDiscount
-     * @param float       $taxRate        Default 10.00%
-     * @param string|null $idempotencyKey
-     * @return SaleHeader
+     * @param  array  $items  [['variant_id' => 1, 'quantity' => 2, 'discount' => 0.00], ...]
+     * @param  string  $paymentMethod  CASH, CARD, QR, ABA, BAKONG, GIFT_CARD
+     * @param  float  $taxRate  Default 10.00%
+     *
      * @throws Exception
      */
     public function checkout(
@@ -68,13 +63,13 @@ class POSService
             $idempotencyKey,
             $startTime
         ) {
-            $totalAmount    = 0.0;
+            $totalAmount = 0.0;
             $saleDetailsData = [];
 
             // ── 1. Validate items & lock variants (pessimistic locking) ──────
             foreach ($items as $item) {
-                $variantId   = $item['variant_id'];
-                $qty         = (int) $item['quantity'];
+                $variantId = $item['variant_id'];
+                $qty = (int) $item['quantity'];
                 $itemDiscount = (float) ($item['discount'] ?? 0.0);
 
                 if ($qty <= 0) {
@@ -87,15 +82,15 @@ class POSService
                     ->lockForUpdate()
                     ->first();
 
-                if (!$variant) {
+                if (! $variant) {
                     throw new Exception("Product variant ID {$variantId} not found.");
                 }
 
                 $isDigital = ($variant->product->product_type ?? 'PHYSICAL_APPAREL') === 'DIGITAL_DOWNLOAD';
 
-                if (!$isDigital && $variant->quantity < $qty) {
+                if (! $isDigital && $variant->quantity < $qty) {
                     throw new Exception(
-                        "Insufficient stock for SKU [{$variant->sku}]. " .
+                        "Insufficient stock for SKU [{$variant->sku}]. ".
                         "Requested: {$qty}, Available: {$variant->quantity}."
                     );
                 }
@@ -103,16 +98,16 @@ class POSService
                 // Historical Price Preservation: stamp sale_price at checkout time.
                 // Future catalog price edits will never alter historical receipts.
                 $unitPrice = (float) $variant->sale_price;
-                $subTotal  = max(0, ($unitPrice * $qty) - $itemDiscount);
+                $subTotal = max(0, ($unitPrice * $qty) - $itemDiscount);
                 $totalAmount += $subTotal;
 
                 $saleDetailsData[] = [
-                    'variant'      => $variant,
-                    'quantity'     => $qty,
-                    'unit_price'   => $unitPrice,
-                    'discount'     => $itemDiscount,
-                    'sub_total'    => $subTotal,
-                    'is_digital'   => $isDigital,
+                    'variant' => $variant,
+                    'quantity' => $qty,
+                    'unit_price' => $unitPrice,
+                    'discount' => $itemDiscount,
+                    'sub_total' => $subTotal,
+                    'is_digital' => $isDigital,
                     'stock_before' => $variant->quantity,
                 ];
             }
@@ -121,108 +116,108 @@ class POSService
             // Net Amount  = Total Line Items − Overall Discount
             // Tax (10%)   = round(Net × 0.10, 2)
             // Grand Total = Net + Tax
-            $netAmount  = max(0, $totalAmount - $overallDiscount);
-            $taxAmount  = round($netAmount * ($taxRate / 100), 2);
+            $netAmount = max(0, $totalAmount - $overallDiscount);
+            $taxAmount = round($netAmount * ($taxRate / 100), 2);
             $grandTotal = round($netAmount + $taxAmount, 2);
 
             // ── 3. Create Sale Header ─────────────────────────────────────────
             $saleHeader = SaleHeader::create([
-                'customer_id'     => $customerId,
-                'employee_id'     => $employeeId,
-                'sale_date'       => now(),
-                'total_amount'    => $totalAmount,
-                'discount'        => $overallDiscount,
-                'tax_rate'        => $taxRate,
-                'tax_amount'      => $taxAmount,
-                'grand_total'     => $grandTotal,
-                'payment_status'  => 'PAID',
-                'status'          => 'COMPLETED',
+                'customer_id' => $customerId,
+                'employee_id' => $employeeId,
+                'sale_date' => now(),
+                'total_amount' => $totalAmount,
+                'discount' => $overallDiscount,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'grand_total' => $grandTotal,
+                'payment_status' => 'PAID',
+                'status' => 'COMPLETED',
                 'idempotency_key' => $idempotencyKey,
             ]);
 
             // Auto-generate invoice_no after we have the sale_id PK.
-            $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . str_pad($saleHeader->sale_id, 5, '0', STR_PAD_LEFT);
+            $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad($saleHeader->sale_id, 5, '0', STR_PAD_LEFT);
             $saleHeader->update(['invoice_no' => $invoiceNo]);
 
             // ── 4. Create Sale Details, deduct stock & write movement ledger ─
             foreach ($saleDetailsData as $detail) {
                 /** @var ProductVariant $variant */
-                $variant     = $detail['variant'];
-                $qty         = $detail['quantity'];
-                $isDigital   = $detail['is_digital'];
+                $variant = $detail['variant'];
+                $qty = $detail['quantity'];
+                $isDigital = $detail['is_digital'];
                 $stockBefore = $detail['stock_before'];
 
                 SaleDetail::create([
-                    'sale_id'    => $saleHeader->sale_id,
+                    'sale_id' => $saleHeader->sale_id,
                     'variant_id' => $variant->variant_id,
-                    'quantity'   => $qty,
+                    'quantity' => $qty,
                     'unit_price' => $detail['unit_price'],
-                    'discount'   => $detail['discount'],
-                    'sub_total'  => $detail['sub_total'],
+                    'discount' => $detail['discount'],
+                    'sub_total' => $detail['sub_total'],
                 ]);
 
-                if (!$isDigital) {
+                if (! $isDigital) {
                     // Atomically decrement stock on variant
                     $variant->decrement('quantity', $qty);
                     $stockAfter = $stockBefore - $qty;
 
                     // Stock Movement Audit Ledger (stock_before + stock_after required)
                     StockMovement::create([
-                        'variant_id'     => $variant->variant_id,
-                        'movement_type'  => 'SALE',
-                        'quantity'       => -$qty,
-                        'stock_before'   => $stockBefore,
-                        'stock_after'    => $stockAfter,
-                        'movement_date'  => now(),
+                        'variant_id' => $variant->variant_id,
+                        'movement_type' => 'SALE',
+                        'quantity' => -$qty,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockAfter,
+                        'movement_date' => now(),
                         'reference_type' => 'SaleHeader',
-                        'reference_id'   => $saleHeader->sale_id,
-                        'note'           => "POS Sale {$invoiceNo}",
-                        'employee_id'    => $employeeId,
-                        'created_by'     => $employeeId,
+                        'reference_id' => $saleHeader->sale_id,
+                        'note' => "POS Sale {$invoiceNo}",
+                        'employee_id' => $employeeId,
+                        'created_by' => $employeeId,
                     ]);
                 }
             }
 
             // ── 5. Create Payment Record ──────────────────────────────────────
             $amountTendered = $paymentAmount > 0 ? $paymentAmount : $grandTotal;
-            $changeDue      = max(0, $amountTendered - $grandTotal);
-            $refNum         = 'POS-' . strtoupper(Str::random(8));
+            $changeDue = max(0, $amountTendered - $grandTotal);
+            $refNum = 'POS-'.strtoupper(Str::random(8));
 
             Payment::create([
-                'sale_id'          => $saleHeader->sale_id,
-                'payment_date'     => now(),
-                'amount'           => $grandTotal,
-                'amount_tendered'  => $amountTendered,
-                'change_due'       => $changeDue,
-                'payment_method'   => strtoupper($paymentMethod),
-                'payment_status'   => 'PAID',
-                'transaction_ref'  => $refNum,
+                'sale_id' => $saleHeader->sale_id,
+                'payment_date' => now(),
+                'amount' => $grandTotal,
+                'amount_tendered' => $amountTendered,
+                'change_due' => $changeDue,
+                'payment_method' => strtoupper($paymentMethod),
+                'payment_status' => 'PAID',
+                'transaction_ref' => $refNum,
                 'reference_number' => $refNum,
             ]);
 
             // ── 6. System Audit Log & Dedicated POS Channel Logging ──────────
             AuditLogService::log(
-                action:    'SALE',
-                entity:    'SaleHeader',
-                entityId:  $saleHeader->sale_id,
+                action: 'SALE',
+                entity: 'SaleHeader',
+                entityId: $saleHeader->sale_id,
                 newValues: [
-                    'invoice_no'  => $invoiceNo,
+                    'invoice_no' => $invoiceNo,
                     'grand_total' => $grandTotal,
                     'items_count' => count($items),
-                    'method'      => $paymentMethod,
+                    'method' => $paymentMethod,
                 ],
                 userId: $employeeId
             );
 
             Log::channel('pos')->info('POS Checkout completed', [
-                'sale_id'     => $saleHeader->sale_id,
-                'invoice_no'  => $invoiceNo,
+                'sale_id' => $saleHeader->sale_id,
+                'invoice_no' => $invoiceNo,
                 'grand_total' => (float) $grandTotal,
-                'cashier_id'  => $employeeId,
+                'cashier_id' => $employeeId,
                 'items_count' => count($items),
-                'method'      => $paymentMethod,
-                'tendered'    => (float) $amountTendered,
-                'change'      => (float) $changeDue,
+                'method' => $paymentMethod,
+                'tendered' => (float) $amountTendered,
+                'change' => (float) $changeDue,
                 'duration_ms' => round((microtime(true) - $startTime) * 1000, 2),
             ]);
 
@@ -233,10 +228,6 @@ class POSService
     /**
      * Void a completed sale and restore physical stock inside an atomic transaction.
      *
-     * @param int         $saleId
-     * @param int         $employeeId
-     * @param string|null $reason
-     * @return SaleHeader
      * @throws Exception
      */
     public function voidSale(int $saleId, int $employeeId, ?string $reason = null): SaleHeader
@@ -252,11 +243,11 @@ class POSService
             }
 
             if ($saleHeader->status === 'ESTIMATE') {
-                throw new Exception("Estimates cannot be voided. Use the estimate deletion endpoint.");
+                throw new Exception('Estimates cannot be voided. Use the estimate deletion endpoint.');
             }
 
             $saleHeader->update([
-                'status'         => 'VOIDED',
+                'status' => 'VOIDED',
                 'payment_status' => 'REFUNDED',
             ]);
 
@@ -272,27 +263,27 @@ class POSService
                     $stockAfter = $stockBefore + $detail->quantity;
 
                     StockMovement::create([
-                        'variant_id'     => $variant->variant_id,
-                        'movement_type'  => 'RETURN_IN',
-                        'quantity'       => $detail->quantity,
-                        'stock_before'   => $stockBefore,
-                        'stock_after'    => $stockAfter,
-                        'movement_date'  => now(),
+                        'variant_id' => $variant->variant_id,
+                        'movement_type' => 'RETURN_IN',
+                        'quantity' => $detail->quantity,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockAfter,
+                        'movement_date' => now(),
                         'reference_type' => 'SaleHeader',
-                        'reference_id'   => $saleHeader->sale_id,
-                        'note'           => "Voided Sale #{$saleHeader->sale_id}. Reason: " . ($reason ?? 'N/A'),
-                        'created_by'     => $employeeId,
+                        'reference_id' => $saleHeader->sale_id,
+                        'note' => "Voided Sale #{$saleHeader->sale_id}. Reason: ".($reason ?? 'N/A'),
+                        'created_by' => $employeeId,
                     ]);
                 }
             }
 
             AuditLogService::log(
-                action:    'VOID_SALE',
-                entity:    'SaleHeader',
-                entityId:  $saleHeader->sale_id,
+                action: 'VOID_SALE',
+                entity: 'SaleHeader',
+                entityId: $saleHeader->sale_id,
                 oldValues: ['status' => 'COMPLETED', 'payment_status' => 'PAID'],
                 newValues: ['status' => 'VOIDED', 'payment_status' => 'REFUNDED', 'reason' => $reason],
-                userId:    $employeeId
+                userId: $employeeId
             );
 
             return $saleHeader->fresh(['details.variant.product', 'customer', 'employee', 'payments']);

@@ -1,13 +1,25 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\LogApiRequests;
+use App\Http\Middleware\SecurityHeadersMiddleware;
+use App\Http\Middleware\SetLocaleFromHeaderMiddleware;
+use App\Http\Response\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,21 +30,21 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role'       => \App\Http\Middleware\CheckRole::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'admin'      => \App\Http\Middleware\AdminMiddleware::class,
+            'role' => CheckRole::class,
+            'permission' => PermissionMiddleware::class,
+            'admin' => AdminMiddleware::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => null);
 
         $middleware->api(append: [
-            \App\Http\Middleware\SecurityHeadersMiddleware::class,
-            \App\Http\Middleware\LogApiRequests::class,
-            \App\Http\Middleware\SetLocaleFromHeaderMiddleware::class,
+            SecurityHeadersMiddleware::class,
+            LogApiRequests::class,
+            SetLocaleFromHeaderMiddleware::class,
         ]);
 
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeadersMiddleware::class,
+            SecurityHeadersMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -43,7 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, Request $request) {
             $isApi = $request->is('api/*') || $request->expectsJson();
 
-            if (!$isApi) {
+            if (! $isApi) {
                 return null;
             }
 
@@ -51,7 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 423 - Account locked (brute-force protection)
             // Must be evaluated before generic 401 handling.
             // ----------------------------------------------------------------
-            if ($e instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
+            if ($e instanceof HttpResponseException) {
                 return null;
             }
 
@@ -59,7 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 401 - Unauthenticated
             // ----------------------------------------------------------------
             if ($e instanceof AuthenticationException) {
-                return \App\Http\Response\ApiResponse::unauthenticated(
+                return ApiResponse::unauthenticated(
                     'token_missing',
                     'Invalid or expired authentication token.'
                 );
@@ -69,7 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 403 - Forbidden (Symfony AccessDeniedException from middleware)
             // ----------------------------------------------------------------
             if ($e instanceof AccessDeniedHttpException) {
-                return \App\Http\Response\ApiResponse::forbidden(
+                return ApiResponse::forbidden(
                     'You do not have permission to perform this action.'
                 );
             }
@@ -78,7 +90,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 422 - Validation
             // ----------------------------------------------------------------
             if ($e instanceof ValidationException) {
-                return \App\Http\Response\ApiResponse::validationError(
+                return ApiResponse::validationError(
                     $e->errors(),
                     'The provided data failed validation.'
                 );
@@ -88,7 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 404 - Route not found
             // ----------------------------------------------------------------
             if ($e instanceof NotFoundHttpException) {
-                return \App\Http\Response\ApiResponse::notFound(
+                return ApiResponse::notFound(
                     'Resource',
                     null,
                     'The requested endpoint or resource was not found.'
@@ -98,10 +110,11 @@ return Application::configure(basePath: dirname(__DIR__))
             // ----------------------------------------------------------------
             // 404 - Eloquent findOrFail / firstOrFail
             // ----------------------------------------------------------------
-            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+            if ($e instanceof ModelNotFoundException) {
                 $model = class_basename($e->getModel());
-                $ids   = implode(', ', $e->getIds());
-                return \App\Http\Response\ApiResponse::notFound(
+                $ids = implode(', ', $e->getIds());
+
+                return ApiResponse::notFound(
                     $model,
                     $ids,
                     "The requested {$model} was not found."
@@ -111,8 +124,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // ----------------------------------------------------------------
             // 405 - Method not allowed
             // ----------------------------------------------------------------
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
-                return \App\Http\Response\ApiResponse::methodNotAllowed(
+            if ($e instanceof MethodNotAllowedHttpException) {
+                return ApiResponse::methodNotAllowed(
                     $request->method(),
                     $request->path()
                 );
@@ -121,13 +134,14 @@ return Application::configure(basePath: dirname(__DIR__))
             // ----------------------------------------------------------------
             // 429 - Rate limit exceeded
             // ----------------------------------------------------------------
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException
-                || $e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
-                $headers    = $e->getHeaders();
+            if ($e instanceof TooManyRequestsHttpException
+                || $e instanceof ThrottleRequestsException) {
+                $headers = $e->getHeaders();
                 $retryAfter = (int) ($headers['Retry-After'] ?? 60);
-                $limit      = (int) ($headers['X-RateLimit-Limit'] ?? 60);
-                $remaining  = (int) ($headers['X-RateLimit-Remaining'] ?? 0);
-                return \App\Http\Response\ApiResponse::tooManyRequests($limit, $remaining, $retryAfter);
+                $limit = (int) ($headers['X-RateLimit-Limit'] ?? 60);
+                $remaining = (int) ($headers['X-RateLimit-Remaining'] ?? 0);
+
+                return ApiResponse::tooManyRequests($limit, $remaining, $retryAfter);
             }
 
             // ----------------------------------------------------------------
@@ -135,19 +149,19 @@ return Application::configure(basePath: dirname(__DIR__))
             // Debug detail is only included when APP_DEBUG=true (local/staging).
             // File paths and stack traces are never exposed in production.
             // ----------------------------------------------------------------
-            $isDebug  = config('app.debug') || app()->isLocal();
-            $debug    = $isDebug ? [
+            $isDebug = config('app.debug') || app()->isLocal();
+            $debug = $isDebug ? [
                 'exception' => get_class($e),
-                'message'   => $e->getMessage(),
-                'file'      => $e->getFile(),
-                'line'      => $e->getLine(),
-                'trace'     => array_slice(explode("\n", $e->getTraceAsString()), 0, 8),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 8),
             ] : null;
 
             $httpCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
             $httpCode = ($httpCode >= 400 && $httpCode < 600) ? $httpCode : 500;
 
-            return \App\Http\Response\ApiResponse::error(
+            return ApiResponse::error(
                 'INTERNAL_SERVER_ERROR',
                 $isDebug ? $e->getMessage() : 'An unexpected error occurred while processing the request.',
                 null,

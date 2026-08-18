@@ -12,6 +12,7 @@ class Cart extends Model
     use HasFactory;
 
     protected $table = 'carts';
+
     protected $primaryKey = 'cart_id';
 
     protected $fillable = [
@@ -35,6 +36,7 @@ class Cart extends Model
     {
         return (float) $this->items->sum(function ($item) {
             $price = $item->unit_price ?? $item->variant?->price ?? 0;
+
             return $price * $item->quantity;
         });
     }

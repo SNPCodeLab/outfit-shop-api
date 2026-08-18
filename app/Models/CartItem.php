@@ -11,6 +11,7 @@ class CartItem extends Model
     use HasFactory;
 
     protected $table = 'cart_items';
+
     protected $primaryKey = 'cart_item_id';
 
     protected $fillable = [
@@ -33,6 +34,7 @@ class CartItem extends Model
     public function getLineTotalAttribute(): float
     {
         $price = $this->unit_price ?? $this->variant?->price ?? 0;
+
         return (float) ($price * $this->quantity);
     }
 }

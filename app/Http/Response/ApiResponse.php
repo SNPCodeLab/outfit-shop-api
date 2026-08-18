@@ -41,61 +41,61 @@ class ApiResponse
      * Automatically detects LengthAwarePaginator and CursorPaginator instances
      * and extracts data + meta.pagination from them without manual wrapping.
      *
-     * @param  mixed   $data        Resource, collection, array, paginator, or null
-     * @param  string  $message     Human-readable summary
-     * @param  array   $meta        Additional meta fields merged into the meta block
-     * @param  array   $links       Override the links block
-     * @param  int     $statusCode  HTTP status code (default 200)
-     * @param  array   $filters     Applied filters surfaced in meta.filters_applied
+     * @param  mixed  $data  Resource, collection, array, paginator, or null
+     * @param  string  $message  Human-readable summary
+     * @param  array  $meta  Additional meta fields merged into the meta block
+     * @param  array  $links  Override the links block
+     * @param  int  $statusCode  HTTP status code (default 200)
+     * @param  array  $filters  Applied filters surfaced in meta.filters_applied
      */
     public static function success(
-        mixed  $data       = null,
-        string $message    = 'Operation completed successfully',
-        array  $meta       = [],
-        array  $links      = [],
-        int    $statusCode = 200,
-        array  $filters    = []
+        mixed $data = null,
+        string $message = 'Operation completed successfully',
+        array $meta = [],
+        array $links = [],
+        int $statusCode = 200,
+        array $filters = []
     ): JsonResponse {
-        $requestId      = self::resolveRequestId();
+        $requestId = self::resolveRequestId();
         $processingTime = self::processingTimeMs();
 
         $baseMeta = [
-            'system'             => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
-            'api_version'        => config('api.version', '1.0.0'),
+            'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
+            'api_version' => config('api.version', '1.0.0'),
             'processing_time_ms' => $processingTime,
         ];
 
         if ($data instanceof LengthAwarePaginator) {
             $paginationMeta = self::buildPaginationMeta($data, $filters);
-            $resolvedLinks  = self::buildPaginationLinks($data);
-            $resolvedData   = $data->items();
-            $resolvedMeta   = array_merge($baseMeta, $paginationMeta, $meta);
+            $resolvedLinks = self::buildPaginationLinks($data);
+            $resolvedData = $data->items();
+            $resolvedMeta = array_merge($baseMeta, $paginationMeta, $meta);
         } elseif ($data instanceof CursorPaginator) {
             $paginationMeta = self::buildCursorMeta($data);
-            $resolvedLinks  = [
-                'self'     => $data->path(),
-                'next'     => $data->nextPageUrl(),
+            $resolvedLinks = [
+                'self' => $data->path(),
+                'next' => $data->nextPageUrl(),
                 'previous' => $data->previousPageUrl(),
             ];
             $resolvedData = $data->items();
             $resolvedMeta = array_merge($baseMeta, $paginationMeta, $meta);
         } else {
-            $resolvedData  = $data ?? [];
-            $resolvedMeta  = array_merge($baseMeta, $meta);
+            $resolvedData = $data ?? [];
+            $resolvedMeta = array_merge($baseMeta, $meta);
             $resolvedLinks = $links;
         }
 
         $envelope = [
-            'success'     => true,
+            'success' => true,
             'status_code' => $statusCode,
-            'request_id'  => $requestId,
-            'timestamp'   => now()->toISOString(),
-            'message'     => $message,
-            'data'        => $resolvedData,
-            'meta'        => $resolvedMeta,
+            'request_id' => $requestId,
+            'timestamp' => now()->toISOString(),
+            'message' => $message,
+            'data' => $resolvedData,
+            'meta' => $resolvedMeta,
         ];
 
-        if (!empty($resolvedLinks)) {
+        if (! empty($resolvedLinks)) {
             $envelope['links'] = $resolvedLinks;
         }
 
@@ -107,10 +107,10 @@ class ApiResponse
      * Attaches a Location header pointing to the canonical resource URI.
      */
     public static function created(
-        mixed   $data        = null,
-        string  $message     = 'Resource created successfully',
+        mixed $data = null,
+        string $message = 'Resource created successfully',
         ?string $locationUrl = null,
-        array   $meta        = []
+        array $meta = []
     ): JsonResponse {
         $response = self::success($data, $message, $meta, [], 201);
 
@@ -135,7 +135,7 @@ class ApiResponse
      * 202 Accepted - async job queued, not yet processed.
      */
     public static function accepted(
-        mixed  $data    = null,
+        mixed $data = null,
         string $message = 'Request accepted and queued for processing'
     ): JsonResponse {
         return self::success($data, $message, [], [], 202);
@@ -148,46 +148,46 @@ class ApiResponse
     /**
      * Build a standard error response envelope (RFC 7807 inspired).
      *
-     * @param  string     $errorCode          Machine-readable slug (SCREAMING_SNAKE_CASE)
-     * @param  string     $message            Human-readable summary
-     * @param  mixed      $detail             Structured detail block (field errors, resource info, etc.)
-     * @param  int        $statusCode         HTTP status code
-     * @param  bool       $retryAllowed       Whether the client should retry the request
-     * @param  int|null   $retryAfterSeconds  Seconds before a safe retry (sets Retry-After header)
-     * @param  array|null $debug              Debug payload - only rendered when APP_DEBUG=true
+     * @param  string  $errorCode  Machine-readable slug (SCREAMING_SNAKE_CASE)
+     * @param  string  $message  Human-readable summary
+     * @param  mixed  $detail  Structured detail block (field errors, resource info, etc.)
+     * @param  int  $statusCode  HTTP status code
+     * @param  bool  $retryAllowed  Whether the client should retry the request
+     * @param  int|null  $retryAfterSeconds  Seconds before a safe retry (sets Retry-After header)
+     * @param  array|null  $debug  Debug payload - only rendered when APP_DEBUG=true
      */
     public static function error(
-        string  $errorCode         = 'INTERNAL_SERVER_ERROR',
-        string  $message           = 'An unexpected error occurred.',
-        mixed   $detail            = null,
-        int     $statusCode        = 500,
-        bool    $retryAllowed      = false,
-        ?int    $retryAfterSeconds = null,
-        ?array  $debug             = null
+        string $errorCode = 'INTERNAL_SERVER_ERROR',
+        string $message = 'An unexpected error occurred.',
+        mixed $detail = null,
+        int $statusCode = 500,
+        bool $retryAllowed = false,
+        ?int $retryAfterSeconds = null,
+        ?array $debug = null
     ): JsonResponse {
-        $requestId      = self::resolveRequestId();
+        $requestId = self::resolveRequestId();
         $processingTime = self::processingTimeMs();
 
         $envelope = [
-            'success'     => false,
+            'success' => false,
             'status_code' => $statusCode,
-            'request_id'  => $requestId,
-            'timestamp'   => now()->toISOString(),
-            'error'       => [
-                'code'    => $errorCode,
-                'type'    => self::errorType($statusCode, $errorCode),
+            'request_id' => $requestId,
+            'timestamp' => now()->toISOString(),
+            'error' => [
+                'code' => $errorCode,
+                'type' => self::errorType($statusCode, $errorCode),
                 'message' => $message,
-                'detail'  => $detail,
-                'debug'   => (config('app.debug') && $debug !== null) ? $debug : null,
+                'detail' => $detail,
+                'debug' => (config('app.debug') && $debug !== null) ? $debug : null,
             ],
-            'meta'        => [
-                'system'              => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
-                'api_version'         => config('api.version', '1.0.0'),
-                'processing_time_ms'  => $processingTime,
-                'documentation'       => config('api.docs_base', '/api/v1/guide') . '#' . strtolower($errorCode),
-                'retry_allowed'       => $retryAllowed,
+            'meta' => [
+                'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
+                'api_version' => config('api.version', '1.0.0'),
+                'processing_time_ms' => $processingTime,
+                'documentation' => config('api.docs_base', '/api/v1/guide').'#'.strtolower($errorCode),
+                'retry_allowed' => $retryAllowed,
                 'retry_after_seconds' => $retryAfterSeconds,
-                'support_contact'     => config('api.support_email', 'support@kesararamwithdigital.tech'),
+                'support_contact' => config('api.support_email', 'support@kesararamwithdigital.tech'),
             ],
         ];
 
@@ -209,19 +209,19 @@ class ApiResponse
      * 401 - Token missing, invalid, or expired.
      */
     public static function unauthenticated(
-        string  $reason    = 'token_missing',
-        string  $message   = 'Invalid or expired authentication token.',
+        string $reason = 'token_missing',
+        string $message = 'Invalid or expired authentication token.',
         ?string $expiredAt = null
     ): JsonResponse {
         return self::error(
             'AUTHENTICATION_FAILED',
             $message,
             array_filter([
-                'reason'                  => $reason,
-                'token_type'              => 'Bearer',
-                'token_expired_at'        => $expiredAt,
+                'reason' => $reason,
+                'token_type' => 'Bearer',
+                'token_expired_at' => $expiredAt,
                 'reauthenticate_endpoint' => '/api/v1/auth/login',
-                'refresh_endpoint'        => '/api/v1/auth/refresh',
+                'refresh_endpoint' => '/api/v1/auth/refresh',
             ]),
             401,
             true
@@ -247,15 +247,15 @@ class ApiResponse
      * 404 - Resource was not found.
      */
     public static function notFound(
-        string $resource   = 'Resource',
-        mixed  $identifier = null,
-        string $message    = 'The requested resource was not found.'
+        string $resource = 'Resource',
+        mixed $identifier = null,
+        string $message = 'The requested resource was not found.'
     ): JsonResponse {
         return self::error(
             'RESOURCE_NOT_FOUND',
             $message,
             array_filter([
-                'resource'   => $resource,
+                'resource' => $resource,
                 'identifier' => $identifier,
             ]),
             404,
@@ -267,16 +267,16 @@ class ApiResponse
      * 405 - HTTP method not supported on this endpoint.
      */
     public static function methodNotAllowed(
-        string $method   = '',
+        string $method = '',
         string $endpoint = ''
     ): JsonResponse {
         return self::error(
             'METHOD_NOT_ALLOWED',
             'The HTTP method used is not allowed for this endpoint.',
             array_filter([
-                'method'   => strtoupper($method),
+                'method' => strtoupper($method),
                 'endpoint' => $endpoint,
-                'hint'     => 'Check the API documentation for supported HTTP methods.',
+                'hint' => 'Check the API documentation for supported HTTP methods.',
             ]),
             405,
             false
@@ -289,7 +289,7 @@ class ApiResponse
     public static function conflict(
         string $message,
         string $errorCode = 'RESOURCE_CONFLICT',
-        mixed  $detail    = null
+        mixed $detail = null
     ): JsonResponse {
         return self::error($errorCode, $message, $detail, 409, true);
     }
@@ -298,14 +298,14 @@ class ApiResponse
      * 422 - Validation failed with per-field detail.
      */
     public static function validationError(
-        array  $errors  = [],
+        array $errors = [],
         string $message = 'The provided data failed validation.'
     ): JsonResponse {
         $fields = [];
         foreach ($errors as $field => $messages) {
             $fields[] = [
-                'field'   => $field,
-                'rule'    => 'validation',
+                'field' => $field,
+                'rule' => 'validation',
                 'message' => $messages[0] ?? 'Invalid value.',
             ];
         }
@@ -323,16 +323,16 @@ class ApiResponse
      * 423 - Account locked (brute-force protection trigger).
      */
     public static function accountLocked(
-        string $message    = 'Account temporarily locked due to excessive failed login attempts.',
-        int    $retryAfter = 900
+        string $message = 'Account temporarily locked due to excessive failed login attempts.',
+        int $retryAfter = 900
     ): JsonResponse {
         return self::error(
             'ACCOUNT_LOCKED',
             $message,
             [
-                'reason'              => 'too_many_failed_attempts',
+                'reason' => 'too_many_failed_attempts',
                 'retry_after_seconds' => $retryAfter,
-                'contact'             => config('api.support_email', 'support@kesararamwithdigital.tech'),
+                'contact' => config('api.support_email', 'support@kesararamwithdigital.tech'),
             ],
             423,
             true,
@@ -344,21 +344,21 @@ class ApiResponse
      * 429 - Rate limit exceeded.
      */
     public static function tooManyRequests(
-        int    $limit      = 60,
-        int    $remaining  = 0,
-        int    $retryAfter = 60,
-        string $role       = 'PUBLIC'
+        int $limit = 60,
+        int $remaining = 0,
+        int $retryAfter = 60,
+        string $role = 'PUBLIC'
     ): JsonResponse {
         return self::error(
             'RATE_LIMIT_EXCEEDED',
             'Too many requests. Please retry after the specified time.',
             [
-                'limit'               => $limit,
-                'remaining'           => $remaining,
-                'reset_at'            => now()->addSeconds($retryAfter)->toISOString(),
+                'limit' => $limit,
+                'remaining' => $remaining,
+                'reset_at' => now()->addSeconds($retryAfter)->toISOString(),
                 'retry_after_seconds' => $retryAfter,
-                'window'              => '1 minute',
-                'role_limit'          => $role,
+                'window' => '1 minute',
+                'role_limit' => $role,
             ],
             429,
             true,
@@ -371,7 +371,7 @@ class ApiResponse
      */
     public static function serverError(
         string $message = 'An unexpected error occurred while processing the request.',
-        ?array $debug   = null
+        ?array $debug = null
     ): JsonResponse {
         return self::error(
             'INTERNAL_SERVER_ERROR',
@@ -388,8 +388,8 @@ class ApiResponse
      * 503 - Service temporarily unavailable (maintenance, circuit breaker open).
      */
     public static function serviceUnavailable(
-        string $message    = 'The service is temporarily unavailable.',
-        int    $retryAfter = 30
+        string $message = 'The service is temporarily unavailable.',
+        int $retryAfter = 30
     ): JsonResponse {
         return self::error(
             'SERVICE_UNAVAILABLE',
@@ -413,6 +413,7 @@ class ApiResponse
     {
         try {
             $headerValue = request()->header('X-Request-Id');
+
             return ($headerValue && strlen($headerValue) <= 64)
                 ? $headerValue
                 : (string) Str::uuid();
@@ -427,6 +428,7 @@ class ApiResponse
     private static function processingTimeMs(): int
     {
         $start = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
+
         return (int) round((microtime(true) - $start) * 1000);
     }
 
@@ -437,15 +439,15 @@ class ApiResponse
     {
         $meta = [
             'pagination' => [
-                'current_page'    => $paginator->currentPage(),
-                'per_page'        => $paginator->perPage(),
-                'total_items'     => $paginator->total(),
-                'total_pages'     => $paginator->lastPage(),
-                'has_next'        => $paginator->hasMorePages(),
-                'has_previous'    => $paginator->currentPage() > 1,
-                'from'            => $paginator->firstItem(),
-                'to'              => $paginator->lastItem(),
-                'next_cursor'     => $paginator->hasMorePages()
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total_items' => $paginator->total(),
+                'total_pages' => $paginator->lastPage(),
+                'has_next' => $paginator->hasMorePages(),
+                'has_previous' => $paginator->currentPage() > 1,
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+                'next_cursor' => $paginator->hasMorePages()
                     ? base64_encode(json_encode(['page' => $paginator->currentPage() + 1]))
                     : null,
                 'previous_cursor' => $paginator->currentPage() > 1
@@ -454,7 +456,7 @@ class ApiResponse
             ],
         ];
 
-        if (!empty($filters)) {
+        if (! empty($filters)) {
             $meta['filters_applied'] = $filters;
         }
 
@@ -467,11 +469,11 @@ class ApiResponse
     private static function buildPaginationLinks(LengthAwarePaginator $paginator): array
     {
         return [
-            'self'     => $paginator->url($paginator->currentPage()),
-            'first'    => $paginator->url(1),
-            'last'     => $paginator->url($paginator->lastPage()),
+            'self' => $paginator->url($paginator->currentPage()),
+            'first' => $paginator->url(1),
+            'last' => $paginator->url($paginator->lastPage()),
             'previous' => $paginator->previousPageUrl(),
-            'next'     => $paginator->nextPageUrl(),
+            'next' => $paginator->nextPageUrl(),
         ];
     }
 
@@ -482,8 +484,8 @@ class ApiResponse
     {
         return [
             'pagination' => [
-                'per_page'     => $paginator->perPage(),
-                'has_next'     => $paginator->hasMorePages(),
+                'per_page' => $paginator->perPage(),
+                'has_next' => $paginator->hasMorePages(),
                 'has_previous' => $paginator->previousCursor() !== null,
             ],
         ];
@@ -494,10 +496,18 @@ class ApiResponse
      */
     private static function errorType(int $statusCode, string $errorCode = ''): string
     {
-        if ($errorCode === 'VALIDATION_ERROR')    return 'ValidationException';
-        if ($errorCode === 'RATE_LIMIT_EXCEEDED') return 'ThrottleRequestsException';
-        if ($errorCode === 'RESOURCE_NOT_FOUND')  return 'ModelNotFoundException';
-        if ($errorCode === 'ACCOUNT_LOCKED')      return 'AccountLockedException';
+        if ($errorCode === 'VALIDATION_ERROR') {
+            return 'ValidationException';
+        }
+        if ($errorCode === 'RATE_LIMIT_EXCEEDED') {
+            return 'ThrottleRequestsException';
+        }
+        if ($errorCode === 'RESOURCE_NOT_FOUND') {
+            return 'ModelNotFoundException';
+        }
+        if ($errorCode === 'ACCOUNT_LOCKED') {
+            return 'AccountLockedException';
+        }
 
         return match ($statusCode) {
             401 => 'AuthenticationException',

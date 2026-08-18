@@ -26,8 +26,8 @@ class MarketingBannerController extends BaseApiController
         if ($dept = $request->input('department')) {
             $query->where(function ($q) use ($dept) {
                 $q->where('target_department', strtoupper($dept))
-                  ->orWhereNull('target_department')
-                  ->orWhere('target_department', 'ALL');
+                    ->orWhereNull('target_department')
+                    ->orWhere('target_department', 'ALL');
             });
         }
 
@@ -43,22 +43,22 @@ class MarketingBannerController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title'             => 'required|string|max:150',
-            'subtitle'          => 'nullable|string|max:255',
-            'image_url'         => 'required|url|max:500',
-            'image_public_id'   => 'nullable|string|max:255',
-            'link_url'          => 'nullable|string|max:500',
-            'placement'         => 'nullable|string|in:HERO_SLIDER,PROMO_CARD,SECTION_BANNER,POPUP',
+            'title' => 'required|string|max:150',
+            'subtitle' => 'nullable|string|max:255',
+            'image_url' => 'required|url|max:500',
+            'image_public_id' => 'nullable|string|max:255',
+            'link_url' => 'nullable|string|max:500',
+            'placement' => 'nullable|string|in:HERO_SLIDER,PROMO_CARD,SECTION_BANNER,POPUP',
             'target_department' => 'nullable|string|max:50',
-            'sort_order'        => 'nullable|integer',
-            'is_active'         => 'nullable|boolean',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $banner = MarketingBanner::create($validated);
 
         AuditLogService::log('CREATE', 'MarketingBanner', $banner->banner_id, null, $banner->toArray());
 
-        return $this->createdResponse($banner, 'Marketing banner created successfully', '/api/v1/marketing/banners/' . $banner->banner_id);
+        return $this->createdResponse($banner, 'Marketing banner created successfully', '/api/v1/marketing/banners/'.$banner->banner_id);
     }
 
     /**

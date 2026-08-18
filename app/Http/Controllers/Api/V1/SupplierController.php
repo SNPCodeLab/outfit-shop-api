@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class SupplierController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
@@ -16,7 +17,7 @@ class SupplierController extends BaseApiController
         if ($search = $request->input('q') ?? $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('supplier_name', 'ILIKE', "%{$search}%")
-                  ->orWhere('email', 'ILIKE', "%{$search}%");
+                    ->orWhere('email', 'ILIKE', "%{$search}%");
             });
         }
 
@@ -24,7 +25,7 @@ class SupplierController extends BaseApiController
             $query->where('status', strtoupper($status));
         }
 
-        $perPage   = (int) $request->input('per_page', 50);
+        $perPage = (int) $request->input('per_page', 50);
         $suppliers = $query->orderBy('supplier_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($suppliers, 'Suppliers retrieved successfully');
@@ -34,22 +35,23 @@ class SupplierController extends BaseApiController
     {
         $validated = $request->validate([
             'supplier_name' => 'required|string|max:150',
-            'phone'         => 'nullable|string',
-            'email'         => 'nullable|email',
-            'address'       => 'nullable|string',
-            'status'        => 'nullable|string|in:ACTIVE,INACTIVE',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
+            'status' => 'nullable|string|in:ACTIVE,INACTIVE',
         ]);
 
         $supplier = Supplier::create($validated);
 
         AuditLogService::log('CREATE', 'Supplier', $supplier->supplier_id, null, $supplier->toArray());
 
-        return $this->createdResponse($supplier, 'Supplier created successfully', '/api/v1/suppliers/' . $supplier->supplier_id);
+        return $this->createdResponse($supplier, 'Supplier created successfully', '/api/v1/suppliers/'.$supplier->supplier_id);
     }
 
     public function show(int $id): JsonResponse
     {
         $supplier = Supplier::findOrFail($id);
+
         return $this->successResponse($supplier, 'Supplier details');
     }
 
@@ -60,10 +62,10 @@ class SupplierController extends BaseApiController
 
         $validated = $request->validate([
             'supplier_name' => 'required|string|max:150',
-            'phone'         => 'nullable|string',
-            'email'         => 'nullable|email',
-            'address'       => 'nullable|string',
-            'status'        => 'nullable|string|in:ACTIVE,INACTIVE',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
+            'status' => 'nullable|string|in:ACTIVE,INACTIVE',
         ]);
 
         $supplier->update($validated);

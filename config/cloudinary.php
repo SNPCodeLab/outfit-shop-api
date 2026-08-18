@@ -16,24 +16,30 @@ return [
     'cloud_name' => env('CLOUDINARY_CLOUD_NAME', function () {
         if ($url = env('CLOUDINARY_URL')) {
             $parsed = parse_url($url);
+
             return $parsed['host'] ?? null;
         }
+
         return null;
     }),
 
     'api_key' => env('CLOUDINARY_API_KEY', function () {
         if ($url = env('CLOUDINARY_URL')) {
             $parsed = parse_url($url);
+
             return $parsed['user'] ?? null;
         }
+
         return null;
     }),
 
     'api_secret' => env('CLOUDINARY_API_SECRET', function () {
         if ($url = env('CLOUDINARY_URL')) {
             $parsed = parse_url($url);
+
             return $parsed['pass'] ?? null;
         }
+
         return null;
     }),
 

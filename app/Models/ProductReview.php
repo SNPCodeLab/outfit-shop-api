@@ -11,6 +11,7 @@ class ProductReview extends Model
     use HasFactory;
 
     protected $table = 'product_reviews';
+
     protected $primaryKey = 'review_id';
 
     protected $fillable = [
@@ -25,9 +26,9 @@ class ProductReview extends Model
     ];
 
     protected $casts = [
-        'rating'               => 'integer',
+        'rating' => 'integer',
         'is_verified_purchase' => 'boolean',
-        'is_approved'          => 'boolean',
+        'is_approved' => 'boolean',
     ];
 
     public function product(): BelongsTo

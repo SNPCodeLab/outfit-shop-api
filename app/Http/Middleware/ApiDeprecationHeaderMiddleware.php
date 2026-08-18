@@ -11,8 +11,8 @@ class ApiDeprecationHeaderMiddleware
     /**
      * Handle an incoming request and attach IETF standard Deprecation / Sunset headers.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string|null $sunsetDate e.g. "2027-12-31"
+     * @param  Closure(Request): (Response)  $next
+     * @param  string|null  $sunsetDate  e.g. "2027-12-31"
      */
     public function handle(Request $request, Closure $next, ?string $sunsetDate = null): Response
     {

@@ -11,6 +11,7 @@ class Promotion extends Model
     use HasFactory;
 
     protected $table = 'promotions';
+
     protected $primaryKey = 'promotion_id';
 
     protected $fillable = [
@@ -28,18 +29,19 @@ class Promotion extends Model
     ];
 
     protected $casts = [
-        'start_date'     => 'datetime',
-        'end_date'       => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
         'discount_value' => 'float',
-        'min_spend'      => 'float',
-        'is_active'      => 'boolean',
+        'min_spend' => 'float',
+        'is_active' => 'boolean',
     ];
 
     public function scopeActive($query)
     {
         $now = Carbon::now();
+
         return $query->where('is_active', true)
-                     ->where('start_date', '<=', $now)
-                     ->where('end_date', '>=', $now);
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now);
     }
 }

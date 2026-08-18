@@ -18,7 +18,7 @@ class ColorController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'color_name'  => 'required|string|unique:colors,color_name',
+            'color_name' => 'required|string|unique:colors,color_name',
             'description' => 'nullable|string',
         ]);
 
@@ -26,12 +26,13 @@ class ColorController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Color', $color->color_id, null, $color->toArray());
 
-        return $this->createdResponse($color, 'Color created successfully', '/api/v1/colors/' . $color->color_id);
+        return $this->createdResponse($color, 'Color created successfully', '/api/v1/colors/'.$color->color_id);
     }
 
     public function show(int $id): JsonResponse
     {
         $color = Color::findOrFail($id);
+
         return $this->successResponse($color, 'Color details');
     }
 
@@ -41,7 +42,7 @@ class ColorController extends BaseApiController
         $old = $color->toArray();
 
         $validated = $request->validate([
-            'color_name'  => 'required|string|unique:colors,color_name,' . $id . ',color_id',
+            'color_name' => 'required|string|unique:colors,color_name,'.$id.',color_id',
             'description' => 'nullable|string',
         ]);
 

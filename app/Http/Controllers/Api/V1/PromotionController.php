@@ -32,8 +32,8 @@ class PromotionController extends BaseApiController
         if ($dept = $request->input('department')) {
             $query->where(function ($q) use ($dept) {
                 $q->where('target_department', strtoupper($dept))
-                  ->orWhereNull('target_department')
-                  ->orWhere('target_department', 'ALL');
+                    ->orWhereNull('target_department')
+                    ->orWhere('target_department', 'ALL');
             });
         }
 
@@ -50,14 +50,14 @@ class PromotionController extends BaseApiController
     {
         $request->validate([
             'promo_code' => 'required|string',
-            'subtotal'   => 'required|numeric|min:0',
+            'subtotal' => 'required|numeric|min:0',
         ]);
 
         $promo = Promotion::active()
             ->where('promo_code', strtoupper($request->promo_code))
             ->first();
 
-        if (!$promo) {
+        if (! $promo) {
             return $this->notFoundResponse('Promotion', $request->promo_code, 'Invalid, expired, or inactive coupon code.');
         }
 
@@ -75,13 +75,13 @@ class PromotionController extends BaseApiController
             : min((float) $promo->discount_value, (float) $request->subtotal);
 
         return $this->successResponse([
-            'promotion_id'    => $promo->promotion_id,
-            'title'           => $promo->title,
-            'promo_code'      => $promo->promo_code,
-            'discount_type'   => $promo->discount_type,
-            'discount_value'  => $promo->discount_value,
+            'promotion_id' => $promo->promotion_id,
+            'title' => $promo->title,
+            'promo_code' => $promo->promo_code,
+            'discount_type' => $promo->discount_type,
+            'discount_value' => $promo->discount_value,
             'discount_amount' => $discountAmount,
-            'final_total'     => max(0, round((float) $request->subtotal - $discountAmount, 2)),
+            'final_total' => max(0, round((float) $request->subtotal - $discountAmount, 2)),
         ], 'Coupon applied successfully');
     }
 
@@ -92,16 +92,16 @@ class PromotionController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title'             => 'required|string|max:150',
-            'promo_code'        => 'nullable|string|max:50|unique:promotions,promo_code',
-            'discount_type'     => 'required|string|in:PERCENTAGE,FIXED_AMOUNT,BUY_X_GET_Y',
-            'discount_value'    => 'required|numeric|min:0',
-            'min_spend'         => 'nullable|numeric|min:0',
+            'title' => 'required|string|max:150',
+            'promo_code' => 'nullable|string|max:50|unique:promotions,promo_code',
+            'discount_type' => 'required|string|in:PERCENTAGE,FIXED_AMOUNT,BUY_X_GET_Y',
+            'discount_value' => 'required|numeric|min:0',
+            'min_spend' => 'nullable|numeric|min:0',
             'target_department' => 'nullable|string|max:50',
-            'start_date'        => 'required|date',
-            'end_date'          => 'required|date|after:start_date',
-            'max_usage_count'   => 'nullable|integer',
-            'is_active'         => 'nullable|boolean',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'max_usage_count' => 'nullable|integer',
+            'is_active' => 'nullable|boolean',
         ]);
 
         if (isset($validated['promo_code'])) {
@@ -112,7 +112,7 @@ class PromotionController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Promotion', $promo->promotion_id, null, $promo->toArray());
 
-        return $this->createdResponse($promo, 'Promotion campaign created successfully', '/api/v1/promotions/' . $promo->promotion_id);
+        return $this->createdResponse($promo, 'Promotion campaign created successfully', '/api/v1/promotions/'.$promo->promotion_id);
     }
 
     /**

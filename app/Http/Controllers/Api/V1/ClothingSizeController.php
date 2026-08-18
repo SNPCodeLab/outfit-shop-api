@@ -18,7 +18,7 @@ class ClothingSizeController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'size_name'   => 'required|string|unique:clothing_sizes,size_name',
+            'size_name' => 'required|string|unique:clothing_sizes,size_name',
             'description' => 'nullable|string',
         ]);
 
@@ -26,12 +26,13 @@ class ClothingSizeController extends BaseApiController
 
         AuditLogService::log('CREATE', 'ClothingSize', $size->size_id, null, $size->toArray());
 
-        return $this->createdResponse($size, 'Clothing size created successfully', '/api/v1/clothing-sizes/' . $size->size_id);
+        return $this->createdResponse($size, 'Clothing size created successfully', '/api/v1/clothing-sizes/'.$size->size_id);
     }
 
     public function show(int $id): JsonResponse
     {
         $size = ClothingSize::findOrFail($id);
+
         return $this->successResponse($size, 'Clothing size details');
     }
 
@@ -41,7 +42,7 @@ class ClothingSizeController extends BaseApiController
         $old = $size->toArray();
 
         $validated = $request->validate([
-            'size_name'   => 'required|string|unique:clothing_sizes,size_name,' . $id . ',size_id',
+            'size_name' => 'required|string|unique:clothing_sizes,size_name,'.$id.',size_id',
             'description' => 'nullable|string',
         ]);
 

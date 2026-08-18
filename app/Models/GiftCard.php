@@ -11,6 +11,7 @@ class GiftCard extends Model
     use HasFactory;
 
     protected $table = 'gift_cards';
+
     protected $primaryKey = 'card_id';
 
     protected $fillable = [
@@ -30,8 +31,8 @@ class GiftCard extends Model
     protected $casts = [
         'initial_balance' => 'float',
         'current_balance' => 'float',
-        'expiry_date'     => 'datetime',
-        'is_active'       => 'boolean',
+        'expiry_date' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function purchaser(): BelongsTo

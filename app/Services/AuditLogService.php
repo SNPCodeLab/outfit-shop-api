@@ -15,14 +15,14 @@ class AuditLogService
      * parent DB transaction. Failures are silently logged to Laravel's error
      * log for alerting / monitoring (Graceful Degradation pattern).
      *
-     * @param string     $action    LOGIN, LOGOUT, CREATE, UPDATE, DELETE, SALE, VOID_SALE,
-     *                              PURCHASE, ADJUSTMENT, CONVERT_ESTIMATE_TO_INVOICE, BROADCAST
-     * @param string     $entity    Model/Resource name (e.g. 'SaleHeader', 'ProductVariant')
-     * @param mixed      $entityId  Primary key of the target resource
-     * @param array|null $oldValues Previous field values (for UPDATE / VOID_SALE)
-     * @param array|null $newValues New field values
-     * @param int|null   $userId    Override authenticated user ID
-     * @return AuditLog|null       Returns null on failure (never throws)
+     * @param  string  $action  LOGIN, LOGOUT, CREATE, UPDATE, DELETE, SALE, VOID_SALE,
+     *                          PURCHASE, ADJUSTMENT, CONVERT_ESTIMATE_TO_INVOICE, BROADCAST
+     * @param  string  $entity  Model/Resource name (e.g. 'SaleHeader', 'ProductVariant')
+     * @param  mixed  $entityId  Primary key of the target resource
+     * @param  array|null  $oldValues  Previous field values (for UPDATE / VOID_SALE)
+     * @param  array|null  $newValues  New field values
+     * @param  int|null  $userId  Override authenticated user ID
+     * @return AuditLog|null Returns null on failure (never throws)
      */
     public static function log(
         string $action,
@@ -36,11 +36,11 @@ class AuditLogService
             $currentUser = auth('sanctum')->user() ?? auth()->user();
 
             return AuditLog::create([
-                'user_id'    => $userId ?? $currentUser?->employee_id ?? $currentUser?->id,
-                'user_type'  => $currentUser ? get_class($currentUser) : 'Guest',
-                'action'     => strtoupper($action),
-                'entity'     => $entity,
-                'entity_id'  => (string) $entityId,
+                'user_id' => $userId ?? $currentUser?->employee_id ?? $currentUser?->id,
+                'user_type' => $currentUser ? get_class($currentUser) : 'Guest',
+                'action' => strtoupper($action),
+                'entity' => $entity,
+                'entity_id' => (string) $entityId,
                 'ip_address' => Request::ip(),
                 'user_agent' => Request::userAgent(),
                 'old_values' => $oldValues,
@@ -49,10 +49,10 @@ class AuditLogService
         } catch (\Throwable $e) {
             // Graceful degradation: audit failure must NEVER crash a business transaction.
             Log::error('[AuditLogService] Failed to write audit record', [
-                'action'    => $action,
-                'entity'    => $entity,
+                'action' => $action,
+                'entity' => $entity,
                 'entity_id' => $entityId,
-                'error'     => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             return null;

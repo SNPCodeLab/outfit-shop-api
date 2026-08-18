@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Response\ApiResponse;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseApiController
@@ -91,10 +94,10 @@ class AuthController extends BaseApiController
     public function login(LoginRequest $request): JsonResponse
     {
         $identifier = $request->input('username') ?? $request->input('email');
-        $lockKey    = "login_lockout:{$identifier}";
+        $lockKey = "login_lockout:{$identifier}";
 
-        if (\Illuminate\Support\Facades\Cache::has($lockKey)) {
-            return \App\Http\Response\ApiResponse::accountLocked(
+        if (Cache::has($lockKey)) {
+            return ApiResponse::accountLocked(
                 'Account temporarily locked due to 10 failed login attempts. Please wait 15 minutes before retrying.',
                 900
             );
@@ -106,17 +109,17 @@ class AuthController extends BaseApiController
             ->first();
 
         if ($employee && Hash::check($request->password, $employee->password_hash)) {
-            \Illuminate\Support\Facades\Cache::forget("login_fails:{$identifier}");
+            Cache::forget("login_fails:{$identifier}");
 
             if ($employee->status !== 'ACTIVE') {
-                return \App\Http\Response\ApiResponse::forbidden(
+                return ApiResponse::forbidden(
                     'Account is inactive. Please contact your administrator.'
                 );
             }
 
-            $role        = $this->resolveRole($employee);
-            $deviceName  = $request->input('device_name', 'Web Client / POS Terminal');
-            $token       = $employee->createToken($deviceName)->plainTextToken;
+            $role = $this->resolveRole($employee);
+            $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
+            $token = $employee->createToken($deviceName)->plainTextToken;
             $permissions = $this->permissionsFor($role);
 
             if (class_exists(AuditLogService::class)) {
@@ -128,32 +131,32 @@ class AuthController extends BaseApiController
                 );
             }
 
-            \Illuminate\Support\Facades\Log::channel('security')->info('Employee authenticated successfully', [
+            Log::channel('security')->info('Employee authenticated successfully', [
                 'employee_id' => $employee->employee_id,
-                'username'    => $employee->username,
-                'role'        => $role,
-                'device'      => $deviceName,
-                'ip'          => $request->ip(),
-                'user_agent'  => $request->userAgent(),
+                'username' => $employee->username,
+                'role' => $role,
+                'device' => $deviceName,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
             ]);
 
             return $this->successResponse([
                 'access_token' => $token,
-                'token_type'   => 'Bearer',
-                'device_name'  => $deviceName,
+                'token_type' => 'Bearer',
+                'device_name' => $deviceName,
                 'account_type' => 'employee',
-                'employee'     => [
+                'employee' => [
                     'employee_id' => $employee->employee_id,
-                    'username'    => $employee->username,
-                    'role'        => $role,
+                    'username' => $employee->username,
+                    'role' => $role,
                 ],
                 'user' => [
-                    'id'          => $employee->employee_id,
-                    'name'        => $employee->employee_name,
-                    'username'    => $employee->username,
-                    'email'       => $employee->email,
-                    'position'    => $employee->position,
-                    'role'        => $role,
+                    'id' => $employee->employee_id,
+                    'name' => $employee->employee_name,
+                    'username' => $employee->username,
+                    'email' => $employee->email,
+                    'position' => $employee->position,
+                    'role' => $role,
                     'permissions' => $permissions,
                 ],
             ], 'Login successful');
@@ -164,50 +167,50 @@ class AuthController extends BaseApiController
 
         if ($user && Hash::check($request->password, $user->password)) {
 
-            $role        = $this->resolveRole($user);
-            $deviceName  = $request->input('device_name', 'Web Client / POS Terminal');
-            $token       = $user->createToken($deviceName)->plainTextToken;
+            $role = $this->resolveRole($user);
+            $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
+            $token = $user->createToken($deviceName)->plainTextToken;
             $permissions = $this->permissionsFor($role);
 
-            \Illuminate\Support\Facades\Log::channel('security')->info('User account authenticated', [
-                'user_id'    => $user->id,
-                'email'      => $user->email,
-                'role'       => $role,
-                'device'     => $deviceName,
-                'ip'         => $request->ip(),
+            Log::channel('security')->info('User account authenticated', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $role,
+                'device' => $deviceName,
+                'ip' => $request->ip(),
             ]);
 
             return $this->successResponse([
                 'access_token' => $token,
-                'token_type'   => 'Bearer',
-                'device_name'  => $deviceName,
+                'token_type' => 'Bearer',
+                'device_name' => $deviceName,
                 'account_type' => 'user',
                 'user' => [
-                    'id'          => $user->id,
-                    'name'        => $user->name,
-                    'email'       => $user->email,
-                    'role'        => $role,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $role,
                     'permissions' => $permissions,
                 ],
             ], 'Login successful');
         }
 
         $failKey = "login_fails:{$identifier}";
-        $fails = (int) \Illuminate\Support\Facades\Cache::get($failKey, 0) + 1;
-        \Illuminate\Support\Facades\Cache::put($failKey, $fails, now()->addMinutes(15));
+        $fails = (int) Cache::get($failKey, 0) + 1;
+        Cache::put($failKey, $fails, now()->addMinutes(15));
 
         if ($fails >= 10) {
-            \Illuminate\Support\Facades\Cache::put("login_lockout:{$identifier}", true, now()->addMinutes(15));
-            \Illuminate\Support\Facades\Log::channel('security')->alert("Account locked out after 10 failed attempts: {$identifier}", [
+            Cache::put("login_lockout:{$identifier}", true, now()->addMinutes(15));
+            Log::channel('security')->alert("Account locked out after 10 failed attempts: {$identifier}", [
                 'ip' => $request->ip(),
             ]);
         }
 
-        \Illuminate\Support\Facades\Log::channel('security')->warning('Failed authentication attempt', [
-            'identifier'     => $identifier,
-            'attempt_count'  => $fails,
-            'ip'             => $request->ip(),
-            'user_agent'     => $request->userAgent(),
+        Log::channel('security')->warning('Failed authentication attempt', [
+            'identifier' => $identifier,
+            'attempt_count' => $fails,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
         ]);
 
         throw ValidationException::withMessages([
@@ -224,13 +227,13 @@ class AuthController extends BaseApiController
         $account = $request->user();
         $secret = strtoupper(substr(md5(uniqid()), 0, 16));
         $email = $account->email ?? 'admin@kesararamwithdigital.tech';
-        
-        \Illuminate\Support\Facades\Cache::put("2fa_secret:{$account->id}", $secret, now()->addDays(30));
+
+        Cache::put("2fa_secret:{$account->id}", $secret, now()->addDays(30));
 
         return $this->successResponse([
             'two_factor_secret' => $secret,
-            'qr_code_url'       => "otpauth://totp/CSMS:{$email}?secret={$secret}&issuer=CSMS",
-            'backup_codes'      => [rand(100000, 999999), rand(100000, 999999), rand(100000, 999999)],
+            'qr_code_url' => "otpauth://totp/CSMS:{$email}?secret={$secret}&issuer=CSMS",
+            'backup_codes' => [rand(100000, 999999), rand(100000, 999999), rand(100000, 999999)],
         ], 'Two-factor authentication (2FA) setup generated');
     }
 
@@ -245,7 +248,7 @@ class AuthController extends BaseApiController
 
         return $this->successResponse([
             '2fa_verified' => true,
-            'verified_at'  => now()->toISOString(),
+            'verified_at' => now()->toISOString(),
         ], 'Two-factor authentication verified successfully');
     }
 
@@ -257,15 +260,15 @@ class AuthController extends BaseApiController
     {
         $account = $request->user();
 
-        if (!$account) {
-            return \App\Http\Response\ApiResponse::unauthenticated(
+        if (! $account) {
+            return ApiResponse::unauthenticated(
                 'token_missing',
                 'Authentication required. Please login to continue.'
             );
         }
 
         $currentToken = $account->currentAccessToken();
-        $deviceName   = $currentToken ? ($currentToken->name ?? 'Rotated Token') : 'Refreshed Device';
+        $deviceName = $currentToken ? ($currentToken->name ?? 'Rotated Token') : 'Refreshed Device';
 
         // Revoke current token (Token Rotation pattern)
         if ($currentToken) {
@@ -273,16 +276,16 @@ class AuthController extends BaseApiController
         }
 
         // Issue fresh access token
-        $newToken    = $account->createToken($deviceName)->plainTextToken;
-        $role        = $this->resolveRole($account);
+        $newToken = $account->createToken($deviceName)->plainTextToken;
+        $role = $this->resolveRole($account);
         $permissions = $this->permissionsFor($role);
 
         return $this->successResponse([
             'access_token' => $newToken,
-            'token_type'   => 'Bearer',
-            'device_name'  => $deviceName,
-            'role'         => $role,
-            'permissions'  => $permissions,
+            'token_type' => 'Bearer',
+            'device_name' => $deviceName,
+            'role' => $role,
+            'permissions' => $permissions,
         ], 'Token refreshed successfully with rotation');
     }
 
@@ -307,32 +310,32 @@ class AuthController extends BaseApiController
 
     public function me(Request $request): JsonResponse
     {
-        $account     = $request->user();
-        $role        = $this->resolveRole($account);
+        $account = $request->user();
+        $role = $this->resolveRole($account);
         $permissions = $this->permissionsFor($role);
 
         if ($account instanceof Employee) {
             return $this->successResponse([
                 'account_type' => 'employee',
-                'id'           => $account->employee_id,
-                'name'         => $account->employee_name,
-                'username'     => $account->username,
-                'email'        => $account->email,
-                'position'     => $account->position,
-                'role'         => $role,
-                'status'       => $account->status,
-                'permissions'  => $permissions,
+                'id' => $account->employee_id,
+                'name' => $account->employee_name,
+                'username' => $account->username,
+                'email' => $account->email,
+                'position' => $account->position,
+                'role' => $role,
+                'status' => $account->status,
+                'permissions' => $permissions,
             ], 'Authenticated profile');
         }
 
         return $this->successResponse([
             'account_type' => 'user',
-            'id'           => $account->id,
-            'name'         => $account->name,
-            'email'        => $account->email,
-            'role'         => $role,
-            'is_admin'     => (bool) ($account->is_admin ?? false),
-            'permissions'  => $permissions,
+            'id' => $account->id,
+            'name' => $account->name,
+            'email' => $account->email,
+            'role' => $role,
+            'is_admin' => (bool) ($account->is_admin ?? false),
+            'permissions' => $permissions,
         ], 'Authenticated profile');
     }
 
@@ -371,8 +374,8 @@ class AuthController extends BaseApiController
         $roleName = strtolower($request->input('role', 'staff'));
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             'is_admin' => $roleName === 'admin',
         ]);
@@ -382,17 +385,17 @@ class AuthController extends BaseApiController
         }
 
         $resolvedRole = $this->resolveRole($user);
-        $token        = $user->createToken('ssmis-api-token')->plainTextToken;
+        $token = $user->createToken('ssmis-api-token')->plainTextToken;
 
         return $this->createdResponse([
             'access_token' => $token,
-            'token_type'   => 'Bearer',
+            'token_type' => 'Bearer',
             'account_type' => 'user',
             'user' => [
-                'id'          => $user->id,
-                'name'        => $user->name,
-                'email'       => $user->email,
-                'role'        => $resolvedRole,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $resolvedRole,
                 'permissions' => $this->permissionsFor($resolvedRole),
             ],
         ], 'User account created successfully', '/api/v1/auth/me');

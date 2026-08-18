@@ -25,7 +25,7 @@ class GiftCardController extends BaseApiController
             ->where('is_active', true)
             ->first();
 
-        if (!$card) {
+        if (! $card) {
             return $this->notFoundResponse('GiftCard', $request->card_code, 'Invalid, inactive, or expired gift card code.');
         }
 
@@ -39,11 +39,11 @@ class GiftCardController extends BaseApiController
         }
 
         return $this->successResponse([
-            'card_code'       => $card->card_code,
+            'card_code' => $card->card_code,
             'current_balance' => (float) $card->current_balance,
             'initial_balance' => (float) $card->initial_balance,
-            'expiry_date'     => $card->expiry_date ? $card->expiry_date->toISOString() : null,
-            'is_active'       => true,
+            'expiry_date' => $card->expiry_date ? $card->expiry_date->toISOString() : null,
+            'is_active' => true,
         ], 'Gift card is valid and ready to use');
     }
 
@@ -54,22 +54,22 @@ class GiftCardController extends BaseApiController
     public function issue(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'amount'                => 'required|numeric|min:5|max:1000',
+            'amount' => 'required|numeric|min:5|max:1000',
             'purchaser_customer_id' => 'nullable|exists:customers,customer_id',
-            'expiry_months'         => 'nullable|integer|min:1|max:36',
+            'expiry_months' => 'nullable|integer|min:1|max:36',
         ]);
 
-        $code   = 'KM-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4));
+        $code = 'KM-'.strtoupper(Str::random(4)).'-'.strtoupper(Str::random(4)).'-'.strtoupper(Str::random(4));
         $months = (int) ($validated['expiry_months'] ?? 12);
         $expiry = Carbon::now()->addMonths($months);
 
         $card = GiftCard::create([
-            'card_code'             => $code,
-            'initial_balance'       => $validated['amount'],
-            'current_balance'       => $validated['amount'],
+            'card_code' => $code,
+            'initial_balance' => $validated['amount'],
+            'current_balance' => $validated['amount'],
             'purchaser_customer_id' => $validated['purchaser_customer_id'] ?? null,
-            'expiry_date'           => $expiry,
-            'is_active'             => true,
+            'expiry_date' => $expiry,
+            'is_active' => true,
         ]);
 
         return $this->createdResponse(

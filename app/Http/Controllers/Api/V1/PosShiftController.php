@@ -24,7 +24,7 @@ class PosShiftController extends BaseApiController
             ->first();
 
         return $this->successResponse([
-            'shift'   => $shift,
+            'shift' => $shift,
             'is_open' => (bool) $shift,
         ], $shift ? 'Active shift found' : 'No active shift currently open');
     }
@@ -47,20 +47,20 @@ class PosShiftController extends BaseApiController
         }
 
         $validated = $request->validate([
-            'branch_id'         => 'nullable|exists:store_branches,branch_id',
+            'branch_id' => 'nullable|exists:store_branches,branch_id',
             'opening_float_usd' => 'required|numeric|min:0',
             'opening_float_khr' => 'nullable|numeric|min:0',
-            'notes'             => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $shift = PosShift::create([
-            'employee_id'       => $employeeId,
-            'branch_id'         => $validated['branch_id'] ?? null,
-            'opened_at'         => Carbon::now(),
+            'employee_id' => $employeeId,
+            'branch_id' => $validated['branch_id'] ?? null,
+            'opened_at' => Carbon::now(),
             'opening_float_usd' => $validated['opening_float_usd'],
             'opening_float_khr' => $validated['opening_float_khr'] ?? ($validated['opening_float_usd'] * 4100),
-            'status'            => 'OPEN',
-            'notes'             => $validated['notes'] ?? null,
+            'status' => 'OPEN',
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         return $this->createdResponse($shift, 'POS Register Shift opened successfully', '/api/v1/shifts/current');
@@ -74,13 +74,13 @@ class PosShiftController extends BaseApiController
         $employeeId = $request->user()->employee_id ?? $request->user()->id ?? 1;
         $shift = PosShift::where('employee_id', $employeeId)->where('status', 'OPEN')->first();
 
-        if (!$shift) {
+        if (! $shift) {
             return $this->notFoundResponse('PosShift', null, 'No active open shift found for cash drop.');
         }
 
         $validated = $request->validate([
             'drop_amount_usd' => 'required|numeric|min:0.01',
-            'reason'          => 'nullable|string|max:255',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         $shift->increment('petty_cash_drops_usd', $validated['drop_amount_usd']);
@@ -97,14 +97,14 @@ class PosShiftController extends BaseApiController
         $employeeId = $request->user()->employee_id ?? $request->user()->id ?? 1;
         $shift = PosShift::where('employee_id', $employeeId)->where('status', 'OPEN')->first();
 
-        if (!$shift) {
+        if (! $shift) {
             return $this->notFoundResponse('PosShift', null, 'No active open shift found to close.');
         }
 
         $validated = $request->validate([
             'closing_cash_usd' => 'required|numeric|min:0',
             'closing_cash_khr' => 'nullable|numeric|min:0',
-            'notes'            => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         // Calculate sales during this shift window with eager-loaded payments (Eager Loading N+1 fix)
@@ -116,7 +116,7 @@ class PosShiftController extends BaseApiController
 
         $totalCashSales = 0.0;
         $totalCardSales = 0.0;
-        $totalQrSales   = 0.0;
+        $totalQrSales = 0.0;
 
         foreach ($sales as $sale) {
             foreach ($sale->payments as $p) {
@@ -132,42 +132,41 @@ class PosShiftController extends BaseApiController
         }
 
         $expectedCash = (float) $shift->opening_float_usd + $totalCashSales - (float) $shift->petty_cash_drops_usd;
-        $actualCash   = (float) $validated['closing_cash_usd'];
-        $discrepancy  = round($actualCash - $expectedCash, 2);
+        $actualCash = (float) $validated['closing_cash_usd'];
+        $discrepancy = round($actualCash - $expectedCash, 2);
 
         $zReport = [
-            'shift_id'           => $shift->shift_id,
-            'opened_at'          => $shift->opened_at->toISOString(),
-            'closed_at'          => now()->toISOString(),
-            'opening_float'      => (float) $shift->opening_float_usd,
-            'total_sales_count'  => $sales->count(),
-            'cash_sales'         => round($totalCashSales, 2),
-            'card_sales'         => round($totalCardSales, 2),
-            'qr_sales'           => round($totalQrSales, 2),
-            'gross_revenue'      => round((float) $sales->sum('grand_total'), 2),
-            'petty_cash_drops'   => (float) $shift->petty_cash_drops_usd,
-            'expected_cash'      => round($expectedCash, 2),
-            'actual_cash'        => round($actualCash, 2),
-            'discrepancy'        => $discrepancy,
+            'shift_id' => $shift->shift_id,
+            'opened_at' => $shift->opened_at->toISOString(),
+            'closed_at' => now()->toISOString(),
+            'opening_float' => (float) $shift->opening_float_usd,
+            'total_sales_count' => $sales->count(),
+            'cash_sales' => round($totalCashSales, 2),
+            'card_sales' => round($totalCardSales, 2),
+            'qr_sales' => round($totalQrSales, 2),
+            'gross_revenue' => round((float) $sales->sum('grand_total'), 2),
+            'petty_cash_drops' => (float) $shift->petty_cash_drops_usd,
+            'expected_cash' => round($expectedCash, 2),
+            'actual_cash' => round($actualCash, 2),
+            'discrepancy' => $discrepancy,
             'discrepancy_status' => $discrepancy === 0.0 ? 'BALANCED' : ($discrepancy > 0 ? 'OVER' : 'SHORT'),
         ];
 
         $shift->update([
-            'closed_at'         => now(),
-            'cash_sales_usd'    => $totalCashSales,
-            'card_sales_usd'    => $totalCardSales,
-            'qr_sales_usd'      => $totalQrSales,
+            'closed_at' => now(),
+            'cash_sales_usd' => $totalCashSales,
+            'card_sales_usd' => $totalCardSales,
+            'qr_sales_usd' => $totalQrSales,
             'expected_cash_usd' => $expectedCash,
-            'closing_cash_usd'  => $actualCash,
-            'discrepancy_usd'   => $discrepancy,
-            'status'            => 'CLOSED',
-            'z_report_summary'  => $zReport,
+            'closing_cash_usd' => $actualCash,
+            'discrepancy_usd' => $discrepancy,
+            'status' => 'CLOSED',
+            'z_report_summary' => $zReport,
         ]);
 
         return $this->successResponse([
-            'shift'    => $shift->fresh(),
+            'shift' => $shift->fresh(),
             'z_report' => $zReport,
         ], 'Shift closed successfully. End-of-Day Z-Report generated.');
     }
 }
-

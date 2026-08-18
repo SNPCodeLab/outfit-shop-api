@@ -7,7 +7,6 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\PurchaseHeader;
-use App\Models\SaleDetail;
 use App\Models\SaleHeader;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
@@ -26,20 +25,20 @@ class ReportController extends BaseApiController
 
         if (in_array($groupBy, ['day', 'week', 'month', 'year'])) {
             $format = match ($groupBy) {
-                'day'   => 'YYYY-MM-DD',
-                'week'  => 'IYYY-IW',
+                'day' => 'YYYY-MM-DD',
+                'week' => 'IYYY-IW',
                 'month' => 'YYYY-MM',
-                'year'  => 'YYYY',
+                'year' => 'YYYY',
             };
 
             $data = SaleHeader::where('status', 'COMPLETED')
                 ->select(
                     DB::raw("TO_CHAR(sale_date, '{$format}') as period"),
-                    DB::raw("COUNT(sale_id) as total_transactions"),
-                    DB::raw("SUM(grand_total) as total_revenue"),
-                    DB::raw("SUM(tax_amount) as total_tax"),
-                    DB::raw("SUM(discount) as total_discount"),
-                    DB::raw("AVG(grand_total) as average_ticket")
+                    DB::raw('COUNT(sale_id) as total_transactions'),
+                    DB::raw('SUM(grand_total) as total_revenue'),
+                    DB::raw('SUM(tax_amount) as total_tax'),
+                    DB::raw('SUM(discount) as total_discount'),
+                    DB::raw('AVG(grand_total) as average_ticket')
                 )
                 ->groupBy('period')
                 ->orderBy('period', 'desc')
@@ -121,12 +120,12 @@ class ReportController extends BaseApiController
         $marginPct = $retail > 0 ? round(($potentialProfit / $retail) * 100, 2) : 0.0;
 
         return $this->successResponse([
-            'total_skus'                  => (int) $valuation->total_skus,
-            'total_units_on_hand'         => (int) $valuation->total_units_on_hand,
-            'total_cost_value_usd'        => $cost,
-            'total_retail_value_usd'      => $retail,
-            'potential_gross_profit_usd'  => $potentialProfit,
-            'projected_gross_margin_pct'  => $marginPct,
+            'total_skus' => (int) $valuation->total_skus,
+            'total_units_on_hand' => (int) $valuation->total_units_on_hand,
+            'total_cost_value_usd' => $cost,
+            'total_retail_value_usd' => $retail,
+            'potential_gross_profit_usd' => $potentialProfit,
+            'projected_gross_margin_pct' => $marginPct,
         ], 'Inventory valuation report retrieved');
     }
 
@@ -141,10 +140,10 @@ class ReportController extends BaseApiController
             ->get();
 
         $agingSummary = [
-            'fresh_under_30_days'  => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
+            'fresh_under_30_days' => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
             'normal_30_to_60_days' => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
-            'slow_60_to_90_days'   => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
-            'dead_stock_over_90'   => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
+            'slow_60_to_90_days' => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
+            'dead_stock_over_90' => ['count' => 0, 'units' => 0, 'cost_value' => 0.0],
         ];
 
         $now = now();
@@ -177,8 +176,8 @@ class ReportController extends BaseApiController
      */
     public function customerPurchaseHistory(): JsonResponse
     {
-        $customers = Customer::withCount(['sales as orders_count' => fn($q) => $q->where('status', 'COMPLETED')])
-            ->withSum(['sales as total_spent' => fn($q) => $q->where('status', 'COMPLETED')], 'grand_total')
+        $customers = Customer::withCount(['sales as orders_count' => fn ($q) => $q->where('status', 'COMPLETED')])
+            ->withSum(['sales as total_spent' => fn ($q) => $q->where('status', 'COMPLETED')], 'grand_total')
             ->orderBy('total_spent', 'desc')
             ->limit(50)
             ->get();
@@ -193,7 +192,7 @@ class ReportController extends BaseApiController
     public function supplierPerformance(): JsonResponse
     {
         $suppliers = Supplier::withCount('purchases')
-            ->withSum(['purchases as total_spend' => fn($q) => $q->where('status', 'RECEIVED')], 'grand_total')
+            ->withSum(['purchases as total_spend' => fn ($q) => $q->where('status', 'RECEIVED')], 'grand_total')
             ->orderBy('total_spend', 'desc')
             ->get();
 
@@ -207,7 +206,7 @@ class ReportController extends BaseApiController
     public function profitMargin(Request $request): JsonResponse
     {
         $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
-        $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
+        $endDate = $request->input('end_date', now()->endOfMonth()->toDateString());
 
         $summary = DB::table('sale_details')
             ->join('sale_headers', 'sale_details.sale_id', '=', 'sale_headers.sale_id')
@@ -222,17 +221,17 @@ class ReportController extends BaseApiController
             ->first();
 
         $revenue = (float) ($summary->gross_revenue ?? 0.0);
-        $cogs    = (float) ($summary->cogs ?? 0.0);
+        $cogs = (float) ($summary->cogs ?? 0.0);
         $grossProfit = round($revenue - $cogs, 2);
-        $marginPct   = $revenue > 0 ? round(($grossProfit / $revenue) * 100, 2) : 0.0;
+        $marginPct = $revenue > 0 ? round(($grossProfit / $revenue) * 100, 2) : 0.0;
 
         return $this->successResponse([
-            'date_range'        => ['start' => $startDate, 'end' => $endDate],
-            'gross_revenue'     => $revenue,
-            'cogs'              => $cogs,
-            'gross_profit'      => $grossProfit,
-            'gross_margin_pct'  => $marginPct,
-            'total_units_sold'  => (int) ($summary->total_units_sold ?? 0),
+            'date_range' => ['start' => $startDate, 'end' => $endDate],
+            'gross_revenue' => $revenue,
+            'cogs' => $cogs,
+            'gross_profit' => $grossProfit,
+            'gross_margin_pct' => $marginPct,
+            'total_units_sold' => (int) ($summary->total_units_sold ?? 0),
         ], 'Realized profit margin report retrieved');
     }
 
@@ -255,10 +254,10 @@ class ReportController extends BaseApiController
         $netCashFlow = round($totalInflow - $totalOutflow, 2);
 
         return $this->successResponse([
-            'total_inflow_usd'     => (float) $totalInflow,
-            'total_outflow_usd'    => (float) $totalOutflow,
-            'net_cash_flow_usd'    => $netCashFlow,
-            'inflows_by_method'    => $inflowsByMethod,
+            'total_inflow_usd' => (float) $totalInflow,
+            'total_outflow_usd' => (float) $totalOutflow,
+            'net_cash_flow_usd' => $netCashFlow,
+            'inflows_by_method' => $inflowsByMethod,
         ], 'Store cash flow report retrieved');
     }
 }

@@ -11,6 +11,7 @@ class VariantPricingTier extends Model
     use HasFactory;
 
     protected $table = 'variant_pricing_tiers';
+
     protected $primaryKey = 'tier_id';
 
     protected $fillable = [
@@ -22,9 +23,9 @@ class VariantPricingTier extends Model
     ];
 
     protected $casts = [
-        'min_quantity'        => 'integer',
-        'max_quantity'        => 'integer',
-        'unit_price'          => 'float',
+        'min_quantity' => 'integer',
+        'max_quantity' => 'integer',
+        'unit_price' => 'float',
         'discount_percentage' => 'float',
     ];
 

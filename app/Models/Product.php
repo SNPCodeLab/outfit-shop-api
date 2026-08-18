@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
@@ -62,7 +63,7 @@ class Product extends Model
         return $this->hasMany(ProductReview::class, 'product_id', 'product_id')->where('is_approved', true);
     }
 
-    public function primaryImage(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function primaryImage(): HasOne
     {
         return $this->hasOne(ProductImage::class, 'product_id', 'product_id')->whereRaw('is_primary is true');
     }

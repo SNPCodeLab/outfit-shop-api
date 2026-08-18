@@ -7,6 +7,4 @@ use App\Http\Controllers\Api\V1\AuthController as V1AuthController;
 /**
  * Backward Compatibility Proxy for Root AuthController
  */
-class AuthController extends V1AuthController
-{
-}
+class AuthController extends V1AuthController {}

@@ -15,9 +15,9 @@ class SetLocaleFromHeaderMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $supportedLocales = ['en', 'km', 'zh'];
-        
+
         $header = $request->header('X-Locale') ?? $request->header('Accept-Language');
-        
+
         if ($header) {
             $locale = strtolower(substr($header, 0, 2));
             if (in_array($locale, $supportedLocales)) {

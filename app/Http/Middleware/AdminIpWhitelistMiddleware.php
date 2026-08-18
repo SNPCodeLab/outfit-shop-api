@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Response\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +24,8 @@ class AdminIpWhitelistMiddleware
         $allowedIps = array_map('trim', explode(',', $whitelist));
         $clientIp = $request->ip();
 
-        if (!in_array($clientIp, $allowedIps) && !in_array('127.0.0.1', $allowedIps) && !app()->isLocal()) {
-            return \App\Http\Response\ApiResponse::forbidden(
+        if (! in_array($clientIp, $allowedIps) && ! in_array('127.0.0.1', $allowedIps) && ! app()->isLocal()) {
+            return ApiResponse::forbidden(
                 'Access restricted: Your IP address is not authorized for administrative operations.'
             );
         }

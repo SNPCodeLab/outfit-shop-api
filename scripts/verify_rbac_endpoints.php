@@ -1,14 +1,14 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\Employee;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
 
 // Ensure test employees exist for each RBAC tier
 $admin = Employee::firstOrCreate(
@@ -20,7 +20,7 @@ $admin = Employee::firstOrCreate(
         'position' => 'System Administrator',
         'phone' => '012000001',
         'email' => 'admin@test.com',
-        'status' => 'ACTIVE'
+        'status' => 'ACTIVE',
     ]
 );
 
@@ -33,7 +33,7 @@ $manager = Employee::firstOrCreate(
         'position' => 'Store Manager',
         'phone' => '012000002',
         'email' => 'manager@test.com',
-        'status' => 'ACTIVE'
+        'status' => 'ACTIVE',
     ]
 );
 
@@ -46,21 +46,21 @@ $cashier = Employee::firstOrCreate(
         'position' => 'Front Desk Cashier',
         'phone' => '012000003',
         'email' => 'cashier@test.com',
-        'status' => 'ACTIVE'
+        'status' => 'ACTIVE',
     ]
 );
 
 // Issue Sanctum Tokens
-$adminToken   = $admin->createToken('admin_test_token')->plainTextToken;
+$adminToken = $admin->createToken('admin_test_token')->plainTextToken;
 $managerToken = $manager->createToken('manager_test_token')->plainTextToken;
 $cashierToken = $cashier->createToken('cashier_test_token')->plainTextToken;
 
 echo "========================================================================\n";
 echo "           🔍 COMPREHENSIVE RBAC & ENDPOINT INTEGRITY AUDIT 🔍         \n";
 echo "========================================================================\n";
-echo "• Admin Token:   " . substr($adminToken, 0, 10) . "...\n";
-echo "• Manager Token: " . substr($managerToken, 0, 10) . "...\n";
-echo "• Cashier Token: " . substr($cashierToken, 0, 10) . "...\n";
+echo '• Admin Token:   '.substr($adminToken, 0, 10)."...\n";
+echo '• Manager Token: '.substr($managerToken, 0, 10)."...\n";
+echo '• Cashier Token: '.substr($cashierToken, 0, 10)."...\n";
 echo "------------------------------------------------------------------------\n\n";
 
 $testScenarios = [
@@ -115,7 +115,7 @@ foreach ($testScenarios as $test) {
     $req = Request::create($test['uri'], $test['method']);
     $req->headers->set('Accept', 'application/json');
     if ($test['token']) {
-        $req->headers->set('Authorization', 'Bearer ' . $test['token']);
+        $req->headers->set('Authorization', 'Bearer '.$test['token']);
     }
 
     $response = $app->handle($req);
@@ -133,5 +133,5 @@ foreach ($testScenarios as $test) {
 
 echo "\n------------------------------------------------------------------------\n";
 echo "AUDIT SUMMARY: {$passCount} Passed, {$failCount} Failed.\n";
-echo "RBAC Enforcement Status: " . ($failCount === 0 ? "100% PERFECT & FULLY SECURE 🔒" : "VULNERABILITIES DETECTED") . "\n";
+echo 'RBAC Enforcement Status: '.($failCount === 0 ? '100% PERFECT & FULLY SECURE 🔒' : 'VULNERABILITIES DETECTED')."\n";
 echo "========================================================================\n";

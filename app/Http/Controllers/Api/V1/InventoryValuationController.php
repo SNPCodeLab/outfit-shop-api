@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Category;
 use App\Models\ProductVariant;
-use App\Models\PurchaseDetail;
-use App\Models\SaleDetail;
 use App\Models\StoreBranch;
-use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +14,6 @@ class InventoryValuationController extends BaseApiController
 {
     /**
      * Return comprehensive SalesBinder-style inventory statistics, valuation & quantity breakdown.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function statistics(Request $request): JsonResponse
     {
@@ -32,7 +26,7 @@ class InventoryValuationController extends BaseApiController
         $query = ProductVariant::with(['product.category', 'product.brand', 'size', 'color']);
 
         if ($categoryId) {
-            $query->whereHas('product', fn($p) => $p->where('category_id', $categoryId));
+            $query->whereHas('product', fn ($p) => $p->where('category_id', $categoryId));
         }
 
         if ($onlyInStock) {
@@ -76,59 +70,59 @@ class InventoryValuationController extends BaseApiController
 
         // Breakdown By Category (for SalesBinder-style Sidebar Filter)
         $categoriesBreakdown = Category::withCount(['products'])->get()->map(function ($cat) {
-            $catVariants = ProductVariant::whereHas('product', fn($p) => $p->where('category_id', $cat->category_id))->get();
-            $costVal = (float) $catVariants->reduce(fn($c, $v) => $c + ($v->quantity * (float)$v->cost_price), 0);
-            $retailVal = (float) $catVariants->reduce(fn($c, $v) => $c + ($v->quantity * (float)$v->sale_price), 0);
+            $catVariants = ProductVariant::whereHas('product', fn ($p) => $p->where('category_id', $cat->category_id))->get();
+            $costVal = (float) $catVariants->reduce(fn ($c, $v) => $c + ($v->quantity * (float) $v->cost_price), 0);
+            $retailVal = (float) $catVariants->reduce(fn ($c, $v) => $c + ($v->quantity * (float) $v->sale_price), 0);
 
             return [
-                'category_id'      => $cat->category_id,
-                'category_name'    => $cat->category_name,
-                'department_type'  => $cat->department_type,
-                'products_count'   => $cat->products_count,
-                'variants_count'   => $catVariants->count(),
-                'units_on_hand'    => (int) $catVariants->sum('quantity'),
-                'purchased_value'  => round($costVal, 2),
-                'resale_value'     => round($retailVal, 2),
+                'category_id' => $cat->category_id,
+                'category_name' => $cat->category_name,
+                'department_type' => $cat->department_type,
+                'products_count' => $cat->products_count,
+                'variants_count' => $catVariants->count(),
+                'units_on_hand' => (int) $catVariants->sum('quantity'),
+                'purchased_value' => round($costVal, 2),
+                'resale_value' => round($retailVal, 2),
             ];
         });
 
         // Breakdown By Location (Store Branches)
         $locationsBreakdown = StoreBranch::all()->map(function ($b) use ($purchasedValue, $resaleValue, $totalUnitsOnHand) {
             return [
-                'branch_id'        => $b->branch_id,
-                'branch_name'      => $b->branch_name,
-                'branch_code'      => $b->branch_code,
-                'location'         => $b->address,
-                'units_on_hand'    => $totalUnitsOnHand,
-                'purchased_value'  => round($purchasedValue, 2),
-                'resale_value'     => round($resaleValue, 2),
+                'branch_id' => $b->branch_id,
+                'branch_name' => $b->branch_name,
+                'branch_code' => $b->branch_code,
+                'location' => $b->address,
+                'units_on_hand' => $totalUnitsOnHand,
+                'purchased_value' => round($purchasedValue, 2),
+                'resale_value' => round($resaleValue, 2),
             ];
         });
 
         $data = [
             'summary' => [
-                'total_skus'             => $totalItemsCount,
-                'total_units_on_hand'    => $totalUnitsOnHand,
-                'total_units_reserved'   => $totalUnitsReserved,
-                'total_units_available'  => $totalUnitsAvailable,
-                'total_units_incoming'   => $totalUnitsIncoming,
-                'purchased_value_usd'    => round($purchasedValue, 2),
-                'resale_value_usd'       => round($resaleValue, 2),
-                'potential_profit_usd'   => round($potentialProfit, 2),
-                'margin_percent'         => $marginPercent,
-                'low_stock_count'        => $variants->filter(fn($v) => $v->quantity <= $v->reorder_level)->count(),
-                'out_of_stock_count'     => $variants->filter(fn($v) => $v->quantity <= 0)->count(),
+                'total_skus' => $totalItemsCount,
+                'total_units_on_hand' => $totalUnitsOnHand,
+                'total_units_reserved' => $totalUnitsReserved,
+                'total_units_available' => $totalUnitsAvailable,
+                'total_units_incoming' => $totalUnitsIncoming,
+                'purchased_value_usd' => round($purchasedValue, 2),
+                'resale_value_usd' => round($resaleValue, 2),
+                'potential_profit_usd' => round($potentialProfit, 2),
+                'margin_percent' => $marginPercent,
+                'low_stock_count' => $variants->filter(fn ($v) => $v->quantity <= $v->reorder_level)->count(),
+                'out_of_stock_count' => $variants->filter(fn ($v) => $v->quantity <= 0)->count(),
             ],
-            'categories_breakdown'       => $categoriesBreakdown,
-            'locations_breakdown'        => $locationsBreakdown,
-            'active_filters'             => [
-                'branch_id'              => $branchId,
-                'category_id'            => $categoryId,
-                'supplier_id'            => $supplierId,
-                'only_in_stock'          => $onlyInStock,
+            'categories_breakdown' => $categoriesBreakdown,
+            'locations_breakdown' => $locationsBreakdown,
+            'active_filters' => [
+                'branch_id' => $branchId,
+                'category_id' => $categoryId,
+                'supplier_id' => $supplierId,
+                'only_in_stock' => $onlyInStock,
             ],
-            'currency'                   => 'USD',
-            'timestamp'                  => now()->toISOString(),
+            'currency' => 'USD',
+            'timestamp' => now()->toISOString(),
         ];
 
         return $this->successResponse($data, 'SalesBinder inventory valuation & statistics retrieved');

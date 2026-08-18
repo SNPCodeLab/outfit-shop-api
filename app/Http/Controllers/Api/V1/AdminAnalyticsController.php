@@ -59,26 +59,26 @@ class AdminAnalyticsController extends BaseApiController
         // 3. User Activity Per Role
         $activityPerRole = [
             'CASHIER' => ['percentage' => '48%', 'total_api_calls' => 24000, 'primary_routes' => ['/sales/checkout', '/variants/barcode', '/shifts']],
-            'STAFF'   => ['percentage' => '22%', 'total_api_calls' => 11000, 'primary_routes' => ['/products', '/variants/low-stock', '/inventory']],
-            'PUBLIC'  => ['percentage' => '18%', 'total_api_calls' => 9000,  'primary_routes' => ['/products', '/categories', '/guide']],
+            'STAFF' => ['percentage' => '22%', 'total_api_calls' => 11000, 'primary_routes' => ['/products', '/variants/low-stock', '/inventory']],
+            'PUBLIC' => ['percentage' => '18%', 'total_api_calls' => 9000,  'primary_routes' => ['/products', '/categories', '/guide']],
             'MANAGER' => ['percentage' => '9%',  'total_api_calls' => 4500,  'primary_routes' => ['/purchases', '/reports/sales', '/stock-transfers']],
-            'ADMIN'   => ['percentage' => '3%',  'total_api_calls' => 1500,  'primary_routes' => ['/employees', '/admin/performance', '/audit-logs']],
+            'ADMIN' => ['percentage' => '3%',  'total_api_calls' => 1500,  'primary_routes' => ['/employees', '/admin/performance', '/audit-logs']],
         ];
 
         // 4. Failed Login Attempts Audit
         $failedLogins = [
-            'total_failures_24h'    => 14,
-            'blocked_ip_addresses'  => ['198.51.100.24', '203.0.113.89'],
+            'total_failures_24h' => 14,
+            'blocked_ip_addresses' => ['198.51.100.24', '203.0.113.89'],
             'brute_force_prevented' => 3,
-            'security_alert_level'  => 'LOW_CONTROLLED',
+            'security_alert_level' => 'LOW_CONTROLLED',
         ];
 
         // 5. Active Token Usage per Device Type
         $tokenUsagePerDevice = [
             'iPad & Android Tablets (POS Registers)' => ['active_sessions' => 18, 'share' => '56%'],
-            'Warehouse Handheld Barcode Scanners'    => ['active_sessions' => 8,  'share' => '25%'],
-            'Desktop Web Browsers (Backoffice MIS)'  => ['active_sessions' => 4,  'share' => '13%'],
-            'Automated Cloud Integrations'           => ['active_sessions' => 2,  'share' => '6%'],
+            'Warehouse Handheld Barcode Scanners' => ['active_sessions' => 8,  'share' => '25%'],
+            'Desktop Web Browsers (Backoffice MIS)' => ['active_sessions' => 4,  'share' => '13%'],
+            'Automated Cloud Integrations' => ['active_sessions' => 2,  'share' => '6%'],
         ];
 
         // 6. Geographic Distribution (Cambodia & Regional)
@@ -91,12 +91,12 @@ class AdminAnalyticsController extends BaseApiController
         ];
 
         return $this->successResponse([
-            'most_called_endpoints'     => $mostCalled,
-            'peak_hours_histogram'      => $peakHours,
-            'user_activity_per_role'    => $activityPerRole,
-            'failed_login_analytics'    => $failedLogins,
-            'token_usage_per_device'    => $tokenUsagePerDevice,
-            'geographic_distribution'   => $geoDistribution,
+            'most_called_endpoints' => $mostCalled,
+            'peak_hours_histogram' => $peakHours,
+            'user_activity_per_role' => $activityPerRole,
+            'failed_login_analytics' => $failedLogins,
+            'token_usage_per_device' => $tokenUsagePerDevice,
+            'geographic_distribution' => $geoDistribution,
         ], 'API traffic analytics and telemetry metrics retrieved');
     }
 }

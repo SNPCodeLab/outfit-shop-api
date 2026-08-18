@@ -25,21 +25,21 @@ class CustomerLoyaltyController extends BaseApiController
 
         $tierPerks = match ($customer->vip_tier) {
             'PLATINUM' => '15% automatic discount on all apparel plus free home delivery',
-            'GOLD'     => '10% automatic discount on all apparel plus priority checkout',
-            'SILVER'   => '5% automatic discount on all apparel',
-            default    => 'Standard points earning: 1 point per $1 spent',
+            'GOLD' => '10% automatic discount on all apparel plus priority checkout',
+            'SILVER' => '5% automatic discount on all apparel',
+            default => 'Standard points earning: 1 point per $1 spent',
         };
 
         return $this->successResponse([
-            'customer_id'          => $customer->customer_id,
-            'customer_name'        => $customer->customer_name,
-            'vip_tier'             => $customer->vip_tier ?? 'BRONZE',
-            'loyalty_points'       => $customer->loyalty_points ?? 0,
+            'customer_id' => $customer->customer_id,
+            'customer_name' => $customer->customer_name,
+            'vip_tier' => $customer->vip_tier ?? 'BRONZE',
+            'loyalty_points' => $customer->loyalty_points ?? 0,
             'total_spent_lifetime' => (float) ($customer->total_spent_lifetime ?? 0.0),
             'store_credit_balance' => (float) ($customer->store_credit_balance ?? 0.0),
-            'tier_perks'           => $tierPerks,
-            'conversion_rate'      => '100 points = $5.00 discount voucher',
-            'history'              => $logs,
+            'tier_perks' => $tierPerks,
+            'conversion_rate' => '100 points = $5.00 discount voucher',
+            'history' => $logs,
         ], 'Customer loyalty profile retrieved successfully');
     }
 
@@ -66,23 +66,23 @@ class CustomerLoyaltyController extends BaseApiController
         }
 
         $discountValue = round(($pts / 100) * 5.0, 2);
-        $newBalance    = $customer->loyalty_points - $pts;
+        $newBalance = $customer->loyalty_points - $pts;
 
         $customer->update(['loyalty_points' => $newBalance]);
 
         $log = CustomerLoyaltyLog::create([
-            'customer_id'      => $customerId,
+            'customer_id' => $customerId,
             'transaction_type' => 'REDEEM',
-            'points'           => -$pts,
-            'balance_after'    => $newBalance,
-            'description'      => "Redeemed {$pts} points for \${$discountValue} discount voucher",
+            'points' => -$pts,
+            'balance_after' => $newBalance,
+            'description' => "Redeemed {$pts} points for \${$discountValue} discount voucher",
         ]);
 
         return $this->successResponse([
-            'points_redeemed'  => $pts,
-            'discount_value'   => $discountValue,
+            'points_redeemed' => $pts,
+            'discount_value' => $discountValue,
             'remaining_points' => $newBalance,
-            'log'              => $log,
+            'log' => $log,
         ], "Successfully redeemed {$pts} points for a \${$discountValue} voucher");
     }
 }

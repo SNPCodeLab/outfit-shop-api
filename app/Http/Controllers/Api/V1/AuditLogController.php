@@ -11,12 +11,14 @@ class AuditLogController extends BaseApiController
     public function index(): JsonResponse
     {
         $logs = AuditLog::orderBy('created_at', 'desc')->paginate(50);
+
         return $this->successResponse($logs, 'System audit logs');
     }
 
     public function show(int $id): JsonResponse
     {
         $log = AuditLog::findOrFail($id);
+
         return $this->successResponse($log, 'Audit log entry details');
     }
 }

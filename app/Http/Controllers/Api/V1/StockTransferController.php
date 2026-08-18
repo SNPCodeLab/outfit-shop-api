@@ -62,35 +62,35 @@ class StockTransferController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'from_branch_id'   => 'required|integer',
-            'to_branch_id'     => 'required|integer|different:from_branch_id',
-            'notes'            => 'nullable|string|max:500',
-            'items'            => 'required|array|min:1',
+            'from_branch_id' => 'required|integer',
+            'to_branch_id' => 'required|integer|different:from_branch_id',
+            'notes' => 'nullable|string|max:500',
+            'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,variant_id',
-            'items.*.quantity'   => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:1',
         ]);
 
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
 
         $transfer = DB::transaction(function () use ($validated, $employeeId) {
-            $transferNo = 'TRF-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
+            $transferNo = 'TRF-'.now()->format('Ymd').'-'.strtoupper(uniqid());
 
             $transfer = StockTransfer::create([
-                'transfer_no'    => $transferNo,
+                'transfer_no' => $transferNo,
                 'from_branch_id' => $validated['from_branch_id'],
-                'to_branch_id'   => $validated['to_branch_id'],
-                'status'         => 'REQUESTED',
-                'requested_by'   => $employeeId,
-                'notes'          => $validated['notes'] ?? null,
+                'to_branch_id' => $validated['to_branch_id'],
+                'status' => 'REQUESTED',
+                'requested_by' => $employeeId,
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             foreach ($validated['items'] as $item) {
                 StockTransferItem::create([
-                    'transfer_id'        => $transfer->transfer_id,
-                    'variant_id'         => $item['variant_id'],
+                    'transfer_id' => $transfer->transfer_id,
+                    'variant_id' => $item['variant_id'],
                     'quantity_requested' => $item['quantity'],
-                    'quantity_shipped'   => 0,
-                    'quantity_received'  => 0,
+                    'quantity_shipped' => 0,
+                    'quantity_received' => 0,
                 ]);
             }
 
@@ -102,7 +102,7 @@ class StockTransferController extends BaseApiController
             return $transfer->load('items.variant.product');
         });
 
-        return $this->createdResponse($transfer, 'Stock transfer requested successfully', '/api/v1/stock-transfers/' . $transfer->transfer_id);
+        return $this->createdResponse($transfer, 'Stock transfer requested successfully', '/api/v1/stock-transfers/'.$transfer->transfer_id);
     }
 
     /**
@@ -124,7 +124,7 @@ class StockTransferController extends BaseApiController
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
 
         $transfer->update([
-            'status'      => 'APPROVED',
+            'status' => 'APPROVED',
             'approved_by' => $employeeId,
         ]);
 
@@ -164,7 +164,7 @@ class StockTransferController extends BaseApiController
         $transfer = DB::transaction(function () use ($id, $employeeId) {
             $transfer = StockTransfer::with('items.variant')->lockForUpdate()->findOrFail($id);
 
-            if (!in_array($transfer->status, ['APPROVED', 'PICKED'])) {
+            if (! in_array($transfer->status, ['APPROVED', 'PICKED'])) {
                 throw new Exception("Transfer cannot be shipped from status [{$transfer->status}]");
             }
 
@@ -185,22 +185,22 @@ class StockTransferController extends BaseApiController
 
                 // Write Outgoing Stock Movement
                 StockMovement::create([
-                    'variant_id'     => $variant->variant_id,
-                    'movement_type'  => 'RETURN_OUT',
-                    'quantity'       => -$qty,
-                    'stock_before'   => $stockBefore,
-                    'stock_after'    => $stockAfter,
-                    'movement_date'  => now(),
+                    'variant_id' => $variant->variant_id,
+                    'movement_type' => 'RETURN_OUT',
+                    'quantity' => -$qty,
+                    'stock_before' => $stockBefore,
+                    'stock_after' => $stockAfter,
+                    'movement_date' => now(),
                     'reference_type' => 'StockTransferOut',
-                    'reference_id'   => $transfer->transfer_id,
-                    'note'           => "Inter-Store Transfer Out: {$transfer->transfer_no} to Branch #{$transfer->to_branch_id}",
-                    'employee_id'    => $employeeId,
-                    'created_by'     => $employeeId,
+                    'reference_id' => $transfer->transfer_id,
+                    'note' => "Inter-Store Transfer Out: {$transfer->transfer_no} to Branch #{$transfer->to_branch_id}",
+                    'employee_id' => $employeeId,
+                    'created_by' => $employeeId,
                 ]);
             }
 
             $transfer->update([
-                'status'     => 'SHIPPED',
+                'status' => 'SHIPPED',
                 'shipped_by' => $employeeId,
                 'shipped_at' => now(),
             ]);
@@ -241,22 +241,22 @@ class StockTransferController extends BaseApiController
 
                 // Write Incoming Stock Movement
                 StockMovement::create([
-                    'variant_id'     => $variant->variant_id,
-                    'movement_type'  => 'RETURN_IN',
-                    'quantity'       => $qty,
-                    'stock_before'   => $stockBefore,
-                    'stock_after'    => $stockAfter,
-                    'movement_date'  => now(),
+                    'variant_id' => $variant->variant_id,
+                    'movement_type' => 'RETURN_IN',
+                    'quantity' => $qty,
+                    'stock_before' => $stockBefore,
+                    'stock_after' => $stockAfter,
+                    'movement_date' => now(),
                     'reference_type' => 'StockTransferIn',
-                    'reference_id'   => $transfer->transfer_id,
-                    'note'           => "Inter-Store Transfer In: {$transfer->transfer_no} from Branch #{$transfer->from_branch_id}",
-                    'employee_id'    => $employeeId,
-                    'created_by'     => $employeeId,
+                    'reference_id' => $transfer->transfer_id,
+                    'note' => "Inter-Store Transfer In: {$transfer->transfer_no} from Branch #{$transfer->from_branch_id}",
+                    'employee_id' => $employeeId,
+                    'created_by' => $employeeId,
                 ]);
             }
 
             $transfer->update([
-                'status'      => 'RECEIVED',
+                'status' => 'RECEIVED',
                 'received_by' => $employeeId,
                 'received_at' => now(),
             ]);
@@ -266,12 +266,12 @@ class StockTransferController extends BaseApiController
 
         // Trigger Webhook Event
         WebhookDispatcherService::dispatch('STOCK_TRANSFER_COMPLETED', [
-            'transfer_id'    => $transfer->transfer_id,
-            'transfer_no'    => $transfer->transfer_no,
+            'transfer_id' => $transfer->transfer_id,
+            'transfer_no' => $transfer->transfer_no,
             'from_branch_id' => $transfer->from_branch_id,
-            'to_branch_id'   => $transfer->to_branch_id,
-            'items_count'    => $transfer->items->count(),
-            'received_at'    => $transfer->received_at->toISOString(),
+            'to_branch_id' => $transfer->to_branch_id,
+            'items_count' => $transfer->items->count(),
+            'received_at' => $transfer->received_at->toISOString(),
         ]);
 
         Log::channel('inventory')->info("Stock transfer received and completed: {$transfer->transfer_no}");

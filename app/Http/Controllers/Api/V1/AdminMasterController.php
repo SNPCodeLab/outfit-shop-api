@@ -22,45 +22,45 @@ class AdminMasterController extends BaseApiController
         $staffTimeTracking = [
             [
                 'employee_name' => 'POS Cashier 01',
-                'role'          => 'CASHIER',
-                'shift_status'  => 'ON DUTY (Register #1)',
-                'clock_in'      => '08:00 AM',
-                'hours_worked'  => '6.5 hrs',
+                'role' => 'CASHIER',
+                'shift_status' => 'ON DUTY (Register #1)',
+                'clock_in' => '08:00 AM',
+                'hours_worked' => '6.5 hrs',
                 'time_allocation' => [
-                    'pos_checkout'    => '75%',
+                    'pos_checkout' => '75%',
                     'cash_drop_audit' => '15%',
-                    'break_time'      => '10%',
+                    'break_time' => '10%',
                 ],
                 'sales_velocity' => '$333.30/hr (43 checkouts)',
-                'efficiency'     => '96% (Optimal)',
+                'efficiency' => '96% (Optimal)',
             ],
             [
                 'employee_name' => 'Inventory Staff 01',
-                'role'          => 'STAFF',
-                'shift_status'  => 'ON DUTY (Warehouse Bay 2)',
-                'clock_in'      => '08:30 AM',
-                'hours_worked'  => '6.0 hrs',
+                'role' => 'STAFF',
+                'shift_status' => 'ON DUTY (Warehouse Bay 2)',
+                'clock_in' => '08:30 AM',
+                'hours_worked' => '6.0 hrs',
                 'time_allocation' => [
                     'shelf_replenish' => '50%',
-                    'stock_lookup'    => '35%',
+                    'stock_lookup' => '35%',
                     'incoming_intake' => '15%',
                 ],
                 'units_processed' => '185 units/day',
-                'efficiency'      => '94% (Fast)',
+                'efficiency' => '94% (Fast)',
             ],
             [
                 'employee_name' => 'Store Inventory Manager',
-                'role'          => 'MANAGER',
-                'shift_status'  => 'ACTIVE (Operations Desk)',
-                'clock_in'      => '07:45 AM',
-                'hours_worked'  => '6.75 hrs',
+                'role' => 'MANAGER',
+                'shift_status' => 'ACTIVE (Operations Desk)',
+                'clock_in' => '07:45 AM',
+                'hours_worked' => '6.75 hrs',
                 'time_allocation' => [
                     'purchase_orders' => '40%',
                     'inventory_audit' => '30%',
                     'staff_supervise' => '30%',
                 ],
-                'po_processed'   => '3 POs ($4,200)',
-                'efficiency'     => '98% (High)',
+                'po_processed' => '3 POs ($4,200)',
+                'efficiency' => '98% (High)',
             ],
         ];
 
@@ -83,11 +83,11 @@ class AdminMasterController extends BaseApiController
 
         // 4. Matrix Breakdown (Size x Color matrix status across catalog)
         $matrixOverview = [
-            'total_brands'      => 5,
-            'total_categories'  => 9,
+            'total_brands' => 5,
+            'total_categories' => 9,
             'matrix_grid_cells' => 26,
-            'in_stock_rate'     => '94.2%',
-            'stockout_risk'     => '2 items (Gold Leather Tote, Large Classic Polo)',
+            'in_stock_rate' => '94.2%',
+            'stockout_risk' => '2 items (Gold Leather Tote, Large Classic Polo)',
         ];
 
         // 5. Active Broadcast Alerts
@@ -98,13 +98,13 @@ class AdminMasterController extends BaseApiController
             ->get();
 
         return $this->successResponse([
-            'dashboard_type'         => 'ADMIN_MASTER_CONTROLLER',
-            'staff_working_hours'    => $staffTimeTracking,
-            'financial_waterfall'    => $financialWaterfall,
-            'agile_sprint_velocity'  => $agileSprintVelocity,
+            'dashboard_type' => 'ADMIN_MASTER_CONTROLLER',
+            'staff_working_hours' => $staffTimeTracking,
+            'financial_waterfall' => $financialWaterfall,
+            'agile_sprint_velocity' => $agileSprintVelocity,
             'inventory_matrix_stats' => $matrixOverview,
-            'active_broadcast_alerts'=> $activeAlerts,
-            'system_timestamp'       => now()->toISOString(),
+            'active_broadcast_alerts' => $activeAlerts,
+            'system_timestamp' => now()->toISOString(),
         ], 'Admin Master Controller Pulse generated successfully');
     }
 
@@ -114,30 +114,30 @@ class AdminMasterController extends BaseApiController
     public function broadcastAlert(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'message'     => 'required|string',
-            'priority'    => 'nullable|string|in:LOW,NORMAL,HIGH,URGENT',
+            'title' => 'required|string|max:255',
+            'message' => 'required|string',
+            'priority' => 'nullable|string|in:LOW,NORMAL,HIGH,URGENT',
             'target_role' => 'nullable|string|in:ALL,CASHIER,STAFF,MANAGER,ADMIN',
-            'expires_at'  => 'nullable|date',
+            'expires_at' => 'nullable|date',
         ]);
 
         $alertId = DB::table('system_broadcast_alerts')->insertGetId([
             'created_by_user_id' => $request->user()->id ?? null,
-            'title'              => $validated['title'],
-            'message'            => $validated['message'],
-            'priority'           => $validated['priority'] ?? 'HIGH',
-            'target_role'        => $validated['target_role'] ?? 'ALL',
-            'is_active'          => true,
-            'expires_at'         => $validated['expires_at'] ?? now()->addDays(7),
-            'created_at'         => now(),
-            'updated_at'         => now(),
+            'title' => $validated['title'],
+            'message' => $validated['message'],
+            'priority' => $validated['priority'] ?? 'HIGH',
+            'target_role' => $validated['target_role'] ?? 'ALL',
+            'is_active' => true,
+            'expires_at' => $validated['expires_at'] ?? now()->addDays(7),
+            'created_at' => now(),
+            'updated_at' => now(),
         ], 'alert_id');
 
         return $this->createdResponse([
-            'alert_id'    => $alertId,
-            'title'       => $validated['title'],
+            'alert_id' => $alertId,
+            'title' => $validated['title'],
             'target_role' => $validated['target_role'] ?? 'ALL',
-            'priority'    => $validated['priority'] ?? 'HIGH',
+            'priority' => $validated['priority'] ?? 'HIGH',
         ], 'Broadcast alert sent successfully to all users');
     }
 }

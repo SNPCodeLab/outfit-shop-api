@@ -11,6 +11,7 @@ class BundleItem extends Model
     use HasFactory;
 
     protected $table = 'bundle_items';
+
     protected $primaryKey = 'bundle_item_id';
 
     protected $fillable = [

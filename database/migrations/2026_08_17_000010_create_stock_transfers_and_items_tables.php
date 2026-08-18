@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('from_branch_id')->default(1);
             $table->unsignedBigInteger('to_branch_id')->default(2);
             $table->enum('status', ['REQUESTED', 'APPROVED', 'PICKED', 'SHIPPED', 'RECEIVED', 'CANCELLED'])->default('REQUESTED');
-            
+
             $table->unsignedBigInteger('requested_by')->nullable();
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->unsignedBigInteger('shipped_by')->nullable();

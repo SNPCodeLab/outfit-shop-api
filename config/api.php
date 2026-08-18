@@ -46,14 +46,14 @@ return [
     */
 
     'brand' => [
-        'name'           => 'OutfitShop',
-        'title'          => 'OutfitShop Ecommerce Clothing API',
-        'primary_logo'   => 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png',
-        'primary_gif'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062663/default-cycle-SNPCodeLab.gif',
+        'name' => 'OutfitShop',
+        'title' => 'OutfitShop Ecommerce Clothing API',
+        'primary_logo' => 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png',
+        'primary_gif' => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062663/default-cycle-SNPCodeLab.gif',
         'secondary_logo' => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062664/bleu-SNPCodeLab.gif',
-        'vector_logo'    => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg',
-        'video_logo'     => 'https://res.cloudinary.com/od8t271n/video/upload/v1787062665/default-cycle-SNPCodeLab.mp4',
-        'favicon'        => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg',
+        'vector_logo' => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg',
+        'video_logo' => 'https://res.cloudinary.com/od8t271n/video/upload/v1787062665/default-cycle-SNPCodeLab.mp4',
+        'favicon' => 'https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg',
     ],
 
 ];

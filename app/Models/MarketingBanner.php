@@ -10,6 +10,7 @@ class MarketingBanner extends Model
     use HasFactory;
 
     protected $table = 'marketing_banners';
+
     protected $primaryKey = 'banner_id';
 
     protected $fillable = [
@@ -25,7 +26,7 @@ class MarketingBanner extends Model
     ];
 
     protected $casts = [
-        'is_active'  => 'boolean',
+        'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
 

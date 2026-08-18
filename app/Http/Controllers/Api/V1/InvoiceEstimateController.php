@@ -24,9 +24,6 @@ class InvoiceEstimateController extends BaseApiController
 
     /**
      * List all Sales Orders, Invoices & Estimates with status filtering.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -50,7 +47,7 @@ class InvoiceEstimateController extends BaseApiController
             $query->whereDate('sale_date', '<=', $toDate);
         }
 
-        $records = $query->orderBy('sale_id', 'desc')->paginate((int)($request->input('per_page', 20)));
+        $records = $query->orderBy('sale_id', 'desc')->paginate((int) ($request->input('per_page', 20)));
 
         // Financial Totals Summary
         $totalInvoiced = (float) SaleHeader::where('status', '!=', 'VOIDED')->sum('grand_total');
@@ -58,36 +55,33 @@ class InvoiceEstimateController extends BaseApiController
         $outstandingBalance = max(0, $totalInvoiced - $totalCollected);
 
         $summary = [
-            'total_invoiced_usd'     => round($totalInvoiced, 2),
-            'total_collected_usd'    => round($totalCollected, 2),
-            'outstanding_balance_usd'=> round($outstandingBalance, 2),
-            'total_documents_count'  => $records->total(),
+            'total_invoiced_usd' => round($totalInvoiced, 2),
+            'total_collected_usd' => round($totalCollected, 2),
+            'outstanding_balance_usd' => round($outstandingBalance, 2),
+            'total_documents_count' => $records->total(),
         ];
 
         return $this->successResponse([
-            'summary'   => $summary,
+            'summary' => $summary,
             'documents' => $records,
         ], 'SalesBinder Invoices & Estimates retrieved');
     }
 
     /**
      * Create a new Quotation / Estimate (Does not immediately deduct inventory).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function createEstimate(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'customer_id'        => 'required|exists:customers,customer_id',
-            'items'              => 'required|array|min:1',
+            'customer_id' => 'required|exists:customers,customer_id',
+            'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,variant_id',
-            'items.*.quantity'   => 'required|integer|min:1',
-            'items.*.discount'   => 'nullable|numeric|min:0',
-            'overall_discount'   => 'nullable|numeric|min:0',
-            'tax_rate'           => 'nullable|numeric|min:0|max:100',
-            'notes'              => 'nullable|string|max:500',
-            'valid_until'        => 'nullable|date',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.discount' => 'nullable|numeric|min:0',
+            'overall_discount' => 'nullable|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'notes' => 'nullable|string|max:500',
+            'valid_until' => 'nullable|date',
         ]);
 
         return DB::transaction(function () use ($validated, $request) {
@@ -113,11 +107,11 @@ class InvoiceEstimateController extends BaseApiController
                 $totalAmount += $lineTotal;
 
                 $detailsData[] = [
-                    'variant_id'      => $variant->variant_id,
-                    'quantity'        => $qty,
-                    'unit_price'      => $unitPrice,
+                    'variant_id' => $variant->variant_id,
+                    'quantity' => $qty,
+                    'unit_price' => $unitPrice,
                     'discount_amount' => $itemDiscount,
-                    'sub_total'       => $lineTotal,
+                    'sub_total' => $lineTotal,
                 ];
             }
 
@@ -126,20 +120,20 @@ class InvoiceEstimateController extends BaseApiController
             $grandTotal = round($netAmount + $taxAmount, 2);
 
             $estimate = SaleHeader::create([
-                'customer_id'     => $validated['customer_id'],
-                'employee_id'     => $employeeId,
-                'sale_date'       => now(),
-                'total_amount'    => $totalAmount,
-                'discount'        => $overallDiscount,
-                'tax_rate'        => $taxRate,
-                'tax_amount'      => $taxAmount,
-                'grand_total'     => $grandTotal,
-                'payment_status'  => 'UNPAID',
-                'status'          => 'ESTIMATE',
-                'notes'           => $validated['notes'] ?? null,
+                'customer_id' => $validated['customer_id'],
+                'employee_id' => $employeeId,
+                'sale_date' => now(),
+                'total_amount' => $totalAmount,
+                'discount' => $overallDiscount,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'grand_total' => $grandTotal,
+                'payment_status' => 'UNPAID',
+                'status' => 'ESTIMATE',
+                'notes' => $validated['notes'] ?? null,
             ]);
 
-            $estimateNo = 'EST-' . now()->format('Ymd') . '-' . str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+            $estimateNo = 'EST-'.now()->format('Ymd').'-'.str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
             $estimate->update(['invoice_no' => $estimateNo]);
 
             foreach ($detailsData as $detail) {
@@ -156,17 +150,13 @@ class InvoiceEstimateController extends BaseApiController
             return $this->createdResponse(
                 $estimate->load(['customer', 'employee', 'details.variant.product', 'details.variant.size', 'details.variant.color']),
                 'Estimate quote created successfully. Stock is reserved but not yet deducted.',
-                '/api/v1/invoices/' . $estimate->sale_id
+                '/api/v1/invoices/'.$estimate->sale_id
             );
         });
     }
 
     /**
      * 1-Click Convert an approved Estimate into an Official Invoice & deduct stock with full movement ledger.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function convertEstimateToInvoice(Request $request, int $id): JsonResponse
     {
@@ -187,13 +177,13 @@ class InvoiceEstimateController extends BaseApiController
                 // Deduct physical inventory, verify stock availability, and write StockMovement audit trail
                 foreach ($estimate->details as $detail) {
                     $variant = ProductVariant::lockForUpdate()->find($detail->variant_id);
-                    if (!$variant) {
+                    if (! $variant) {
                         throw new Exception("Product variant ID {$detail->variant_id} not found.");
                     }
 
                     $isDigital = ($variant->product->product_type ?? 'PHYSICAL_APPAREL') === 'DIGITAL_DOWNLOAD';
 
-                    if (!$isDigital) {
+                    if (! $isDigital) {
                         if ($variant->quantity < $detail->quantity) {
                             throw new Exception("Insufficient stock for SKU [{$variant->sku}]. Available: {$variant->quantity}, Required: {$detail->quantity}.");
                         }
@@ -203,41 +193,41 @@ class InvoiceEstimateController extends BaseApiController
                         $stockAfter = $stockBefore - $detail->quantity;
 
                         StockMovement::create([
-                            'variant_id'     => $variant->variant_id,
-                            'movement_type'  => 'SALE',
-                            'quantity'       => -$detail->quantity,
-                            'stock_before'   => $stockBefore,
-                            'stock_after'    => $stockAfter,
-                            'movement_date'  => now(),
+                            'variant_id' => $variant->variant_id,
+                            'movement_type' => 'SALE',
+                            'quantity' => -$detail->quantity,
+                            'stock_before' => $stockBefore,
+                            'stock_after' => $stockAfter,
+                            'movement_date' => now(),
                             'reference_type' => 'SaleHeader',
-                            'reference_id'   => $estimate->sale_id,
-                            'note'           => "Converted from Estimate #{$estimate->sale_id}",
-                            'created_by'     => $employeeId,
+                            'reference_id' => $estimate->sale_id,
+                            'note' => "Converted from Estimate #{$estimate->sale_id}",
+                            'created_by' => $employeeId,
                         ]);
                     }
                 }
 
-                $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+                $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
                 $paymentMethod = $request->input('payment_method');
                 $paymentStatus = $paymentMethod ? 'PAID' : 'UNPAID';
 
                 $estimate->update([
-                    'status'         => 'COMPLETED',
-                    'invoice_no'     => $invoiceNo,
+                    'status' => 'COMPLETED',
+                    'invoice_no' => $invoiceNo,
                     'payment_status' => $paymentStatus,
                 ]);
 
                 // Auto-register payment if provided
                 if ($paymentMethod) {
                     Payment::create([
-                        'sale_id'         => $estimate->sale_id,
-                        'payment_method'  => strtoupper($paymentMethod),
-                        'amount'          => $estimate->grand_total,
+                        'sale_id' => $estimate->sale_id,
+                        'payment_method' => strtoupper($paymentMethod),
+                        'amount' => $estimate->grand_total,
                         'amount_tendered' => $estimate->grand_total,
-                        'change_due'      => 0.00,
-                        'payment_date'    => now(),
-                        'transaction_ref' => 'CONV-' . strtoupper(Str::random(8)),
-                        'payment_status'  => 'PAID',
+                        'change_due' => 0.00,
+                        'payment_date' => now(),
+                        'transaction_ref' => 'CONV-'.strtoupper(Str::random(8)),
+                        'payment_status' => 'PAID',
                     ]);
                 }
 
@@ -252,7 +242,7 @@ class InvoiceEstimateController extends BaseApiController
 
                 return $this->successResponse(
                     $estimate->fresh(['customer', 'employee', 'details.variant.product', 'payments']),
-                    'Estimate #' . $estimate->sale_id . " successfully converted to official Invoice [{$invoiceNo}]!"
+                    'Estimate #'.$estimate->sale_id." successfully converted to official Invoice [{$invoiceNo}]!"
                 );
             });
         } catch (Exception $e) {
@@ -262,9 +252,6 @@ class InvoiceEstimateController extends BaseApiController
 
     /**
      * Render a SalesBinder-style professional printable A4/PDF Invoice View.
-     *
-     * @param int $id
-     * @return Response
      */
     public function renderInvoiceHtml(int $id): Response
     {
@@ -274,7 +261,7 @@ class InvoiceEstimateController extends BaseApiController
             'details.variant.product.category',
             'details.variant.size',
             'details.variant.color',
-            'payments'
+            'payments',
         ])->findOrFail($id);
 
         $customer = $sale->customer;
@@ -935,4 +922,3 @@ class InvoiceEstimateController extends BaseApiController
         return response($html, 200)->header('Content-Type', 'text/html; charset=utf-8');
     }
 }
-

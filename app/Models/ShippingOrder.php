@@ -11,6 +11,7 @@ class ShippingOrder extends Model
     use HasFactory;
 
     protected $table = 'shipping_orders';
+
     protected $primaryKey = 'shipping_id';
 
     protected $fillable = [
@@ -32,7 +33,7 @@ class ShippingOrder extends Model
     protected $casts = [
         'shipping_cost' => 'float',
         'dispatched_at' => 'datetime',
-        'delivered_at'  => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     public function sale(): BelongsTo

@@ -22,16 +22,13 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Upload an image to Cloudinary (Multipart file or Remote URL).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function upload(Request $request): JsonResponse
     {
         $request->validate([
-            'image'     => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
+            'image' => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
             'image_url' => 'required_without:image|nullable|url',
-            'folder'    => 'nullable|string|max:100',
+            'folder' => 'nullable|string|max:100',
         ]);
 
         try {
@@ -47,7 +44,7 @@ class ImageUploadController extends BaseApiController
                     entityId: 0,
                     newValues: [
                         'public_id' => $uploadResult['public_id'],
-                        'url'       => $uploadResult['secure_url'],
+                        'url' => $uploadResult['secure_url'],
                     ],
                     userId: $request->user()->employee_id ?? $request->user()->id ?? null
                 );
@@ -61,9 +58,6 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Delete an image from Cloudinary by public ID or URL.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function destroy(Request $request): JsonResponse
     {
@@ -73,20 +67,20 @@ class ImageUploadController extends BaseApiController
         ]);
 
         try {
-            $target  = $request->input('public_id') ?? $request->input('image_url');
+            $target = $request->input('public_id') ?? $request->input('image_url');
             $deleted = $this->cloudinary->delete($target);
 
-            if (!$deleted) {
+            if (! $deleted) {
                 return $this->notFoundResponse('CloudinaryAsset', $target, 'Image could not be deleted from Cloudinary or was not found.');
             }
 
             if ($request->user()) {
                 AuditLogService::log(
-                    action:    'DELETE_IMAGE',
-                    entity:    'CloudinaryAsset',
-                    entityId:  0,
+                    action: 'DELETE_IMAGE',
+                    entity: 'CloudinaryAsset',
+                    entityId: 0,
                     oldValues: ['target' => $target],
-                    userId:    $request->user()->employee_id ?? $request->user()->id ?? null
+                    userId: $request->user()->employee_id ?? $request->user()->id ?? null
                 );
             }
 
@@ -98,17 +92,13 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Upload and directly attach an image to a Product.
-     *
-     * @param Request $request
-     * @param int $productId
-     * @return JsonResponse
      */
     public function uploadForProduct(Request $request, int $productId): JsonResponse
     {
         $product = Product::findOrFail($productId);
 
         $request->validate([
-            'image'     => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif|max:10240',
+            'image' => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'image_url' => 'required_without:image|nullable|url',
         ]);
 
@@ -123,7 +113,7 @@ class ImageUploadController extends BaseApiController
 
             $oldValues = $product->toArray();
             $product->update([
-                'image_url'       => $uploadResult['secure_url'],
+                'image_url' => $uploadResult['secure_url'],
                 'image_public_id' => $uploadResult['public_id'],
             ]);
 
@@ -144,17 +134,13 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Upload and assign an image directly to a product variant.
-     *
-     * @param Request $request
-     * @param int $variantId
-     * @return JsonResponse
      */
     public function uploadForVariant(Request $request, int $variantId): JsonResponse
     {
         $variant = ProductVariant::findOrFail($variantId);
 
         $request->validate([
-            'image'     => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif|max:10240',
+            'image' => 'required_without:image_url|file|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'image_url' => 'required_without:image|nullable|url',
         ]);
 
@@ -169,7 +155,7 @@ class ImageUploadController extends BaseApiController
 
             $oldValues = $variant->toArray();
             $variant->update([
-                'image_url'       => $uploadResult['secure_url'],
+                'image_url' => $uploadResult['secure_url'],
                 'image_public_id' => $uploadResult['public_id'],
             ]);
 
@@ -190,21 +176,18 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Batch upload a list of images (URLs or Files) and optionally assign to Products/Variants.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function uploadBatch(Request $request): JsonResponse
     {
         $request->validate([
-            'items'             => 'required_without:images|array|min:1',
-            'items.*.url'       => 'required_with:items|url',
-            'items.*.product_id'=> 'nullable|exists:products,product_id',
-            'items.*.variant_id'=> 'nullable|exists:product_variants,variant_id',
-            'items.*.folder'    => 'nullable|string|max:100',
-            'images'            => 'required_without:items|array|min:1',
-            'images.*'          => 'file|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
-            'folder'            => 'nullable|string|max:100',
+            'items' => 'required_without:images|array|min:1',
+            'items.*.url' => 'required_with:items|url',
+            'items.*.product_id' => 'nullable|exists:products,product_id',
+            'items.*.variant_id' => 'nullable|exists:product_variants,variant_id',
+            'items.*.folder' => 'nullable|string|max:100',
+            'images' => 'required_without:items|array|min:1',
+            'images.*' => 'file|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
+            'folder' => 'nullable|string|max:100',
         ]);
 
         $results = [];
@@ -218,11 +201,11 @@ class ImageUploadController extends BaseApiController
                     $upload = $this->cloudinary->upload($item['url'], $itemFolder);
 
                     // Optionally link to Product
-                    if (!empty($item['product_id'])) {
+                    if (! empty($item['product_id'])) {
                         $product = Product::find($item['product_id']);
                         if ($product) {
                             $product->update([
-                                'image_url'       => $upload['secure_url'],
+                                'image_url' => $upload['secure_url'],
                                 'image_public_id' => $upload['public_id'],
                             ]);
                             $upload['attached_to_product_id'] = $item['product_id'];
@@ -230,11 +213,11 @@ class ImageUploadController extends BaseApiController
                     }
 
                     // Optionally link to Variant
-                    if (!empty($item['variant_id'])) {
+                    if (! empty($item['variant_id'])) {
                         $variant = ProductVariant::find($item['variant_id']);
                         if ($variant) {
                             $variant->update([
-                                'image_url'       => $upload['secure_url'],
+                                'image_url' => $upload['secure_url'],
                                 'image_public_id' => $upload['public_id'],
                             ]);
                             $upload['attached_to_variant_id'] = $item['variant_id'];
@@ -244,9 +227,9 @@ class ImageUploadController extends BaseApiController
                     $results[] = array_merge(['status' => 'success', 'original_url' => $item['url']], $upload);
                 } catch (Exception $e) {
                     $results[] = [
-                        'status'       => 'error',
+                        'status' => 'error',
                         'original_url' => $item['url'] ?? null,
-                        'message'      => $e->getMessage(),
+                        'message' => $e->getMessage(),
                     ];
                 }
             }
@@ -260,9 +243,9 @@ class ImageUploadController extends BaseApiController
                     $results[] = array_merge(['status' => 'success', 'file_name' => $file->getClientOriginalName()], $upload);
                 } catch (Exception $e) {
                     $results[] = [
-                        'status'    => 'error',
+                        'status' => 'error',
                         'file_name' => $file->getClientOriginalName(),
-                        'message'   => $e->getMessage(),
+                        'message' => $e->getMessage(),
                     ];
                 }
             }
@@ -273,8 +256,6 @@ class ImageUploadController extends BaseApiController
 
     /**
      * Get list of all images currently attached across products and variants.
-     *
-     * @return JsonResponse
      */
     public function gallery(): JsonResponse
     {
@@ -282,12 +263,12 @@ class ImageUploadController extends BaseApiController
             ->select('product_id', 'product_name', 'brand', 'image_url', 'image_public_id', 'updated_at')
             ->get()
             ->map(fn ($p) => [
-                'type'       => 'product',
-                'id'         => $p->product_id,
-                'name'       => $p->product_name,
-                'brand'      => $p->brand,
-                'image_url'  => $p->image_url,
-                'public_id'  => $p->image_public_id,
+                'type' => 'product',
+                'id' => $p->product_id,
+                'name' => $p->product_name,
+                'brand' => $p->brand,
+                'image_url' => $p->image_url,
+                'public_id' => $p->image_public_id,
                 'updated_at' => $p->updated_at,
             ]);
 
@@ -296,22 +277,22 @@ class ImageUploadController extends BaseApiController
             ->select('variant_id', 'product_id', 'size_id', 'color_id', 'sku', 'image_url', 'image_public_id', 'updated_at')
             ->get()
             ->map(fn ($v) => [
-                'type'         => 'variant',
-                'id'           => $v->variant_id,
-                'sku'          => $v->sku,
+                'type' => 'variant',
+                'id' => $v->variant_id,
+                'sku' => $v->sku,
                 'product_name' => $v->product->product_name ?? null,
-                'size'         => $v->size->size_name ?? null,
-                'color'        => $v->color->color_name ?? null,
-                'image_url'    => $v->image_url,
-                'public_id'    => $v->image_public_id,
-                'updated_at'   => $v->updated_at,
+                'size' => $v->size->size_name ?? null,
+                'color' => $v->color->color_name ?? null,
+                'image_url' => $v->image_url,
+                'public_id' => $v->image_public_id,
+                'updated_at' => $v->updated_at,
             ]);
 
         return $this->successResponse([
             'total_product_images' => $productImages->count(),
             'total_variant_images' => $variantImages->count(),
-            'product_images'       => $productImages,
-            'variant_images'       => $variantImages,
+            'product_images' => $productImages,
+            'variant_images' => $variantImages,
         ], 'Media gallery retrieved');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Response\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,14 +26,14 @@ class CheckRole
         $user = $request->user();
 
         if (! $user) {
-            return \App\Http\Response\ApiResponse::unauthenticated(
+            return ApiResponse::unauthenticated(
                 'token_missing',
                 'Authentication required. Please login to continue.'
             );
         }
 
         $allowedRoles = array_map('strtoupper', $roles);
-        $userRole     = strtoupper($user->role ?? '');
+        $userRole = strtoupper($user->role ?? '');
 
         // 1. Admin is always allowed everywhere
         if ($userRole === 'ADMIN' || (property_exists($user, 'is_admin') && $user->is_admin)) {
@@ -49,7 +50,7 @@ class CheckRole
             return $next($request);
         }
 
-        return \App\Http\Response\ApiResponse::forbidden(
+        return ApiResponse::forbidden(
             'You do not have sufficient permissions to access this resource.'
         );
     }

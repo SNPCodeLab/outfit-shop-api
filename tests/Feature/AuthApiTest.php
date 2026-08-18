@@ -15,11 +15,11 @@ class AuthApiTest extends TestCase
     {
         $employee = Employee::create([
             'employee_name' => 'Test Cashier',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier_test',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier_test',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
-            'status'        => 'ACTIVE',
+            'role' => 'CASHIER',
+            'status' => 'ACTIVE',
         ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
@@ -42,10 +42,10 @@ class AuthApiTest extends TestCase
     {
         Employee::create([
             'employee_name' => 'Test Cashier',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier_test',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier_test',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
@@ -62,23 +62,23 @@ class AuthApiTest extends TestCase
     {
         $employee = Employee::create([
             'employee_name' => 'Test Cashier',
-            'email'         => 'cashier@test.local',
-            'username'      => 'cashier_test',
+            'email' => 'cashier@test.local',
+            'username' => 'cashier_test',
             'password_hash' => Hash::make('Secret123'),
-            'role'          => 'CASHIER',
+            'role' => 'CASHIER',
         ]);
 
         $token = $employee->createToken('test-token')->plainTextToken;
 
         // Profile
-        $profileResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $profileResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/v1/auth/me');
 
         $profileResponse->assertStatus(200)
             ->assertJsonPath('data.username', 'cashier_test');
 
         // Logout
-        $logoutResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $logoutResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/v1/auth/logout');
 
         $logoutResponse->assertStatus(200);

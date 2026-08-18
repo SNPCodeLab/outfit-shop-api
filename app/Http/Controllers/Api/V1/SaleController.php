@@ -58,7 +58,7 @@ class SaleController extends BaseApiController
         }
 
         $perPage = (int) $request->input('per_page', 20);
-        $sales   = $query->orderBy('sale_id', 'desc')->paginate($perPage);
+        $sales = $query->orderBy('sale_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($sales, 'Sales history retrieved');
     }
@@ -80,13 +80,13 @@ class SaleController extends BaseApiController
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
 
             $sale = $this->posService->checkout(
-                employeeId:     $employeeId,
-                customerId:     $validated['customer_id'] ?? null,
-                items:          $validated['items'],
-                paymentMethod:  $validated['payment_method'] ?? 'CASH',
-                paymentAmount:  (float) ($validated['payment_amount'] ?? 0.0),
-                overallDiscount:(float) ($validated['overall_discount'] ?? 0.0),
-                taxRate:        (float) ($validated['tax_rate'] ?? 10.00),
+                employeeId: $employeeId,
+                customerId: $validated['customer_id'] ?? null,
+                items: $validated['items'],
+                paymentMethod: $validated['payment_method'] ?? 'CASH',
+                paymentAmount: (float) ($validated['payment_amount'] ?? 0.0),
+                overallDiscount: (float) ($validated['overall_discount'] ?? 0.0),
+                taxRate: (float) ($validated['tax_rate'] ?? 10.00),
                 idempotencyKey: $idempotencyKey,
             );
 
@@ -130,7 +130,7 @@ class SaleController extends BaseApiController
 
         try {
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
-            $sale       = $this->posService->voidSale($id, $employeeId, $request->reason);
+            $sale = $this->posService->voidSale($id, $employeeId, $request->reason);
 
             return $this->successResponse($sale, "Sale #{$id} voided successfully and inventory restored");
         } catch (Exception $e) {

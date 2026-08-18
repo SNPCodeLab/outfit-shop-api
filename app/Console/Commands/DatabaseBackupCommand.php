@@ -34,34 +34,34 @@ class DatabaseBackupCommand extends Command
         $this->info('Starting automated database backup...');
 
         $dbConnection = config('database.default', 'pgsql');
-        $dbConfig     = config("database.connections.{$dbConnection}");
+        $dbConfig = config("database.connections.{$dbConnection}");
 
-        $host     = $dbConfig['host'] ?? '127.0.0.1';
-        $port     = $dbConfig['port'] ?? '5432';
+        $host = $dbConfig['host'] ?? '127.0.0.1';
+        $port = $dbConfig['port'] ?? '5432';
         $database = $dbConfig['database'] ?? 'laravel';
         $username = $dbConfig['username'] ?? 'postgres';
         $password = $dbConfig['password'] ?? '';
 
         $backupDir = storage_path('app/backups');
-        if (!File::exists($backupDir)) {
+        if (! File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
 
         $timestamp = now()->format('Ymd_His');
-        $fileName  = "csms_backup_{$timestamp}.dump";
-        $filePath  = "{$backupDir}/{$fileName}";
+        $fileName = "csms_backup_{$timestamp}.dump";
+        $filePath = "{$backupDir}/{$fileName}";
 
         // ── 1. Execute pg_dump with Custom Compressed Format (-Fc) ────────────
         $this->comment("Dumping database [{$database}] to {$fileName}...");
 
         $command = [
             'pg_dump',
-            "-h", $host,
-            "-p", (string) $port,
-            "-U", $username,
-            "-d", $database,
-            "-Fc",
-            "-f", $filePath,
+            '-h', $host,
+            '-p', (string) $port,
+            '-U', $username,
+            '-d', $database,
+            '-Fc',
+            '-f', $filePath,
         ];
 
         $process = new Process($command, null, [
@@ -72,11 +72,11 @@ class DatabaseBackupCommand extends Command
         try {
             $process->run();
 
-            if (!$process->isSuccessful()) {
+            if (! $process->isSuccessful()) {
                 // If pg_dump binary is not present in local environment, fallback to SQL export
-                $this->warn('pg_dump process returned a warning: ' . $process->getErrorOutput());
+                $this->warn('pg_dump process returned a warning: '.$process->getErrorOutput());
                 // Write a lightweight schema manifest if binary was unavailable
-                if (!File::exists($filePath) || File::size($filePath) === 0) {
+                if (! File::exists($filePath) || File::size($filePath) === 0) {
                     File::put($filePath, "-- CSMS Database Backup Snapshot: {$timestamp}\n-- Host: {$host}\n");
                 }
             }
@@ -98,8 +98,8 @@ class DatabaseBackupCommand extends Command
                         $this->comment('S3 credentials not configured in .env; skipping cloud sync.');
                     }
                 } catch (\Throwable $cloudEx) {
-                    $this->warn('Cloud upload skipped/failed: ' . $cloudEx->getMessage());
-                    Log::warning('S3 backup upload failed: ' . $cloudEx->getMessage());
+                    $this->warn('Cloud upload skipped/failed: '.$cloudEx->getMessage());
+                    Log::warning('S3 backup upload failed: '.$cloudEx->getMessage());
                 }
             }
 
@@ -109,8 +109,9 @@ class DatabaseBackupCommand extends Command
 
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->error('Database backup failed: ' . $e->getMessage());
-            Log::error('Database backup command exception: ' . $e->getMessage());
+            $this->error('Database backup failed: '.$e->getMessage());
+            Log::error('Database backup command exception: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

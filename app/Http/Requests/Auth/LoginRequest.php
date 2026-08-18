@@ -18,7 +18,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'username' => 'required_without:email|string',
-            'email'    => 'required_without:username|string|email',
+            'email' => 'required_without:username|string|email',
             'password' => 'required|string',
         ];
     }
@@ -27,9 +27,9 @@ class LoginRequest extends FormRequest
     {
         return [
             'username.required_without' => 'Either username or email is required.',
-            'email.required_without'    => 'Either username or email is required.',
-            'email.email'               => 'The email address format is invalid.',
-            'password.required'         => 'Password is required.',
+            'email.required_without' => 'Either username or email is required.',
+            'email.email' => 'The email address format is invalid.',
+            'password.required' => 'Password is required.',
         ];
     }
 

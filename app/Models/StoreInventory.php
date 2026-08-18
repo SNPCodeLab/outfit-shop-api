@@ -11,6 +11,7 @@ class StoreInventory extends Model
     use HasFactory;
 
     protected $table = 'store_inventories';
+
     protected $primaryKey = 'inventory_id';
 
     protected $fillable = [
