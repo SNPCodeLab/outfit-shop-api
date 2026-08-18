@@ -38,6 +38,11 @@ database/*.sqlite
 database/*.sqlite-journal
 .dataconnect/
 firebase.json
+
+# Local Assets & Scripts
+/items/
+items/
+extracted_urls.txt
 .firebaserc
 *firebase*
 
