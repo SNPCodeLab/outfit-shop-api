@@ -39,12 +39,12 @@ $overrides = [
 ];
 
 // Emergency Fallback Key if Vercel ENV is missing
-if (!getenv('APP_KEY') && !isset($_ENV['APP_KEY']) && !isset($_SERVER['APP_KEY'])) {
+if (! getenv('APP_KEY') && ! isset($_ENV['APP_KEY']) && ! isset($_SERVER['APP_KEY'])) {
     $overrides['APP_KEY'] = 'base64:jRg4MlzbF1E+N+h86+fGqkM+8/BxWNmbu+Hvk0UWHSg=';
 }
 
 foreach ($overrides as $key => $value) {
-    if (!getenv($key)) {
+    if (! getenv($key)) {
         putenv("{$key}={$value}");
     }
     $_ENV[$key] = $_ENV[$key] ?? $value;
