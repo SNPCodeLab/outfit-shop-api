@@ -2,40 +2,69 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\CustomerWishlist;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CustomerWishlistController extends Controller
+class CustomerWishlistController extends BaseApiController
 {
     /**
-     * Get customer wishlist items
+     * Get customer wishlist items.
+     * Requires ?customer_id query parameter or Bearer token.
+     * Public / Authenticated.
      */
     public function index(Request $request): JsonResponse
     {
-        $customerId = $request->input('customer_id');
+        $customerId = $request->user()?->customer_id
+            ?? $request->input('customer_id')
+            ?? $request->header('X-Customer-Id');
 
         if (!$customerId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer ID parameter required',
-            ], 400);
+            return $this->validationErrorResponse([
+                'customer_id' => ['The customer_id field or X-Customer-Id header is required to retrieve wishlist items.']
+            ]);
         }
 
-        $wishlists = CustomerWishlist::with(['product.category', 'product.images', 'variant.size', 'variant.color'])
+        $wishlists = CustomerWishlist::with([
+            'product.category',
+            'product.images',
+            'variant.size',
+            'variant.color',
+        ])
             ->where('customer_id', $customerId)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $wishlists,
-            'message' => 'Customer wishlist retrieved successfully',
-        ]);
+        return $this->successResponse($wishlists, 'Customer wishlist retrieved successfully');
     }
 
     /**
-     * Toggle product in/out of customer wishlist
+     * Add a product to the wishlist directly.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,customer_id',
+            'product_id'  => 'required|exists:products,product_id',
+            'variant_id'  => 'nullable|exists:product_variants,variant_id',
+        ]);
+
+        $wishlist = CustomerWishlist::firstOrCreate(
+            [
+                'customer_id' => $validated['customer_id'],
+                'product_id'  => $validated['product_id'],
+            ],
+            [
+                'variant_id'  => $validated['variant_id'] ?? null,
+            ]
+        );
+
+        return $this->createdResponse($wishlist, 'Product added to wishlist successfully');
+    }
+
+    /**
+     * Toggle a product in or out of a customer wishlist.
+     * Public - no authentication required (guest wishlist support).
      */
     public function toggle(Request $request): JsonResponse
     {
@@ -51,20 +80,29 @@ class CustomerWishlistController extends Controller
 
         if ($existing) {
             $existing->delete();
-            return response()->json([
-                'success'    => true,
-                'is_saved'   => false,
-                'message'    => 'Removed from wishlist',
-            ]);
+
+            return $this->successResponse(
+                ['is_saved' => false, 'product_id' => (int) $validated['product_id']],
+                'Product removed from wishlist'
+            );
         }
 
         $wishlist = CustomerWishlist::create($validated);
 
-        return response()->json([
-            'success'    => true,
-            'is_saved'   => true,
-            'data'       => $wishlist,
-            'message'    => 'Added to wishlist',
-        ], 201);
+        return $this->createdResponse(
+            ['is_saved' => true, 'wishlist' => $wishlist],
+            'Product added to wishlist'
+        );
+    }
+
+    /**
+     * Remove an item from wishlist by ID.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $item = CustomerWishlist::findOrFail($id);
+        $item->delete();
+
+        return $this->successResponse(null, 'Item removed from wishlist');
     }
 }

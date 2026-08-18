@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Sale\CheckoutRequest;
 use App\Models\SaleHeader;
 use App\Services\POSService;
 use Exception;
@@ -68,22 +69,10 @@ class SaleController extends BaseApiController
      * Supports idempotency_key header/body field to safely retry failed requests
      * without creating duplicate sales.
      */
-    public function checkout(Request $request): JsonResponse
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'customer_id'        => 'nullable|exists:customers,customer_id',
-            'items'              => 'required|array|min:1',
-            'items.*.variant_id' => 'required|exists:product_variants,variant_id',
-            'items.*.quantity'   => 'required|integer|min:1',
-            'items.*.discount'   => 'nullable|numeric|min:0',
-            'payment_method'     => 'nullable|string|in:CASH,CARD,QR,ABA,BAKONG,GIFT_CARD',
-            'payment_amount'     => 'nullable|numeric|min:0',
-            'overall_discount'   => 'nullable|numeric|min:0',
-            'tax_rate'           => 'nullable|numeric|min:0|max:100',
-            'idempotency_key'    => 'nullable|string|max:64',
-        ]);
+        $validated = $request->validated();
 
-        // Accept idempotency key from request body OR X-Idempotency-Key header
         $idempotencyKey = $validated['idempotency_key']
             ?? $request->header('X-Idempotency-Key');
 
@@ -108,7 +97,7 @@ class SaleController extends BaseApiController
 
             return $this->successResponse($sale, $msg, $httpCode);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_CHECKOUT_FAILED');
+            return $this->errorResponse($e->getMessage(), 400, 'CHECKOUT_FAILED');
         }
     }
 
@@ -145,7 +134,7 @@ class SaleController extends BaseApiController
 
             return $this->successResponse($sale, "Sale #{$id} voided successfully and inventory restored");
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_VOID_FAILED');
+            return $this->errorResponse($e->getMessage(), 400, 'SALE_VOID_FAILED');
         }
     }
 }

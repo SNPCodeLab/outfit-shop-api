@@ -3,12 +3,15 @@
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ClothingSizeController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\CustomerController;
+use App\Http\Controllers\Api\V1\CustomerWishlistController;
 use App\Http\Controllers\Api\V1\EmployeeController;
 use App\Http\Controllers\Api\V1\ImageUploadController;
+use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\PurchaseController;
@@ -20,11 +23,11 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| SS-MIS RESTful API — v1
+| OutfitShop Ecommerce Clothing RESTful API — v1
 |--------------------------------------------------------------------------
 |
 | Access Tiers:
-|   TIER 1 (PUBLIC)        — No token required. Read-only storefront & catalog.
+|   TIER 1 (PUBLIC)        — No token required. Read-only storefront, catalog, cart, wishlist.
 |   TIER 2 (AUTHENTICATED) — Requires valid Bearer token (CASHIER, STAFF, MANAGER, ADMIN).
 |   TIER 3 (MANAGER)       — Requires token + role MANAGER or ADMIN.
 |   TIER 4 (ADMIN)         — Requires token + role ADMIN only.
@@ -91,8 +94,19 @@ Route::prefix('v1')->group(function () {
     Route::post('/promotions/verify-coupon',           [\App\Http\Controllers\Api\V1\PromotionController::class, 'verifyCoupon']);
 
     Route::get('/branches',                            [\App\Http\Controllers\Api\V1\StoreBranchController::class, 'index']);
-    Route::get('/wishlist',                            [\App\Http\Controllers\Api\V1\CustomerWishlistController::class, 'index']);
-    Route::post('/wishlist/toggle',                    [\App\Http\Controllers\Api\V1\CustomerWishlistController::class, 'toggle']);
+
+    // Shopping Cart Endpoints (Guest Session & Customer Cart)
+    Route::get('/cart',                                [CartController::class, 'index']);
+    Route::post('/cart/items',                         [CartController::class, 'addItem']);
+    Route::put('/cart/items/{id}',                     [CartController::class, 'updateItem']);
+    Route::delete('/cart/items/{id}',                  [CartController::class, 'removeItem']);
+    Route::delete('/cart/clear',                       [CartController::class, 'clear']);
+
+    // Customer Wishlist Endpoints
+    Route::get('/wishlist',                            [CustomerWishlistController::class, 'index']);
+    Route::post('/wishlist',                           [CustomerWishlistController::class, 'store']);
+    Route::post('/wishlist/toggle',                    [CustomerWishlistController::class, 'toggle']);
+    Route::delete('/wishlist/{id}',                    [CustomerWishlistController::class, 'destroy']);
 
     Route::get('/variants',                            [ProductVariantController::class,'index']);
     Route::get('/variants/low-stock',                  [ProductVariantController::class,'lowStock']);
@@ -101,11 +115,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/variants/{id}/tiers',                 [\App\Http\Controllers\Api\V1\VariantPricingTierController::class, 'index']);
     Route::get('/variants/{id}/barcode-label',         [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'barcodeLabel']);
 
-    // SalesBinder Inventory Statistics & Valuation (High-speed cached)
+    // Inventory Statistics & Valuation (High-speed cached)
     Route::get('/inventory/statistics',                [\App\Http\Controllers\Api\V1\InventoryValuationController::class, 'statistics']);
 
-    // Payments, KHQR & Hardware Print Services
+    // Payments, KHQR & Hardware Print Services (Orders & Legacy Sales aliases)
     Route::get('/payments/khqr',                       [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateCustom']);
+    Route::get('/orders/{id}/khqr',                     [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateForSale']);
+    Route::get('/orders/{id}/receipt-thermal',          [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'receiptThermal']);
+    Route::get('/orders/{id}/invoice-pdf',              [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'renderInvoiceHtml']);
     Route::get('/sales/{id}/khqr',                     [\App\Http\Controllers\Api\V1\KhqrPaymentController::class, 'generateForSale']);
     Route::get('/sales/{id}/receipt-thermal',          [\App\Http\Controllers\Api\V1\BarcodePrintController::class, 'receiptThermal']);
     Route::get('/sales/{id}/invoice-pdf',              [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'renderInvoiceHtml']);
@@ -145,10 +162,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/shifts/drop-cash',               [\App\Http\Controllers\Api\V1\PosShiftController::class, 'dropCash']);
         Route::post('/shifts/close',                   [\App\Http\Controllers\Api\V1\PosShiftController::class, 'close']);
 
-        // -- POS Sales, Invoices & Estimates (SalesBinder Engine) --
-        Route::post('/sales/checkout',                 [SaleController::class, 'checkout']);
-        Route::get('/sales',                           [SaleController::class, 'index']);
-        Route::get('/sales/{id}',                      [SaleController::class, 'show']);
+        // -- Orders & Checkouts (First-class endpoints) --
+        Route::post('/orders/checkout',                [OrderController::class, 'checkout']);
+        Route::get('/orders',                          [OrderController::class, 'index']);
+        Route::get('/orders/{id}',                     [OrderController::class, 'show']);
+
+        // -- Legacy POS Sales Aliases (Backward-Compatibility) --
+        Route::post('/sales/checkout',                 [OrderController::class, 'checkout']);
+        Route::get('/sales',                           [OrderController::class, 'index']);
+        Route::get('/sales/{id}',                      [OrderController::class, 'show']);
 
         Route::get('/invoices',                        [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'index']);
         Route::post('/estimates',                      [\App\Http\Controllers\Api\V1\InvoiceEstimateController::class, 'createEstimate']);
@@ -173,7 +195,10 @@ Route::prefix('v1')->group(function () {
                 ->where('is_active', true)
                 ->orderBy('alert_id', 'DESC')
                 ->get();
-            return response()->json(['success' => true, 'data' => $alerts]);
+            return \App\Http\Response\ApiResponse::success(
+                $alerts,
+                'Active broadcast alerts retrieved'
+            );
         });
 
 
@@ -259,8 +284,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/products/{id}/image',        [ImageUploadController::class,   'uploadForProduct']);
             Route::post('/variants/{id}/image',        [ImageUploadController::class,   'uploadForVariant']);
 
-            // Sales Voiding
-            Route::post('/sales/{id}/void',            [SaleController::class,          'void']);
+            // Orders & Sales Voiding
+            Route::post('/orders/{id}/void',           [OrderController::class,         'void']);
+            Route::post('/sales/{id}/void',            [OrderController::class,         'void']);
 
             // Audit Logs (Accessible by Manager and Admin)
             Route::get('/audit-logs',                  [AuditLogController::class,      'index']);
@@ -342,4 +368,3 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
-

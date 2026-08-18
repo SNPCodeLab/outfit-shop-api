@@ -31,13 +31,8 @@ class AppServiceProvider extends ServiceProvider
             if (!$user) {
                 return \Illuminate\Cache\RateLimiting\Limit::perMinute(30)
                     ->by($request->ip())
-                    ->response(function () use ($request) {
-                        return response()->json([
-                            'success'    => false,
-                            'message'    => 'Too many requests. Public rate limit exceeded (30 req/min).',
-                            'error_code' => 'ERR_TOO_MANY_REQUESTS',
-                            'request_id' => $request->header('X-Request-Id') ?? (string) \Illuminate\Support\Str::uuid(),
-                        ], 429);
+                    ->response(function () {
+                        return \App\Http\Response\ApiResponse::tooManyRequests(30, 0, 60, 'PUBLIC');
                     });
             }
 
@@ -63,13 +58,10 @@ class AppServiceProvider extends ServiceProvider
 
             return \Illuminate\Cache\RateLimiting\Limit::perMinute($maxAttempts)
                 ->by((string) $userId)
-                ->response(function () use ($role, $maxAttempts, $request) {
-                    return response()->json([
-                        'success'    => false,
-                        'message'    => "Too many requests. Role [{$role}] limit exceeded ({$maxAttempts} req/min).",
-                        'error_code' => 'ERR_TOO_MANY_REQUESTS',
-                        'request_id' => $request->header('X-Request-Id') ?? (string) \Illuminate\Support\Str::uuid(),
-                    ], 429);
+                ->response(function () use ($role, $maxAttempts) {
+                    return \App\Http\Response\ApiResponse::tooManyRequests(
+                        $maxAttempts, 0, 60, $role
+                    );
                 });
         });
     }

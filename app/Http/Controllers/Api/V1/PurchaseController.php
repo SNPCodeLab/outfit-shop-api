@@ -76,9 +76,9 @@ class PurchaseController extends BaseApiController
                 items: $validated['items']
             );
 
-            return $this->successResponse($purchase, 'Purchase order received successfully', 201);
+            return $this->createdResponse($purchase, 'Purchase order received successfully', '/api/v1/purchases/' . $purchase->purchase_id);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_PURCHASE_FAILED');
+            return $this->errorResponse($e->getMessage(), 400, 'PURCHASE_RECEIVE_FAILED');
         }
     }
 

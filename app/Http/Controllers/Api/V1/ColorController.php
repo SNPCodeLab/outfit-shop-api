@@ -26,7 +26,7 @@ class ColorController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Color', $color->color_id, null, $color->toArray());
 
-        return $this->successResponse($color, 'Color created', 201);
+        return $this->createdResponse($color, 'Color created successfully', '/api/v1/colors/' . $color->color_id);
     }
 
     public function show(int $id): JsonResponse

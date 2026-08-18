@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "outfitshop/api",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "OutfitShop Ecommerce Clothing API — Modern Enterprise RESTful API.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
