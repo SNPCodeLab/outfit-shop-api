@@ -3,32 +3,43 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Employee\StoreEmployeeRequest;
 use App\Models\Employee;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
 class EmployeeController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->successResponse(Employee::all(), 'Employees directory');
+        $query = Employee::query();
+
+        if ($search = $request->input('q') ?? $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('employee_name', 'ILIKE', "%{$search}%")
+                  ->orWhere('username', 'ILIKE', "%{$search}%")
+                  ->orWhere('email', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        if ($role = $request->input('role')) {
+            $query->where('role', strtoupper($role));
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', strtoupper($status));
+        }
+
+        $perPage   = (int) $request->input('per_page', 50);
+        $employees = $query->orderBy('employee_id', 'desc')->paginate($perPage);
+
+        return $this->successResponse($employees, 'Employee directory retrieved');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'employee_name' => 'required|string|max:150',
-            'gender'        => 'nullable|string',
-            'phone'         => 'nullable|string',
-            'email'         => 'required|email|unique:employees,email',
-            'position'      => 'nullable|string',
-            'username'      => 'required|string|unique:employees,username',
-            'password'      => 'required|string|min:6',
-            'role'          => 'required|string|in:ADMIN,MANAGER,CASHIER,STAFF',
-            'status'        => 'nullable|string|in:ACTIVE,INACTIVE',
-        ]);
+        $validated = $request->validated();
 
         $employee = Employee::create([
             'employee_name' => $validated['employee_name'],
@@ -47,7 +58,7 @@ class EmployeeController extends BaseApiController
             'role'     => $employee->role,
         ]);
 
-        return $this->successResponse($employee, 'Employee registered', 201);
+        return $this->createdResponse($employee, 'Employee registered successfully', '/api/v1/employees/' . $employee->employee_id);
     }
 
     public function show(int $id): JsonResponse

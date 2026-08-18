@@ -35,7 +35,7 @@ class CategoryController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Category', $category->category_id, null, $category->toArray());
 
-        return $this->successResponse($category, 'Category created', 201);
+        return $this->createdResponse($category, 'Category created successfully', '/api/v1/categories/' . $category->category_id);
     }
 
     public function show(int $id): JsonResponse

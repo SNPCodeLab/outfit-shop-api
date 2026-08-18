@@ -1,6 +1,26 @@
-# Store Stock and Point-of-Sale Information System (SS-MIS) API
+<div align="center">
+  <img src="https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png" alt="OutfitShop Primary Logo" width="280" />
+  <h1>OutfitShop API</h1>
+  <p><strong>OutfitShop Ecommerce Clothing API</strong> — High-Performance Enterprise RESTful API for Omnichannel Apparel, POS Checkout, Cart, Wishlist, Multi-Branch Inventory & Financial Ledgers.</p>
 
-RESTful API backend for retail clothing store inventory, supplier purchasing, POS checkout, omnichannel logistics, and role-based administrative control.
+  [![Status](https://img.shields.io/badge/Status-Operational-brightgreen)](#)
+  [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel&logoColor=white)](#)
+  [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-336791?logo=postgresql&logoColor=white)](#)
+  [![Auth](https://img.shields.io/badge/Auth-Sanctum%204--Tier%20RBAC-blue)](#)
+  [![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](#)
+</div>
+
+---
+
+## 🎨 Official Brand Assets
+
+| Asset Type | Preview / Resource Link |
+| :--- | :--- |
+| **Primary Logo** | [![Primary Logo](https://res.cloudinary.com/od8t271n/image/upload/h_35/v1787064621/bleu-SNPCodeLab.png)](https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png) |
+| **Animated Cycle** | [default-cycle-SNPCodeLab.gif](https://res.cloudinary.com/od8t271n/image/upload/v1787062663/default-cycle-SNPCodeLab.gif) |
+| **Secondary Logo** | [bleu-SNPCodeLab.gif](https://res.cloudinary.com/od8t271n/image/upload/v1787062664/bleu-SNPCodeLab.gif) |
+| **Vector Icon** | [anime-SNPCodeLab.svg](https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg) |
+| **Brand Video** | [default-cycle-SNPCodeLab.mp4](https://res.cloudinary.com/od8t271n/video/upload/v1787062665/default-cycle-SNPCodeLab.mp4) |
 
 ---
 
@@ -9,7 +29,7 @@ RESTful API backend for retail clothing store inventory, supplier purchasing, PO
 * **IS Type**: Transaction Processing System (TPS / OLTP) with embedded Management Information System (MIS) Reporting  
 * **Architecture**: Monolithic, Headless REST API Backend (Laravel 11 + PostgreSQL 16)
 * **Access Model**: 4-Tier Role-Based Access Control (`ADMIN`, `MANAGER`, `CASHIER`, `STAFF`)
-* **Total Database Entities**: 48 Tables across 6 Core Operational Domains
+* **Total Database Entities**: 50 Tables across 6 Core Operational Domains (including Shopping Carts & Items)
 
 ---
 

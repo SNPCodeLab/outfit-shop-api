@@ -102,7 +102,7 @@ class StockTransferController extends BaseApiController
             return $transfer->load('items.variant.product');
         });
 
-        return $this->successResponse($transfer, 'Stock transfer requested successfully', 201);
+        return $this->createdResponse($transfer, 'Stock transfer requested successfully', '/api/v1/stock-transfers/' . $transfer->transfer_id);
     }
 
     /**
@@ -114,7 +114,11 @@ class StockTransferController extends BaseApiController
         $transfer = StockTransfer::findOrFail($id);
 
         if ($transfer->status !== 'REQUESTED') {
-            return $this->errorResponse("Transfer cannot be approved from current status [{$transfer->status}]", 400, 'ERR_INVALID_STATUS');
+            return $this->conflictResponse(
+                "Transfer cannot be approved from current status [{$transfer->status}]",
+                'INVALID_TRANSFER_STATUS',
+                ['current_status' => $transfer->status, 'required_status' => 'REQUESTED']
+            );
         }
 
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
@@ -136,7 +140,11 @@ class StockTransferController extends BaseApiController
         $transfer = StockTransfer::findOrFail($id);
 
         if ($transfer->status !== 'APPROVED') {
-            return $this->errorResponse("Transfer cannot be picked from status [{$transfer->status}]", 400, 'ERR_INVALID_STATUS');
+            return $this->conflictResponse(
+                "Transfer cannot be picked from status [{$transfer->status}]",
+                'INVALID_TRANSFER_STATUS',
+                ['current_status' => $transfer->status, 'required_status' => 'APPROVED']
+            );
         }
 
         $transfer->update(['status' => 'PICKED']);
@@ -263,7 +271,7 @@ class StockTransferController extends BaseApiController
             'from_branch_id' => $transfer->from_branch_id,
             'to_branch_id'   => $transfer->to_branch_id,
             'items_count'    => $transfer->items->count(),
-            'received_at'    => $transfer->received_at->toIso8601String(),
+            'received_at'    => $transfer->received_at->toISOString(),
         ]);
 
         Log::channel('inventory')->info("Stock transfer received and completed: {$transfer->transfer_no}");
@@ -280,7 +288,11 @@ class StockTransferController extends BaseApiController
         $transfer = StockTransfer::findOrFail($id);
 
         if (in_array($transfer->status, ['RECEIVED', 'CANCELLED'])) {
-            return $this->errorResponse("Transfer cannot be cancelled from status [{$transfer->status}]", 400, 'ERR_INVALID_STATUS');
+            return $this->conflictResponse(
+                "Transfer cannot be cancelled from status [{$transfer->status}]",
+                'INVALID_TRANSFER_STATUS',
+                ['current_status' => $transfer->status, 'terminal_states' => ['RECEIVED', 'CANCELLED']]
+            );
         }
 
         $transfer->update(['status' => 'CANCELLED']);

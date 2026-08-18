@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\ProductVariant;
 use App\Models\PurchaseDetail;
 use App\Models\PurchaseHeader;
@@ -13,35 +13,33 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class InventoryForecastingController extends Controller
+class InventoryForecastingController extends BaseApiController
 {
     /**
-     * Calculate 14-day sales velocity and generate restock recommendations
+     * Calculate 14-day sales velocity and generate restock recommendations.
+     * Restricted to MANAGER or ADMIN.
      */
     public function restockRecommendations(): JsonResponse
     {
         $lookbackDays = 14;
-        $sinceDate = Carbon::now()->subDays($lookbackDays);
+        $sinceDate    = Carbon::now()->subDays($lookbackDays);
 
-        // Calculate sales velocity per variant
         $salesVelocity = SaleDetail::where('created_at', '>=', $sinceDate)
             ->select('variant_id', DB::raw('SUM(quantity) as total_sold'))
             ->groupBy('variant_id')
             ->pluck('total_sold', 'variant_id')
             ->toArray();
 
-        $variants = ProductVariant::with(['product.category', 'size', 'color'])->get();
-
+        $variants       = ProductVariant::with(['product.category', 'size', 'color'])->get();
         $recommendations = [];
 
         foreach ($variants as $v) {
-            $sold14 = $salesVelocity[$v->variant_id] ?? 0;
+            $sold14      = $salesVelocity[$v->variant_id] ?? 0;
             $dailyRunRate = round($sold14 / $lookbackDays, 2);
-            $daysLeft = $dailyRunRate > 0 ? round($v->quantity / $dailyRunRate, 1) : 999;
+            $daysLeft    = $dailyRunRate > 0 ? round($v->quantity / $dailyRunRate, 1) : 999;
             $reorderThreshold = $v->reorder_level ?? 10;
-
-            $isUrgent = ($v->quantity <= $reorderThreshold) || ($daysLeft <= 7 && $dailyRunRate > 0);
-            $recommendedOrderQty = max(20, (int) round(($dailyRunRate * 30) - $v->quantity)); // 30 days of safety stock
+            $isUrgent    = ($v->quantity <= $reorderThreshold) || ($daysLeft <= 7 && $dailyRunRate > 0);
+            $recommendedQty = max(20, (int) round(($dailyRunRate * 30) - $v->quantity));
 
             if ($isUrgent || $v->quantity <= 5) {
                 $recommendations[] = [
@@ -56,63 +54,55 @@ class InventoryForecastingController extends Controller
                     'daily_run_rate'          => $dailyRunRate,
                     'days_of_stock_left'      => $daysLeft,
                     'cost_price'              => (float) $v->cost_price,
-                    'recommended_order_qty'   => $recommendedOrderQty,
-                    'estimated_restock_cost'  => round($recommendedOrderQty * (float)$v->cost_price, 2),
-                    'urgency'                 => $v->quantity == 0 ? 'OUT_OF_STOCK' : ($daysLeft <= 3 ? 'CRITICAL' : 'RESTOCK_NEEDED'),
+                    'recommended_order_qty'   => $recommendedQty,
+                    'estimated_restock_cost'  => round($recommendedQty * (float) $v->cost_price, 2),
+                    'urgency'                 => $v->quantity === 0
+                        ? 'OUT_OF_STOCK'
+                        : ($daysLeft <= 3 ? 'CRITICAL' : 'RESTOCK_NEEDED'),
                 ];
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'data'    => [
-                'lookback_days'         => $lookbackDays,
-                'total_items_to_restock'=> count($recommendations),
-                'total_estimated_budget'=> round(array_sum(array_column($recommendations, 'estimated_restock_cost')), 2),
-                'recommendations'       => $recommendations,
-            ],
-            'message' => 'Restock recommendations generated based on sales velocity',
-        ]);
+        return $this->successResponse([
+            'lookback_days'          => $lookbackDays,
+            'total_items_to_restock' => count($recommendations),
+            'total_estimated_budget' => round(array_sum(array_column($recommendations, 'estimated_restock_cost')), 2),
+            'recommendations'        => $recommendations,
+        ], 'Restock recommendations generated based on 14-day sales velocity');
     }
 
     /**
-     * Auto-draft a Purchase Order for recommended restock items
+     * Auto-draft a Purchase Order for recommended restock items.
+     * Restricted to MANAGER or ADMIN.
      */
     public function autoGeneratePurchaseOrder(Request $request): JsonResponse
     {
-        $supplier = Supplier::first();
-        if (!$supplier) {
-            $supplier = Supplier::create([
-                'supplier_name' => 'Khmer Garment Central Supply',
-                'contact_name'  => 'Vendor Relations',
-                'phone'         => '+855 23 777 888',
-                'email'         => 'orders@garmentsupply.kh',
-                'status'        => 'ACTIVE',
-            ]);
-        }
+        $items = $request->validate([
+            'items'                => 'required|array|min:1',
+            'items.*.variant_id'   => 'required|exists:product_variants,variant_id',
+            'items.*.quantity'     => 'required|integer|min:1',
+            'items.*.cost_price'   => 'nullable|numeric|min:0',
+        ])['items'];
 
-        $items = $request->input('items', []);
-
-        if (empty($items)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No restock items specified for Purchase Order generation.',
-            ], 400);
-        }
+        $supplier = Supplier::first() ?? Supplier::create([
+            'supplier_name' => 'Khmer Garment Central Supply',
+            'contact_name'  => 'Vendor Relations',
+            'phone'         => '+855 23 777 888',
+            'email'         => 'orders@garmentsupply.kh',
+            'status'        => 'ACTIVE',
+        ]);
 
         $po = DB::transaction(function () use ($supplier, $items, $request) {
-            $employeeId = $request->user()->employee_id ?? 1;
-
+            $employeeId  = $request->user()->employee_id ?? $request->user()->id ?? 1;
             $totalAmount = 0.0;
-            $poDetails = [];
+            $poDetails   = [];
 
             foreach ($items as $item) {
-                $variant = ProductVariant::findOrFail($item['variant_id']);
-                $qty = (int) $item['quantity'];
-                $cost = (float) ($item['cost_price'] ?? $variant->cost_price);
+                $variant  = ProductVariant::findOrFail($item['variant_id']);
+                $qty      = (int) $item['quantity'];
+                $cost     = (float) ($item['cost_price'] ?? $variant->cost_price);
                 $subtotal = $qty * $cost;
                 $totalAmount += $subtotal;
-
                 $poDetails[] = [
                     'variant_id' => $variant->variant_id,
                     'quantity'   => $qty,
@@ -134,17 +124,12 @@ class InventoryForecastingController extends Controller
             ]);
 
             foreach ($poDetails as $d) {
-                $d['purchase_id'] = $purchase->purchase_id;
-                PurchaseDetail::create($d);
+                PurchaseDetail::create(array_merge($d, ['purchase_id' => $purchase->purchase_id]));
             }
 
             return $purchase->load(['supplier', 'details.variant.product']);
         });
 
-        return response()->json([
-            'success' => true,
-            'data'    => $po,
-            'message' => 'Purchase Order auto-drafted successfully',
-        ], 201);
+        return $this->createdResponse($po, 'Purchase order auto-drafted successfully', '/api/v1/purchases/' . $po->purchase_id);
     }
 }

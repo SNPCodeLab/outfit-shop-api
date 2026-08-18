@@ -1,6 +1,22 @@
-# Retail Clothing Store MIS & POS — API Delivery Package
+<div align="center">
+  <img src="https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png" alt="OutfitShop Primary Logo" width="280" />
+  <h1>OutfitShop API — Delivery Package</h1>
+  <p>Official Integration & Handoff Package for <strong>OutfitShop Ecommerce Clothing API</strong>.</p>
+</div>
 
-Welcome to the official API Integration Package for the **Retail Clothing Store MIS & Point-of-Sale System (SS-MIS / CSMS)**.
+---
+
+## 🎨 Brand Assets Directory
+
+| Asset | CDN URL |
+| :--- | :--- |
+| **Primary Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png` |
+| **Animated Cycle** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062663/default-cycle-SNPCodeLab.gif` |
+| **Secondary Logo** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062664/bleu-SNPCodeLab.gif` |
+| **Vector Icon** | `https://res.cloudinary.com/od8t271n/image/upload/v1787062662/anime-SNPCodeLab.svg` |
+| **Brand Video** | `https://res.cloudinary.com/od8t271n/video/upload/v1787062665/default-cycle-SNPCodeLab.mp4` |
+
+---
 
 ## 🌐 Environments & Base URLs
 
@@ -17,8 +33,9 @@ Welcome to the official API Integration Package for the **Retail Clothing Store 
 ```text
 📁 API-Delivery-Package/
 ├── 📄 README.md                # This setup & architectural guide
-├── 📄 postman_collection.json  # Complete Postman v2.1 test collection
-├── 📄 openapi_spec.yaml        # OpenAPI 3.0 / Swagger schema specification
+├── 📄 postman_collection.json  # Complete OutfitShop Postman v2.1 test collection
+├── 📄 openapi_spec.json        # OpenAPI 3.0 JSON specification
+├── 📄 openapi_spec.yaml        # OpenAPI 3.0 / Swagger YAML schema specification
 ├── 📄 error_codes.md           # Machine-readable error dictionary & HTTP codes
 ├── 📄 auth_flow.md             # 4-Tier RBAC & Sanctum token lifecycle
 ├── 📄 test_credentials.md      # Staging & local demo employee credentials
@@ -27,7 +44,7 @@ Welcome to the official API Integration Package for the **Retail Clothing Store 
 
 ---
 
-## ⚡ Quickstart for Frontend Developers (3 Minutes)
+## ⚡ Quickstart for Frontend Developers
 
 ### 1. Configure Environment Variable
 In your Next.js / Vite root directory, create or update `.env.local`:
@@ -49,22 +66,11 @@ X-Request-Id: <uuid_v4>
 ### 3. Core Business Policy Rules
 1. **Tax Policy**: `10.00% Tax-Exclusive (VAT)` applied on net subtotal (`Subtotal = Items - Discount`, `Tax = round(Net * 0.10, 2)`).
 2. **Exchange Rate**: Fixed retail rate `1 USD = 4,100 KHR`.
-3. **Pessimistic Locking**: `POST /sales/checkout` uses row locking on `product_variants`. Always pass `X-Idempotency-Key` to avoid double-charging on network retries.
-4. **Brand Scope**: The brand name *"KhmeRiel (Clothing MIS & POS)"* is strictly for the frontend user interface; backend endpoints remain domain-agnostic.
-
----
-
-## 🧪 Automated Test Suite Verification
-
-The backend API test suite validates all 135+ endpoints with 100% pass rate:
-
-```bash
-php artisan test
-# Tests: 307 passed (0 failed, 0 errors)
-```
+3. **Pessimistic Locking**: `POST /orders/checkout` (and legacy alias `POST /sales/checkout`) uses row locking on `product_variants`. Always pass `X-Idempotency-Key` to avoid double-charging on network retries.
+4. **Cart & Wishlist**: Public endpoints `GET /cart`, `POST /cart/items`, `GET /wishlist`, `POST /wishlist/toggle` are available for guest & logged-in user experiences.
 
 ---
 
 ## 👥 Engineering & Support Contacts
 - **Backend Architecture Lead**: `support@kesararamwithdigital.tech`
-- **GitHub Repository**: [github.com/SNPbuilds/csms-backend-api](https://github.com/SNPbuilds/csms-backend-api)
+- **Package Name**: `outfitshop/api`
