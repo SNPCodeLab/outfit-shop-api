@@ -12,19 +12,11 @@ ini_set('display_errors', '0');
 
 // Environment Overrides for Vercel Serverless
 putenv('LOG_CHANNEL=stderr');
-putenv('LOG_LEVEL=error');
-putenv('CACHE_STORE=array');
-putenv('CACHE_DRIVER=array');
-putenv('SESSION_DRIVER=cookie');
-putenv('APP_MAINTENANCE_DRIVER=file');
-putenv('APP_MAINTENANCE_STORE=array');
-
-$_ENV['LOG_CHANNEL'] = 'stderr';
-$_ENV['CACHE_STORE'] = 'array';
-$_ENV['CACHE_DRIVER'] = 'array';
-$_ENV['SESSION_DRIVER'] = 'cookie';
-$_ENV['APP_MAINTENANCE_DRIVER'] = 'file';
-$_ENV['APP_MAINTENANCE_STORE'] = 'array';
+putenv('LOG_LEVEL=debug');
+putenv('CACHE_STORE=database');
+putenv('SESSION_DRIVER=database');
+putenv('APP_DEBUG=true');
+$_ENV['APP_DEBUG'] = 'true';
 
 if (! getenv('APP_DEBUG')) {
     putenv('APP_DEBUG=true');
@@ -35,12 +27,13 @@ if (! getenv('APP_KEY') && isset($_ENV['APP_KEY'])) {
     putenv("APP_KEY={$_ENV['APP_KEY']}");
 }
 
-if (! getenv('DB_CONNECTION')) {
+// Ensure database connection is set correctly for Vercel/Neon
+if (getenv('DATABASE_URL')) {
     putenv('DB_CONNECTION=pgsql');
     $_ENV['DB_CONNECTION'] = 'pgsql';
 }
 
-// Create writable /tmp paths
+// Create writable /tmp paths for Laravel storage
 $storagePath = '/tmp/storage';
 @mkdir($storagePath.'/framework/views', 0755, true);
 @mkdir($storagePath.'/framework/sessions', 0755, true);
@@ -76,6 +69,7 @@ try {
     header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
+        'message' => 'Vercel Laravel Boot Error',
         'error' => $e->getMessage(),
         'file' => $e->getFile(),
         'line' => $e->getLine(),
