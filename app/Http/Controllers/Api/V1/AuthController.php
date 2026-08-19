@@ -62,11 +62,15 @@ class AuthController extends BaseApiController
      */
     private function resolveRole(mixed $account): string
     {
+        if (! $account) {
+            return 'GUEST';
+        }
+
         if ($account instanceof Employee) {
             return strtoupper($account->role ?? 'STAFF');
         }
 
-        if (property_exists($account, 'is_admin') && $account->is_admin) {
+        if (is_object($account) && property_exists($account, 'is_admin') && $account->is_admin) {
             return 'ADMIN';
         }
 
@@ -313,6 +317,14 @@ class AuthController extends BaseApiController
     public function me(Request $request): JsonResponse
     {
         $account = $request->user();
+
+        if (! $account) {
+            return ApiResponse::unauthenticated(
+                'token_invalid',
+                'Your authentication token is no longer valid. Please login again.'
+            );
+        }
+
         $role = $this->resolveRole($account);
         $permissions = $this->permissionsFor($role);
 

@@ -5,6 +5,7 @@
 *.env
 !.env.example
 /auth.json
+LOCAL_CREDENTIALS.md
 
 # Postman, API Collections & Client Environments
 /postman_collections/
