@@ -147,6 +147,31 @@ class CloudinaryService
     }
 
     /**
+     * List resources from Cloudinary with optional prefix/folder filtering.
+     * Uses the Cloudinary Admin API.
+     *
+     * @throws Exception
+     */
+    public function listResources(?string $prefix = null, int $maxResults = 100): array
+    {
+        $endpoint = "https://api.cloudinary.com/v1_1/{$this->cloudName}/resources/image";
+
+        $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
+            ->get($endpoint, [
+                'prefix' => $prefix,
+                'max_results' => $maxResults,
+                'type' => 'upload',
+            ]);
+
+        if ($response->failed()) {
+            $errorMsg = $response->json('error.message') ?? $response->body();
+            throw new Exception("Failed to list Cloudinary resources: {$errorMsg}");
+        }
+
+        return $response->json('resources') ?? [];
+    }
+
+    /**
      * Generate Cloudinary SHA-1 authentication signature.
      */
     protected function generateSignature(array $params): string
