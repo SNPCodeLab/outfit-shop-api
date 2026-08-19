@@ -8,7 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class CloudinarySyncTestDataSeeder extends Seeder
 {
@@ -32,7 +31,7 @@ class CloudinarySyncTestDataSeeder extends Seeder
                 Product::create([
                     'category_id' => $category->category_id,
                     'brand_id' => $brand->brand_id,
-                    'product_name' => $brand->brand_name . " Product {$i}",
+                    'product_name' => $brand->brand_name." Product {$i}",
                     'description' => "Luxury product from {$brand->brand_name}",
                     'status' => 'ACTIVE',
                 ]);

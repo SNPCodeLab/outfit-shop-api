@@ -14,10 +14,10 @@ class LouisVuittonImageSeeder extends Seeder
 {
     public function run(): void
     {
-        $cloudinary = new CloudinaryService();
+        $cloudinary = new CloudinaryService;
         $brand = Brand::where('slug', 'louis-vuitton')->first();
 
-        if (!$brand) {
+        if (! $brand) {
             return;
         }
 
@@ -25,7 +25,8 @@ class LouisVuittonImageSeeder extends Seeder
         try {
             $resources = $cloudinary->listResources(null, 1000);
         } catch (\Exception $e) {
-            echo "Cloudinary API Error: " . $e->getMessage() . "\n";
+            echo 'Cloudinary API Error: '.$e->getMessage()."\n";
+
             return;
         }
 
@@ -37,7 +38,7 @@ class LouisVuittonImageSeeder extends Seeder
                 if (str_contains($publicId, strtolower($kw))) {
                     $matches[] = [
                         'public_id' => $res['public_id'],
-                        'url' => $res['secure_url'] ?? $res['url']
+                        'url' => $res['secure_url'] ?? $res['url'],
                     ];
                     break;
                 }
@@ -46,6 +47,7 @@ class LouisVuittonImageSeeder extends Seeder
 
         if (empty($matches)) {
             echo "No matching images found in Cloudinary.\n";
+
             return;
         }
 
@@ -54,10 +56,11 @@ class LouisVuittonImageSeeder extends Seeder
 
         if ($products->isEmpty()) {
             echo "No Louis Vuitton products found in database.\n";
+
             return;
         }
 
-        echo "Seeding " . count($matches) . " images for " . $products->count() . " products...\n";
+        echo 'Seeding '.count($matches).' images for '.$products->count()." products...\n";
 
         // 3. Distribute images across products
         $imgIndex = 0;

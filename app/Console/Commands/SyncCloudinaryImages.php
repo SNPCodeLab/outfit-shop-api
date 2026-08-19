@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\File;
 class SyncCloudinaryImages extends Command
 {
     protected $signature = 'cloudinary:sync {--report-only : Only generate the missing images report}';
+
     protected $description = 'Synchronize brand images from Cloudinary to the local database with strict deduplication.';
 
     public function handle(CloudinarySyncService $syncService): int
     {
         if ($this->option('report-only')) {
             $this->generateReport($syncService);
+
             return 0;
         }
 
@@ -28,7 +30,7 @@ class SyncCloudinaryImages extends Command
             $stats['inserted'],
             $stats['skipped'],
             $stats['updated'],
-            $stats['errors']
+            $stats['errors'],
         ]]);
 
         $this->generateSyncLog($stats);
@@ -43,17 +45,18 @@ class SyncCloudinaryImages extends Command
 
         if (empty($report)) {
             $this->info('All products for all brands have associated images.');
+
             return;
         }
 
         $this->warn('Missing Images Report:');
-        $this->table(['Brand ID', 'Brand Name', 'Products', 'With Images', 'Missing'], array_map(fn($r) => (array)$r, $report));
+        $this->table(['Brand ID', 'Brand Name', 'Products', 'With Images', 'Missing'], array_map(fn ($r) => (array) $r, $report));
     }
 
     protected function generateSyncLog(array $stats): void
     {
         $logPath = base_path('sync_log.md');
-        $content = "# Cloudinary Sync Log - " . now()->toDateTimeString() . "\n\n";
+        $content = '# Cloudinary Sync Log - '.now()->toDateTimeString()."\n\n";
         $content .= "## Summary\n";
         $content .= "- **Inserted:** {$stats['inserted']}\n";
         $content .= "- **Skipped:** {$stats['skipped']}\n";
