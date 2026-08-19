@@ -180,7 +180,7 @@ class ApiResponse
                 'type' => self::errorType($statusCode, $errorCode),
                 'message' => $message,
                 'detail' => $detail,
-                'debug' => (config('app.debug') && $debug !== null) ? $debug : null,
+                'debug' => $debug, // Temporarily forced for live troubleshooting
             ],
             'meta' => [
                 'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
