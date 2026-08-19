@@ -95,7 +95,7 @@ class InventoryService
             ]);
 
             // Auto-generate reference_no after we have the PK
-            $referenceNo = 'PO-'.now()->format('Ymd').'-'.str_pad($purchaseHeader->purchase_id, 5, '0', STR_PAD_LEFT);
+            $referenceNo = 'PO-'.now()->format('Ymd').'-'.str_pad((string) $purchaseHeader->purchase_id, 5, '0', STR_PAD_LEFT);
             $purchaseHeader->update(['reference_no' => $referenceNo]);
 
             foreach ($detailsToInsert as $detail) {

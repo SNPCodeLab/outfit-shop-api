@@ -138,7 +138,7 @@ class POSService
             ]);
 
             // Auto-generate invoice_no after we have the sale_id PK.
-            $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad($saleHeader->sale_id, 5, '0', STR_PAD_LEFT);
+            $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad((string) $saleHeader->sale_id, 5, '0', STR_PAD_LEFT);
             $saleHeader->update(['invoice_no' => $invoiceNo]);
 
             // ── 4. Create Sale Details, deduct stock & write movement ledger ─

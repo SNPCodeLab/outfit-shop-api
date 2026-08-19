@@ -135,7 +135,7 @@ class InvoiceEstimateController extends BaseApiController
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $estimateNo = 'EST-'.now()->format('Ymd').'-'.str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+            $estimateNo = 'EST-'.now()->format('Ymd').'-'.str_pad((string) $estimate->sale_id, 5, '0', STR_PAD_LEFT);
             $estimate->update(['invoice_no' => $estimateNo]);
 
             foreach ($detailsData as $detail) {
@@ -209,7 +209,7 @@ class InvoiceEstimateController extends BaseApiController
                     }
                 }
 
-                $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad($estimate->sale_id, 5, '0', STR_PAD_LEFT);
+                $invoiceNo = 'INV-'.now()->format('Ymd').'-'.str_pad((string) $estimate->sale_id, 5, '0', STR_PAD_LEFT);
                 $paymentMethod = $request->input('payment_method');
                 $paymentStatus = $paymentMethod ? 'PAID' : 'UNPAID';
 
