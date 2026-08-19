@@ -33,7 +33,7 @@ $_ENV['APP_KEY'] = $appKey;
 $_SERVER['APP_KEY'] = $appKey;
 
 // 2. Database Discovery (Neon / Vercel)
-$dbUrl = getenv('DATABASE_URL') ?: (getenv('POSTGRES_URL') ?: 'postgresql://neondb_owner:npg_SsC0GRvWm1Bz@ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require');
+$dbUrl = getenv('DATABASE_URL') ?: (getenv('POSTGRES_URL') ?: 'postgresql://neondb_owner:npg_SsC0GRvWm1Bz@ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require');
 
 if ($dbUrl && str_contains($dbUrl, '://')) {
     $parsedUrl = parse_url($dbUrl);
