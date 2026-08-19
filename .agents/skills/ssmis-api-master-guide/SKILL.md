@@ -12,7 +12,13 @@ This skill defines the technical and operational standards for the KhmeRiel / CS
 
 ## 1. Primary Infrastructure Status
 - **Production Gateway**: `https://api.kesararamwithdigital.tech/api/v1`
-- **Primary Database**: Neon PostgreSQL (Host: `ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech`)
+- **Primary Database**: Neon PostgreSQL — branch `main`, database `neondb`
+  - Pooler (primary): `ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech:5432`
+  - Data API: `https://ep-blue-mode-avbaa8zy.apirest.c-11.us-east-1.aws.neon.tech/neondb/rest/v1`
+  - Auth URL: `https://ep-blue-mode-avbaa8zy.neonauth.c-11.us-east-1.aws.neon.tech/neondb/auth`
+  - JWKS URL: `https://ep-blue-mode-avbaa8zy.neonauth.c-11.us-east-1.aws.neon.tech/neondb/auth/.well-known/jwks.json`
+  - Full connection string: `postgresql://neondb_owner:npg_SsC0GRvWm1Bz@ep-blue-mode-avbaa8zy-pooler.c-11.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+  - See `neon-primary-connection` skill for complete configuration rules.
 - **Media CDN**: Cloudinary Edge (`od8t271n`)
 - **Framework**: Laravel 12 (Hardened for Serverless/Vercel)
 
