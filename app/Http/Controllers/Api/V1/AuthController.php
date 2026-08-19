@@ -99,17 +99,17 @@ class AuthController extends BaseApiController
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $identifier = $request->input('username') ?? $request->input('email');
-        $lockKey = "login_lockout:{$identifier}";
-
-        if (Cache::has($lockKey)) {
-            return ApiResponse::accountLocked(
-                'Account temporarily locked due to 10 failed login attempts. Please wait 15 minutes before retrying.',
-                900
-            );
-        }
-
         try {
+            $identifier = $request->input('username') ?? $request->input('email');
+            $lockKey = "login_lockout:{$identifier}";
+
+            if (Cache::has($lockKey)) {
+                return ApiResponse::accountLocked(
+                    'Account temporarily locked due to 10 failed login attempts. Please wait 15 minutes before retrying.',
+                    900
+                );
+            }
+
             // 1 — Employee authentication (username or email)
             $employee = Employee::where('username', $identifier)
                 ->orWhere('email', $identifier)
@@ -218,6 +218,32 @@ class AuthController extends BaseApiController
                     ],
                 ], 'Login successful');
             }
+
+            // Failed authentication handling
+            $failKey = "login_fails:{$identifier}";
+            $fails = (int) Cache::get($failKey, 0) + 1;
+            Cache::put($failKey, $fails, now()->addMinutes(15));
+
+            if ($fails >= 10) {
+                Cache::put("login_lockout:{$identifier}", true, now()->addMinutes(15));
+                Log::channel('security')->alert("Account locked out after 10 failed attempts: {$identifier}", [
+                    'ip' => $request->ip(),
+                ]);
+            }
+
+            Log::channel('security')->warning('Failed authentication attempt', [
+                'identifier' => $identifier,
+                'attempt_count' => $fails,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'username' => ['Invalid credentials. Please check your username/email and password.'],
+            ]);
+
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::critical('CRITICAL LOGIN FAILURE: '.$e->getMessage(), [
                 'exception' => get_class($e),
@@ -233,28 +259,6 @@ class AuthController extends BaseApiController
                 500
             );
         }
-
-        $failKey = "login_fails:{$identifier}";
-        $fails = (int) Cache::get($failKey, 0) + 1;
-        Cache::put($failKey, $fails, now()->addMinutes(15));
-
-        if ($fails >= 10) {
-            Cache::put("login_lockout:{$identifier}", true, now()->addMinutes(15));
-            Log::channel('security')->alert("Account locked out after 10 failed attempts: {$identifier}", [
-                'ip' => $request->ip(),
-            ]);
-        }
-
-        Log::channel('security')->warning('Failed authentication attempt', [
-            'identifier' => $identifier,
-            'attempt_count' => $fails,
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        throw ValidationException::withMessages([
-            'username' => ['Invalid credentials. Please check your username/email and password.'],
-        ]);
     }
 
     /**
