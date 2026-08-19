@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,8 +22,9 @@ class Color extends Model
     public function getDescriptionAttribute($value): string
     {
         if (empty($value)) {
-            return 'A beautiful ' . strtolower($this->color_name) . ' shade for high-end fashion.';
+            return 'A beautiful '.strtolower($this->color_name).' shade for high-end fashion.';
         }
+
         return $value;
     }
 

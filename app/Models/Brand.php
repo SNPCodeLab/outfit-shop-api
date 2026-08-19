@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,8 +34,9 @@ class Brand extends Model
     public function getDescriptionAttribute($value): string
     {
         if (empty($value)) {
-            return 'Official ' . $this->brand_name . ' collection featuring premium craftsmanship.';
+            return 'Official '.$this->brand_name.' collection featuring premium craftsmanship.';
         }
+
         return $value;
     }
 
@@ -42,6 +45,7 @@ class Brand extends Model
         if (empty($value) && ($this->brand_name === 'KhmeRiel Signature' || $this->slug === 'khmeriel')) {
             return 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png';
         }
+
         return $value;
     }
 

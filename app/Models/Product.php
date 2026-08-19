@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,8 +39,10 @@ class Product extends Model
     {
         if (empty($value)) {
             $words = ['Premium', 'Luxury', 'Classic', 'Elegant', 'Modern', 'Handcrafted', 'Signature', 'Exclusive'];
-            return $words[array_rand($words)] . ' ' . $this->product_name . ' designed for comfort and style.';
+
+            return $words[array_rand($words)].' '.$this->product_name.' designed for comfort and style.';
         }
+
         return $value;
     }
 
@@ -49,8 +53,10 @@ class Product extends Model
             if ($this->brand === 'KhmeRiel' || $this->brand === 'KhmeRiel Signature') {
                 return 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png';
             }
+
             return 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png';
         }
+
         return $value;
     }
 

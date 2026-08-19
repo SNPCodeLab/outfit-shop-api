@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,8 +26,9 @@ class Category extends Model
     public function getDescriptionAttribute($value): string
     {
         if (empty($value)) {
-            return 'High-quality collection of ' . strtolower($this->category_name) . ' items.';
+            return 'High-quality collection of '.strtolower($this->category_name).' items.';
         }
+
         return $value;
     }
 

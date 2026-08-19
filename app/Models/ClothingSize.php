@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,8 +22,9 @@ class ClothingSize extends Model
     public function getDescriptionAttribute($value): string
     {
         if (empty($value)) {
-            return 'Standard sizing for ' . $this->size_name . ' apparel.';
+            return 'Standard sizing for '.$this->size_name.' apparel.';
         }
+
         return $value;
     }
 

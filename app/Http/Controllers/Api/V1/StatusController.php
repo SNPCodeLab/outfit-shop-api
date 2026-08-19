@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +31,7 @@ class StatusController extends BaseApiController
             'version' => config('api.version', 'Version: 1.2.0'),
             'api_status' => 'Operational',
             'database' => $dbStatus,
-            'live_products_count' => \App\Models\Product::where('status', 'ACTIVE')->count(),
+            'live_products_count' => Product::where('status', 'ACTIVE')->count(),
             'environment' => config('app.env', 'production'),
             'frontend_url' => 'https://app.kesararamwithdigital.tech',
             'guide_url' => url('/guide'),
