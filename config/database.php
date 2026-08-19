@@ -99,6 +99,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
+            // Neon uses PgBouncer in transaction-pooling mode.
+            // Prepared statements are not supported across pooled connections,
+            // so we disable them here to prevent SQLSTATE[25P02] errors.
+            'options' => [
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ],
         ],
 
         'sqlsrv' => [
