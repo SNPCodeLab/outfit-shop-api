@@ -26,6 +26,13 @@ class Payment extends Model
         'reference_number',
     ];
 
+    protected $casts = [
+        'amount' => 'float',
+        'amount_tendered' => 'float',
+        'change_due' => 'float',
+        'payment_date' => 'datetime',
+    ];
+
     public function sale(): BelongsTo
     {
         return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');

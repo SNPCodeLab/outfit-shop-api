@@ -35,6 +35,15 @@ class ProductVariant extends Model
         'reorder_level',
     ];
 
+    protected $casts = [
+        'cost_price' => 'float',
+        'sale_price' => 'float',
+        'wholesale_price' => 'float',
+        'alcohol_by_volume' => 'float',
+        'quantity' => 'integer',
+        'reorder_level' => 'integer',
+    ];
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id', 'product_id');

@@ -28,6 +28,13 @@ class PurchaseHeader extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'total_amount' => 'float',
+        'tax_amount' => 'float',
+        'grand_total' => 'float',
+        'purchase_date' => 'datetime',
+    ];
+
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');

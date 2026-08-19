@@ -23,6 +23,12 @@ class SaleDetail extends Model
         'sub_total',
     ];
 
+    protected $casts = [
+        'unit_price' => 'float',
+        'discount' => 'float',
+        'sub_total' => 'float',
+    ];
+
     public function header(): BelongsTo
     {
         return $this->belongsTo(SaleHeader::class, 'sale_id', 'sale_id');

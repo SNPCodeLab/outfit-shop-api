@@ -321,9 +321,9 @@ class InvoiceEstimateController extends BaseApiController
         $discount = number_format($sale->discount, 2);
         $tax = number_format($sale->tax_amount, 2);
         $grand = number_format($sale->grand_total, 2);
-        $paid = number_format($totalPaid, 2);
-        $due = number_format($balanceDue, 2);
-        $saleDate = date('d M Y - H:i', strtotime($sale->sale_date ?? now()));
+        $paid = number_format((float) $totalPaid, 2);
+        $due = number_format((float) $balanceDue, 2);
+        $saleDate = ($sale->sale_date ?? now())->format('d M Y - H:i');
 
         $html = "
 <!DOCTYPE html>

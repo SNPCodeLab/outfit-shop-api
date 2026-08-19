@@ -29,6 +29,13 @@ class StockMovement extends Model
         'employee_id',
     ];
 
+    protected $casts = [
+        'quantity' => 'integer',
+        'stock_before' => 'integer',
+        'stock_after' => 'integer',
+        'movement_date' => 'datetime',
+    ];
+
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'variant_id', 'variant_id');
