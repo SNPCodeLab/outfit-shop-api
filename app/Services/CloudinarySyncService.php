@@ -43,7 +43,7 @@ class CloudinarySyncService
                 ];
             } catch (Exception $e) {
                 $stats['errors']++;
-                Log::error("Failed to sync images for brand {$brand->brand_name}: " . $e->getMessage());
+                Log::error("Failed to sync images for brand {$brand->brand_name}: ".$e->getMessage());
             }
         }
 
@@ -61,7 +61,7 @@ class CloudinarySyncService
 
         // Fetch resources from Cloudinary matching the brand slug folder or prefix
         // Convention: Folder 'khmeriel/products/{brand_slug}'
-        $prefix = config('cloudinary.folder', 'khmeriel/products') . '/' . $brand->slug;
+        $prefix = config('cloudinary.folder', 'khmeriel/products').'/'.$brand->slug;
         $resources = $this->cloudinary->listResources($prefix);
 
         foreach ($resources as $resource) {
@@ -72,7 +72,7 @@ class CloudinarySyncService
             // Basic convention: {brand_slug}_{product_id}_{suffix}
             $productId = $this->resolveProductIdFromPublicId($publicId, $brand);
 
-            if (!$productId) {
+            if (! $productId) {
                 // If we can't map to a specific product, we might link to the brand logo or just skip
                 continue;
             }
@@ -87,9 +87,11 @@ class CloudinarySyncService
                 if ($exists->brand_id === $brand->brand_id && $exists->product_id === $productId) {
                     $exists->touch(); // Record was seen, update timestamp
                     $updated++;
+
                     continue;
                 }
                 $skipped++;
+
                 continue;
             }
 
@@ -102,6 +104,7 @@ class CloudinarySyncService
 
             if ($sameAssoc) {
                 $skipped++;
+
                 continue;
             }
 
@@ -133,7 +136,7 @@ class CloudinarySyncService
         $filename = basename($publicId);
 
         // Match pattern: {brand_slug}_(\d+)_
-        $pattern = '/^' . preg_quote($brand->slug, '/') . '_(\d+)/i';
+        $pattern = '/^'.preg_quote($brand->slug, '/').'_(\d+)/i';
 
         if (preg_match($pattern, $filename, $matches)) {
             return (int) $matches[1];
@@ -152,7 +155,7 @@ class CloudinarySyncService
      */
     public function getMissingImagesReport(): array
     {
-        return DB::select("
+        return DB::select('
             SELECT
                 b.brand_id,
                 b.brand_name,
@@ -164,6 +167,6 @@ class CloudinarySyncService
             LEFT JOIN product_images pi ON p.product_id = pi.product_id
             GROUP BY b.brand_id, b.brand_name
             HAVING COUNT(pi.image_id) = 0 OR COUNT(p.product_id) > COUNT(DISTINCT pi.product_id)
-        ");
+        ');
     }
 }
