@@ -72,5 +72,6 @@ X-Request-Id: <uuid_v4>
 ---
 
 ## 👥 Engineering & Support Contacts
-- **Backend Architecture Lead**: `support@kesararamwithdigital.tech`
+- **Backend Architecture Lead**: ``
 - **Package Name**: `outfitshop/api`
+- **Version**: `Version: 1.2.0`

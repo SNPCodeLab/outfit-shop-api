@@ -18,7 +18,7 @@ return [
     | Injected into every response envelope under meta.api_version.
     */
 
-    'version' => env('API_VERSION', '1.0.0'),
+    'version' => env('API_VERSION', 'Version: 1.2.0'),
 
     /*
     |--------------------------------------------------------------------------
@@ -27,7 +27,7 @@ return [
     | Included in every error response under meta.support_contact.
     */
 
-    'support_email' => env('API_SUPPORT_EMAIL', 'support@kesararamwithdigital.tech'),
+    'support_email' => env('API_SUPPORT_EMAIL', ''),
 
     /*
     |--------------------------------------------------------------------------

@@ -149,6 +149,17 @@ class RolesAndPermissionsSeeder extends Seeder
                 'phone' => '+85512345680',
                 'status' => 'ACTIVE',
             ],
+            [
+                'username' => 'staff',
+                'employee_name' => 'General Staff',
+                'email' => 'staff@ssmis.local',
+                'position' => 'Store Assistant',
+                'password_hash' => Hash::make('Staff@123456'),
+                'role' => 'STAFF',
+                'gender' => 'Male',
+                'phone' => '+85512345681',
+                'status' => 'ACTIVE',
+            ],
         ];
 
         foreach ($employees as $data) {

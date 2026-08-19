@@ -8,10 +8,10 @@ Use these pre-seeded accounts to test each RBAC role across your frontend applic
 
 | Role | Username | Password | Assigned Permissions & Capabilities |
 |---|---|---|---|
-| **👑 ADMIN** | `admin` | `Password123!` | Superuser access across all endpoints, employee management, system telemetry, and audit logs. |
-| **👔 MANAGER** | `manager1` | `Password123!` | Full catalog CRUD, purchase orders, restock forecasting, supplier management, and stock adjustments. |
-| **💳 CASHIER** | `cashier1` | `Password123!` | POS register checkout, 10% VAT tax calculations, customer lookups, cash shift open/close, and Z-Reports. |
-| **📦 STAFF** | `staff1` | `Password123!` | Read-only inventory movements, real-time stock pulse, barcode lookup, and shelf replenishment logs. |
+| **👑 ADMIN** | `admin` | `Admin@123456` | Superuser access across all endpoints, employee management, system telemetry, and audit logs. |
+| **👔 MANAGER** | `manager` | `Manager@123456` | Full catalog CRUD, purchase orders, restock forecasting, supplier management, and stock adjustments. |
+| **💳 CASHIER** | `cashier` | `Cashier@123456` | POS register checkout, 10% VAT tax calculations, customer lookups, cash shift open/close, and Z-Reports. |
+| **📦 STAFF** | `staff` | `Staff@123456` | Read-only inventory movements, real-time stock pulse, barcode lookup, and shelf replenishment logs. |
 
 ---
 

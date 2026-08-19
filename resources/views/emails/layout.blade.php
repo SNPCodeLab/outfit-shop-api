@@ -87,7 +87,7 @@
                 <strong>OutfitShop</strong> • Powered by Modern Enterprise API
             </p>
             <p style="margin: 0 0 6px;">
-                Support: <a href="mailto:{{ config('api.support_email', 'support@kesararamwithdigital.tech') }}" style="color: #2563eb;">{{ config('api.support_email', 'support@kesararamwithdigital.tech') }}</a>
+                Support: <a href="mailto:{{ config('api.support_email', '') }}" style="color: #2563eb;">{{ config('api.support_email', '') }}</a>
             </p>
             <p style="margin: 0; color: #94a3b8;">
                 &copy; {{ date('Y') }} OutfitShop. All rights reserved.

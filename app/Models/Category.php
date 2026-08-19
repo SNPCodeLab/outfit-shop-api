@@ -21,6 +21,14 @@ class Category extends Model
         'image_url',
     ];
 
+    public function getDescriptionAttribute($value): string
+    {
+        if (empty($value)) {
+            return 'High-quality collection of ' . strtolower($this->category_name) . ' items.';
+        }
+        return $value;
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id', 'category_id');

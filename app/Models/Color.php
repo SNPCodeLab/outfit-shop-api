@@ -17,6 +17,14 @@ class Color extends Model
         'description',
     ];
 
+    public function getDescriptionAttribute($value): string
+    {
+        if (empty($value)) {
+            return 'A beautiful ' . strtolower($this->color_name) . ' shade for high-end fashion.';
+        }
+        return $value;
+    }
+
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'color_id', 'color_id');

@@ -61,7 +61,7 @@ class ApiResponse
 
         $baseMeta = [
             'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
-            'api_version' => config('api.version', '1.0.0'),
+            'api_version' => config('api.version', 'Version: 1.2.0'),
             'processing_time_ms' => $processingTime,
         ];
 
@@ -182,12 +182,12 @@ class ApiResponse
             ],
             'meta' => [
                 'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
-                'api_version' => config('api.version', '1.0.0'),
+                'api_version' => config('api.version', 'Version: 1.2.0'),
                 'processing_time_ms' => $processingTime,
                 'documentation' => config('api.docs_base', '/api/v1/guide').'#'.strtolower($errorCode),
                 'retry_allowed' => $retryAllowed,
                 'retry_after_seconds' => $retryAfterSeconds,
-                'support_contact' => config('api.support_email', 'support@kesararamwithdigital.tech'),
+                'support_contact' => config('api.support_email', ''),
             ],
         ];
 
@@ -332,7 +332,7 @@ class ApiResponse
             [
                 'reason' => 'too_many_failed_attempts',
                 'retry_after_seconds' => $retryAfter,
-                'contact' => config('api.support_email', 'support@kesararamwithdigital.tech'),
+                'contact' => config('api.support_email', ''),
             ],
             423,
             true,
