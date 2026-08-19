@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'success' => '操作成功完成。',
     'unauthenticated' => '访问此资源需要先进行身份验证。',

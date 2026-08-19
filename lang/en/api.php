@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'success' => 'Operation completed successfully.',
     'unauthenticated' => 'Authentication is required to access this resource.',

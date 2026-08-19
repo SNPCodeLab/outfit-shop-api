@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\V1\HelpCentreGuideController;
 use App\Http\Response\ApiResponse;
 use Illuminate\Support\Facades\Route;
