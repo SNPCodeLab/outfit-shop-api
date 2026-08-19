@@ -109,113 +109,129 @@ class AuthController extends BaseApiController
             );
         }
 
-        // 1 — Employee authentication (username or email)
-        $employee = Employee::where('username', $identifier)
-            ->orWhere('email', $identifier)
-            ->first();
+        try {
+            // 1 — Employee authentication (username or email)
+            $employee = Employee::where('username', $identifier)
+                ->orWhere('email', $identifier)
+                ->first();
 
-        if ($employee && Hash::check($request->password, $employee->password_hash)) {
-            Cache::forget("login_fails:{$identifier}");
+            if ($employee && Hash::check($request->password, $employee->password_hash)) {
+                Cache::forget("login_fails:{$identifier}");
 
-            if ($employee->status !== 'ACTIVE') {
-                return ApiResponse::forbidden(
-                    'Account is inactive. Please contact your administrator.'
-                );
-            }
-
-            $role = $this->resolveRole($employee);
-            $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
-            $token = $employee->createToken($deviceName)->plainTextToken;
-            $permissions = $this->permissionsFor($role);
-
-            if (class_exists(AuditLogService::class)) {
-                try {
-                    AuditLogService::log(
-                        action: 'LOGIN',
-                        entity: 'Employee',
-                        entityId: $employee->employee_id,
-                        userId: $employee->employee_id
+                if ($employee->status !== 'ACTIVE') {
+                    return ApiResponse::forbidden(
+                        'Account is inactive. Please contact your administrator.'
                     );
-                } catch (\Throwable $e) {
-                    Log::error('Audit log failed during login: '.$e->getMessage());
                 }
-            }
 
-            Log::channel('security')->info('Employee authenticated successfully', [
-                'employee_id' => $employee->employee_id,
-                'username' => $employee->username,
-                'role' => $role,
-                'device' => $deviceName,
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+                $role = $this->resolveRole($employee);
+                $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
+                $token = $employee->createToken($deviceName)->plainTextToken;
+                $permissions = $this->permissionsFor($role);
 
-            return $this->successResponse([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'device_name' => $deviceName,
-                'account_type' => 'employee',
-                'employee' => [
+                if (class_exists(AuditLogService::class)) {
+                    try {
+                        AuditLogService::log(
+                            action: 'LOGIN',
+                            entity: 'Employee',
+                            entityId: $employee->employee_id,
+                            userId: $employee->employee_id
+                        );
+                    } catch (\Throwable $e) {
+                        Log::error('Audit log failed during login: '.$e->getMessage());
+                    }
+                }
+
+                Log::channel('security')->info('Employee authenticated successfully', [
                     'employee_id' => $employee->employee_id,
                     'username' => $employee->username,
                     'role' => $role,
-                ],
-                'user' => [
-                    'id' => $employee->employee_id,
-                    'name' => $employee->employee_name,
-                    'username' => $employee->username,
-                    'email' => $employee->email,
-                    'position' => $employee->position,
-                    'role' => $role,
-                    'permissions' => $permissions,
-                ],
-            ], 'Login successful');
-        }
+                    'device' => $deviceName,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
 
-        // 2 — User authentication (email)
-        $user = User::where('email', $identifier)->first();
-
-        if ($user && Hash::check($request->password, $user->password)) {
-
-            $role = $this->resolveRole($user);
-            $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
-            $token = $user->createToken($deviceName)->plainTextToken;
-            $permissions = $this->permissionsFor($role);
-
-            Log::channel('security')->info('User account authenticated', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'role' => $role,
-                'device' => $deviceName,
-                'ip' => $request->ip(),
-            ]);
-
-            if (class_exists(AuditLogService::class)) {
-                try {
-                    AuditLogService::log(
-                        action: 'LOGIN',
-                        entity: 'User',
-                        entityId: $user->id,
-                        userId: $user->id
-                    );
-                } catch (\Throwable $e) {
-                    Log::error('Audit log failed during user login: '.$e->getMessage());
-                }
+                return $this->successResponse([
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'device_name' => $deviceName,
+                    'account_type' => 'employee',
+                    'employee' => [
+                        'employee_id' => $employee->employee_id,
+                        'username' => $employee->username,
+                        'role' => $role,
+                    ],
+                    'user' => [
+                        'id' => $employee->employee_id,
+                        'name' => $employee->employee_name,
+                        'username' => $employee->username,
+                        'email' => $employee->email,
+                        'position' => $employee->position,
+                        'role' => $role,
+                        'permissions' => $permissions,
+                    ],
+                ], 'Login successful');
             }
 
-            return $this->successResponse([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'device_name' => $deviceName,
-                'account_type' => 'user',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
+            // 2 — User authentication (email)
+            $user = User::where('email', $identifier)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+
+                $role = $this->resolveRole($user);
+                $deviceName = $request->input('device_name', 'Web Client / POS Terminal');
+                $token = $user->createToken($deviceName)->plainTextToken;
+                $permissions = $this->permissionsFor($role);
+
+                Log::channel('security')->info('User account authenticated', [
+                    'user_id' => $user->id,
                     'email' => $user->email,
                     'role' => $role,
-                    'permissions' => $permissions,
-                ],
-            ], 'Login successful');
+                    'device' => $deviceName,
+                    'ip' => $request->ip(),
+                ]);
+
+                if (class_exists(AuditLogService::class)) {
+                    try {
+                        AuditLogService::log(
+                            action: 'LOGIN',
+                            entity: 'User',
+                            entityId: $user->id,
+                            userId: $user->id
+                        );
+                    } catch (\Throwable $e) {
+                        Log::error('Audit log failed during user login: '.$e->getMessage());
+                    }
+                }
+
+                return $this->successResponse([
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'device_name' => $deviceName,
+                    'account_type' => 'user',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $role,
+                        'permissions' => $permissions,
+                    ],
+                ], 'Login successful');
+            }
+        } catch (\Throwable $e) {
+            Log::critical('CRITICAL LOGIN FAILURE: '.$e->getMessage(), [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return ApiResponse::error(
+                'LOGIN_PROCESS_CRASH',
+                'A critical error occurred during the login sequence: '.$e->getMessage(),
+                ['file' => basename($e->getFile()), 'line' => $e->getLine()],
+                500
+            );
         }
 
         $failKey = "login_fails:{$identifier}";
