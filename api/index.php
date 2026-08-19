@@ -107,11 +107,11 @@ try {
     $app->booted(function () {
         try {
             config(['database.connections.pgsql.options' => [
-                \PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::ATTR_EMULATE_PREPARES => true,
             ]]);
             // Purge the resolved pgsql connection so the next query picks up the new options.
             app('db')->purge('pgsql');
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Non-fatal: if config override fails the request proceeds normally.
         }
     });
