@@ -34,6 +34,15 @@ class SaleHeader extends Model
         'idempotency_key',
     ];
 
+    protected $casts = [
+        'total_amount' => 'float',
+        'discount' => 'float',
+        'tax_rate' => 'float',
+        'tax_amount' => 'float',
+        'grand_total' => 'float',
+        'sale_date' => 'datetime',
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');

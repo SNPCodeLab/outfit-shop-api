@@ -22,6 +22,11 @@ class PurchaseDetail extends Model
         'sub_total',
     ];
 
+    protected $casts = [
+        'cost_price' => 'float',
+        'sub_total' => 'float',
+    ];
+
     public function header(): BelongsTo
     {
         return $this->belongsTo(PurchaseHeader::class, 'purchase_id', 'purchase_id');
