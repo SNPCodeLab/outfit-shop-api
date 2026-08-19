@@ -29,6 +29,22 @@ class Brand extends Model
         'is_featured' => 'boolean',
     ];
 
+    public function getDescriptionAttribute($value): string
+    {
+        if (empty($value)) {
+            return 'Official ' . $this->brand_name . ' collection featuring premium craftsmanship.';
+        }
+        return $value;
+    }
+
+    public function getLogoUrlAttribute($value): ?string
+    {
+        if (empty($value) && ($this->brand_name === 'KhmeRiel Signature' || $this->slug === 'khmeriel')) {
+            return 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png';
+        }
+        return $value;
+    }
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'brand_id', 'brand_id');

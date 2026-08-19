@@ -19,6 +19,31 @@
 	],
 	"item": [
 		{
+			"name": "0. Quick Setup & Master Data Bulk Fill",
+			"item": [
+				{
+					"name": "Bulk Import Products (Master Data)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{bearer_token}}" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"products\": [\n    {\n      \"category_id\": 1,\n      \"product_name\": \"Premium Silk Shirt\",\n      \"brand\": \"KhmeRiel\",\n      \"variants\": [\n        { \"size_id\": 1, \"color_id\": 1, \"sku\": \"SILK-SH-001\", \"barcode\": \"8850000001\", \"cost_price\": 15.0, \"sale_price\": 45.0, \"quantity\": 100 },\n        { \"size_id\": 2, \"color_id\": 1, \"sku\": \"SILK-SH-002\", \"barcode\": \"8850000002\", \"cost_price\": 15.0, \"sale_price\": 45.0, \"quantity\": 100 }\n      ]\n    },\n    {\n      \"category_id\": 2,\n      \"product_name\": \"Luxury Tailored Pants\",\n      \"brand\": \"KhmeRiel\",\n      \"variants\": [\n        { \"size_id\": 1, \"color_id\": 2, \"sku\": \"PANT-TL-001\", \"barcode\": \"8850000003\", \"cost_price\": 20.0, \"sale_price\": 65.0, \"quantity\": 50 }\n      ]\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/products/bulk-import",
+							"host": ["{{base_url}}"],
+							"path": ["products", "bulk-import"]
+						}
+					}
+				}
+			]
+		},
+		{
 			"name": "1. Authentication & System",
 			"item": [
 				{

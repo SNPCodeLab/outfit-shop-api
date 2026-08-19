@@ -19,7 +19,7 @@ Route::get('/', function () {
 
     return ApiResponse::success([
         'system' => 'OutfitShop Ecommerce Clothing API',
-        'version' => config('api.version', '1.0.0'),
+        'version' => config('api.version', 'Version: 1.2.0'),
         'status' => 'online',
         'frontend_url' => 'https://app.kesararamwithdigital.tech',
         'endpoints' => [

@@ -17,6 +17,14 @@ class ClothingSize extends Model
         'description',
     ];
 
+    public function getDescriptionAttribute($value): string
+    {
+        if (empty($value)) {
+            return 'Standard sizing for ' . $this->size_name . ' apparel.';
+        }
+        return $value;
+    }
+
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'size_id', 'size_id');

@@ -2,10 +2,10 @@ openapi: 3.0.3
 info:
   title: OutfitShop API
   description: Enterprise RESTful API Backend for OutfitShop Ecommerce Clothing & Point-of-Sale System.
-  version: 1.0.0
+  version: "Version: 1.2.0"
   contact:
     name: OutfitShop API Engineering Lead
-    email: support@kesararamwithdigital.tech
+    email: ""
 servers:
   - url: https://api.kesararamwithdigital.tech/api/v1
     description: Production API Gateway

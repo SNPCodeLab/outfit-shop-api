@@ -25,9 +25,10 @@ class StatusController extends BaseApiController
 
         $data = [
             'system' => 'OutfitShop Ecommerce Clothing API',
-            'version' => config('api.version', 'v1.0.0'),
+            'version' => config('api.version', 'Version: 1.2.0'),
             'api_status' => 'Operational',
             'database' => $dbStatus,
+            'live_products_count' => \App\Models\Product::where('status', 'ACTIVE')->count(),
             'environment' => config('app.env', 'production'),
             'frontend_url' => 'https://app.kesararamwithdigital.tech',
             'guide_url' => url('/guide'),

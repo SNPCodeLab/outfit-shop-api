@@ -102,7 +102,7 @@ try {
 
     $app->handleRequest(Request::capture());
 } catch (Throwable $e) {
-    if (!headers_sent()) {
+    if (! headers_sent()) {
         http_response_code(500);
         header('Content-Type: application/json');
     }
