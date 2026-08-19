@@ -68,7 +68,7 @@ if ($dbUrl && str_contains($dbUrl, '://')) {
 // 3. Set App Overrides
 $overrides = [
     'APP_ENV' => 'production',
-    'APP_DEBUG' => 'false',
+    'APP_DEBUG' => 'true',
     'LOG_CHANNEL' => 'stderr',
     'CACHE_STORE' => 'database',
     'SESSION_DRIVER' => 'database',
