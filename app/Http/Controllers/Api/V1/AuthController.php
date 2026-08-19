@@ -129,12 +129,16 @@ class AuthController extends BaseApiController
             $permissions = $this->permissionsFor($role);
 
             if (class_exists(AuditLogService::class)) {
-                AuditLogService::log(
-                    action: 'LOGIN',
-                    entity: 'Employee',
-                    entityId: $employee->employee_id,
-                    userId: $employee->employee_id
-                );
+                try {
+                    AuditLogService::log(
+                        action: 'LOGIN',
+                        entity: 'Employee',
+                        entityId: $employee->employee_id,
+                        userId: $employee->employee_id
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('Audit log failed during login: ' . $e->getMessage());
+                }
             }
 
             Log::channel('security')->info('Employee authenticated successfully', [
@@ -185,6 +189,19 @@ class AuthController extends BaseApiController
                 'device' => $deviceName,
                 'ip' => $request->ip(),
             ]);
+
+            if (class_exists(AuditLogService::class)) {
+                try {
+                    AuditLogService::log(
+                        action: 'LOGIN',
+                        entity: 'User',
+                        entityId: $user->id,
+                        userId: $user->id
+                    );
+                } catch (\Throwable $e) {
+                    Log::error('Audit log failed during user login: ' . $e->getMessage());
+                }
+            }
 
             return $this->successResponse([
                 'access_token' => $token,
