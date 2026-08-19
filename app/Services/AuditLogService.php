@@ -35,7 +35,12 @@ class AuditLogService
         ?int $userId = null
     ): ?AuditLog {
         try {
-            $currentUser = auth('sanctum')->user() ?? auth()->user();
+            $currentUser = null;
+            try {
+                $currentUser = auth('sanctum')->user() ?? auth()->user();
+            } catch (\Throwable) {
+                // Ignore auth failures during logging
+            }
 
             return AuditLog::create([
                 'user_id' => $userId ?? $currentUser?->employee_id ?? $currentUser?->id,
@@ -43,8 +48,8 @@ class AuditLogService
                 'action' => strtoupper($action),
                 'entity' => $entity,
                 'entity_id' => (string) $entityId,
-                'ip_address' => Request::ip(),
-                'user_agent' => Request::userAgent(),
+                'ip_address' => \Illuminate\Support\Facades\Request::ip(),
+                'user_agent' => \Illuminate\Support\Facades\Request::userAgent(),
                 'old_values' => $oldValues,
                 'new_values' => $newValues,
             ]);
