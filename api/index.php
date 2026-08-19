@@ -98,6 +98,24 @@ try {
 
     Facade::setFacadeApplication($app);
 
+    // Force PDO emulated prepares for Neon PgBouncer (transaction-pooling mode).
+    // PgBouncer does not support server-side prepared statements. Without this,
+    // any PDO prepare() call poisons the connection and causes SQLSTATE[25P02]
+    // on all subsequent queries in that transaction block.
+    // This runtime override runs after boot and before any DB connection is
+    // resolved, ensuring the option is active regardless of cached config.php.
+    $app->booted(function () {
+        try {
+            config(['database.connections.pgsql.options' => [
+                \PDO::ATTR_EMULATE_PREPARES => true,
+            ]]);
+            // Purge the resolved pgsql connection so the next query picks up the new options.
+            app('db')->purge('pgsql');
+        } catch (\Throwable) {
+            // Non-fatal: if config override fails the request proceeds normally.
+        }
+    });
+
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
     $_SERVER['ORIG_SCRIPT_NAME'] = '/index.php';
