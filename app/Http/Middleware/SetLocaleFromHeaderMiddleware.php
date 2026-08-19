@@ -20,7 +20,7 @@ class SetLocaleFromHeaderMiddleware
 
         $header = $request->header('X-Locale') ?? $request->header('Accept-Language');
 
-        if ($header) {
+        if ($header && is_string($header)) {
             $locale = strtolower(substr($header, 0, 2));
             if (in_array($locale, $supportedLocales)) {
                 app()->setLocale($locale);

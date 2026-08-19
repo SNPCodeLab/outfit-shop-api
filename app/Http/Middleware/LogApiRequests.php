@@ -44,7 +44,8 @@ class LogApiRequests
         }
         // Fallback: use X-Request-Id header sent by the client (frontend interceptor)
         if (! $requestId) {
-            $requestId = $request->header('X-Request-Id');
+            $headerValue = $request->header('X-Request-Id');
+            $requestId = is_string($headerValue) ? $headerValue : null;
         }
 
         try {
