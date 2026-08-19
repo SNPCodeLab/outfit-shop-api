@@ -137,7 +137,7 @@ class AuthController extends BaseApiController
                         userId: $employee->employee_id
                     );
                 } catch (\Throwable $e) {
-                    Log::error('Audit log failed during login: ' . $e->getMessage());
+                    Log::error('Audit log failed during login: '.$e->getMessage());
                 }
             }
 
@@ -199,7 +199,7 @@ class AuthController extends BaseApiController
                         userId: $user->id
                     );
                 } catch (\Throwable $e) {
-                    Log::error('Audit log failed during user login: ' . $e->getMessage());
+                    Log::error('Audit log failed during user login: '.$e->getMessage());
                 }
             }
 

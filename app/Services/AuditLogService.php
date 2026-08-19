@@ -48,8 +48,8 @@ class AuditLogService
                 'action' => strtoupper($action),
                 'entity' => $entity,
                 'entity_id' => (string) $entityId,
-                'ip_address' => \Illuminate\Support\Facades\Request::ip(),
-                'user_agent' => \Illuminate\Support\Facades\Request::userAgent(),
+                'ip_address' => Request::ip(),
+                'user_agent' => Request::userAgent(),
                 'old_values' => $oldValues,
                 'new_values' => $newValues,
             ]);
