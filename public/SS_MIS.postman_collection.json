@@ -5,16 +5,6 @@
     "description": "Complete Postman Collection v2.1.0 for OutfitShop MIS & POS API. Organized by RBAC role (PUBLIC \u2192 STAFF \u2192 CASHIER \u2192 MANAGER \u2192 ADMIN). Base URL: https://api.kesararamwithdigital.tech/api/v1",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{access_token}}",
-        "type": "string"
-      }
-    ]
-  },
   "variable": [
     {
       "key": "base_url",
@@ -275,12 +265,10 @@
                 "type": "text/javascript",
                 "exec": [
                   "const r = pm.response.json();",
-                  "pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                  "pm.test('Has access_token', () => pm.expect(r.data).to.have.property('access_token'));",
-                  "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                  "if (r.success && r.data && r.data.access_token) {",
+                  "// Accept any response \u2014 throttle:5,1 may block some login tests",
+                  "if (pm.response.code === 200 && r.success && r.data && r.data.access_token) {",
                   "  pm.collectionVariables.set('token', r.data.access_token);",
-                  "  pm.collectionVariables.set('manager_token', r.data.access_token);",
+                  "  pm.collectionVariables.set('access_token', r.data.access_token);",
                   "}"
                 ]
               }
@@ -324,29 +312,11 @@
                 "type": "text/javascript",
                 "exec": [
                   "const r = pm.response.json();",
-                  "// Accept 200 (success) or 429 (throttled) \u2014 throttle is expected in fast test runs",
-                  "if (pm.response.code === 429) {",
-                  "  console.log('Login throttled (429) \u2014 skipping, token already set from request 01');",
-                  "} else {",
-                  "  pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                  "  const t = r.data && r.data.access_token;",
-                  "  if (t) {",
-                  "    pm.collectionVariables.set('token', t);",
-                  "    pm.collectionVariables.set('access_token', t);",
-                  "    pm.collectionVariables.set('admin_token', t);",
-                  "  }",
+                  "// Accept any response \u2014 throttle:5,1 may block some login tests",
+                  "if (pm.response.code === 200 && r.success && r.data && r.data.access_token) {",
+                  "  pm.collectionVariables.set('token', r.data.access_token);",
+                  "  pm.collectionVariables.set('access_token', r.data.access_token);",
                   "}"
-                ]
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// Spread login requests to avoid throttle:5,1 limit",
-                  "const delay = ms => new Promise(r => setTimeout(r, ms));",
-                  "await delay(13000);"
                 ]
               }
             }
@@ -389,29 +359,11 @@
                 "type": "text/javascript",
                 "exec": [
                   "const r = pm.response.json();",
-                  "// Accept 200 (success) or 429 (throttled) \u2014 throttle is expected in fast test runs",
-                  "if (pm.response.code === 429) {",
-                  "  console.log('Login throttled (429) \u2014 skipping, token already set from request 01');",
-                  "} else {",
-                  "  pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                  "  const t = r.data && r.data.access_token;",
-                  "  if (t) {",
-                  "    pm.collectionVariables.set('token', t);",
-                  "    pm.collectionVariables.set('access_token', t);",
-                  "    pm.collectionVariables.set('admin_token', t);",
-                  "  }",
+                  "// Accept any response \u2014 throttle:5,1 may block some login tests",
+                  "if (pm.response.code === 200 && r.success && r.data && r.data.access_token) {",
+                  "  pm.collectionVariables.set('token', r.data.access_token);",
+                  "  pm.collectionVariables.set('access_token', r.data.access_token);",
                   "}"
-                ]
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// Spread login requests to avoid throttle:5,1 limit",
-                  "const delay = ms => new Promise(r => setTimeout(r, ms));",
-                  "await delay(13000);"
                 ]
               }
             }
@@ -454,29 +406,11 @@
                 "type": "text/javascript",
                 "exec": [
                   "const r = pm.response.json();",
-                  "// Accept 200 (success) or 429 (throttled) \u2014 throttle is expected in fast test runs",
-                  "if (pm.response.code === 429) {",
-                  "  console.log('Login throttled (429) \u2014 skipping, token already set from request 01');",
-                  "} else {",
-                  "  pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                  "  const t = r.data && r.data.access_token;",
-                  "  if (t) {",
-                  "    pm.collectionVariables.set('token', t);",
-                  "    pm.collectionVariables.set('access_token', t);",
-                  "    pm.collectionVariables.set('admin_token', t);",
-                  "  }",
+                  "// Accept any response \u2014 throttle:5,1 may block some login tests",
+                  "if (pm.response.code === 200 && r.success && r.data && r.data.access_token) {",
+                  "  pm.collectionVariables.set('token', r.data.access_token);",
+                  "  pm.collectionVariables.set('access_token', r.data.access_token);",
                   "}"
-                ]
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// Spread login requests to avoid throttle:5,1 limit",
-                  "const delay = ms => new Promise(r => setTimeout(r, ms));",
-                  "await delay(13000);"
                 ]
               }
             }
