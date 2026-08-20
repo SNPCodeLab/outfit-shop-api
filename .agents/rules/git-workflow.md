@@ -13,72 +13,34 @@ No other long-lived branches are permitted. Short-lived working branches are cre
 
 ## Command Shorthand — Primary Reference
 
-These are the canonical commands you use. The agent follows them exactly.
-
 | You say | What the agent does |
 |---------|---------------------|
-| `merge` | Merge current branch into `docs`, sync `main`, push both, run checkpoint pipeline |
+| `merge` | Merge current branch into `docs`, sync `main`, push both — double checkpoint required |
 | `push` | Open a PR targeting `docs` (no merge yet) |
-| `merge push` | Merge into `docs` + sync `main` + push both + trigger production deploy via checkpoint pipeline |
-
-### `merge` — Default Merge to `docs`
-
-When you say **merge**, the agent will:
-1. Run the pre-push checkpoint pipeline (lint, stage check)
-2. Merge the current branch into `docs` (no-ff commit)
-3. Fast-forward sync `main` to match `docs`
-4. Push `docs` and `main` to origin
-5. Delete the working branch (local + remote) if applicable
-
-```bash
-git checkout docs
-git merge <branch> --no-ff -m "merge: <branch> -> docs — <description>"
-git push origin docs
-git checkout main
-git merge origin/docs --ff-only
-git push origin main
-```
-
-### `push` — Open PR to `docs`
-
-When you say **push** (without merge), the agent will:
-1. Push the current working branch to origin
-2. Open a Pull Request targeting `docs`
-3. No merge is performed — waits for review
-
-```bash
-git push -u origin <branch>
-# then open PR to docs
-```
-
-### `merge push` — Full Release to Production
-
-When you say **merge push**, the agent will:
-1. Run the full pre-push checkpoint pipeline
-2. Merge current branch into `docs`
-3. Sync `main` to `docs` (ff-only)
-4. Push `docs` to origin — this triggers the GitHub Actions deploy pipeline
-5. Push `main` to origin
-6. Delete the working branch (local + remote)
-7. Confirm the GitHub Actions deploy pipeline fired (smoke test passes)
-
-This is the production release command. Every `merge push` must pass the checkpoint pipeline before touching `docs`.
+| `merge push` | Merge + sync + push both + production deploy fires — double checkpoint required |
 
 ---
 
-## Pre-Push Checkpoint Pipeline
+## Double Checkpoint — Mandatory Before Every Push to `docs` or `main`
 
-Run before every merge or push. No skipping.
+Every merge or push goes through TWO checkpoints. If either fails, **do not push**. Fix the issue first.
+
+### Checkpoint 1 — Local (Pre-Push)
+
+Run locally before staging the commit:
 
 ```bash
 # 1. Confirm branch and clean working tree
 git status
 
-# 2. Stage only relevant files (never git add .)
+# 2. Stage only specific relevant files (never git add .)
 git add <specific files>
 
-# 3. Lint check
+# 3. Run Pint lint — MUST PASS before continuing
 vendor/bin/pint --test
+
+# If lint fails: fix with vendor/bin/pint <file>, then re-run --test
+# Only proceed when output shows: PASS — X files
 
 # 4. Review staged diff
 git diff --staged --stat
@@ -87,46 +49,99 @@ git diff --staged --stat
 git commit -m "type: short description"
 ```
 
-Commit message types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`
+**If `vendor/bin/pint --test` fails → run `vendor/bin/pint` to auto-fix → re-run `--test` → must show PASS before any push.**
+
+### Checkpoint 2 — GitHub Actions (Post-Push)
+
+After pushing to `docs` or `main`, verify the CI/CD pipeline passes on GitHub:
+
+| Stage | Check |
+|-------|-------|
+| Lint (Pint & Code Style) | Must be green |
+| Test (PHPUnit / Pest) | Must be green |
+| Build (Production Artifact) | Must be green |
+| Deploy (Webhook trigger) | Must be green |
+| Smoke Test (Live health check) | Must be green |
+
+**If any GitHub Actions stage fails → do not declare the task done. Investigate, fix, re-run the full double checkpoint, and push again.**
+
+The pipeline runs on every push to `docs` and `main` via `.github/workflows/deploy.yml`.
 
 ---
 
-## GitHub Actions Deploy Pipeline
+## Merge Flow
 
-Every push to `docs` or `main` triggers the CI/CD pipeline in `.github/workflows/deploy.yml`:
-
-| Stage | What runs |
-|-------|-----------|
-| 1. Lint | Laravel Pint code style check |
-| 2. Test | PHPUnit / Pest test suite against PostgreSQL |
-| 3. Build | Production artifact, config + route cache |
-| 4. Deploy | Webhook trigger to production server |
-| 5. Smoke Test | Live health check on `https://api.kesararamwithdigital.tech/api/v1/health` |
-| 6. Notify | Slack / Teams status alert |
-
-After every `merge` or `merge push`, verify the pipeline passed before calling the task done.
+```
+working branch
+     |
+     v
+[ Checkpoint 1: vendor/bin/pint --test → PASS ]
+     |
+     v
+git merge -> docs (--no-ff)
+git push origin docs
+     |
+     v
+[ Checkpoint 2: GitHub Actions pipeline → ALL GREEN ]
+     |
+     v
+git checkout main
+git merge origin/docs --ff-only
+git push origin main
+     |
+     v
+DONE
+```
 
 ---
 
-## Branch Flow
+## Full Command Sequences
 
-```
-working branch  -->  docs (merge/merge push)  -->  main (ff-only sync)
-                          |
-                          +---> GitHub Actions --> Production Deploy
+### `merge`
+
+```bash
+vendor/bin/pint --test                          # Checkpoint 1 — must PASS
+git checkout docs
+git merge <branch> --no-ff -m "merge: <branch> -> docs — <description>"
+git push origin docs                            # triggers GitHub Actions
+# wait for Checkpoint 2 — all stages must be green
+git checkout main
+git merge origin/docs --ff-only
+git push origin main
+git checkout docs
 ```
 
-Default PR target: `docs`
-Production deploy branch: `docs`
-Mirror branch: `main`
+### `push` (PR only)
+
+```bash
+vendor/bin/pint --test                          # Checkpoint 1 — must PASS
+git push -u origin <branch>
+# open PR targeting docs
+```
+
+### `merge push` (full release)
+
+```bash
+vendor/bin/pint --test                          # Checkpoint 1 — must PASS
+git checkout docs
+git merge <branch> --no-ff -m "merge: <branch> -> docs — <description>"
+git push origin docs                            # triggers GitHub Actions deploy
+# wait for Checkpoint 2 — all stages must be green
+git checkout main
+git merge origin/docs --ff-only
+git push origin main
+git checkout docs
+# delete working branch (local + remote)
+```
 
 ---
 
 ## Forbidden Actions
 
-- Direct push to `docs` or `main` without going through the checkpoint pipeline
+- Pushing to `docs` or `main` when Checkpoint 1 (Pint) is failing
+- Declaring a task done when Checkpoint 2 (GitHub Actions) is failing
+- Direct push to `docs` or `main` that bypasses the checkpoint pipeline
 - Force push (`--force`) on `docs` or `main`
 - Merging `main` into `docs` (direction is always: working branch -> `docs` -> `main`)
-- Leaving stale working branches alive after merge
 - Using `git add .` — always stage specific files
-- Skipping lint before merge
+- Leaving stale working branches alive after merge
