@@ -19,6 +19,7 @@ trait CastsBooleanForPostgres
     {
         if (isset($this->casts[$key]) && $this->casts[$key] === 'boolean') {
             $this->attributes[$key] = $value ? 'true' : 'false';
+
             return $this;
         }
 

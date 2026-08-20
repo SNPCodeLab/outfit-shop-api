@@ -9,12 +9,6 @@ postman/OutfitShop_Master_Collection.json
 ```
 
 Never create, edit, or maintain any other collection JSON.
-Every rebuild syncs it to these four copy targets:
-- `API-Delivery-Package/postman_collection.json`
-- `docs/postman_collection.json`
-- `postman_collection.json`
-- `public/SS_MIS.postman_collection.json`
-
 Delete any stale collection or environment files found in `postman/` or `docs/`.
 
 ## Real IDs Always

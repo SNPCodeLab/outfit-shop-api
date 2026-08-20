@@ -225,7 +225,7 @@ Route::prefix('v1')->group(function () {
         // Active Broadcast Alerts feed for all logged-in staff
         Route::get('/alerts/active', function () {
             $alerts = DB::table('system_broadcast_alerts')
-                ->where('is_active', true)
+                ->whereRaw('is_active is true')
                 ->orderBy('alert_id', 'DESC')
                 ->get();
 
