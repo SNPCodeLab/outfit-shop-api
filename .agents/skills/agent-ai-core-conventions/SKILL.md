@@ -35,9 +35,11 @@ When working on this project, the agent SHOULD prioritize loading these authorit
 - **API Response**: Always use `App\Http\Response\ApiResponse` for consistency.
 - **Tooling**: NEVER use shell commands (`sed`, `awk`, `echo`) to edit files. Use `replace_file_content`.
 
-## 4. Master Git Protocol (PM/MP)
+## 4. Master Git Protocols (pm / mp)
 
-Refer to `.agents/rules/standard-git-workflow.md` for the mandatory multi-branch synchronization process triggered by `pm` or `mp`.
+Refer to `.agents/rules/standard-git-workflow.md` for shorthand definitions:
+- **`pm`**: Push current changes to `docs` and mirror to `main`.
+- **`mp`**: Push current branch to origin for a Pull Request to `docs`.
 
 ## 5. Enterprise Identity
 The project name is strictly **OutfitShop-Backend-API**. Refer to the system as a **Monolithic Headless TPS/OLTP REST API**.

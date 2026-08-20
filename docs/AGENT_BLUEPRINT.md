@@ -39,12 +39,9 @@ All modifications must adhere to these strict rules found in `.agents/rules/`:
 
 ## 4. The Standard Git Workflow (PM/MP)
 
-To ensure production stability, the following sequence is automated during a `pm` (Push Merge) command:
-
-1.  **Lint Check**: `vendor/bin/pint --test` must show PASS.
-2.  **Logic Check**: `php artisan test` must show 100% Green.
-3.  **Sync `docs`**: Push current changes to the default `docs` branch.
-4.  **Mirror `main`**: Fast-forward the `main` branch to match `docs` and push.
+To ensure production stability, the following shorthands are used:
+- **`pm` (Push Merge)**: Automates lint check, test pass, push to `docs`, and mirror to `main`.
+- **`mp` (Make PR)**: Automates lint/test and pushes current branch to origin for PR review.
 
 ---
 
