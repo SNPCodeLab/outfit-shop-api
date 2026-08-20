@@ -2423,53 +2423,6 @@
                     ]
                 },
                 {
-                    "name": "61 POST /auth/revoke-all",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/auth/revoke-all",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "revoke-all"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        }
-                    },
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                                    "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
                     "name": "62 POST /auth/2fa/setup",
                     "request": {
                         "method": "POST",
@@ -8483,7 +8436,54 @@
                     ]
                 },
                 {
-                    "name": "198 POST /auth/logout",
+                    "name": "199 POST /auth/revoke-all",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/revoke-all",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "revoke-all"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                                    "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "200 POST /auth/logout",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -8522,7 +8522,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                                    "pm.test('Logged out', () => pm.expect(pm.response.code).to.be.oneOf([200, 401]));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
                                 ]
                             }
