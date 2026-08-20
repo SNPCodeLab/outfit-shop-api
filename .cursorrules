@@ -1,0 +1,27 @@
+# Authoritative AI Agent Rules for OutfitShop-Backend-API
+
+Any AI Model, Agent, or Assistant interacting with this repository MUST follow these rules strictly.
+
+## 1. Primary Instruction Source
+Before performing ANY task, read the following files to understand the project architecture and development protocols:
+- `.agents/skills/agent-ai-core-conventions/SKILL.md`
+- `.agents/rules/standard-git-workflow.md`
+- `docs/AGENT_BLUEPRINT.md`
+
+## 2. Mandatory Coding Rules
+- **No Emojis**: Strictly prohibited in code, comments, UI, and commits.
+- **Strict Typing**: All PHP files must use `declare(strict_types=1);`.
+- **Formatting**: Run `vendor/bin/pint` before every commit.
+
+## 3. Git Protocol
+- Use the **PM/MP Protocol** (Push Merge) only when explicitly commanded.
+- Multi-branch sync: `docs` (Default) -> `main` (Production Mirror).
+- Double-checkpoint verification (Local Lint/Test + Remote CI).
+
+## 4. Documentation
+- Always use the `App\Http\Response\ApiResponse` envelope.
+- Maintain Postman synchronization across all 5 copy targets.
+
+## 5. System Identity
+- Primary name: `OutfitShop-Backend-API`.
+- Classification: Monolithic Headless TPS/OLTP REST API.
