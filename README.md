@@ -100,20 +100,20 @@ API root: `http://127.0.0.1:8000/api/v1`
 
 ---
 
-## 6. API Usage
+## 6. Public API Usage
 
-The API is versioned under `/api/v1`. Authentication uses **Bearer Tokens** via Laravel Sanctum.
+The API is versioned under `/api/v1`. Public endpoints for storefront integration do not require authentication.
 
-### Authentication Flow
-1. `POST /api/v1/auth/login` → Receive `access_token`.
-2. Send `Authorization: Bearer <token>` in headers.
+### Core Public Endpoints
+- `GET /api/v1/health` — System health check.
+- `GET /api/v1/products` — Browse product catalog.
+- `GET /api/v1/categories` — List categories.
+- `GET /api/v1/cart` — Manage session-based shopping cart.
 
 ```bash
-# Example: Login
-curl -s -X POST http://127.0.0.1:8000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"username":"admin","password":"your-password"}'
+# Example: Fetch Products
+curl -s -X GET https://api.kesararamwithdigital.tech/api/v1/products \
+  -H "Accept: application/json"
 ```
 
 ---

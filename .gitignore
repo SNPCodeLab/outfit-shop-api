@@ -8,9 +8,14 @@
 LOCAL_CREDENTIALS.md
 
 # Postman, API Collections & Client Environments
+/postman/
 /postman_collections/
 postman_collections/
 *hoppscotch*
+
+# Delivery & Staging Credentials
+/API-Delivery-Package/test_credentials.md
+Staging & Local Test Credentials Directory
 
 # PHP & Composer Dependencies
 /vendor

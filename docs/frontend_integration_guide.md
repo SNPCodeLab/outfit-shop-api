@@ -24,13 +24,11 @@ To reset the database and seed initial accounts:
 php artisan migrate:fresh --seed
 ```
 
-### Pre-Seeded Test Credentials
-| Role | Username | Email | Password | Allowed Capabilities |
-|---|---|---|---|---|
-| **ADMIN** | `admin` | `admin@ssmis.local` | `Admin@123456` | Full system control & employee account management |
-| **MANAGER** | `manager` | `manager@ssmis.local` | `Manager@123456` | Product CRUD, purchase receiving, stock adjustments, voiding sales |
-| **CASHIER** | `cashier` | `cashier@ssmis.local` | `Cashier@123456` | POS Checkouts, receipt issuing, customer registration |
-| **STAFF** | `staff` | `staff@ssmis.local` | `Staff@123456` | Catalog lookups & barcode scanning |
+### Access Tiers & Roles
+- **ADMIN**: Full system control & employee account management.
+- **MANAGER**: Product CRUD, purchase receiving, stock adjustments, voiding sales.
+- **CASHIER**: POS Checkouts, receipt issuing, customer registration.
+- **STAFF**: Catalog lookups & barcode scanning.
 
 ---
 

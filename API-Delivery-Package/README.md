@@ -33,10 +33,8 @@
 ```text
 📁 API-Delivery-Package/
 ├── 📄 README.md                # This setup & architectural guide
-├── 📄 postman_collection.json  # Complete OutfitShop Postman v2.1 test collection
 ├── 📄 error_codes.md           # Machine-readable error dictionary & HTTP codes
 ├── 📄 auth_flow.md             # 4-Tier RBAC & Sanctum token lifecycle
-├── 📄 test_credentials.md      # Staging & local demo employee credentials
 └── 📄 example_requests.md      # Copyable cURL & TypeScript/Axios code snippets
 ```
 
