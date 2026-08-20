@@ -58,7 +58,15 @@ class ClothingSizeController extends BaseApiController
 
     public function destroy(int $id): JsonResponse
     {
-        $size = ClothingSize::findOrFail($id);
+        $size = ClothingSize::withCount('variants')->findOrFail($id);
+
+        if ($size->variants_count > 0) {
+            return $this->conflictResponse(
+                'Cannot delete size that is assigned to product variants.',
+                'SIZE_HAS_VARIANTS'
+            );
+        }
+
         $old = $size->toArray();
         $size->delete();
 

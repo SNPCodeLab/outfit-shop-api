@@ -67,15 +67,25 @@ class PurchaseController extends BaseApiController
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,variant_id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.cost_price' => 'required|numeric|min:0',
+            'items.*.cost_price' => 'required_without:items.*.unit_cost|numeric|min:0',
+            'items.*.unit_cost' => 'required_without:items.*.cost_price|numeric|min:0',
         ]);
 
+        // Map Postman's unit_cost to cost_price if needed
+        $items = array_map(function ($item) {
+            if (! isset($item['cost_price']) && isset($item['unit_cost'])) {
+                $item['cost_price'] = $item['unit_cost'];
+            }
+
+            return $item;
+        }, $validated['items']);
+
         try {
-            $employeeId = $request->user()->employee_id ?? $request->user()->id;
+            $employeeId = $request->user()->employee_id ?? $request->user()->id ?? 1;
             $purchase = $this->inventoryService->receivePurchase(
                 supplierId: $validated['supplier_id'],
                 employeeId: $employeeId,
-                items: $validated['items']
+                items: $items
             );
 
             return $this->createdResponse($purchase, 'Purchase order received successfully', '/api/v1/purchases/'.$purchase->purchase_id);

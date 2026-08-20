@@ -132,9 +132,9 @@ class ProductVariantController extends BaseApiController
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,product_id',
-            'size_id' => 'required|exists:clothing_sizes,size_id',
-            'color_id' => 'required|exists:colors,color_id',
-            'sku' => 'required|string|unique:product_variants,sku',
+            'size_id' => 'nullable|exists:clothing_sizes,size_id',
+            'color_id' => 'nullable|exists:colors,color_id',
+            'sku' => 'nullable|string|unique:product_variants,sku',
             'barcode' => 'nullable|string|unique:product_variants,barcode',
             'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
@@ -144,14 +144,18 @@ class ProductVariantController extends BaseApiController
             'reorder_level' => 'nullable|integer|min:0',
         ]);
 
-        // Validate unique combination of product_id, size_id, color_id
-        $exists = ProductVariant::where('product_id', $validated['product_id'])
-            ->where('size_id', $validated['size_id'])
-            ->where('color_id', $validated['color_id'])
-            ->exists();
+        $validated['sku'] = $validated['sku'] ?? ('SKU-'.strtoupper(uniqid()));
 
-        if ($exists) {
-            return $this->errorResponse('A product variant with this Size and Color combination already exists.', 422);
+        // Validate unique combination of product_id, size_id, color_id (only if they are provided)
+        if (! empty($validated['size_id']) || ! empty($validated['color_id'])) {
+            $exists = ProductVariant::where('product_id', $validated['product_id'])
+                ->where('size_id', $validated['size_id'] ?? null)
+                ->where('color_id', $validated['color_id'] ?? null)
+                ->exists();
+
+            if ($exists) {
+                return $this->errorResponse('A product variant with this Size and Color combination already exists.', 422);
+            }
         }
 
         $variant = ProductVariant::create($validated);
@@ -197,6 +201,19 @@ class ProductVariantController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $variant = ProductVariant::findOrFail($id);
+
+        // Check if variant has any transactions (Sales, Movements)
+        $hasTransactions = DB::table('sale_details')->where('variant_id', $id)->exists()
+            || DB::table('stock_movements')->where('variant_id', $id)->exists()
+            || DB::table('purchase_details')->where('variant_id', $id)->exists();
+
+        if ($hasTransactions) {
+            return $this->conflictResponse(
+                'Cannot delete variant with transaction history. It has been soft-deleted instead.',
+                'VARIANT_HAS_TRANSACTIONS'
+            );
+        }
+
         $old = $variant->toArray();
         $variant->delete();
 

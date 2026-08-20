@@ -54,7 +54,7 @@ class ImageUploadController extends BaseApiController
 
             return $this->createdResponse($uploadResult, 'Image uploaded successfully to Cloudinary');
         } catch (Exception $e) {
-            return $this->serverErrorResponse('Image upload failed. Please try again.');
+            return $this->serverErrorResponse('Image upload failed: '.$e->getMessage());
         }
     }
 

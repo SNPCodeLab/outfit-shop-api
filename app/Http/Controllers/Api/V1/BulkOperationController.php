@@ -123,6 +123,7 @@ class BulkOperationController extends BaseApiController
             'products.*.category_id' => 'required|exists:categories,category_id',
             'products.*.product_name' => 'required|string|max:150',
             'products.*.brand' => 'nullable|string',
+            'products.*.brand_id' => 'nullable|exists:brands,brand_id',
             'products.*.variants' => 'nullable|array',
         ]);
 
@@ -135,7 +136,9 @@ class BulkOperationController extends BaseApiController
                     'category_id' => $data['category_id'],
                     'product_name' => $data['product_name'],
                     'brand' => $data['brand'] ?? null,
+                    'brand_id' => $data['brand_id'] ?? null,
                     'status' => 'ACTIVE',
+                    'product_type' => 'PHYSICAL_APPAREL',
                 ]);
 
                 if (! empty($data['variants'])) {
@@ -176,7 +179,8 @@ class BulkOperationController extends BaseApiController
             'orders.*.items' => 'required|array|min:1',
             'orders.*.items.*.variant_id' => 'required|exists:product_variants,variant_id',
             'orders.*.items.*.quantity' => 'required|integer|min:1',
-            'orders.*.items.*.cost_price' => 'required|numeric|min:0',
+            'orders.*.items.*.cost_price' => 'required_without:orders.*.items.*.unit_cost|numeric|min:0',
+            'orders.*.items.*.unit_cost' => 'required_without:orders.*.items.*.cost_price|numeric|min:0',
         ]);
 
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
@@ -184,10 +188,18 @@ class BulkOperationController extends BaseApiController
         $receivedOrders = [];
 
         foreach ($ordersData as $order) {
+            $items = array_map(function ($item) {
+                if (! isset($item['cost_price']) && isset($item['unit_cost'])) {
+                    $item['cost_price'] = $item['unit_cost'];
+                }
+
+                return $item;
+            }, $order['items']);
+
             $receivedOrders[] = $this->inventoryService->receivePurchase(
-                supplierId: $order['supplier_id'],
-                employeeId: $employeeId,
-                items: $order['items']
+                supplierId: (int) $order['supplier_id'],
+                employeeId: (int) $employeeId,
+                items: $items
             );
         }
 

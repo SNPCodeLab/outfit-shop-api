@@ -54,7 +54,7 @@ class StoreBranchController extends BaseApiController
     {
         $validated = $request->validate([
             'branch_name' => 'required|string|max:100',
-            'branch_code' => 'required|string|max:30|unique:store_branches,branch_code',
+            'branch_code' => 'required|string|max:30',
             'phone' => 'nullable|string|max:30',
             'email' => 'nullable|email|max:100',
             'address' => 'nullable|string',
@@ -62,6 +62,11 @@ class StoreBranchController extends BaseApiController
             'is_warehouse' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $existing = StoreBranch::where('branch_code', $validated['branch_code'])->first();
+        if ($existing) {
+            return $this->successResponse($existing, 'Store branch already exists');
+        }
 
         $branch = StoreBranch::create($validated);
 

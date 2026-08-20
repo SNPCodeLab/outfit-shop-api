@@ -339,13 +339,13 @@ Route::prefix('v1')->group(function () {
 
             // Multi-Store Stock Transfers (5-Stage Lifecycle: Request -> Approve -> Pick -> Ship -> Receive)
             Route::get('/stock-transfers', [StockTransferController::class, 'index']);
-            Route::get('/stock-transfers/{id}', [StockTransferController::class, 'show']);
+            Route::get('/stock-transfers/{id}', [StockTransferController::class, 'show'])->whereNumber('id');
             Route::post('/stock-transfers', [StockTransferController::class, 'store']);
-            Route::post('/stock-transfers/{id}/approve', [StockTransferController::class, 'approve']);
-            Route::post('/stock-transfers/{id}/pick', [StockTransferController::class, 'pick']);
-            Route::post('/stock-transfers/{id}/ship', [StockTransferController::class, 'ship']);
-            Route::post('/stock-transfers/{id}/receive', [StockTransferController::class, 'receive']);
-            Route::post('/stock-transfers/{id}/cancel', [StockTransferController::class, 'cancel']);
+            Route::post('/stock-transfers/{id}/approve', [StockTransferController::class, 'approve'])->whereNumber('id');
+            Route::post('/stock-transfers/{id}/pick', [StockTransferController::class, 'pick'])->whereNumber('id');
+            Route::post('/stock-transfers/{id}/ship', [StockTransferController::class, 'ship'])->whereNumber('id');
+            Route::post('/stock-transfers/{id}/receive', [StockTransferController::class, 'receive'])->whereNumber('id');
+            Route::post('/stock-transfers/{id}/cancel', [StockTransferController::class, 'cancel'])->whereNumber('id');
 
             // Advanced MIS Financial & Operational Reports
             Route::get('/reports/sales', [ReportController::class, 'sales']);

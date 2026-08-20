@@ -47,14 +47,17 @@ class MarketingBannerController extends BaseApiController
         $validated = $request->validate([
             'title' => 'required|string|max:150',
             'subtitle' => 'nullable|string|max:255',
-            'image_url' => 'required|url|max:500',
+            'image_url' => 'nullable|url|max:500',
             'image_public_id' => 'nullable|string|max:255',
             'link_url' => 'nullable|string|max:500',
-            'placement' => 'nullable|string|in:HERO_SLIDER,PROMO_CARD,SECTION_BANNER,POPUP',
+            'placement' => 'nullable|string',
             'target_department' => 'nullable|string|max:50',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['image_url'] = $validated['image_url'] ?? 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png';
+        $validated['placement'] = strtoupper($validated['placement'] ?? 'HERO_SLIDER');
 
         $banner = MarketingBanner::create($validated);
 
