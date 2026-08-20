@@ -188,13 +188,15 @@ class ProductController extends BaseApiController
         $old = $product->toArray();
 
         $validated = $request->validate([
-            'category_id' => 'required|exists:categories,category_id',
-            'product_name' => 'required|string|max:150',
+            'category_id' => 'sometimes|required|exists:categories,category_id',
+            'product_name' => 'sometimes|required|string|max:150',
             'brand' => 'nullable|string',
+            'brand_id' => 'nullable|exists:brands,brand_id',
             'description' => 'nullable|string',
             'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'status' => 'nullable|string|in:ACTIVE,INACTIVE',
+            'featured_badge' => 'nullable|string|max:50',
+            'status' => 'nullable|string|in:ACTIVE,INACTIVE,DRAFT',
         ]);
 
         $product->update($validated);

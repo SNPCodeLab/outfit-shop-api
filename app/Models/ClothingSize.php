@@ -16,6 +16,7 @@ class ClothingSize extends Model
 
     protected $fillable = [
         'size_name',
+        'size_code',
         'description',
     ];
 

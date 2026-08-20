@@ -54,10 +54,11 @@ class CustomerLoyaltyController extends BaseApiController
         $customer = Customer::findOrFail($customerId);
 
         $validated = $request->validate([
-            'points_to_redeem' => 'required|integer|min:100',
+            'points' => 'required_without:points_to_redeem|integer|min:1',
+            'points_to_redeem' => 'required_without:points|integer|min:1',
         ]);
 
-        $pts = $validated['points_to_redeem'];
+        $pts = (int) ($validated['points'] ?? $validated['points_to_redeem']);
 
         if (($customer->loyalty_points ?? 0) < $pts) {
             return $this->errorResponse(

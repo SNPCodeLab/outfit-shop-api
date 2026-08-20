@@ -163,56 +163,60 @@ class StockTransferController extends BaseApiController
     {
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
 
-        $transfer = DB::transaction(function () use ($id, $employeeId) {
-            $transfer = StockTransfer::with('items.variant')->lockForUpdate()->findOrFail($id);
+        try {
+            $transfer = DB::transaction(function () use ($id, $employeeId) {
+                $transfer = StockTransfer::with('items.variant')->lockForUpdate()->findOrFail($id);
 
-            if (! in_array($transfer->status, ['APPROVED', 'PICKED'])) {
-                throw new Exception("Transfer cannot be shipped from status [{$transfer->status}]");
-            }
-
-            foreach ($transfer->items as $item) {
-                $variant = ProductVariant::where('variant_id', $item->variant_id)->lockForUpdate()->firstOrFail();
-                $qty = $item->quantity_requested;
-
-                if ($variant->quantity < $qty) {
-                    throw new Exception("Insufficient stock for SKU [{$variant->sku}] at origin branch. Available: {$variant->quantity}, Requested: {$qty}");
+                if (! in_array($transfer->status, ['APPROVED', 'PICKED'])) {
+                    throw new Exception("Transfer cannot be shipped from status [{$transfer->status}]");
                 }
 
-                $stockBefore = (int) $variant->quantity;
-                $variant->decrement('quantity', $qty);
-                $stockAfter = $stockBefore - $qty;
+                foreach ($transfer->items as $item) {
+                    $variant = ProductVariant::where('variant_id', $item->variant_id)->lockForUpdate()->firstOrFail();
+                    $qty = $item->quantity_requested;
 
-                // Update shipped quantity on item
-                $item->update(['quantity_shipped' => $qty]);
+                    if ($variant->quantity < $qty) {
+                        throw new Exception("Insufficient stock for SKU [{$variant->sku}] at origin branch. Available: {$variant->quantity}, Requested: {$qty}");
+                    }
 
-                // Write Outgoing Stock Movement
-                StockMovement::create([
-                    'variant_id' => $variant->variant_id,
-                    'movement_type' => 'RETURN_OUT',
-                    'quantity' => -$qty,
-                    'stock_before' => $stockBefore,
-                    'stock_after' => $stockAfter,
-                    'movement_date' => now(),
-                    'reference_type' => 'StockTransferOut',
-                    'reference_id' => $transfer->transfer_id,
-                    'note' => "Inter-Store Transfer Out: {$transfer->transfer_no} to Branch #{$transfer->to_branch_id}",
-                    'employee_id' => $employeeId,
-                    'created_by' => $employeeId,
+                    $stockBefore = (int) $variant->quantity;
+                    $variant->decrement('quantity', $qty);
+                    $stockAfter = $stockBefore - $qty;
+
+                    // Update shipped quantity on item
+                    $item->update(['quantity_shipped' => $qty]);
+
+                    // Write Outgoing Stock Movement
+                    StockMovement::create([
+                        'variant_id' => $variant->variant_id,
+                        'movement_type' => 'RETURN_OUT',
+                        'quantity' => -$qty,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockAfter,
+                        'movement_date' => now(),
+                        'reference_type' => 'StockTransferOut',
+                        'reference_id' => $transfer->transfer_id,
+                        'note' => "Inter-Store Transfer Out: {$transfer->transfer_no} to Branch #{$transfer->to_branch_id}",
+                        'employee_id' => $employeeId,
+                        'created_by' => $employeeId,
+                    ]);
+                }
+
+                $transfer->update([
+                    'status' => 'SHIPPED',
+                    'shipped_by' => $employeeId,
+                    'shipped_at' => now(),
                 ]);
-            }
 
-            $transfer->update([
-                'status' => 'SHIPPED',
-                'shipped_by' => $employeeId,
-                'shipped_at' => now(),
-            ]);
+                return $transfer->fresh(['items.variant']);
+            });
 
-            return $transfer->fresh(['items.variant']);
-        });
+            Log::channel('inventory')->info("Stock transfer shipped: {$transfer->transfer_no}");
 
-        Log::channel('inventory')->info("Stock transfer shipped: {$transfer->transfer_no}");
-
-        return $this->successResponse($transfer, 'Stock transfer shipped and origin inventory deducted');
+            return $this->successResponse($transfer, 'Stock transfer shipped and origin inventory deducted');
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
     }
 
     /**
@@ -224,61 +228,65 @@ class StockTransferController extends BaseApiController
     {
         $employeeId = $request->user()?->id ?? $request->user()?->employee_id ?? 1;
 
-        $transfer = DB::transaction(function () use ($id, $employeeId) {
-            $transfer = StockTransfer::with('items.variant')->lockForUpdate()->findOrFail($id);
+        try {
+            $transfer = DB::transaction(function () use ($id, $employeeId) {
+                $transfer = StockTransfer::with('items.variant')->lockForUpdate()->findOrFail($id);
 
-            if ($transfer->status !== 'SHIPPED') {
-                throw new Exception("Transfer cannot be received from status [{$transfer->status}]");
-            }
+                if ($transfer->status !== 'SHIPPED') {
+                    throw new Exception("Transfer cannot be received from status [{$transfer->status}]");
+                }
 
-            foreach ($transfer->items as $item) {
-                $variant = ProductVariant::where('variant_id', $item->variant_id)->lockForUpdate()->firstOrFail();
-                $qty = $item->quantity_shipped ?: $item->quantity_requested;
+                foreach ($transfer->items as $item) {
+                    $variant = ProductVariant::where('variant_id', $item->variant_id)->lockForUpdate()->firstOrFail();
+                    $qty = $item->quantity_shipped ?: $item->quantity_requested;
 
-                $stockBefore = (int) $variant->quantity;
-                $variant->increment('quantity', $qty);
-                $stockAfter = $stockBefore + $qty;
+                    $stockBefore = (int) $variant->quantity;
+                    $variant->increment('quantity', $qty);
+                    $stockAfter = $stockBefore + $qty;
 
-                $item->update(['quantity_received' => $qty]);
+                    $item->update(['quantity_received' => $qty]);
 
-                // Write Incoming Stock Movement
-                StockMovement::create([
-                    'variant_id' => $variant->variant_id,
-                    'movement_type' => 'RETURN_IN',
-                    'quantity' => $qty,
-                    'stock_before' => $stockBefore,
-                    'stock_after' => $stockAfter,
-                    'movement_date' => now(),
-                    'reference_type' => 'StockTransferIn',
-                    'reference_id' => $transfer->transfer_id,
-                    'note' => "Inter-Store Transfer In: {$transfer->transfer_no} from Branch #{$transfer->from_branch_id}",
-                    'employee_id' => $employeeId,
-                    'created_by' => $employeeId,
+                    // Write Incoming Stock Movement
+                    StockMovement::create([
+                        'variant_id' => $variant->variant_id,
+                        'movement_type' => 'RETURN_IN',
+                        'quantity' => $qty,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockAfter,
+                        'movement_date' => now(),
+                        'reference_type' => 'StockTransferIn',
+                        'reference_id' => $transfer->transfer_id,
+                        'note' => "Inter-Store Transfer In: {$transfer->transfer_no} from Branch #{$transfer->from_branch_id}",
+                        'employee_id' => $employeeId,
+                        'created_by' => $employeeId,
+                    ]);
+                }
+
+                $transfer->update([
+                    'status' => 'RECEIVED',
+                    'received_by' => $employeeId,
+                    'received_at' => now(),
                 ]);
-            }
 
-            $transfer->update([
-                'status' => 'RECEIVED',
-                'received_by' => $employeeId,
-                'received_at' => now(),
+                return $transfer->fresh(['items.variant']);
+            });
+
+            // Trigger Webhook Event
+            WebhookDispatcherService::dispatch('STOCK_TRANSFER_COMPLETED', [
+                'transfer_id' => $transfer->transfer_id,
+                'transfer_no' => $transfer->transfer_no,
+                'from_branch_id' => $transfer->from_branch_id,
+                'to_branch_id' => $transfer->to_branch_id,
+                'items_count' => $transfer->items->count(),
+                'received_at' => $transfer->received_at->toISOString(),
             ]);
 
-            return $transfer->fresh(['items.variant']);
-        });
+            Log::channel('inventory')->info("Stock transfer received and completed: {$transfer->transfer_no}");
 
-        // Trigger Webhook Event
-        WebhookDispatcherService::dispatch('STOCK_TRANSFER_COMPLETED', [
-            'transfer_id' => $transfer->transfer_id,
-            'transfer_no' => $transfer->transfer_no,
-            'from_branch_id' => $transfer->from_branch_id,
-            'to_branch_id' => $transfer->to_branch_id,
-            'items_count' => $transfer->items->count(),
-            'received_at' => $transfer->received_at->toISOString(),
-        ]);
-
-        Log::channel('inventory')->info("Stock transfer received and completed: {$transfer->transfer_no}");
-
-        return $this->successResponse($transfer, 'Stock transfer received and destination inventory updated');
+            return $this->successResponse($transfer, 'Stock transfer received and destination inventory updated');
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
     }
 
     /**
