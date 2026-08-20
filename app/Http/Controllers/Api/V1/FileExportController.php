@@ -168,12 +168,33 @@ class FileExportController extends BaseApiController
      */
     public function exportZReportThermal(int $shiftId): Response
     {
-        $shift = PosShift::with(['employee', 'sales.payments'])->findOrFail($shiftId);
+        $shift = PosShift::with(['employee'])->findOrFail($shiftId);
 
-        $totalSales = $shift->sales->sum('grand_total');
-        $cashSales = $shift->sales->filter(fn ($s) => $s->payments->contains('payment_method', 'CASH'))->sum('grand_total');
-        $cardSales = $shift->sales->filter(fn ($s) => $s->payments->contains('payment_method', 'CARD'))->sum('grand_total');
-        $qrSales = $shift->sales->filter(fn ($s) => in_array($s->payments->first()?->payment_method, ['QR', 'ABA', 'BAKONG']))->sum('grand_total');
+        // Fetch sales for this shift window manually since no direct shift_id exists in sale_headers
+        $sales = SaleHeader::with('payments')
+            ->where('employee_id', $shift->employee_id)
+            ->where('created_at', '>=', $shift->opened_at)
+            ->when($shift->closed_at, fn ($q) => $q->where('created_at', '<=', $shift->closed_at))
+            ->where('status', 'COMPLETED')
+            ->get();
+
+        $totalSales = $sales->sum('grand_total');
+        $cashSales = 0.0;
+        $cardSales = 0.0;
+        $qrSales = 0.0;
+
+        foreach ($sales as $s) {
+            foreach ($s->payments as $p) {
+                $method = strtoupper($p->payment_method);
+                if ($method === 'CASH') {
+                    $cashSales += (float) $p->amount;
+                } elseif ($method === 'CARD') {
+                    $cardSales += (float) $p->amount;
+                } else {
+                    $qrSales += (float) $p->amount;
+                }
+            }
+        }
 
         $receipt = "================================\n";
         $receipt .= "      END-OF-DAY Z-REPORT      \n";

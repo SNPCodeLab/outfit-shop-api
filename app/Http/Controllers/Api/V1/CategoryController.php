@@ -27,7 +27,10 @@ class CategoryController extends BaseApiController
     {
         $validated = $request->validate([
             'category_name' => 'required|string|unique:categories,category_name',
+            'slug' => 'nullable|string|max:120|unique:categories,slug',
+            'department_type' => 'nullable|string|max:50',
             'description' => 'nullable|string',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $category = Category::create($validated);

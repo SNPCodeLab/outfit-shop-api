@@ -85,7 +85,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/guide', [HelpCentreGuideController::class, 'index']);
     Route::get('/docs', [HelpCentreGuideController::class, 'index']);
     Route::get('/postman.json', function () {
-        $path = base_path('API-Delivery-Package/postman_collection.json');
+        $path = base_path('postman/OutfitShop_Master_Collection.json');
 
         return response()->file($path, ['Content-Type' => 'application/json']);
     });

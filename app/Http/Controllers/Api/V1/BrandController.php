@@ -54,15 +54,18 @@ class BrandController extends BaseApiController
     {
         $validated = $request->validate([
             'brand_name' => 'required|string|max:100|unique:brands,brand_name',
+            'slug' => 'nullable|string|max:120|unique:brands,slug',
             'logo_url' => 'nullable|url|max:500',
             'banner_url' => 'nullable|url|max:500',
-            'country_of_origin' => 'nullable|string|max:50',
+            'country_of_origin' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'website_url' => 'nullable|url|max:255',
             'is_featured' => 'nullable|boolean',
         ]);
 
-        $validated['slug'] = Str::slug($validated['brand_name']);
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['brand_name']);
+        }
 
         $brand = Brand::create($validated);
 

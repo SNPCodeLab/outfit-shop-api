@@ -34,7 +34,7 @@ class PrivacyComplianceController extends BaseApiController
                 'phone' => $customer->phone,
                 'address' => $customer->address,
                 'loyalty_points' => $customer->loyalty_points,
-                'member_tier' => $customer->member_tier,
+                'member_tier' => $customer->vip_tier,
                 'created_at' => $customer->created_at?->toISOString(),
             ],
             'purchase_history' => $customer->sales,

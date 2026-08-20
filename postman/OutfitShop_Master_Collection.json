@@ -38,12 +38,12 @@
     },
     {
       "key": "product_id",
-      "value": "182",
+      "value": "13",
       "type": "string"
     },
     {
       "key": "variant_id",
-      "value": "174",
+      "value": "2",
       "type": "string"
     },
     {
@@ -4374,7 +4374,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\"color_code\":\"NAVY\",\"color_name\":\"Navy Blue\",\"hex_code\":\"#001f5b\"}",
+              "raw": "{\"color_code\":\"NAVY\",\"color_name\":\"Navy Blue\",\"hex_code\":\"#001f5b\",\"description\":\"Premium Navy\"}",
               "options": {
                 "raw": {
                   "language": "json"

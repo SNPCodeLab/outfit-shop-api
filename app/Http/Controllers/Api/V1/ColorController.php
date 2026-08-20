@@ -21,6 +21,7 @@ class ColorController extends BaseApiController
     {
         $validated = $request->validate([
             'color_name' => 'required|string|unique:colors,color_name',
+            'hex_code' => 'nullable|string|max:20',
             'description' => 'nullable|string',
         ]);
 

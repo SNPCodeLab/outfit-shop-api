@@ -56,19 +56,27 @@ class GiftCardController extends BaseApiController
     public function issue(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:5|max:1000',
+            'amount' => 'required_without:initial_balance|numeric|min:5|max:1000',
+            'initial_balance' => 'required_without:amount|numeric|min:5|max:1000',
             'purchaser_customer_id' => 'nullable|exists:customers,customer_id',
             'expiry_months' => 'nullable|integer|min:1|max:36',
+            'expiry_date' => 'nullable|date',
         ]);
 
+        $amount = (float) ($validated['amount'] ?? $validated['initial_balance']);
         $code = 'KM-'.strtoupper(Str::random(4)).'-'.strtoupper(Str::random(4)).'-'.strtoupper(Str::random(4));
-        $months = (int) ($validated['expiry_months'] ?? 12);
-        $expiry = Carbon::now()->addMonths($months);
+
+        if (! empty($validated['expiry_date'])) {
+            $expiry = Carbon::parse($validated['expiry_date']);
+        } else {
+            $months = (int) ($validated['expiry_months'] ?? 12);
+            $expiry = Carbon::now()->addMonths($months);
+        }
 
         $card = GiftCard::create([
             'card_code' => $code,
-            'initial_balance' => $validated['amount'],
-            'current_balance' => $validated['amount'],
+            'initial_balance' => $amount,
+            'current_balance' => $amount,
             'purchaser_customer_id' => $validated['purchaser_customer_id'] ?? null,
             'expiry_date' => $expiry,
             'is_active' => true,
@@ -76,7 +84,7 @@ class GiftCardController extends BaseApiController
 
         return $this->createdResponse(
             $card,
-            "Digital gift card of \${$validated['amount']} issued successfully"
+            "Digital gift card of \${$amount} issued successfully"
         );
     }
 }

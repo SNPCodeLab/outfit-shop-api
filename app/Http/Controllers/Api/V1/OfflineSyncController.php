@@ -31,7 +31,7 @@ class OfflineSyncController extends BaseApiController
         // 72-hour signed sync token for offline verification
         $syncToken = 'OFFLINE-'.strtoupper(Str::random(32)).'-'.now()->addHours(72)->timestamp;
 
-        $variants = ProductVariant::with(['product:product_id,product_name,brand,category_id', 'size:size_id,size_name', 'color:color_id,color_name,hex_code'])
+        $variants = ProductVariant::with(['product:product_id,product_name,brand,category_id', 'size:size_id,size_name', 'color:color_id,color_name'])
             ->select(['variant_id', 'product_id', 'size_id', 'color_id', 'sku', 'barcode', 'sale_price', 'quantity'])
             ->get()
             ->map(function ($v) {
