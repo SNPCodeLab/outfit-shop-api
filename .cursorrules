@@ -14,7 +14,8 @@ Before performing ANY task, read the following files to understand the project a
 - **Formatting**: Run `vendor/bin/pint` before every commit.
 
 ## 3. Git Protocol
-- Use the **PM/MP Protocol** (Push Merge) only when explicitly commanded.
+- **`pm`**: Trigger "Push Merge" (sync `docs` and `main`).
+- **`mp`**: Trigger "Make PR" (push for Pull Request to `docs`).
 - Multi-branch sync: `docs` (Default) -> `main` (Production Mirror).
 - Double-checkpoint verification (Local Lint/Test + Remote CI).
 

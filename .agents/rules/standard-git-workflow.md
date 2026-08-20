@@ -9,23 +9,29 @@ This is the mandatory workflow for all code changes in the OutfitShop-Backend-AP
 | `docs` | **Default Branch**. All development, staging, and feature merges target here. |
 | `main` | **Production Mirror**. Only updated via fast-forward from `docs` after verification. |
 
-## 2. Command Trigger: pm / mp
+## 2. Command Shorthand Definitions
 
-The agent MUST ONLY perform a multi-branch sync and push when the user explicitly says:
-`pm`, `mp`, `push merge`, or `merge push`.
+The agent MUST ONLY perform Git push operations when the user explicitly uses these shorthand triggers:
 
-### The PM/MP Sequence:
-1.  **Compliance Check**: Run `vendor/bin/pint --test`. If it fails, run `vendor/bin/pint` and retry.
-2.  **Logic Check**: Run `php artisan test`. All tests must pass (100% Green).
-3.  **Stage Specifics**: `git add <files>`. Never use `git add .`.
-4.  **Commit**: Use Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`).
-5.  **Push Docs**: `git push origin docs`.
-6.  **Mirror Main**:
-    - `git checkout main`
-    - `git merge docs --ff-only`
-    - `git push origin main`
-    - `git checkout docs`
-7.  **Finalize**: Delete any temporary feature branches.
+| Command | Action Name | Workflow Description |
+| :--- | :--- | :--- |
+| **`pm`** | **Push Merge** | Full 3-way synchronization: `Local` ──► `origin/docs` ──► `origin/main`. |
+| **`mp`** | **Make PR** | Push current branch to `origin` and prepare for a **Pull Request** to `docs`. |
+
+### The `pm` (Push Merge) Sequence:
+1.  **Compliance Check**: Run `vendor/bin/pint --test`.
+2.  **Logic Check**: Run `php artisan test`.
+3.  **Stage & Commit**: `git add <files>` and `git commit -m "..."`.
+4.  **Push Docs**: `git push origin docs`.
+5.  **Mirror Main**: `git checkout main` ──► `git merge docs --ff-only` ──► `git push origin main`.
+6.  **Return**: `git checkout docs`.
+
+### The `mp` (Make PR) Sequence:
+1.  **Compliance Check**: Run `vendor/bin/pint --test`.
+2.  **Logic Check**: Run `php artisan test`.
+3.  **Stage & Commit**: `git add <files>` and `git commit -m "..."`.
+4.  **Push Branch**: `git push origin <current-branch>`.
+5.  **Notification**: Inform the user that the branch is ready for a Pull Request to `docs`.
 
 ## 3. The Double-Checkpoint Rule
 
