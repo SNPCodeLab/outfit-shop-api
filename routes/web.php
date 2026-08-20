@@ -20,7 +20,7 @@ Route::get('/', function () {
     $base = rtrim(config('app.url', 'https://api.kesararamwithdigital.tech'), '/');
 
     return ApiResponse::success([
-        'system' => 'OutfitShop Ecommerce Clothing API',
+        'system' => 'OutfitShop-Backend-API',
         'version' => config('api.version', 'Version: 1.2.0'),
         'status' => 'online',
         'frontend_url' => 'https://app.kesararamwithdigital.tech',
@@ -28,7 +28,6 @@ Route::get('/', function () {
             'guide' => "{$base}/guide",
             'health' => "{$base}/api/v1/health",
             'status' => "{$base}/api/v1/status",
-            'openapi_spec' => "{$base}/api/v1/openapi.json",
             'postman' => "{$base}/api/v1/postman.json",
         ],
         'public_catalog' => [
@@ -71,7 +70,7 @@ Route::get('/', function () {
             'admin_pulse' => "{$base}/api/v1/admin/master-pulse",
             'api_analytics' => "{$base}/api/v1/admin/api-analytics",
         ],
-    ], 'OutfitShop API gateway is operational');
+    ], 'OutfitShop-Backend-API gateway is operational');
 });
 
 // Help Centre and Interactive Knowledge Base

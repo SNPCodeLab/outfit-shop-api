@@ -103,7 +103,6 @@ Whenever handing off this API to frontend teams, provide the standardized 7-docu
 📁 API-Delivery-Package/
 ├── 📄 README.md                # Environment setup & business rules guide
 ├── 📄 postman_collection.json  # Complete Postman v2.1 test collection
-├── 📄 openapi_spec.yaml        # OpenAPI 3.0 / Swagger schema specification
 ├── 📄 error_codes.md           # Machine-readable error code dictionary
 ├── 📄 auth_flow.md             # 4-Tier RBAC & Sanctum token lifecycle
 ├── 📄 test_credentials.md      # Demo employee credentials across all roles

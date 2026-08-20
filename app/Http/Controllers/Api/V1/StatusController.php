@@ -27,7 +27,7 @@ class StatusController extends BaseApiController
         }
 
         $data = [
-            'system' => 'OutfitShop Ecommerce Clothing API',
+            'system' => 'OutfitShop-Backend-API',
             'version' => config('api.version', 'Version: 1.2.0'),
             'api_status' => 'Operational',
             'database' => $dbStatus,
@@ -45,6 +45,6 @@ class StatusController extends BaseApiController
             $data['db_error'] = $dbError;
         }
 
-        return $this->successResponse($data, 'OutfitShop API is operational');
+        return $this->successResponse($data, 'OutfitShop-Backend-API is operational');
     }
 }

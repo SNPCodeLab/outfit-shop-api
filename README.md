@@ -1,61 +1,123 @@
-# OutfitShop MIS and POS API
+# OutfitShop-Backend-API
 
-**Version:** 1.2.0  
-**Status:** Operational  
-**Organization:** SNPCodeLab  
-**Gateway Domain**: https://api.kesararamwithdigital.tech/api/v1
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
+![Status](https://img.shields.io/badge/status-operational-success)
+![Framework](https://img.shields.io/badge/framework-Laravel_12-red)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+OutfitShop-Backend-API is an enterprise-grade backend infrastructure designed for fashion retail management. Built on the **Laravel 12** framework, it provides a unified platform for multi-channel product cataloging, persistent shopping cart management, and point-of-sale (POS) operations.
 
 ---
 
-## 1. Project Overview
-OutfitShop API is an enterprise-grade backend infrastructure designed for fashion retail management. Built on the Laravel 12 framework, it provides a unified platform for multi-channel product cataloging, persistent shopping cart management, and point-of-sale (POS) operations. The system is specifically engineered for the Cambodian market, implementing high-precision financial auditing and localized tax compliance.
+## 1. System Classification
+
+The system is architected as a **Monolithic, Headless REST API Backend** implementing a:
+- **TPS / OLTP**: Real-time Transaction Processing System for POS checkouts and inventory mutations.
+- **MIS Reporting**: Management Information System for dashboard analytics and audit ledgers.
 
 ---
 
 ## 2. Core Capabilities
 
-### 2.1 Access Control and Security
-The system implements a four-tier Role-Based Access Control (RBAC) architecture to ensure data integrity and operational security. Access levels are categorized into Public/Guest, Cashier/Staff, Manager, and Administrator. Authentication is managed through cryptographically hashed tokens and integrated rate limiting to prevent unauthorized access and brute-force attacks.
-
-### 2.2 Transactional Integrity
-The POS engine utilizes idempotent request handling and pessimistic row-level locking to manage high-concurrency checkouts. This ensures that inventory levels remain accurate across multiple terminals and prevents duplicate transactions during network instability.
-
-### 2.3 Inventory and Product Logic
-A dynamic variant matrix tracks stock across multiple dimensions including size and color. Every stock mutation is recorded in an immutable audit ledger, providing a complete historical trail of stock movements, adjustments, and sales. The system supports real-time SKU tracking and instant barcode resolution.
-
-### 2.4 Financial Auditing
-The financial engine performs real-time asset valuation based on cost versus resale metrics. It handles multi-currency transactions (USD and KHR) and implements a specialized 10% tax-exclusive calculation formula. Cash register operations are managed through structured shifts with automated Z-Report generation for daily reconciliation.
+- **Access Control (RBAC)**: 4-tier Role-Based Access Control (Public, Staff, Manager, Admin) via Laravel Sanctum and Spatie Permissions.
+- **Transactional Integrity**: Idempotent request handling and pessimistic row-level locking for high-concurrency checkouts.
+- **Inventory Matrix**: Dynamic variants tracking stock across dimensions (Size $\times$ Color) with immutable audit ledgers.
+- **Financial Auditing**: Real-time asset valuation, multi-currency support (USD/KHR), and automated Z-Report generation.
+- **Omnichannel Logistics**: Bakong KHQR integration, thermal receipt engine, and sales velocity forecasting.
 
 ---
 
 ## 3. Technical Architecture
 
-### 3.1 Technology Stack
-- Framework: Laravel 12
-- Database: PostgreSQL 17
-- Media Management: Cloudinary Edge Service
-- API Standard: RESTful with standardized JSON envelopes
+- **Framework**: Laravel 12 (Hardened for Serverless/Vercel)
+- **Primary Database**: PostgreSQL 17 (Neon Cloud Managed)
+- **Alternative Database**: Oracle SQL (Enterprise on-premise)
+- **Media Management**: Cloudinary Edge CDN
+- **API Standard**: RESTful JSON with standardized `ApiResponse` envelopes
 
-### 3.2 Serverless Optimization
-The application is hardened for serverless environments. It features a custom bootstrap sequence that handles read-only filesystems by redirecting cache and session storage to database-driven layers and writable temporary paths.
-
----
-
-## 4. Operational Protocols
-
-### 4.1 Development Workflow
-To maintain production stability, work is performed in isolated feature branches. Updates are merged into the staging branch for validation before being synchronized with the production environment.
-
-### 4.2 Deployment Requirements
-Proper execution in a production environment requires the configuration of the following parameters:
-- Application encryption keys for data protection.
-- Secure PostgreSQL connection strings with forced SSL mode.
-- Database-backed session and cache drivers for serverless persistence.
+Detailed documentation is available in the `docs/` folder:
+- [Architecture & Responsibilities](docs/ARCHITECTURE.md)
+- [API Conventions & Endpoints](docs/API.md)
+- [Frontend Integration Guide](docs/frontend_integration_guide.md)
 
 ---
 
-## 5. System Resources
-Comprehensive API specifications are maintained in OpenAPI 3.0 format. A master Postman collection is provided within the repository to facilitate endpoint testing and integration. Entity relationships and master data matrices are defined in the accompanying product documentation files.
+## 4. Quick Start
+
+### 4.1 Requirements
+- PHP 8.2+ (8.3+ recommended)
+- Composer 2
+- PostgreSQL 16+ (or SQLite for local testing)
+
+### 4.2 Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/SNPCodeLab/outfit-shop-api.git
+cd "OutfitShop MIS and POS API"
+
+# 2. Install dependencies
+composer install
+
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4.3 Database Setup
+
+```bash
+php artisan migrate
+php artisan db:seed              # Seed roles + demo catalog
+php artisan serve
+```
+
+API root: `http://127.0.0.1:8000/api/v1`
+
+---
+
+## 5. Environment Configuration
+
+| Variable | Purpose | Default / Example |
+|---|---|---|
+| `APP_KEY` | Encryption key (`php artisan key:generate`) | `base64:...` |
+| `DB_CONNECTION` | Database driver | `pgsql` (Primary) or `oracle` |
+| `DATABASE_URL` | Neon Database connection string | `postgresql://...` |
+| `CACHE_STORE` | Cache driver (use `database` for serverless) | `database` |
+| `SESSION_DRIVER` | Session persistence | `database` |
+| `CLOUDINARY_URL` | Media CDN credentials | `cloudinary://...` |
+
+---
+
+## 6. API Usage
+
+The API is versioned under `/api/v1`. Authentication uses **Bearer Tokens** via Laravel Sanctum.
+
+### Authentication Flow
+1. `POST /api/v1/auth/login` → Receive `access_token`.
+2. Send `Authorization: Bearer <token>` in headers.
+
+```bash
+# Example: Login
+curl -s -X POST http://127.0.0.1:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"username":"admin","password":"your-password"}'
+```
+
+---
+
+## 7. Testing & Quality
+
+We use PHPUnit for feature and unit testing.
+
+```bash
+# Run tests
+php artisan test
+
+# Run linting (Laravel Pint)
+vendor/bin/pint --test
+```
 
 ---
 Copyright 2024–2026 SNPCodeLab. All rights reserved.

@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png" alt="OutfitShop Primary Logo" width="280" />
-  <h1>OutfitShop API — Delivery Package</h1>
-  <p>Official Integration & Handoff Package for <strong>OutfitShop Ecommerce Clothing API</strong>.</p>
+  <h1>OutfitShop-Backend-API — Delivery Package</h1>
+  <p>Official Integration & Handoff Package for <strong>OutfitShop-Backend-API</strong>.</p>
 </div>
 
 ---
@@ -34,8 +34,6 @@
 📁 API-Delivery-Package/
 ├── 📄 README.md                # This setup & architectural guide
 ├── 📄 postman_collection.json  # Complete OutfitShop Postman v2.1 test collection
-├── 📄 openapi_spec.json        # OpenAPI 3.0 JSON specification
-├── 📄 openapi_spec.yaml        # OpenAPI 3.0 / Swagger YAML schema specification
 ├── 📄 error_codes.md           # Machine-readable error dictionary & HTTP codes
 ├── 📄 auth_flow.md             # 4-Tier RBAC & Sanctum token lifecycle
 ├── 📄 test_credentials.md      # Staging & local demo employee credentials

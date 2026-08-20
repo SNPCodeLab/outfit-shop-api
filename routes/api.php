@@ -60,7 +60,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| OutfitShop Ecommerce Clothing RESTful API — v1
+| OutfitShop-Backend-APIRESTful API — v1
 |--------------------------------------------------------------------------
 |
 | Access Tiers:
@@ -84,11 +84,6 @@ Route::prefix('v1')->group(function () {
     Route::get('/status', [StatusController::class, 'index']);
     Route::get('/guide', [HelpCentreGuideController::class, 'index']);
     Route::get('/docs', [HelpCentreGuideController::class, 'index']);
-    Route::get('/openapi.json', function () {
-        $path = base_path('API-Delivery-Package/openapi_spec.json');
-
-        return response()->file($path, ['Content-Type' => 'application/json']);
-    });
     Route::get('/postman.json', function () {
         $path = base_path('API-Delivery-Package/postman_collection.json');
 

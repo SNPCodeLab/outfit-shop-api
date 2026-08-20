@@ -21,6 +21,16 @@ class Customer extends Model
         'phone',
         'email',
         'address',
+        'loyalty_points',
+        'vip_tier',
+        'total_spent_lifetime',
+        'store_credit_balance',
+    ];
+
+    protected $casts = [
+        'loyalty_points' => 'integer',
+        'total_spent_lifetime' => 'float',
+        'store_credit_balance' => 'float',
     ];
 
     public function sales(): HasMany
