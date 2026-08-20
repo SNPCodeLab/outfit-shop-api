@@ -84,7 +84,7 @@ class CartController extends BaseApiController
         $itemsList = [];
 
         foreach ($cart->items as $item) {
-            $unitPrice = (float) ($item->unit_price ?? $item->variant?->price ?? 0.0);
+            $unitPrice = (float) ($item->unit_price ?? $item->variant?->sale_price ?? 0.0);
             $lineTotal = $unitPrice * $item->quantity;
             $subtotal += $lineTotal;
             $totalItems += $item->quantity;
@@ -165,14 +165,14 @@ class CartController extends BaseApiController
 
         if ($cartItem) {
             $cartItem->quantity += $quantity;
-            $cartItem->unit_price = $variant->price;
+            $cartItem->unit_price = $variant->sale_price;
             $cartItem->save();
         } else {
             $cartItem = CartItem::create([
                 'cart_id' => $cart->cart_id,
                 'variant_id' => $variant->variant_id,
                 'quantity' => $quantity,
-                'unit_price' => $variant->price,
+                'unit_price' => $variant->sale_price,
             ]);
         }
 

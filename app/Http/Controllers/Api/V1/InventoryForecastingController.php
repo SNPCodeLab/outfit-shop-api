@@ -8,69 +8,66 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Models\ProductVariant;
 use App\Models\PurchaseDetail;
 use App\Models\PurchaseHeader;
-use App\Models\SaleDetail;
 use App\Models\Supplier;
-use Carbon\Carbon;
+use App\Services\ForecastingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class InventoryForecastingController extends BaseApiController
 {
+    protected ForecastingService $forecastingService;
+
+    public function __construct(ForecastingService $forecastingService)
+    {
+        $this->forecastingService = $forecastingService;
+    }
+
     /**
-     * Calculate 14-day sales velocity and generate restock recommendations.
+     * Calculate sales velocity and generate restock recommendations.
      * Restricted to MANAGER or ADMIN.
      */
-    public function restockRecommendations(): JsonResponse
+    public function restockRecommendations(Request $request): JsonResponse
     {
-        $lookbackDays = 14;
-        $sinceDate = Carbon::now()->subDays($lookbackDays);
+        $lookbackDays = (int) $request->input('lookback', 14);
+        $threshold = (int) $request->input('threshold', 7);
 
-        $salesVelocity = SaleDetail::where('created_at', '>=', $sinceDate)
-            ->select('variant_id', DB::raw('SUM(quantity) as total_sold'))
-            ->groupBy('variant_id')
-            ->pluck('total_sold', 'variant_id')
-            ->toArray();
+        $risks = $this->forecastingService->getStockoutRisks($lookbackDays, $threshold);
 
-        $variants = ProductVariant::with(['product.category', 'size', 'color'])->get();
         $recommendations = [];
 
-        foreach ($variants as $v) {
-            $sold14 = $salesVelocity[$v->variant_id] ?? 0;
-            $dailyRunRate = round($sold14 / $lookbackDays, 2);
-            $daysLeft = $dailyRunRate > 0 ? round($v->quantity / $dailyRunRate, 1) : 999;
-            $reorderThreshold = $v->reorder_level ?? 10;
-            $isUrgent = ($v->quantity <= $reorderThreshold) || ($daysLeft <= 7 && $dailyRunRate > 0);
-            $recommendedQty = max(20, (int) round(($dailyRunRate * 30) - $v->quantity));
+        foreach ($risks as $vId => $r) {
+            $variant = ProductVariant::with(['product.category', 'size', 'color'])->find($vId);
 
-            if ($isUrgent || $v->quantity <= 5) {
-                $recommendations[] = [
-                    'variant_id' => $v->variant_id,
-                    'sku' => $v->sku,
-                    'product_name' => $v->product->product_name ?? 'Unknown',
-                    'size_name' => $v->size->size_name ?? 'STD',
-                    'color_name' => $v->color->color_name ?? 'Default',
-                    'current_stock' => $v->quantity,
-                    'reorder_level' => $reorderThreshold,
-                    'units_sold_last_14_days' => $sold14,
-                    'daily_run_rate' => $dailyRunRate,
-                    'days_of_stock_left' => $daysLeft,
-                    'cost_price' => (float) $v->cost_price,
-                    'recommended_order_qty' => $recommendedQty,
-                    'estimated_restock_cost' => round($recommendedQty * (float) $v->cost_price, 2),
-                    'urgency' => $v->quantity === 0
-                        ? 'OUT_OF_STOCK'
-                        : ($daysLeft <= 3 ? 'CRITICAL' : 'RESTOCK_NEEDED'),
-                ];
+            if (! $variant) {
+                continue;
             }
+
+            $recommendations[] = [
+                'variant_id' => $variant->variant_id,
+                'sku' => $variant->sku,
+                'product_name' => $variant->product->product_name ?? 'Unknown',
+                'size_name' => $variant->size->size_name ?? 'STD',
+                'color_name' => $variant->color->color_name ?? 'Default',
+                'current_stock' => $variant->quantity,
+                'reorder_level' => $r['reorder_level'],
+                'units_sold_last_period' => $r['total_sold'],
+                'daily_run_rate' => $r['daily_velocity'],
+                'days_of_stock_left' => $r['days_remaining'],
+                'cost_price' => $r['cost_price'],
+                'recommended_order_qty' => $r['suggested_reorder_qty'],
+                'estimated_restock_cost' => $r['estimated_cost'],
+                'urgency' => $r['urgency'],
+            ];
         }
 
         return $this->successResponse([
             'lookback_days' => $lookbackDays,
+            'threshold_days' => $threshold,
             'total_items_to_restock' => count($recommendations),
             'total_estimated_budget' => round(array_sum(array_column($recommendations, 'estimated_restock_cost')), 2),
             'recommendations' => $recommendations,
-        ], 'Restock recommendations generated based on 14-day sales velocity');
+        ], 'Restock recommendations generated based on sales velocity algorithm');
     }
 
     /**

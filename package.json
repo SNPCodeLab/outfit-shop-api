@@ -1,5 +1,5 @@
 {
-  "name": "outfitshop-api",
+  "name": "outfitshop-backend-api",
   "private": true,
   "engines": {
     "node": "24.x"

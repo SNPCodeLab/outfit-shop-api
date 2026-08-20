@@ -74,10 +74,7 @@ Activate this skill whenever the user asks:
 - **Live Health Endpoint**: Zero-dependency `GET /api/v1/health` verifying database and storage connectivity.
 - **API Analytics**: Tracking peak traffic hours, top endpoints, and role activity distribution.
 
-### 10. Documentation & Developer Experience (DX)
-- **OpenAPI 3.0 / Swagger Specification**: Live JSON schema exposed at `GET /api/v1/openapi.json`.
-- **Postman Collection**: Fully configured environment and pre-request token scripts at `GET /api/v1/postman.json`.
-- **Developer Documentation**: Interactive HTML guide, error code dictionary, and SDK generation guides.
+- **API Documentation & Developer Experience (DX)**: Standardized error codes and Postman collections.
 
 ### 11. DevOps, CI/CD & Disaster Recovery
 - **6-Stage CI/CD Pipeline**: Automated Lint (Pint) $\rightarrow$ Test (PostgreSQL container) $\rightarrow$ Build $\rightarrow$ Deploy $\rightarrow$ Smoke Test $\rightarrow$ Slack Notification.
@@ -141,7 +138,7 @@ Prioritize findings into four tiers with actionable code fixes:
 ### Step 6: FRONTEND HANDOFF PACKAGE
 Deliver the final handoff checklist:
 - [ ] Base URL & Live Health Endpoint verified.
-- [ ] OpenAPI 3.0 & Postman JSON collections published.
+- [ ] Postman JSON collections published.
 - [ ] Error Code Dictionary & Localized error messages documented.
 - [ ] Auth & Token Rotation flow verified with sample credentials.
 - [ ] Rate limits and retry-after headers communicated.
@@ -189,7 +186,6 @@ Deliver the final handoff checklist:
 - **Week 4**: Final Hardening & Frontend Handover
 
 ## 5. Frontend Integration & Handover Checklist
-- [x] OpenAPI Spec: `GET /api/v1/openapi.json`
 - [x] Postman Collection: `GET /api/v1/postman.json`
 - [x] Interactive Guide: `GET /guide`
 

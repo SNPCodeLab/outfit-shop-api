@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "outfitshop/api",
     "type": "project",
-    "description": "OutfitShop Ecommerce Clothing API — Modern Enterprise RESTful API.",
+    "description": "OutfitShop-Backend-API — Modern Enterprise RESTful API.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
@@ -30,6 +30,18 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "test": [
+            "@php artisan test"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --test"
+        ]
     },
     "config": {
         "platform": {

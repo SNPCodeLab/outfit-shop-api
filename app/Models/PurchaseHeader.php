@@ -19,7 +19,6 @@ class PurchaseHeader extends Model
         'reference_no',
         'supplier_id',
         'employee_id',
-        'store_id',
         'purchase_date',
         'total_amount',
         'tax_amount',

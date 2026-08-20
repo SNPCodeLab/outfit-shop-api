@@ -62,7 +62,7 @@ class ApiResponse
         $processingTime = self::processingTimeMs();
 
         $baseMeta = [
-            'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
+            'system' => config('api.system_name', 'OutfitShop-Backend-API'),
             'api_version' => config('api.version', 'Version: 1.2.0'),
             'processing_time_ms' => $processingTime,
         ];
@@ -183,7 +183,7 @@ class ApiResponse
                 'debug' => $debug, // Temporarily forced for live troubleshooting
             ],
             'meta' => [
-                'system' => config('api.system_name', 'OutfitShop Ecommerce Clothing API'),
+                'system' => config('api.system_name', 'OutfitShop-Backend-API'),
                 'api_version' => config('api.version', 'Version: 1.2.0'),
                 'processing_time_ms' => $processingTime,
                 'documentation' => config('api.docs_base', '/api/v1/guide').'#'.strtolower($errorCode),

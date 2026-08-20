@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Customer;
 use App\Models\ProductVariant;
-use App\Models\SaleDetail;
 use App\Models\SaleHeader;
+use App\Services\ForecastingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -127,31 +127,27 @@ class AiIntelligenceController extends BaseApiController
      * 3. GET /api/v1/ai/smart-restock
      * Machine learning restock recommendations based on run-rate velocity and stockout risks.
      */
-    public function smartRestock(): JsonResponse
+    public function smartRestock(ForecastingService $forecastingService): JsonResponse
     {
+        $risks = $forecastingService->getStockoutRisks(30, 7);
         $recommendations = [];
 
-        $variants = ProductVariant::with(['product.category', 'size', 'color'])
-            ->where('quantity', '<=', 10)
-            ->limit(20)
-            ->get();
-
-        foreach ($variants as $v) {
-            $salesLast30Days = SaleDetail::where('variant_id', $v->variant_id)->sum('quantity') ?: 5;
-            $dailyVelocity = round($salesLast30Days / 30, 2);
-            $daysOfStockRemaining = $dailyVelocity > 0 ? round($v->quantity / $dailyVelocity, 1) : 999;
-            $suggestedOrderQty = max(20, (int) round($dailyVelocity * 45)); // 45-day safety buffer
+        foreach ($risks as $vId => $r) {
+            $variant = ProductVariant::with(['product'])->find($vId);
+            if (! $variant) {
+                continue;
+            }
 
             $recommendations[] = [
-                'variant_id' => $v->variant_id,
-                'sku' => $v->sku,
-                'product_name' => $v->product->product_name ?? 'Product',
-                'current_stock' => (int) $v->quantity,
-                'daily_sales_velocity' => $dailyVelocity,
-                'days_until_stockout' => $daysOfStockRemaining,
-                'stockout_urgency' => $daysOfStockRemaining < 7 ? 'CRITICAL' : 'MODERATE',
-                'recommended_reorder_qty' => $suggestedOrderQty,
-                'estimated_reorder_cost' => round($suggestedOrderQty * (float) $v->cost_price, 2),
+                'variant_id' => $variant->variant_id,
+                'sku' => $variant->sku,
+                'product_name' => $variant->product->product_name ?? 'Product',
+                'current_stock' => $r['current_stock'],
+                'daily_sales_velocity' => $r['daily_velocity'],
+                'days_until_stockout' => $r['days_remaining'],
+                'stockout_urgency' => $r['urgency'],
+                'recommended_reorder_qty' => $r['suggested_reorder_qty'],
+                'estimated_reorder_cost' => $r['estimated_cost'],
             ];
         }
 
