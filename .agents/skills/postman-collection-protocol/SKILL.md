@@ -17,13 +17,7 @@ One collection file only:
 postman/OutfitShop_Master_Collection.json
 ```
 
-All other locations are copies synced from this file. Never edit them directly.
-
-Sync targets (copy after every rebuild):
-- `API-Delivery-Package/postman_collection.json`
-- `docs/postman_collection.json`
-- `postman_collection.json` (root)
-- `public/SS_MIS.postman_collection.json`
+Never create or maintain any other collection JSON in the project.
 
 Delete any other `.json` collection or environment file found in `postman/` or `docs/`.
 
@@ -175,5 +169,4 @@ Steps:
 2. Delete `postman/OutfitShop_Master_Collection.json`
 3. Rebuild from scratch following this skill
 4. Validate JSON: `python3 -m json.tool <file> > /dev/null`
-5. Sync to all copy targets
-6. Commit and `pm`
+5. Commit and `pm`
