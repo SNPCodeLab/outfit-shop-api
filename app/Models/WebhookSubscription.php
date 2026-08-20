@@ -6,9 +6,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\CastsBooleanForPostgres;
 
 class WebhookSubscription extends Model
 {
+    use CastsBooleanForPostgres;
     use HasFactory;
 
     protected $table = 'webhook_subscriptions';

@@ -7,9 +7,11 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\CastsBooleanForPostgres;
 
 class Promotion extends Model
 {
+    use CastsBooleanForPostgres;
     use HasFactory;
 
     protected $table = 'promotions';

@@ -7,9 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\CastsBooleanForPostgres;
 
 class GiftCard extends Model
 {
+    use CastsBooleanForPostgres;
     use HasFactory;
 
     protected $table = 'gift_cards';
