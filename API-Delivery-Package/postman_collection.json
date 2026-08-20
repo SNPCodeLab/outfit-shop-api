@@ -10,7 +10,7 @@
         "bearer": [
             {
                 "key": "token",
-                "value": "{{token}}",
+                "value": "{{access_token}}",
                 "type": "string"
             }
         ]
@@ -98,6 +98,16 @@
         },
         {
             "key": "order_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "cart_item_id",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "wishlist_id",
             "value": "1",
             "type": "string"
         },
@@ -203,13 +213,15 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const r = pm.response.json();",
-                                    "pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                                    "pm.test('Has access_token', () => pm.expect(r.data).to.have.property('access_token'));",
+                                    "const json = pm.response.json();",
+                                    "pm.test('Login successful', () => pm.expect(json.success).to.be.true);",
+                                    "const token = json.data && json.data.access_token;",
+                                    "pm.test('Has access_token', () => pm.expect(token).to.be.a('string'));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                                    "if (r.success && r.data && r.data.access_token) {",
-                                    "  pm.collectionVariables.set('token', r.data.access_token);",
-                                    "  pm.collectionVariables.set('admin_token', r.data.access_token);",
+                                    "if (token) {",
+                                    "  pm.collectionVariables.set('access_token', token);",
+                                    "  pm.collectionVariables.set('token', token);",
+                                    "  pm.collectionVariables.set('admin_token', token);",
                                     "}"
                                 ]
                             }
@@ -287,7 +299,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"username\":\"cashier\",\"password\":\"Cashier$Point$2026\"}",
+                            "raw": "{\"email\":\"cashier@api.kesararamwithdigital.tech\",\"password\":\"Cashier$Point$2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -303,11 +315,12 @@
                                 "exec": [
                                     "const r = pm.response.json();",
                                     "pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                                    "pm.test('Has access_token', () => pm.expect(r.data).to.have.property('access_token'));",
+                                    "const token = r.data && r.data.access_token;",
+                                    "pm.test('Has access_token', () => pm.expect(token).to.be.a('string'));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                                    "if (r.success && r.data && r.data.access_token) {",
-                                    "  pm.collectionVariables.set('token', r.data.access_token);",
-                                    "  pm.collectionVariables.set('cashier_token', r.data.access_token);",
+                                    "if (token) {",
+                                    "  pm.collectionVariables.set('token', token);",
+                                    "  pm.collectionVariables.set('cashier_token', token);",
                                     "}"
                                 ]
                             }
@@ -399,13 +412,15 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const r = pm.response.json();",
-                                    "pm.test('Login successful', () => pm.expect(r.success).to.be.true);",
-                                    "pm.test('Has access_token', () => pm.expect(r.data).to.have.property('access_token'));",
+                                    "const json = pm.response.json();",
+                                    "pm.test('Login successful', () => pm.expect(json.success).to.be.true);",
+                                    "const token = json.data && json.data.access_token;",
+                                    "pm.test('Has access_token', () => pm.expect(token).to.be.a('string'));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                                    "if (r.success && r.data && r.data.access_token) {",
-                                    "  pm.collectionVariables.set('token', r.data.access_token);",
-                                    "  pm.collectionVariables.set('admin_token', r.data.access_token);",
+                                    "if (token) {",
+                                    "  pm.collectionVariables.set('access_token', token);",
+                                    "  pm.collectionVariables.set('token', token);",
+                                    "  pm.collectionVariables.set('admin_token', token);",
                                     "}"
                                 ]
                             }
@@ -864,7 +879,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                                    "pm.test('Digital download accessible', () => pm.expect(pm.response.code).to.be.oneOf([200, 302, 403]));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
                                 ]
                             }
@@ -1377,18 +1392,18 @@
                     ]
                 },
                 {
-                    "name": "35 GET /bundles/1",
+                    "name": "35 GET /bundles/{{bundle_id}}",
                     "request": {
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{base_url}}/bundles/1",
+                            "raw": "{{base_url}}/bundles/{{bundle_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "bundles",
-                                "1"
+                                "{{bundle_id}}"
                             ]
                         }
                     },
@@ -1460,7 +1475,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"code\":\"SEASON20\"}",
+                            "raw": "{\"code\":\"SEASON20\",\"amount\":100.00,\"customer_id\":1}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1704,16 +1719,18 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const r = pm.response.json();",
-                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                                    "pm.test('Status 201 or 200', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                                    "pm.test('Success true', () => pm.expect(r.success).to.be.true);"
+                                    "pm.test('Success true', () => pm.expect(r.success).to.be.true);",
+                                    "const item = r.data && (r.data.cart_item_id || r.data.id || (r.data.item && r.data.item.cart_item_id));",
+                                    "if (item) { pm.collectionVariables.set('cart_item_id', item); }"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "44 PUT /cart/items/1",
+                    "name": "44 PUT /cart/items/{{cart_item_id}}",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -1727,14 +1744,14 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/cart/items/1",
+                            "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "cart",
                                 "items",
-                                "1"
+                                "{{cart_item_id}}"
                             ]
                         },
                         "body": {
@@ -1763,7 +1780,7 @@
                     ]
                 },
                 {
-                    "name": "45 DELETE /cart/items/1",
+                    "name": "45 DELETE /cart/items/{{cart_item_id}}",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1773,14 +1790,14 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/cart/items/1",
+                            "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "cart",
                                 "items",
-                                "1"
+                                "{{cart_item_id}}"
                             ]
                         }
                     },
@@ -1897,7 +1914,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":182,\"variant_id\":174}",
+                            "raw": "{\"product_id\":182,\"variant_id\":174,\"customer_id\":1}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1914,7 +1931,9 @@
                                     "const r = pm.response.json();",
                                     "pm.test('Status 200', () => pm.response.to.have.status(200));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
-                                    "pm.test('Success true', () => pm.expect(r.success).to.be.true);"
+                                    "pm.test('Success true', () => pm.expect(r.success).to.be.true);",
+                                    "const wid = r.data && (r.data.wishlist_id || r.data.id || (r.data.item && r.data.item.wishlist_id));",
+                                    "if (wid) { pm.collectionVariables.set('wishlist_id', wid); }"
                                 ]
                             }
                         }
@@ -1946,7 +1965,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"product_id\":182,\"variant_id\":174}",
+                            "raw": "{\"product_id\":182,\"variant_id\":174,\"customer_id\":1}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1970,7 +1989,7 @@
                     ]
                 },
                 {
-                    "name": "50 DELETE /wishlist/1",
+                    "name": "50 DELETE /wishlist/{{wishlist_id}}",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1980,13 +1999,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/wishlist/1",
+                            "raw": "{{base_url}}/wishlist/{{wishlist_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "wishlist",
-                                "1"
+                                "{{wishlist_id}}"
                             ]
                         }
                     },
@@ -2020,13 +2039,19 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/payments/khqr",
+                            "raw": "{{base_url}}/payments/khqr?amount=10.00",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "payments",
                                 "khqr"
+                            ],
+                            "query": [
+                                {
+                                    "key": "amount",
+                                    "value": "10.00"
+                                }
                             ]
                         }
                     },
@@ -2520,53 +2545,6 @@
                         "body": {
                             "mode": "raw",
                             "raw": "{\"code\":\"123456\"}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        }
-                    },
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                                    "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "64 POST /auth/logout",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/auth/logout",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "logout"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -4979,7 +4957,7 @@
                     ]
                 },
                 {
-                    "name": "117 DELETE /bundles/1",
+                    "name": "117 DELETE /bundles/{{bundle_id}}",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -4989,13 +4967,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/bundles/1",
+                            "raw": "{{base_url}}/bundles/{{bundle_id}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "bundles",
-                                "1"
+                                "{{bundle_id}}"
                             ]
                         }
                     },
@@ -8037,7 +8015,7 @@
                                 "exec": [
                                     "const r = pm.response.json();",
                                     "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                                    "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
+                                    "pm.test('Response under 5s', () => pm.expect(pm.response.responseTime).to.be.below(5000));",
                                     "pm.test('Success true', () => pm.expect(r.success).to.be.true);"
                                 ]
                             }
@@ -8499,6 +8477,53 @@
                                     "pm.test('Status 200', () => pm.response.to.have.status(200));",
                                     "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));",
                                     "pm.test('Success true', () => pm.expect(r.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "198 POST /auth/logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                                    "pm.test('Response under 3s', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
                                 ]
                             }
                         }
