@@ -4,100 +4,129 @@
 
 | Branch | Role |
 |--------|------|
-| `docs` | Default branch. Production-ready code. All PRs target here. |
-| `main` | Mirror of `docs`. Kept in sync after every merge to `docs`. |
+| `docs` | Default branch. Production-ready code. All merges and PRs target here. Triggers production deploy. |
+| `main` | Mirror of `docs`. Synced after every merge to `docs`. |
 
-No other branches are permitted. If a feature or fix needs a working branch, create it, use it, then delete it after merging to `docs`.
+No other long-lived branches are permitted. Short-lived working branches are created for features/fixes, then deleted after merging.
 
 ---
 
-## Workflow: Every Push
+## Command Shorthand — Primary Reference
 
-Before pushing any code, run this checklist in order:
+These are the canonical commands you use. The agent follows them exactly.
 
-### 1. Pre-Push Checkpoint Pipeline
+| You say | What the agent does |
+|---------|---------------------|
+| `merge` | Merge current branch into `docs`, sync `main`, push both, run checkpoint pipeline |
+| `push` | Open a PR targeting `docs` (no merge yet) |
+| `merge push` | Merge into `docs` + sync `main` + push both + trigger production deploy via checkpoint pipeline |
 
-```bash
-# 1. Ensure you are on the correct branch (never push directly to docs)
-git status
+### `merge` — Default Merge to `docs`
 
-# 2. Stage only the files relevant to the change
-git add <specific files>
-
-# 3. Run lint check (Pint)
-vendor/bin/pint --test
-
-# 4. Confirm no unintended files are staged
-git diff --staged --stat
-
-# 5. Commit with a clear conventional message
-git commit -m "type: short description"
-```
-
-Commit message types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`
-
-### 2. Push to a Short-Lived Branch
+When you say **merge**, the agent will:
+1. Run the pre-push checkpoint pipeline (lint, stage check)
+2. Merge the current branch into `docs` (no-ff commit)
+3. Fast-forward sync `main` to match `docs`
+4. Push `docs` and `main` to origin
+5. Delete the working branch (local + remote) if applicable
 
 ```bash
-git push -u origin <branch-name>
-```
-
-Never push directly to `docs` or `main`.
-
-### 3. Open a Pull Request to `docs`
-
-All code must enter `docs` via a PR, not a direct push.
-
-PR title: under 70 characters.
-PR description must include:
-- What changed
-- What was tested
-- Any known risks
-
-### 4. After PR is Merged to `docs` — Sync `main`
-
-After every merge to `docs`, immediately sync `main`:
-
-```bash
+git checkout docs
+git merge <branch> --no-ff -m "merge: <branch> -> docs — <description>"
+git push origin docs
 git checkout main
 git merge origin/docs --ff-only
 git push origin main
 ```
 
+### `push` — Open PR to `docs`
+
+When you say **push** (without merge), the agent will:
+1. Push the current working branch to origin
+2. Open a Pull Request targeting `docs`
+3. No merge is performed — waits for review
+
+```bash
+git push -u origin <branch>
+# then open PR to docs
+```
+
+### `merge push` — Full Release to Production
+
+When you say **merge push**, the agent will:
+1. Run the full pre-push checkpoint pipeline
+2. Merge current branch into `docs`
+3. Sync `main` to `docs` (ff-only)
+4. Push `docs` to origin — this triggers the GitHub Actions deploy pipeline
+5. Push `main` to origin
+6. Delete the working branch (local + remote)
+7. Confirm the GitHub Actions deploy pipeline fired (smoke test passes)
+
+This is the production release command. Every `merge push` must pass the checkpoint pipeline before touching `docs`.
+
 ---
 
-## Shorthand Commands
+## Pre-Push Checkpoint Pipeline
 
-| You say | What it means |
-|---------|---------------|
-| `pm` | Push + Merge: push current branch, open PR, merge to `docs`, sync `main` |
-| `mp` | Same as `pm` — merge + push to docs and sync main |
+Run before every merge or push. No skipping.
 
-When you say `pm` or `mp`, the agent will:
-1. Push the current working branch to origin
-2. Merge it into `docs` via PR (or direct merge if no CI is blocking)
-3. Delete the working branch
-4. Sync `main` to match `docs`
-5. Delete any leftover local and remote working branches
+```bash
+# 1. Confirm branch and clean working tree
+git status
+
+# 2. Stage only relevant files (never git add .)
+git add <specific files>
+
+# 3. Lint check
+vendor/bin/pint --test
+
+# 4. Review staged diff
+git diff --staged --stat
+
+# 5. Commit with conventional message
+git commit -m "type: short description"
+```
+
+Commit message types: `feat`, `fix`, `refactor`, `docs`, `chore`, `test`
+
+---
+
+## GitHub Actions Deploy Pipeline
+
+Every push to `docs` or `main` triggers the CI/CD pipeline in `.github/workflows/deploy.yml`:
+
+| Stage | What runs |
+|-------|-----------|
+| 1. Lint | Laravel Pint code style check |
+| 2. Test | PHPUnit / Pest test suite against PostgreSQL |
+| 3. Build | Production artifact, config + route cache |
+| 4. Deploy | Webhook trigger to production server |
+| 5. Smoke Test | Live health check on `https://api.kesararamwithdigital.tech/api/v1/health` |
+| 6. Notify | Slack / Teams status alert |
+
+After every `merge` or `merge push`, verify the pipeline passed before calling the task done.
+
+---
+
+## Branch Flow
+
+```
+working branch  -->  docs (merge/merge push)  -->  main (ff-only sync)
+                          |
+                          +---> GitHub Actions --> Production Deploy
+```
+
+Default PR target: `docs`
+Production deploy branch: `docs`
+Mirror branch: `main`
 
 ---
 
 ## Forbidden Actions
 
-- Direct push to `docs` or `main`
-- Leaving stale branches alive after merge
+- Direct push to `docs` or `main` without going through the checkpoint pipeline
 - Force push (`--force`) on `docs` or `main`
-- Merging `main` into `docs` (the direction is always: working branch -> `docs` -> `main`)
-- Creating branches named `fix`, `main-product`, `dev`, or other permanent parallel branches
-
----
-
-## Quick Reference
-
-```
-Working Branch  -->  PR  -->  docs  -->  main (ff-only sync)
-```
-
-Default branch for all PRs: `docs`
-Production deploy branch: `docs`
-Mirror branch: `main`
+- Merging `main` into `docs` (direction is always: working branch -> `docs` -> `main`)
+- Leaving stale working branches alive after merge
+- Using `git add .` — always stage specific files
+- Skipping lint before merge
