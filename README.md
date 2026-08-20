@@ -38,6 +38,7 @@ The system is architected as a **Monolithic, Headless REST API Backend** impleme
 Detailed documentation is available in the `docs/` folder:
 - [Architecture & Responsibilities](docs/ARCHITECTURE.md)
 - [API Conventions & Endpoints](docs/API.md)
+- [Agent-AI Blueprint & Standards](docs/AGENT_BLUEPRINT.md)
 - [Frontend Integration Guide](docs/frontend_integration_guide.md)
 
 ---
