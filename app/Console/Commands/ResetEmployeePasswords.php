@@ -29,10 +29,10 @@ class ResetEmployeePasswords extends Command
      * Keep in sync with RolesAndPermissionsSeeder and LOCAL_CREDENTIALS.md.
      */
     private const CREDENTIALS = [
-        'admin'   => 'Admin#Secure#2026',
+        'admin' => 'Admin#Secure#2026',
         'manager' => 'Manager@Ops!2026',
         'cashier' => 'Cashier$Point$2026',
-        'staff'   => 'Staff%Store%2026',
+        'staff' => 'Staff%Store%2026',
     ];
 
     public function handle(): int
@@ -56,6 +56,7 @@ class ResetEmployeePasswords extends Command
             if (! $employee) {
                 $rows[] = [$username, 'NOT FOUND', 'SKIPPED'];
                 $failCount++;
+
                 continue;
             }
 
