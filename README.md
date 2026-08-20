@@ -43,6 +43,16 @@ Detailed documentation is available in the `docs/` folder:
 
 ---
 
+## 5. AI Agent & Developer Protocol
+
+This repository is hardened for **AI-Driven Development**. Any AI model interacting with this codebase is bound by the rules defined in the `.agents/` directory.
+
+- **Mandatory First Step**: Load the `agent-ai-core-conventions` skill.
+- **Strict Rule**: No emojis in any project asset.
+- **Workflow**: All changes must follow the **Double-Checkpoint PM/MP Protocol**.
+
+---
+
 ## 4. Quick Start
 
 ### 4.1 Requirements
