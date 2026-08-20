@@ -121,9 +121,9 @@ class RolesAndPermissionsSeeder extends Seeder
             [
                 'username' => 'admin',
                 'employee_name' => 'System Administrator',
-                'email' => 'admin@ssmis.local',
-                'position' => 'General Manager',
-                'password_hash' => Hash::make('Admin@123456'),
+                'email' => 'admin@api.kesararamwithdigital.tech',
+                'position' => 'Chief Executive Officer',
+                'password_hash' => Hash::make('Admin#Secure#2026'),
                 'role' => 'ADMIN',
                 'gender' => 'Male',
                 'phone' => '+85512345678',
@@ -132,9 +132,9 @@ class RolesAndPermissionsSeeder extends Seeder
             [
                 'username' => 'manager',
                 'employee_name' => 'Store Manager',
-                'email' => 'manager@ssmis.local',
-                'position' => 'Inventory Manager',
-                'password_hash' => Hash::make('Manager@123456'),
+                'email' => 'manager@api.kesararamwithdigital.tech',
+                'position' => 'Store Operations Manager',
+                'password_hash' => Hash::make('Manager@Ops!2026'),
                 'role' => 'MANAGER',
                 'gender' => 'Female',
                 'phone' => '+85512345679',
@@ -143,9 +143,9 @@ class RolesAndPermissionsSeeder extends Seeder
             [
                 'username' => 'cashier',
                 'employee_name' => 'Senior Cashier',
-                'email' => 'cashier@ssmis.local',
-                'position' => 'POS Cashier',
-                'password_hash' => Hash::make('Cashier@123456'),
+                'email' => 'cashier@api.kesararamwithdigital.tech',
+                'position' => 'Senior POS Operator',
+                'password_hash' => Hash::make('Cashier$Point$2026'),
                 'role' => 'CASHIER',
                 'gender' => 'Female',
                 'phone' => '+85512345680',
@@ -154,9 +154,9 @@ class RolesAndPermissionsSeeder extends Seeder
             [
                 'username' => 'staff',
                 'employee_name' => 'General Staff',
-                'email' => 'staff@ssmis.local',
-                'position' => 'Store Assistant',
-                'password_hash' => Hash::make('Staff@123456'),
+                'email' => 'staff@api.kesararamwithdigital.tech',
+                'position' => 'Inventory Assistant',
+                'password_hash' => Hash::make('Staff%Store%2026'),
                 'role' => 'STAFF',
                 'gender' => 'Male',
                 'phone' => '+85512345681',
@@ -178,14 +178,14 @@ class RolesAndPermissionsSeeder extends Seeder
         $devTeam = [
             [
                 'name' => 'Frontend Developer',
-                'email' => 'frontend@ssmis.local',
+                'email' => 'frontend@api.kesararamwithdigital.tech',
                 'password' => Hash::make('Frontend@123456'),
                 'is_admin' => false,
                 'role' => 'manager',
             ],
             [
                 'name' => 'Admin User',
-                'email' => 'superadmin@ssmis.local',
+                'email' => 'superadmin@api.kesararamwithdigital.tech',
                 'password' => Hash::make('SuperAdmin@123456'),
                 'is_admin' => true,
                 'role' => 'admin',
@@ -210,11 +210,12 @@ class RolesAndPermissionsSeeder extends Seeder
         $this->command->table(
             ['Role', 'Default Credentials'],
             [
-                ['ADMIN (Employee)',    'admin / Admin@123456'],
-                ['MANAGER (Employee)', 'manager / Manager@123456'],
-                ['CASHIER (Employee)', 'cashier / Cashier@123456'],
-                ['MANAGER (User)',     'frontend@ssmis.local / Frontend@123456'],
-                ['ADMIN (User)',       'superadmin@ssmis.local / SuperAdmin@123456'],
+                ['ADMIN (Employee)',    'admin / Admin#Secure#2026'],
+                ['MANAGER (Employee)', 'manager / Manager@Ops!2026'],
+                ['CASHIER (Employee)', 'cashier / Cashier$Point$2026'],
+                ['STAFF (Employee)',   'staff / Staff%Store%2026'],
+                ['MANAGER (User)',     'frontend@api.kesararamwithdigital.tech / Frontend@123456'],
+                ['ADMIN (User)',       'superadmin@api.kesararamwithdigital.tech / SuperAdmin@123456'],
             ]
         );
     }
