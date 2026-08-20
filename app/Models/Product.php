@@ -87,7 +87,7 @@ class Product extends Model
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(ProductReview::class, 'product_id', 'product_id')->where('is_approved', true);
+        return $this->hasMany(ProductReview::class, 'product_id', 'product_id')->whereRaw('is_approved is true');
     }
 
     public function primaryImage(): HasOne

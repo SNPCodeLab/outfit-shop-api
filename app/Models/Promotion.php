@@ -42,7 +42,7 @@ class Promotion extends Model
     {
         $now = Carbon::now();
 
-        return $query->where('is_active', true)
+        return $query->whereRaw('is_active is true')
             ->where('start_date', '<=', $now)
             ->where('end_date', '>=', $now);
     }
