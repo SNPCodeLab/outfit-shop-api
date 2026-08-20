@@ -59,9 +59,17 @@ jobs:
         run: php artisan key:generate --env=testing
 
       - name: Run Database Migrations
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+          DB_URL: ""
         run: php artisan migrate --force --env=testing
 
       - name: Execute Test Suite (PHPUnit)
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+          DB_URL: ""
         run: php artisan test
 
   # ── STAGE 3: BUILD PRODUCTION ARTIFACT ──────────────────────────────────────
