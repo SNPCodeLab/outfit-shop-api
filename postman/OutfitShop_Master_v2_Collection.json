@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "outfitshop-master-v2-2026",
-    "name": "OutfitShop-Backend-API — Comprehensive Master Collection",
+    "name": "OutfitShop-Backend-API \u2014 Comprehensive Master Collection",
     "description": "Enterprise-grade Postman collection for SS-MIS (OutfitShop) API v1. Includes 135+ endpoints covering CRUD, POS, AI, and Admin modules with full automation and real production IDs.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -82,7 +82,8 @@
                   "if (r.success && r.data && r.data.access_token) {",
                   "  pm.collectionVariables.set('token', r.data.access_token);",
                   "  console.log('Token captured successfully');",
-                  "}"
+                  "}",
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
                 ],
                 "type": "text/javascript"
               }
@@ -90,15 +91,54 @@
           ],
           "request": {
             "method": "POST",
-            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@kesararamwithdigital.tech\",\n    \"password\": \"password123\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"email\": \"admin@kesararamwithdigital.tech\",\n    \"password\": \"Admin#Secure#2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
-        { "name": "GET Auth Me", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] } } },
+        {
+          "name": "GET Auth Me",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
         {
           "name": "POST Refresh Token",
           "event": [
@@ -107,31 +147,199 @@
               "script": {
                 "exec": [
                   "const r = pm.response.json();",
-                  "if (r.success && r.data && r.data.access_token) { pm.collectionVariables.set('token', r.data.access_token); }"
+                  "if (r.success && r.data && r.data.access_token) { pm.collectionVariables.set('token', r.data.access_token); }",
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
                 ],
                 "type": "text/javascript"
               }
             }
           ],
-          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"] } }
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          }
         },
-        { "name": "POST Logout", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] } } },
-        { "name": "POST Revoke All", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/revoke-all", "host": ["{{baseUrl}}"], "path": ["auth", "revoke-all"] } } },
-        { "name": "POST 2FA Setup", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/2fa/setup", "host": ["{{baseUrl}}"], "path": ["auth", "2fa", "setup"] } } },
-        { "name": "POST 2FA Verify", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/2fa/verify", "host": ["{{baseUrl}}"], "path": ["auth", "2fa", "verify"] } } },
+        {
+          "name": "POST Logout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Revoke All",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/revoke-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "revoke-all"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST 2FA Setup",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/2fa/setup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "2fa",
+                "setup"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST 2FA Verify",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/2fa/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "2fa",
+                "verify"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
         {
           "name": "POST Register Admin",
           "request": {
             "method": "POST",
-            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"New Admin\",\n    \"email\": \"admin.new{{$randomInt}}@example.com\",\n    \"password\": \"password123\",\n    \"role\": \"ADMIN\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
-        { "name": "GET Employees", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/employees", "host": ["{{baseUrl}}"], "path": ["employees"] } } },
+        {
+          "name": "GET Employees",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
         {
           "name": "POST Create Employee",
           "event": [
@@ -140,230 +348,3691 @@
               "script": {
                 "exec": [
                   "const jsonData = pm.response.json();",
-                  "if (jsonData.data && jsonData.data.id) { pm.collectionVariables.set(\"employee_id\", jsonData.data.id); }"
+                  "if (jsonData.data && jsonData.data.id) { pm.collectionVariables.set(\"employee_id\", jsonData.data.id); }",
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
                 ],
                 "type": "text/javascript"
               }
             }
           ],
-          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/employees", "host": ["{{baseUrl}}"], "path": ["employees"] } }
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/employees",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees"
+              ]
+            }
+          }
         },
-        { "name": "GET Employee ({{employee_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/employees/{{employee_id}}", "host": ["{{baseUrl}}"], "path": ["employees", "{{employee_id}}"] } } },
-        { "name": "PUT Update Employee ({{employee_id}})", "request": { "method": "PUT", "url": { "raw": "{{baseUrl}}/employees/{{employee_id}}", "host": ["{{baseUrl}}"], "path": ["employees", "{{employee_id}}"] } } },
-        { "name": "DELETE Employee ({{employee_id}})", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/employees/{{employee_id}}", "host": ["{{baseUrl}}"], "path": ["employees", "{{employee_id}}"] } } }
+        {
+          "name": "GET Employee ({{employee_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees/{{employee_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "{{employee_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Employee ({{employee_id}})",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/employees/{{employee_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "{{employee_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Employee ({{employee_id}})",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/employees/{{employee_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "{{employee_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "01 - System, Health & Settings",
       "item": [
-        { "name": "GET Health", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] } } },
-        { "name": "GET Status", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/status", "host": ["{{baseUrl}}"], "path": ["status"] } } },
-        { "name": "GET API Docs", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/docs", "host": ["{{baseUrl}}"], "path": ["docs"] } } },
-        { "name": "GET Help Guide", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/guide", "host": ["{{baseUrl}}"], "path": ["guide"] } } },
-        { "name": "GET Audio Cues", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/settings/audio-cues", "host": ["{{baseUrl}}"], "path": ["settings", "audio-cues"] } } },
-        { "name": "GET Banners", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/marketing/banners", "host": ["{{baseUrl}}"], "path": ["marketing", "banners"] } } },
-        { "name": "POST Create Banner", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/marketing/banners", "host": ["{{baseUrl}}"], "path": ["marketing", "banners"] } } },
-        { "name": "DELETE Banner", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/marketing/banners/1", "host": ["{{baseUrl}}"], "path": ["marketing", "banners", "1"] } } },
-        { "name": "GET Rates", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/currencies/rates", "host": ["{{baseUrl}}"], "path": ["currencies", "rates"] } } },
-        { "name": "POST Convert", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/currencies/convert", "host": ["{{baseUrl}}"], "path": ["currencies", "convert"] } } },
-        { "name": "GET Webhooks", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/webhooks", "host": ["{{baseUrl}}"], "path": ["webhooks"] } } },
-        { "name": "POST Subscribe Webhook", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/webhooks/subscribe", "host": ["{{baseUrl}}"], "path": ["webhooks", "subscribe"] } } },
-        { "name": "POST Test Webhook", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/webhooks/test", "host": ["{{baseUrl}}"], "path": ["webhooks", "test"] } } },
-        { "name": "DELETE Webhook", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/webhooks/1", "host": ["{{baseUrl}}"], "path": ["webhooks", "1"] } } }
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "status"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET API Docs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "docs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Help Guide",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/guide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "guide"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Audio Cues",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/settings/audio-cues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "settings",
+                "audio-cues"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Banners",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/marketing/banners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "marketing",
+                "banners"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Banner",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/marketing/banners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "marketing",
+                "banners"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Banner",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/marketing/banners/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "marketing",
+                "banners",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Rates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/currencies/rates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies",
+                "rates"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Convert",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/currencies/convert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currencies",
+                "convert"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 100,\n    \"from\": \"USD\",\n    \"to\": \"KHR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Webhooks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/webhooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Subscribe Webhook",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/subscribe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                "subscribe"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Test Webhook",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/test",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                "test"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Webhook",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "02 - Catalog (Products, Variants, Categories, Brands)",
       "item": [
-        { "name": "GET Products", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] } } },
+        {
+          "name": "GET Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
         {
           "name": "POST Create Product",
           "event": [
             {
               "listen": "prerequest",
-              "script": { "exec": [ "const ts = new Date().getTime(); pm.collectionVariables.set('p_name', 'Product ' + ts); pm.collectionVariables.set('p_sku', 'SKU-' + ts);" ] }
+              "script": {
+                "exec": [
+                  "const ts = new Date().getTime(); pm.collectionVariables.set('p_name', 'Product ' + ts); pm.collectionVariables.set('p_sku', 'SKU-' + ts);"
+                ]
+              }
             },
             {
               "listen": "test",
-              "script": { "exec": [ "const res = pm.response.json(); if(res.data && res.data.id) pm.collectionVariables.set('product_id', res.data.id);" ] }
+              "script": {
+                "exec": [
+                  "const res = pm.response.json(); if(res.data && res.data.id) pm.collectionVariables.set('product_id', res.data.id);",
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ]
+              }
             }
           ],
           "request": {
             "method": "POST",
-            "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] },
-            "body": { "mode": "raw", "raw": "{\"name\":\"{{p_name}}\", \"sku\":\"{{p_sku}}\", \"category_id\":{{category_id}}, \"brand_id\":{{brand_id}}, \"price\":99.99}", "options": { "raw": { "language": "json" } } }
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{p_name}}\", \"sku\":\"{{p_sku}}\", \"category_id\":{{category_id}}, \"brand_id\":{{brand_id}}, \"price\":99.99}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           }
         },
-        { "name": "GET Product ({{product_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{product_id}}", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}"] } } },
-        { "name": "PUT Update Product ({{product_id}})", "request": { "method": "PUT", "url": { "raw": "{{baseUrl}}/products/{{product_id}}", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}"] } } },
-        { "name": "DELETE Product ({{product_id}})", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/products/{{product_id}}", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}"] } } },
-        { "name": "POST Bulk Import Products", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/products/bulk-import", "host": ["{{baseUrl}}"], "path": ["products", "bulk-import"] } } },
-        { "name": "GET Variants", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/variants", "host": ["{{baseUrl}}"], "path": ["variants"] } } },
-        { "name": "POST Create Variant", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/variants", "host": ["{{baseUrl}}"], "path": ["variants"] } } },
-        { "name": "GET Variant ({{variant_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/variants/{{variant_id}}", "host": ["{{baseUrl}}"], "path": ["variants", "{{variant_id}}"] } } },
-        { "name": "GET Variant Barcode ({{variant_sku}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/variants/barcode/{{variant_sku}}", "host": ["{{baseUrl}}"], "path": ["variants", "barcode", "{{variant_sku}}"] } } },
-        { "name": "GET Low Stock", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/variants/low-stock", "host": ["{{baseUrl}}"], "path": ["variants", "low-stock"] } } },
-        { "name": "POST Bulk Price Update", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/variants/bulk-price-update", "host": ["{{baseUrl}}"], "path": ["variants", "bulk-price-update"] } } },
-        { "name": "GET Categories", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] } } },
-        { "name": "POST Create Category", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] } } },
-        { "name": "GET Category ({{category_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/categories/{{category_id}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{category_id}}"] } } },
-        { "name": "GET Brands", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/brands", "host": ["{{baseUrl}}"], "path": ["brands"] } } },
-        { "name": "POST Create Brand", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/brands", "host": ["{{baseUrl}}"], "path": ["brands"] } } },
-        { "name": "GET Brand ({{brand_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/brands/{{brand_id}}", "host": ["{{baseUrl}}"], "path": ["brands", "{{brand_id}}"] } } },
-        { "name": "GET Bundles", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/bundles", "host": ["{{baseUrl}}"], "path": ["bundles"] } } },
-        { "name": "POST Create Bundle", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/bundles", "host": ["{{baseUrl}}"], "path": ["bundles"] } } },
-        { "name": "GET Promotions", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/promotions", "host": ["{{baseUrl}}"], "path": ["promotions"] } } },
-        { "name": "GET Active Promotions", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/promotions/active", "host": ["{{baseUrl}}"], "path": ["promotions", "active"] } } }
+        {
+          "name": "GET Product ({{product_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Product ({{product_id}})",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Product ({{product_id}})",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Bulk Import Products",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/products/bulk-import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "bulk-import"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Variants",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/variants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Variant",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/variants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Variant ({{variant_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/variants/{{variant_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "{{variant_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Variant Barcode ({{variant_sku}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/variants/barcode/{{variant_sku}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "barcode",
+                "{{variant_sku}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Low Stock",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/variants/low-stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "low-stock"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Bulk Price Update",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/variants/bulk-price-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "bulk-price-update"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Category",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Category ({{category_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{category_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "{{category_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Brands",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/brands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "brands"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Brand",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/brands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "brands"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Brand ({{brand_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/brands/{{brand_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "brands",
+                "{{brand_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Bundles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bundles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bundles"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Bundle",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/bundles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bundles"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Promotions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/promotions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promotions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Active Promotions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/promotions/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promotions",
+                "active"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "03 - Product Assets (Images, Matrix, Reviews, Sizes, Colors)",
       "item": [
-        { "name": "GET Sizes", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/clothing-sizes", "host": ["{{baseUrl}}"], "path": ["clothing-sizes"] } } },
-        { "name": "POST Create Size", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/clothing-sizes", "host": ["{{baseUrl}}"], "path": ["clothing-sizes"] } } },
-        { "name": "GET Colors", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/colors", "host": ["{{baseUrl}}"], "path": ["colors"] } } },
-        { "name": "POST Create Color", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/colors", "host": ["{{baseUrl}}"], "path": ["colors"] } } },
-        { "name": "GET Product Images", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{product_id}}/images", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}", "images"] } } },
-        { "name": "POST Upload Product Image", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/products/{{product_id}}/images", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}", "images"] } } },
-        { "name": "GET Product Matrix", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{product_id}}/matrix", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}", "matrix"] } } },
-        { "name": "GET Colorways", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{product_id}}/colorways", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}", "colorways"] } } },
-        { "name": "GET Reviews", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{product_id}}/reviews", "host": ["{{baseUrl}}"], "path": ["products", "{{product_id}}", "reviews"] } } },
-        { "name": "POST Upload Batch", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/uploads/batch", "host": ["{{baseUrl}}"], "path": ["uploads", "batch"] } } },
-        { "name": "GET Gallery", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/uploads/gallery", "host": ["{{baseUrl}}"], "path": ["uploads", "gallery"] } } },
-        { "name": "POST Upload Single", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/uploads/image", "host": ["{{baseUrl}}"], "path": ["uploads", "image"] } } },
-        { "name": "DELETE Uploaded Image", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/uploads/image", "host": ["{{baseUrl}}"], "path": ["uploads", "image"] } } }
+        {
+          "name": "GET Sizes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/clothing-sizes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clothing-sizes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Size",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/clothing-sizes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clothing-sizes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Colors",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/colors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "colors"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Color",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/colors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "colors"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Product Images",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "images"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Upload Product Image",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "images"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Product Matrix",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}/matrix",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "matrix"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Colorways",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}/colorways",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "colorways"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products/{{product_id}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "reviews"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Upload Batch",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/uploads/batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "batch"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Gallery",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/uploads/gallery",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "gallery"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Upload Single",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/uploads/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "image"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Uploaded Image",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/uploads/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "image"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "04 - Customers & CRM",
       "item": [
-        { "name": "GET Customers", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/customers", "host": ["{{baseUrl}}"], "path": ["customers"] } } },
+        {
+          "name": "GET Customers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
         {
           "name": "POST Create Customer",
           "event": [
             {
               "listen": "test",
-              "script": { "exec": [ "const res = pm.response.json(); if(res.data && res.data.id) pm.collectionVariables.set('customer_id', res.data.id);" ] }
+              "script": {
+                "exec": [
+                  "const res = pm.response.json(); if(res.data && res.data.id) pm.collectionVariables.set('customer_id', res.data.id);",
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ]
+              }
             }
           ],
           "request": {
             "method": "POST",
-            "url": { "raw": "{{baseUrl}}/customers", "host": ["{{baseUrl}}"], "path": ["customers"] },
-            "body": { "mode": "raw", "raw": "{\"name\":\"Test Customer\", \"email\":\"cust{{$randomInt}}@example.com\"}", "options": { "raw": { "language": "json" } } }
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Test Customer\", \"email\":\"cust{{$randomInt}}@example.com\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           }
         },
-        { "name": "GET Customer ({{customer_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/customers/{{customer_id}}", "host": ["{{baseUrl}}"], "path": ["customers", "{{customer_id}}"] } } },
-        { "name": "GET Loyalty ({{customer_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/customers/{{customer_id}}/loyalty", "host": ["{{baseUrl}}"], "path": ["customers", "{{customer_id}}", "loyalty"] } } },
-        { "name": "POST Redeem Points", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/customers/{{customer_id}}/redeem-points", "host": ["{{baseUrl}}"], "path": ["customers", "{{customer_id}}", "redeem-points"] } } },
-        { "name": "GET Wishlist", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/wishlist", "host": ["{{baseUrl}}"], "path": ["wishlist"] } } },
-        { "name": "POST Toggle Wishlist", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/wishlist/toggle", "host": ["{{baseUrl}}"], "path": ["wishlist", "toggle"] } } },
-        { "name": "GET Retention Policy", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/compliance/audit-retention-policy", "host": ["{{baseUrl}}"], "path": ["compliance", "audit-retention-policy"] } } },
-        { "name": "POST Export Data (GDPR)", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/compliance/customers/{{customer_id}}/export-data", "host": ["{{baseUrl}}"], "path": ["compliance", "customers", "{{customer_id}}", "export-data"] } } },
-        { "name": "POST Forget Me", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/compliance/customers/{{customer_id}}/forget-me", "host": ["{{baseUrl}}"], "path": ["compliance", "customers", "{{customer_id}}", "forget-me"] } } }
+        {
+          "name": "GET Customer ({{customer_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/customers/{{customer_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customer_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Loyalty ({{customer_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/customers/{{customer_id}}/loyalty",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customer_id}}",
+                "loyalty"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Redeem Points",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/customers/{{customer_id}}/redeem-points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customer_id}}",
+                "redeem-points"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Wishlist",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/wishlist?customer_id={{customer_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wishlist"
+              ],
+              "query": [
+                {
+                  "key": "customer_id",
+                  "value": "{{customer_id}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Toggle Wishlist",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/wishlist/toggle",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wishlist",
+                "toggle"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_id\": {{customer_id}},\n    \"product_id\": {{product_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Retention Policy",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/compliance/audit-retention-policy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "compliance",
+                "audit-retention-policy"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Export Data (GDPR)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/compliance/customers/{{customer_id}}/export-data",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "compliance",
+                "customers",
+                "{{customer_id}}",
+                "export-data"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Forget Me",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/compliance/customers/{{customer_id}}/forget-me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "compliance",
+                "customers",
+                "{{customer_id}}",
+                "forget-me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "05 - POS & Sales",
       "item": [
-        { "name": "GET Cart", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/cart", "host": ["{{baseUrl}}"], "path": ["cart"] } } },
-        { "name": "POST Add to Cart", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/cart/items", "host": ["{{baseUrl}}"], "path": ["cart", "items"] } } },
-        { "name": "POST POS Checkout", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/orders/checkout", "host": ["{{baseUrl}}"], "path": ["orders", "checkout"] }, "body": { "mode": "raw", "raw": "{\"customer_id\":1, \"items\":[{\"variant_id\":{{variant_id}}, \"quantity\":1}], \"payment_method\":\"CASH\"}", "options": { "raw": { "language": "json" } } } } },
-        { "name": "GET Orders", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders", "host": ["{{baseUrl}}"], "path": ["orders"] } } },
-        { "name": "GET Order ({{order_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders/{{order_id}}", "host": ["{{baseUrl}}"], "path": ["orders", "{{order_id}}"] } } },
-        { "name": "GET Order PDF ({{order_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders/{{order_id}}/invoice-pdf", "host": ["{{baseUrl}}"], "path": ["orders", "{{order_id}}", "invoice-pdf"] } } },
-        { "name": "GET Order KHQR ({{order_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders/{{order_id}}/khqr", "host": ["{{baseUrl}}"], "path": ["orders", "{{order_id}}", "khqr"] } } },
-        { "name": "GET Thermal Receipt ({{order_id}})", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders/{{order_id}}/receipt-thermal", "host": ["{{baseUrl}}"], "path": ["orders", "{{order_id}}", "receipt-thermal"] } } },
-        { "name": "POST Void Order ({{order_id}})", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/orders/{{order_id}}/void", "host": ["{{baseUrl}}"], "path": ["orders", "{{order_id}}", "void"] } } },
-        { "name": "POST Open Shift", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/shifts/open", "host": ["{{baseUrl}}"], "path": ["shifts", "open"] } } },
-        { "name": "POST Close Shift", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/shifts/close", "host": ["{{baseUrl}}"], "path": ["shifts", "close"] } } },
-        { "name": "GET Current Shift", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/shifts/current", "host": ["{{baseUrl}}"], "path": ["shifts", "current"] } } },
-        { "name": "POST Drop Cash", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/shifts/drop-cash", "host": ["{{baseUrl}}"], "path": ["shifts", "drop-cash"] } } },
-        { "name": "POST Create Estimate", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/estimates", "host": ["{{baseUrl}}"], "path": ["estimates"] } } },
-        { "name": "POST Convert Estimate", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/estimates/1/convert", "host": ["{{baseUrl}}"], "path": ["estimates", "1", "convert"] } } },
-        { "name": "POST Issue Gift Card", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/gift-cards/issue", "host": ["{{baseUrl}}"], "path": ["gift-cards", "issue"] } } },
-        { "name": "POST Check Gift Card", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/gift-cards/check", "host": ["{{baseUrl}}"], "path": ["gift-cards", "check"] } } }
+        {
+          "name": "GET Cart",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Add to Cart",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "items"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"variant_id\": {{variant_id}},\n    \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST POS Checkout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/orders/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "checkout"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customer_id\":1, \"items\":[{\"variant_id\":{{variant_id}}, \"quantity\":1}], \"payment_method\":\"CASH\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Order ({{order_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{order_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Order PDF ({{order_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{order_id}}/invoice-pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "invoice-pdf"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Order KHQR ({{order_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{order_id}}/khqr",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "khqr"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Thermal Receipt ({{order_id}})",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{order_id}}/receipt-thermal",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "receipt-thermal"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Void Order ({{order_id}})",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{order_id}}/void",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "void"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Open Shift",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/shifts/open",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shifts",
+                "open"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Close Shift",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/shifts/close",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shifts",
+                "close"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Current Shift",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/shifts/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shifts",
+                "current"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Drop Cash",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/shifts/drop-cash",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shifts",
+                "drop-cash"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Estimate",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/estimates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estimates"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Convert Estimate",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/estimates/1/convert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estimates",
+                "1",
+                "convert"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Issue Gift Card",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/gift-cards/issue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gift-cards",
+                "issue"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Check Gift Card",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/gift-cards/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gift-cards",
+                "check"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"card_code\": \"GC-TEST-2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "06 - Inventory & Stock Management",
       "item": [
-        { "name": "GET Branches", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/branches", "host": ["{{baseUrl}}"], "path": ["branches"] } } },
-        { "name": "GET Branch Stock", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/branches/1/stock", "host": ["{{baseUrl}}"], "path": ["branches", "1", "stock"] } } },
-        { "name": "GET Inventory Stats", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/inventory/statistics", "host": ["{{baseUrl}}"], "path": ["inventory", "statistics"] } } },
-        { "name": "GET Stock Movements", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/stock-movements", "host": ["{{baseUrl}}"], "path": ["stock-movements"] } } },
-        { "name": "POST Adjust Stock", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-movements/adjust", "host": ["{{baseUrl}}"], "path": ["stock-movements", "adjust"] } } },
-        { "name": "POST Bulk Adjust", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/inventory/bulk-adjust", "host": ["{{baseUrl}}"], "path": ["inventory", "bulk-adjust"] } } },
-        { "name": "GET Expiring Soon", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/inventory/expiring-soon", "host": ["{{baseUrl}}"], "path": ["inventory", "expiring-soon"] } } },
-        { "name": "GET Restock Recommendations", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/inventory/restock-recommendations", "host": ["{{baseUrl}}"], "path": ["inventory", "restock-recommendations"] } } },
-        { "name": "GET Stock Transfers", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/stock-transfers", "host": ["{{baseUrl}}"], "path": ["stock-transfers"] } } },
-        { "name": "POST Create Transfer", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-transfers", "host": ["{{baseUrl}}"], "path": ["stock-transfers"] } } },
-        { "name": "POST Approve Transfer", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-transfers/1/approve", "host": ["{{baseUrl}}"], "path": ["stock-transfers", "1", "approve"] } } },
-        { "name": "POST Pick Transfer", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-transfers/1/pick", "host": ["{{baseUrl}}"], "path": ["stock-transfers", "1", "pick"] } } },
-        { "name": "POST Ship Transfer", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-transfers/1/ship", "host": ["{{baseUrl}}"], "path": ["stock-transfers", "1", "ship"] } } },
-        { "name": "POST Receive Transfer", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/stock-transfers/1/receive", "host": ["{{baseUrl}}"], "path": ["stock-transfers", "1", "receive"] } } },
-        { "name": "GET Variant Batches", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/variants/{{variant_id}}/batches", "host": ["{{baseUrl}}"], "path": ["variants", "{{variant_id}}", "batches"] } } },
-        { "name": "POST Create Batch", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/variants/{{variant_id}}/batches", "host": ["{{baseUrl}}"], "path": ["variants", "{{variant_id}}", "batches"] } } }
+        {
+          "name": "GET Branches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/branches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "branches"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Branch Stock",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/branches/1/stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "branches",
+                "1",
+                "stock"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Inventory Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/inventory/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inventory",
+                "statistics"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Stock Movements",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/stock-movements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-movements"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Adjust Stock",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-movements/adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-movements",
+                "adjust"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Bulk Adjust",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/inventory/bulk-adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inventory",
+                "bulk-adjust"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Expiring Soon",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/inventory/expiring-soon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inventory",
+                "expiring-soon"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Restock Recommendations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/inventory/restock-recommendations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inventory",
+                "restock-recommendations"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Stock Transfers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Transfer",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Approve Transfer",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers/1/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers",
+                "1",
+                "approve"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Pick Transfer",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers/1/pick",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers",
+                "1",
+                "pick"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Ship Transfer",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers/1/ship",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers",
+                "1",
+                "ship"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Receive Transfer",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/stock-transfers/1/receive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock-transfers",
+                "1",
+                "receive"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Variant Batches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/variants/{{variant_id}}/batches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "{{variant_id}}",
+                "batches"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Batch",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/variants/{{variant_id}}/batches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "variants",
+                "{{variant_id}}",
+                "batches"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "07 - Purchases & Suppliers",
       "item": [
-        { "name": "GET Suppliers", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/suppliers", "host": ["{{baseUrl}}"], "path": ["suppliers"] } } },
-        { "name": "POST Create Supplier", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/suppliers", "host": ["{{baseUrl}}"], "path": ["suppliers"] } } },
-        { "name": "GET Purchases", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/purchases", "host": ["{{baseUrl}}"], "path": ["purchases"] } } },
-        { "name": "POST Create Purchase", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/purchases", "host": ["{{baseUrl}}"], "path": ["purchases"] } } },
-        { "name": "POST Bulk Receive Purchase", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/purchases/bulk-receive", "host": ["{{baseUrl}}"], "path": ["purchases", "bulk-receive"] } } },
-        { "name": "POST Auto-Generate PO", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/purchases/auto-generate", "host": ["{{baseUrl}}"], "path": ["purchases", "auto-generate"] } } }
+        {
+          "name": "GET Suppliers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/suppliers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "suppliers"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Supplier",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/suppliers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "suppliers"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Purchases",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/purchases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchases"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Purchase",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchases"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Bulk Receive Purchase",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchases/bulk-receive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchases",
+                "bulk-receive"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Auto-Generate PO",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchases/auto-generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchases",
+                "auto-generate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "08 - Logistics & Shipping",
       "item": [
-        { "name": "GET Shipping Orders", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/shipping/orders", "host": ["{{baseUrl}}"], "path": ["shipping", "orders"] } } },
-        { "name": "POST Create Shipping", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/shipping/create", "host": ["{{baseUrl}}"], "path": ["shipping", "create"] } } },
-        { "name": "POST Update Shipping Status", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/shipping/1/status", "host": ["{{baseUrl}}"], "path": ["shipping", "1", "status"] } } },
-        { "name": "GET Offline Manifest", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/offline/manifest", "host": ["{{baseUrl}}"], "path": ["offline", "manifest"] } } },
-        { "name": "POST Push Offline", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/offline/push-transactions", "host": ["{{baseUrl}}"], "path": ["offline", "push-transactions"] } } }
+        {
+          "name": "GET Shipping Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/shipping/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping",
+                "orders"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Shipping",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/shipping/create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping",
+                "create"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Update Shipping Status",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/shipping/1/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipping",
+                "1",
+                "status"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Offline Manifest",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/offline/manifest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offline",
+                "manifest"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Push Offline",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/offline/push-transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offline",
+                "push-transactions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "09 - AI Intelligence",
       "item": [
-        { "name": "GET Sales Forecast", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/sales-forecast", "host": ["{{baseUrl}}"], "path": ["ai", "sales-forecast"] } } },
-        { "name": "GET Smart Restock", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/smart-restock", "host": ["{{baseUrl}}"], "path": ["ai", "smart-restock"] } } },
-        { "name": "GET Anomaly Detection", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/anomaly-detection", "host": ["{{baseUrl}}"], "path": ["ai", "anomaly-detection"] } } },
-        { "name": "GET Dynamic Pricing", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/dynamic-pricing", "host": ["{{baseUrl}}"], "path": ["ai", "dynamic-pricing"] } } },
-        { "name": "GET Customer Segmentation", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/customer-segmentation", "host": ["{{baseUrl}}"], "path": ["ai", "customer-segmentation"] } } }
+        {
+          "name": "GET Sales Forecast",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/sales-forecast",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "sales-forecast"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Smart Restock",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/smart-restock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "smart-restock"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Anomaly Detection",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/anomaly-detection",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "anomaly-detection"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Dynamic Pricing",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/dynamic-pricing",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "dynamic-pricing"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Customer Segmentation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ai/customer-segmentation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "customer-segmentation"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "10 - Analytics & Reports",
       "item": [
-        { "name": "GET Role Pulse", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/dashboard/role-pulse", "host": ["{{baseUrl}}"], "path": ["dashboard", "role-pulse"] } } },
-        { "name": "GET Dashboard Stats", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/dashboard/stats", "host": ["{{baseUrl}}"], "path": ["dashboard", "stats"] } } },
-        { "name": "GET Sales Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/sales", "host": ["{{baseUrl}}"], "path": ["reports", "sales"] } } },
-        { "name": "GET Profit Margin Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/profit-margin", "host": ["{{baseUrl}}"], "path": ["reports", "profit-margin"] } } },
-        { "name": "GET Inventory Valuation Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/inventory-valuation", "host": ["{{baseUrl}}"], "path": ["reports", "inventory-valuation"] } } },
-        { "name": "GET Cash Flow Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/cash-flow", "host": ["{{baseUrl}}"], "path": ["reports", "cash-flow"] } } },
-        { "name": "GET Stock Aging Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/stock-aging", "host": ["{{baseUrl}}"], "path": ["reports", "stock-aging"] } } },
-        { "name": "GET Supplier Performance", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/supplier-performance", "host": ["{{baseUrl}}"], "path": ["reports", "supplier-performance"] } } },
-        { "name": "GET Cust Purchase History", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reports/customer-purchase-history", "host": ["{{baseUrl}}"], "path": ["reports", "customer-purchase-history"] } } },
-        { "name": "GET Admin Performance", "request": { "method": "GET", "url": { "raw": "http://{{baseUrl}}/admin/performance", "host": ["http:","","{{baseUrl}}"], "path": ["admin", "performance"] } } },
-        { "name": "GET API Analytics", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/admin/api-analytics", "host": ["{{baseUrl}}"], "path": ["admin", "api-analytics"] } } },
-        { "name": "GET Export Inventory (Excel)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/exports/inventory/excel", "host": ["{{baseUrl}}"], "path": ["exports", "inventory", "excel"] } } },
-        { "name": "GET Export Sales (PDF)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/exports/sales-report/pdf", "host": ["{{baseUrl}}"], "path": ["exports", "sales-report", "pdf"] } } },
-        { "name": "GET Export Movements (CSV)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/exports/stock-movements/csv", "host": ["{{baseUrl}}"], "path": ["exports", "stock-movements", "csv"] } } },
-        { "name": "GET Export Z-Report", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/exports/z-report/1/thermal", "host": ["{{baseUrl}}"], "path": ["exports", "z-report", "1", "thermal"] } } }
+        {
+          "name": "GET Role Pulse",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/role-pulse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "role-pulse"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "stats"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Sales Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/sales",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "sales"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Profit Margin Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/profit-margin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "profit-margin"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Inventory Valuation Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/inventory-valuation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "inventory-valuation"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Cash Flow Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/cash-flow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "cash-flow"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Stock Aging Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/stock-aging",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "stock-aging"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Supplier Performance",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/supplier-performance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "supplier-performance"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Cust Purchase History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/customer-purchase-history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "customer-purchase-history"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Admin Performance",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/performance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "performance"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET API Analytics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/api-analytics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "api-analytics"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Export Inventory (Excel)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/exports/inventory/excel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exports",
+                "inventory",
+                "excel"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Export Sales (PDF)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/exports/sales-report/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exports",
+                "sales-report",
+                "pdf"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Export Movements (CSV)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/exports/stock-movements/csv",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exports",
+                "stock-movements",
+                "csv"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Export Z-Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/exports/z-report/1/thermal",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exports",
+                "z-report",
+                "1",
+                "thermal"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     },
     {
       "name": "11 - Admin Monitoring & Audit Logs",
       "item": [
-        { "name": "GET Master Pulse", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/admin/master-pulse", "host": ["{{baseUrl}}"], "path": ["admin", "master-pulse"] } } },
-        { "name": "POST Broadcast Alert", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/admin/broadcast-alert", "host": ["{{baseUrl}}"], "path": ["admin", "broadcast-alert"] } } },
-        { "name": "GET Audit Logs", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/audit-logs", "host": ["{{baseUrl}}"], "path": ["audit-logs"] } } },
-        { "name": "GET Audit Log Detail", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/audit-logs/1", "host": ["{{baseUrl}}"], "path": ["audit-logs", "1"] } } },
-        { "name": "GET Active Alerts", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/alerts/active", "host": ["{{baseUrl}}"], "path": ["alerts", "active"] } } }
+        {
+          "name": "GET Master Pulse",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/master-pulse",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "master-pulse"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Broadcast Alert",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/admin/broadcast-alert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "broadcast-alert"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Audit Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "audit-logs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Audit Log Detail",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "audit-logs",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Active Alerts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/alerts/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alerts",
+                "active"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 2xx\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
       ]
     }
   ]
