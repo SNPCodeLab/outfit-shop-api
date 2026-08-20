@@ -19,7 +19,7 @@ class StoreBranchController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $branches = StoreBranch::where('is_active', true)->get();
+        $branches = StoreBranch::whereRaw('is_active is true')->get();
 
         return $this->successResponse($branches, 'Store branches retrieved successfully');
     }
