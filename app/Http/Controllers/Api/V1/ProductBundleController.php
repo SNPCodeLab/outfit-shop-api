@@ -25,7 +25,7 @@ class ProductBundleController extends BaseApiController
             'items.variant.size',
             'items.variant.color',
         ])
-            ->where('is_active', true)
+            ->whereRaw('is_active is true')
             ->get();
 
         return $this->successResponse($bundles, 'Product bundles retrieved successfully');

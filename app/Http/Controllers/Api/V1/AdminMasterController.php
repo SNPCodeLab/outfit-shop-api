@@ -94,7 +94,7 @@ class AdminMasterController extends BaseApiController
 
         // 5. Active Broadcast Alerts
         $activeAlerts = DB::table('system_broadcast_alerts')
-            ->where('is_active', true)
+            ->whereRaw('is_active is true')
             ->orderBy('alert_id', 'DESC')
             ->limit(5)
             ->get();

@@ -34,6 +34,6 @@ class MarketingBanner extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->orderBy('sort_order', 'asc');
+        return $query->whereRaw('is_active is true')->orderBy('sort_order', 'asc');
     }
 }

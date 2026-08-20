@@ -21,7 +21,7 @@ class ProductReviewController extends BaseApiController
         Product::findOrFail($productId);
 
         $reviews = ProductReview::where('product_id', $productId)
-            ->where('is_approved', true)
+            ->whereRaw('is_approved is true')
             ->orderBy('created_at', 'desc')
             ->get();
 

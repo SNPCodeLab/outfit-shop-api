@@ -24,7 +24,7 @@ class GiftCardController extends BaseApiController
         ]);
 
         $card = GiftCard::where('card_code', strtoupper($request->card_code))
-            ->where('is_active', true)
+            ->whereRaw('is_active is true')
             ->first();
 
         if (! $card) {
