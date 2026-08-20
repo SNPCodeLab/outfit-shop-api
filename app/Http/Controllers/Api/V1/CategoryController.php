@@ -10,6 +10,7 @@ use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class CategoryController extends BaseApiController
 {
@@ -32,6 +33,9 @@ class CategoryController extends BaseApiController
             'description' => 'nullable|string',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['category_name']);
+        $validated['department_type'] = $validated['department_type'] ?? 'APPAREL';
 
         $category = Category::create($validated);
 
@@ -75,7 +79,15 @@ class CategoryController extends BaseApiController
 
     public function destroy(int $id): JsonResponse
     {
-        $category = Category::findOrFail($id);
+        $category = Category::withCount('products')->findOrFail($id);
+
+        if ($category->products_count > 0) {
+            return $this->conflictResponse(
+                'Cannot delete category with active products. Please move or delete products first.',
+                'CATEGORY_HAS_PRODUCTS'
+            );
+        }
+
         $oldValues = $category->toArray();
         $category->delete();
 

@@ -25,7 +25,7 @@ class StockTransferController extends BaseApiController
      */
     public function index(Request $request): JsonResponse
     {
-        $query = StockTransfer::with(['items.variant.product', 'requester', 'approver'])
+        $query = StockTransfer::with(['items.variant.product', 'requester', 'approver', 'shipper', 'receiver'])
             ->orderBy('transfer_id', 'desc');
 
         if ($status = $request->input('status')) {
@@ -268,18 +268,20 @@ class StockTransferController extends BaseApiController
                     'received_at' => now(),
                 ]);
 
-                return $transfer->fresh(['items.variant']);
-            });
+                $transfer = $transfer->fresh(['items.variant']);
 
-            // Trigger Webhook Event
-            WebhookDispatcherService::dispatch('STOCK_TRANSFER_COMPLETED', [
-                'transfer_id' => $transfer->transfer_id,
-                'transfer_no' => $transfer->transfer_no,
-                'from_branch_id' => $transfer->from_branch_id,
-                'to_branch_id' => $transfer->to_branch_id,
-                'items_count' => $transfer->items->count(),
-                'received_at' => $transfer->received_at->toISOString(),
-            ]);
+                // Trigger Webhook Event (Async dispatch)
+                WebhookDispatcherService::dispatch('STOCK_TRANSFER_COMPLETED', [
+                    'transfer_id' => $transfer->transfer_id,
+                    'transfer_no' => $transfer->transfer_no,
+                    'from_branch_id' => $transfer->from_branch_id,
+                    'to_branch_id' => $transfer->to_branch_id,
+                    'items_count' => $transfer->items->count(),
+                    'received_at' => $transfer->received_at ? $transfer->received_at->toISOString() : now()->toISOString(),
+                ]);
+
+                return $transfer;
+            });
 
             Log::channel('inventory')->info("Stock transfer received and completed: {$transfer->transfer_no}");
 

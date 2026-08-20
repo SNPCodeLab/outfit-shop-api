@@ -50,4 +50,14 @@ class StockTransfer extends Model
     {
         return $this->belongsTo(Employee::class, 'approved_by', 'employee_id');
     }
+
+    public function shipper(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'shipped_by', 'employee_id');
+    }
+
+    public function receiver(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'received_by', 'employee_id');
+    }
 }

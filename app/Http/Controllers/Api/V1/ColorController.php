@@ -58,7 +58,15 @@ class ColorController extends BaseApiController
 
     public function destroy(int $id): JsonResponse
     {
-        $color = Color::findOrFail($id);
+        $color = Color::withCount('variants')->findOrFail($id);
+
+        if ($color->variants_count > 0) {
+            return $this->conflictResponse(
+                'Cannot delete color that is assigned to product variants.',
+                'COLOR_HAS_VARIANTS'
+            );
+        }
+
         $old = $color->toArray();
         $color->delete();
 
