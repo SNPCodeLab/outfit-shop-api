@@ -189,7 +189,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"username\":\"admin\",\"password\":\"Admin#2026\"}",
+                            "raw": "{\"username\":\"admin\",\"password\":\"Admin#Secure#2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -238,7 +238,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"username\":\"manager\",\"password\":\"Manager#2026\"}",
+                            "raw": "{\"username\":\"manager\",\"password\":\"Manager@Ops!2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -287,7 +287,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"username\":\"cashier\",\"password\":\"Cashier#2026\"}",
+                            "raw": "{\"username\":\"cashier\",\"password\":\"Cashier$Point$2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -336,7 +336,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"username\":\"staff\",\"password\":\"Staff#2026\"}",
+                            "raw": "{\"username\":\"staff\",\"password\":\"Staff%Store%2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -385,7 +385,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"admin@outfitshop.com\",\"password\":\"Admin#2026\"}",
+                            "raw": "{\"email\":\"admin@api.kesararamwithdigital.tech\",\"password\":\"Admin#Secure#2026\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -6378,7 +6378,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"branch_name\":\"BKK1 Flagship\",\"branch_code\":\"BKK1\",\"phone\":\"023456789\",\"email\":\"bkk1@outfitshop.com\",\"address\":\"St.63 BKK1 PP\",\"city\":\"Phnom Penh\",\"is_warehouse\":false,\"is_active\":true}",
+                            "raw": "{\"branch_name\":\"BKK1 Flagship\",\"branch_code\":\"BKK1\",\"phone\":\"023456789\",\"email\":\"bkk1@api.kesararamwithdigital.tech\",\"address\":\"St.63 BKK1 PP\",\"city\":\"Phnom Penh\",\"is_warehouse\":false,\"is_active\":true}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -8177,7 +8177,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"employee_name\":\"Dara Chan\",\"gender\":\"Male\",\"phone\":\"0123456789\",\"email\":\"dara.chan@outfitshop.com\",\"position\":\"Cashier\",\"username\":\"darachan2026\",\"password\":\"Secure#2026\",\"role\":\"CASHIER\",\"store_id\":1,\"status\":\"ACTIVE\"}",
+                            "raw": "{\"employee_name\":\"Dara Chan\",\"gender\":\"Male\",\"phone\":\"0123456789\",\"email\":\"dara.chan@api.kesararamwithdigital.tech\",\"position\":\"Cashier\",\"username\":\"darachan2026\",\"password\":\"Secure#2026\",\"role\":\"CASHIER\",\"store_id\":1,\"status\":\"ACTIVE\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -8318,7 +8318,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"New Manager\",\"email\":\"newmanager@outfitshop.com\",\"password\":\"Manager#2026\",\"password_confirmation\":\"Manager#2026\",\"role\":\"manager\"}",
+                            "raw": "{\"name\":\"New Manager\",\"email\":\"newmanager@api.kesararamwithdigital.tech\",\"password\":\"Manager#2026\",\"password_confirmation\":\"Manager#2026\",\"role\":\"manager\"}",
                             "options": {
                                 "raw": {
                                     "language": "json"
