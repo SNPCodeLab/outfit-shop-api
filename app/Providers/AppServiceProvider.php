@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Database\Connections\PostgresBooleanConnection;
 use App\Http\Response\ApiResponse;
 use App\Models\Category;
 use App\Models\Employee;
@@ -14,6 +15,7 @@ use App\Observers\ProductObserver;
 use App\Observers\ProductVariantObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Database\Connection;
 use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -29,6 +31,13 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(MaintenanceModeContract::class, function () {
             return new FileBasedMaintenanceMode;
+        });
+
+        // PostgreSQL rejects the framework's default integer-cast boolean
+        // bindings ("column is of type boolean but expression is of type
+        // integer"); swap in a connection that binds true/false literals.
+        Connection::resolverFor('pgsql', function ($connection, $database, $prefix, array $config) {
+            return new PostgresBooleanConnection($connection, $database, $prefix, $config);
         });
     }
 
