@@ -21,21 +21,18 @@ class ProductController extends BaseApiController
         $requestedIncludes = $request->input('include');
 
         if ($requestedIncludes) {
+            $includeMap = [
+                'variants' => ['variants.size', 'variants.color'],
+                'category' => ['category'],
+                'images' => ['images'],
+                'primaryImage' => ['primaryImage'],
+            ];
             $includes = array_filter(explode(',', $requestedIncludes));
             $withRelations = [];
             foreach ($includes as $inc) {
                 $inc = trim($inc);
-                if ($inc === 'variants') {
-                    $withRelations[] = 'variants.size';
-                }
-                if ($inc === 'variants') {
-                    $withRelations[] = 'variants.color';
-                }
-                if ($inc === 'category') {
-                    $withRelations[] = 'category';
-                }
-                if ($inc === 'images') {
-                    $withRelations[] = 'images';
+                if (isset($includeMap[$inc])) {
+                    $withRelations = array_merge($withRelations, $includeMap[$inc]);
                 }
             }
             $query = Product::with(array_unique($withRelations ?: $allowedIncludes));
@@ -49,6 +46,7 @@ class ProductController extends BaseApiController
         // Search query
         $search = $request->input('q') ?? $request->input('search') ?? ($filter['search'] ?? null);
         if ($search) {
+            $search = $this->escapeLike($search);
             $query->where(function ($q) use ($search) {
                 $q->where('product_name', 'ILIKE', "%{$search}%")
                     ->orWhere('brand', 'ILIKE', "%{$search}%")
@@ -60,6 +58,7 @@ class ProductController extends BaseApiController
 
         // Brand filter
         if ($brand = $request->input('brand') ?? ($filter['brand'] ?? null)) {
+            $brand = $this->escapeLike((string) $brand);
             $query->where('brand', 'ILIKE', "%{$brand}%");
         }
 
@@ -150,9 +149,9 @@ class ProductController extends BaseApiController
             $query->orderBy('product_id', 'desc');
         }
 
-        // ── 4. Pagination / Limit ─────────────────────────────────────────────
-        $perPage = (int) $request->input('per_page', 0);
-        $products = $perPage > 0 ? $query->paginate($perPage) : $query->get();
+        // ── 4. Pagination (capped at 100 per page; the unpaginated
+        // per_page=all / per_page=0 mode was removed as a DoS vector) ────────
+        $products = $query->paginate($this->perPage($request));
 
         return $this->successResponse($products, 'Products catalog retrieved');
     }
@@ -174,9 +173,12 @@ class ProductController extends BaseApiController
 
     public function show(int $id): JsonResponse
     {
-        // ── High-Speed Caching Layer (Cache hot products for 1 hour) ──────────
+        // ── High-Speed Caching Layer (1h TTL, array payload so the cache
+        //    store never grows with serialized Eloquent model weight) ────────
         $product = Cache::remember("product:{$id}", 3600, function () use ($id) {
-            return Product::with(['category', 'variants.size', 'variants.color', 'images', 'primaryImage'])->findOrFail($id);
+            return Product::with(['category', 'variants.size', 'variants.color', 'images', 'primaryImage'])
+                ->findOrFail($id)
+                ->toArray();
         });
 
         return $this->successResponse($product, 'Product details');

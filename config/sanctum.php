@@ -50,9 +50,12 @@ return [
     | considered expired. This will override any values set in the token's
     | "expires_at" attribute, but first-party sessions are not affected.
     |
+    | 24 hours by default: a leaked Bearer token has a bounded lifetime.
+    | Clients use POST /api/v1/auth/refresh for token rotation.
+    |
     */
 
-    'expiration' => null,
+    'expiration' => (int) env('SANCTUM_EXPIRATION_MINUTES', 1440),
 
     /*
     |--------------------------------------------------------------------------

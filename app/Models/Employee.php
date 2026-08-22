@@ -28,11 +28,25 @@ class Employee extends Authenticatable
         'password_hash',
         'role',
         'status',
+        'joined_at',
+        'avatar_url',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     protected $hidden = [
         'password_hash',
+        'two_factor_secret',
+        'two_factor_verified_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'last_login_at' => 'datetime',
+            'joined_at' => 'date',
+        ];
+    }
 
     /**
      * Return the password attribute so Sanctum's auth driver can verify it.

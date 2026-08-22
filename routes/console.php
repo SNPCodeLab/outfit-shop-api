@@ -10,10 +10,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// ── Automated Daily Database Backup (02:00 AM UTC) ───────────────────────────
-// Generates compressed PostgreSQL dump, syncs to S3 cloud bucket, and prunes older files.
-Schedule::command('db:backup --cloud --prune=30')
-    ->dailyAt('06:00')
+// ── Automated Daily Database Backup (02:00 AM Cambodia) ──────────────────────
+// Compressed PostgreSQL dump + 30-day retention pruning. The previously
+// scheduled "db:backup" command never existed; this invokes the real one.
+Schedule::command('backup:database --keep=30')
+    ->dailyAt('02:00')
     ->timezone('Asia/Phnom_Penh')
     ->withoutOverlapping()
     ->onOneServer()

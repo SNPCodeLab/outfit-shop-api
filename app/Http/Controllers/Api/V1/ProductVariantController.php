@@ -178,16 +178,16 @@ class ProductVariantController extends BaseApiController
         $old = $variant->toArray();
 
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,product_id',
-            'size_id' => 'required|exists:clothing_sizes,size_id',
-            'color_id' => 'required|exists:colors,color_id',
-            'sku' => 'required|string|unique:product_variants,sku,'.$id.',variant_id',
+            'product_id' => 'sometimes|required|exists:products,product_id',
+            'size_id' => 'sometimes|required|exists:clothing_sizes,size_id',
+            'color_id' => 'sometimes|required|exists:colors,color_id',
+            'sku' => 'sometimes|required|string|unique:product_variants,sku,'.$id.',variant_id',
             'barcode' => 'nullable|string|unique:product_variants,barcode,'.$id.',variant_id',
             'image_url' => 'nullable|string|max:500',
             'image_public_id' => 'nullable|string|max:255',
-            'cost_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
+            'cost_price' => 'sometimes|required|numeric|min:0',
+            'sale_price' => 'sometimes|required|numeric|min:0',
+            'quantity' => 'sometimes|required|integer|min:0',
             'reorder_level' => 'nullable|integer|min:0',
         ]);
 

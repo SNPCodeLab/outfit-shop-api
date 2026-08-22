@@ -65,7 +65,11 @@ class StoreBranchController extends BaseApiController
 
         $existing = StoreBranch::where('branch_code', $validated['branch_code'])->first();
         if ($existing) {
-            return $this->successResponse($existing, 'Store branch already exists');
+            return $this->conflictResponse(
+                "Store branch with code {$validated['branch_code']} already exists.",
+                'DUPLICATE_BRANCH_CODE',
+                ['existing_branch_id' => $existing->branch_id]
+            );
         }
 
         $branch = StoreBranch::create($validated);

@@ -34,9 +34,24 @@ jobs:
 
   # ── STAGE 2: AUTOMATED TESTING ──────────────────────────────────────────────
   test:
-    name: 🧪 Test (PHPUnit / Pest Test Suite)
+    name: 🧪 Test (PHPUnit on PostgreSQL - production engine parity)
     needs: lint
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ssmis_test
+          POSTGRES_PASSWORD: ssmis_test
+          POSTGRES_DB: ssmis_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout Code
@@ -58,17 +73,14 @@ jobs:
       - name: Generate App Key
         run: php artisan key:generate --env=testing
 
-      - name: Run Database Migrations
+      - name: Execute Test Suite (PHPUnit against PostgreSQL)
         env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
-          DB_URL: ""
-        run: php artisan migrate --force --env=testing
-
-      - name: Execute Test Suite (PHPUnit)
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: ssmis_test
+          DB_USERNAME: ssmis_test
+          DB_PASSWORD: ssmis_test
           DB_URL: ""
         run: php artisan test
 
@@ -154,3 +166,58 @@ jobs:
           else
             echo "Slack notification webhook not set; skipped."
           fi
+
+  # ── STAGE 7: MANUAL ROLLBACK (Disaster Recovery) ────────────────────────────
+  # Triggered manually from the Actions tab ("Run workflow") with the commit
+  # SHA to redeploy when a bad release reaches production.
+  rollback:
+    name: ⏪ Rollback (Manual - redeploy previous commit)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Target Commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.rollback_sha || github.sha }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_pgsql, pgsql, bcmath
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Build Rollback Artifact
+        run: |
+          cp .env.example .env
+          php artisan key:generate --env=production || true
+          php artisan config:cache || true
+          php artisan route:cache || true
+
+      - name: Trigger Deploy Webhook
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          DEPLOY_WEBHOOK_SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
+        run: |
+          if [ -z "$DEPLOY_WEBHOOK_URL" ]; then
+            echo "DEPLOY_WEBHOOK_URL secret not configured; cannot trigger rollback."
+            exit 1
+          fi
+          SIGNATURE=$(echo -n "${{ github.sha }}" | openssl dgst -sha256 -hmac "$DEPLOY_WEBHOOK_SECRET" | sed 's/^.* //')
+          curl -X POST "$DEPLOY_WEBHOOK_URL" \
+            -H "X-Deploy-Signature: sha256=$SIGNATURE" \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"${{ github.ref }}","rollback":true,"sha":"${{ github.event.inputs.rollback_sha || github.sha }}"}'
+
+      - name: Verify Health After Rollback
+        run: |
+          sleep 20
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kesararamwithdigital.tech/api/v1/health)
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Rollback health check failed (HTTP $HTTP_STATUS). Manual intervention required."
+            exit 1
+          fi
+          echo "Rollback complete; gateway healthy."

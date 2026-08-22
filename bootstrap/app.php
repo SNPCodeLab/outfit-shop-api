@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AdminIpWhitelistMiddleware;
+use App\Http\Middleware\ApiDeprecationHeaderMiddleware;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\LogApiRequests;
 use App\Http\Middleware\SecurityHeadersMiddleware;
@@ -17,6 +18,8 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -34,7 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class,
             'permission' => PermissionMiddleware::class,
-            'admin' => AdminMiddleware::class,
+            'deprecated' => ApiDeprecationHeaderMiddleware::class,
+            'admin.ip' => AdminIpWhitelistMiddleware::class,
+            'ability' => CheckForAnyAbility::class,
+            'abilities' => CheckAbilities::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => null);

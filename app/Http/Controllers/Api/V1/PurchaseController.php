@@ -51,7 +51,7 @@ class PurchaseController extends BaseApiController
             $query->whereDate('purchase_date', '<=', $toDate);
         }
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = $this->perPage($request);
         $purchases = $query->orderBy('purchase_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($purchases, 'Purchases history retrieved');

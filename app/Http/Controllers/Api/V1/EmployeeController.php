@@ -34,7 +34,7 @@ class EmployeeController extends BaseApiController
             $query->where('status', strtoupper($status));
         }
 
-        $perPage = (int) $request->input('per_page', 50);
+        $perPage = $this->perPage($request, 50);
         $employees = $query->orderBy('employee_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($employees, 'Employee directory retrieved');
@@ -54,6 +54,7 @@ class EmployeeController extends BaseApiController
             'password_hash' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'status' => $validated['status'] ?? 'ACTIVE',
+            'avatar_url' => $validated['avatar_url'] ?? null,
         ]);
 
         AuditLogService::log('CREATE', 'Employee', $employee->employee_id, null, [
@@ -77,13 +78,14 @@ class EmployeeController extends BaseApiController
         $old = ['username' => $employee->username, 'role' => $employee->role];
 
         $validated = $request->validate([
-            'employee_name' => 'required|string|max:150',
+            'employee_name' => 'sometimes|required|string|max:150',
             'gender' => 'nullable|string',
             'phone' => 'nullable|string',
-            'email' => 'required|email|unique:employees,email,'.$id.',employee_id',
+            'email' => 'sometimes|required|email|unique:employees,email,'.$id.',employee_id',
             'position' => 'nullable|string',
-            'role' => 'required|string|in:ADMIN,MANAGER,CASHIER,STAFF',
+            'role' => 'sometimes|required|string|in:ADMIN,MANAGER,CASHIER,STAFF',
             'status' => 'nullable|string|in:ACTIVE,INACTIVE',
+            'avatar_url' => 'nullable|url|max:500',
             'password' => 'nullable|string|min:6',
         ]);
 

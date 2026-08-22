@@ -50,6 +50,16 @@ class SalesBinderGuideAndBillingTest extends TestCase
 
     public function test_inventory_statistics_endpoint_returns_financial_valuation(): void
     {
+        // Endpoint now requires authentication (business intelligence data)
+        $manager = Employee::create([
+            'employee_name' => 'Stats Manager',
+            'email' => 'stats-manager@test.local',
+            'username' => 'stats_manager',
+            'password_hash' => Hash::make('Secret123'),
+            'role' => 'MANAGER',
+        ]);
+        $token = 'Bearer '.$manager->createToken('stats-token')->plainTextToken;
+
         $category = Category::firstOrCreate(['category_name' => 'Shirts']);
         $size = ClothingSize::firstOrCreate(['size_name' => 'L']);
         $color = Color::firstOrCreate(['color_name' => 'Navy']);
@@ -65,7 +75,8 @@ class SalesBinderGuideAndBillingTest extends TestCase
             'quantity' => 10,
         ]);
 
-        $response = $this->getJson('/api/v1/inventory/statistics');
+        $response = $this->withHeader('Authorization', $token)
+            ->getJson('/api/v1/inventory/statistics');
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonStructure([

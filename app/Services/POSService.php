@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\PosRuleException;
+use App\Jobs\SendOrderNotificationJob;
 use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\SaleDetail;
 use App\Models\SaleHeader;
 use App\Models\StockMovement;
-use Exception;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -31,7 +33,7 @@ class POSService
      * @param  string  $paymentMethod  CASH, CARD, QR, ABA, BAKONG, GIFT_CARD
      * @param  float  $taxRate  Default 10.00%
      *
-     * @throws Exception
+     * @throws PosRuleException When a business rule (stock, quantity, state) is violated
      */
     public function checkout(
         int $employeeId,
@@ -44,7 +46,7 @@ class POSService
         ?string $idempotencyKey = null
     ): SaleHeader {
         $startTime = microtime(true);
-        // ── Idempotency Guard ─────────────────────────────────────────────────
+        // ── Idempotency Guard (fast path) ─────────────────────────────────────
         // If the same idempotency key was already processed, return the original
         // sale without executing the transaction again (safe retry for frontend).
         if ($idempotencyKey) {
@@ -54,6 +56,51 @@ class POSService
             }
         }
 
+        try {
+            $sale = $this->executeCheckout(
+                $employeeId,
+                $customerId,
+                $items,
+                $paymentMethod,
+                $paymentAmount,
+                $overallDiscount,
+                $taxRate,
+                $idempotencyKey,
+                $startTime
+            );
+
+            // Async e-receipt dispatch once the transaction has committed
+            // (skipped on idempotent replays - notification already sent).
+            if ($sale->wasRecentlyCreated && $sale->customer_id) {
+                SendOrderNotificationJob::dispatch($sale->sale_id, 'EMAIL');
+            }
+
+            return $sale;
+        } catch (UniqueConstraintViolationException $e) {
+            // Race loser: a concurrent request with the same idempotency key
+            // committed first. The UNIQUE index on sale_headers.idempotency_key
+            // guarantees exactly one winner; return the winner's sale.
+            $winner = SaleHeader::where('idempotency_key', $idempotencyKey)->first();
+
+            if ($winner) {
+                return $winner->load(['details.variant.product', 'customer', 'employee', 'payments']);
+            }
+
+            throw $e;
+        }
+    }
+
+    private function executeCheckout(
+        int $employeeId,
+        ?int $customerId,
+        array $items,
+        string $paymentMethod,
+        float $paymentAmount,
+        float $overallDiscount,
+        float $taxRate,
+        ?string $idempotencyKey,
+        float $startTime
+    ): SaleHeader {
         return DB::transaction(function () use (
             $employeeId,
             $customerId,
@@ -65,6 +112,20 @@ class POSService
             $idempotencyKey,
             $startTime
         ) {
+            // ── Idempotency Guard (race-safe path) ───────────────────────────
+            // A locked re-check inside the transaction: if a concurrent request
+            // with the same key holds an uncommitted insert, lockForUpdate blocks
+            // until it commits and we then return its sale instead of inserting.
+            // The UNIQUE index on idempotency_key is the final backstop.
+            if ($idempotencyKey) {
+                $existing = SaleHeader::where('idempotency_key', $idempotencyKey)
+                    ->lockForUpdate()
+                    ->first();
+                if ($existing) {
+                    return $existing->load(['details.variant.product', 'customer', 'employee', 'payments']);
+                }
+            }
+
             $totalAmount = 0.0;
             $saleDetailsData = [];
 
@@ -75,7 +136,7 @@ class POSService
                 $itemDiscount = (float) ($item['discount'] ?? 0.0);
 
                 if ($qty <= 0) {
-                    throw new Exception(
+                    throw new PosRuleException(
                         "Invalid quantity {$qty} for variant ID {$variantId}. Quantity must be > 0."
                     );
                 }
@@ -85,13 +146,13 @@ class POSService
                     ->first();
 
                 if (! $variant) {
-                    throw new Exception("Product variant ID {$variantId} not found.");
+                    throw new PosRuleException("Product variant ID {$variantId} not found.");
                 }
 
                 $isDigital = ($variant->product->product_type ?? 'PHYSICAL_APPAREL') === 'DIGITAL_DOWNLOAD';
 
                 if (! $isDigital && $variant->quantity < $qty) {
-                    throw new Exception(
+                    throw new PosRuleException(
                         "Insufficient stock for SKU [{$variant->sku}]. ".
                         "Requested: {$qty}, Available: {$variant->quantity}."
                     );
@@ -230,7 +291,7 @@ class POSService
     /**
      * Void a completed sale and restore physical stock inside an atomic transaction.
      *
-     * @throws Exception
+     * @throws PosRuleException When the sale is already voided or is an estimate
      */
     public function voidSale(int $saleId, int $employeeId, ?string $reason = null): SaleHeader
     {
@@ -241,11 +302,11 @@ class POSService
                 ->firstOrFail();
 
             if ($saleHeader->status === 'VOIDED') {
-                throw new Exception("Sale #{$saleId} is already voided.");
+                throw new PosRuleException("Sale #{$saleId} is already voided.");
             }
 
             if ($saleHeader->status === 'ESTIMATE') {
-                throw new Exception('Estimates cannot be voided. Use the estimate deletion endpoint.');
+                throw new PosRuleException('Estimates cannot be voided. Use the estimate deletion endpoint.');
             }
 
             $saleHeader->update([

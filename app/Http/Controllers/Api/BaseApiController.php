@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Response\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * BaseApiController
@@ -17,6 +18,37 @@ use Illuminate\Http\JsonResponse;
  */
 abstract class BaseApiController extends Controller
 {
+    /**
+     * Maximum page size accepted from clients on any paginated list
+     * endpoint. Prevents page-size denial-of-service (a per_page of
+     * 100000 dumping the full sales ledger with eager loads).
+     */
+    protected const MAX_PER_PAGE = 100;
+
+    /**
+     * Resolve a sanitized page size from the request's per_page parameter:
+     * falls back to the default when absent or invalid, and caps at 100.
+     */
+    protected function perPage(Request $request, int $default = 20): int
+    {
+        $perPage = (int) $request->input('per_page', $default);
+
+        if ($perPage < 1) {
+            $perPage = $default;
+        }
+
+        return min($perPage, self::MAX_PER_PAGE);
+    }
+
+    /**
+     * Escape LIKE/ILIKE wildcards so client search input matches literally
+     * (blocks wildcard-injection patterns such as "%%" forcing full scans).
+     */
+    protected function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+    }
+
     // =========================================================================
     // SUCCESS DELEGATES
     // =========================================================================

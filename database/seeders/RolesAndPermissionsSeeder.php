@@ -117,6 +117,10 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // ─── 3. Default Employee Accounts ────────────────────────────────────
 
+        // Default profile pictures (DiceBear initials avatars - deterministic,
+        // no upload needed; replaced by real uploads via POST /auth/avatar).
+        $avatar = fn (string $seed): string => 'https://api.dicebear.com/9.x/initials/svg?seed='.rawurlencode($seed);
+
         $employees = [
             [
                 'username' => 'admin',
@@ -128,6 +132,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'gender' => 'Male',
                 'phone' => '+85512345678',
                 'status' => 'ACTIVE',
+                'avatar_url' => $avatar('System Administrator'),
             ],
             [
                 'username' => 'manager',
@@ -139,6 +144,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'gender' => 'Female',
                 'phone' => '+85512345679',
                 'status' => 'ACTIVE',
+                'avatar_url' => $avatar('Store Manager'),
             ],
             [
                 'username' => 'cashier',
@@ -150,6 +156,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'gender' => 'Female',
                 'phone' => '+85512345680',
                 'status' => 'ACTIVE',
+                'avatar_url' => $avatar('Senior Cashier'),
             ],
             [
                 'username' => 'staff',
@@ -161,14 +168,21 @@ class RolesAndPermissionsSeeder extends Seeder
                 'gender' => 'Male',
                 'phone' => '+85512345681',
                 'status' => 'ACTIVE',
+                'avatar_url' => $avatar('General Staff'),
             ],
         ];
 
         foreach ($employees as $data) {
-            Employee::firstOrCreate(
+            $employee = Employee::firstOrCreate(
                 ['username' => $data['username']],
                 $data
             );
+
+            // Backfill the default avatar on pre-existing accounts without
+            // clobbering an avatar the user uploaded themselves.
+            if ($employee->wasRecentlyCreated === false && blank($employee->avatar_url)) {
+                $employee->update(['avatar_url' => $data['avatar_url']]);
+            }
         }
 
         // ─── 4. Frontend Dev Team User Accounts ──────────────────────────────
@@ -180,26 +194,43 @@ class RolesAndPermissionsSeeder extends Seeder
                 'name' => 'Frontend Developer',
                 'email' => 'frontend@api.kesararamwithdigital.tech',
                 'password' => Hash::make('Frontend@123456'),
-                'is_admin' => false,
                 'role' => 'manager',
+                'is_admin' => false,
+                'avatar_url' => $avatar('Frontend Developer'),
             ],
             [
                 'name' => 'Admin User',
                 'email' => 'superadmin@api.kesararamwithdigital.tech',
                 'password' => Hash::make('SuperAdmin@123456'),
-                'is_admin' => true,
                 'role' => 'admin',
+                'is_admin' => true,
+                'avatar_url' => $avatar('Admin User'),
             ],
         ];
 
         foreach ($devTeam as $data) {
             $roleName = $data['role'];
-            unset($data['role']);
+            $shouldBeAdmin = (bool) $data['is_admin'];
+            // is_admin is not mass-assignable by policy; it is also set via
+            // a raw boolean literal because the pooled production connection
+            // binds PHP booleans as integers, which Postgres rejects.
+            unset($data['role'], $data['is_admin']);
 
             $user = User::firstOrCreate(
                 ['email' => $data['email']],
                 $data
             );
+
+            if ($shouldBeAdmin) {
+                DB::table('users')
+                    ->where('email', $user->email)
+                    ->update(['is_admin' => DB::raw('true')]);
+            }
+
+            // Backfill without overwriting a user-uploaded avatar.
+            if ($user->wasRecentlyCreated === false && blank($user->avatar_url)) {
+                $user->update(['avatar_url' => $data['avatar_url']]);
+            }
 
             if (method_exists($user, 'syncRoles')) {
                 $user->syncRoles([$roleName]);

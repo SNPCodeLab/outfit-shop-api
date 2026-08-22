@@ -45,7 +45,7 @@ class ClothingSizeController extends BaseApiController
         $old = $size->toArray();
 
         $validated = $request->validate([
-            'size_name' => 'required|string|unique:clothing_sizes,size_name,'.$id.',size_id',
+            'size_name' => 'sometimes|required|string|unique:clothing_sizes,size_name,'.$id.',size_id',
             'description' => 'nullable|string',
         ]);
 

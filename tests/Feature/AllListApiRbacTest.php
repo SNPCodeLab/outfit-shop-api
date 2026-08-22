@@ -142,7 +142,6 @@ class AllListApiRbacTest extends TestCase
             '/api/v1/promotions/active',
             '/api/v1/branches',
             '/api/v1/variants',
-            '/api/v1/variants/low-stock',
             '/api/v1/marketing/banners',
             '/api/v1/settings/audio-cues',
         ];
@@ -152,6 +151,10 @@ class AllListApiRbacTest extends TestCase
             $response->assertStatus(200)
                 ->assertJsonPath('success', true);
         }
+
+        // Business-intelligence endpoints were moved behind authentication
+        $this->getJson('/api/v1/inventory/statistics')->assertStatus(401);
+        $this->getJson('/api/v1/variants/low-stock')->assertStatus(401);
     }
 
     // =========================================================================

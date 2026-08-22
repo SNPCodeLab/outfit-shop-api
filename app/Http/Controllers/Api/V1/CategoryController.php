@@ -16,8 +16,8 @@ class CategoryController extends BaseApiController
 {
     public function index(): JsonResponse
     {
-        // ── High-Speed Caching Layer (Categories rarely change) ───────────────
-        $categories = Cache::rememberForever('categories:all', function () {
+        // ── High-Speed Caching Layer (1h TTL; observer flushes on any write) ──
+        $categories = Cache::remember('categories:all', 3600, function () {
             return Category::all();
         });
 
@@ -62,8 +62,10 @@ class CategoryController extends BaseApiController
         $oldValues = $category->toArray();
 
         $validated = $request->validate([
-            'category_name' => 'required|string|unique:categories,category_name,'.$id.',category_id',
-            'description' => 'nullable|string',
+            // 'sometimes' allows PATCH partial updates: absent fields keep
+            // their current values instead of failing with 422.
+            'category_name' => 'sometimes|required|string|unique:categories,category_name,'.$id.',category_id',
+            'description' => 'sometimes|nullable|string',
         ]);
 
         $category->update($validated);

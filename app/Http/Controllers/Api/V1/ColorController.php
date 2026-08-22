@@ -45,7 +45,7 @@ class ColorController extends BaseApiController
         $old = $color->toArray();
 
         $validated = $request->validate([
-            'color_name' => 'required|string|unique:colors,color_name,'.$id.',color_id',
+            'color_name' => 'sometimes|required|string|unique:colors,color_name,'.$id.',color_id',
             'description' => 'nullable|string',
         ]);
 

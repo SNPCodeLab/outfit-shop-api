@@ -40,7 +40,7 @@ class StockTransferController extends BaseApiController
             $query->where('to_branch_id', $toBranch);
         }
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = $this->perPage($request);
         $transfers = $query->paginate($perPage);
 
         return $this->successResponse($transfers, 'Stock transfers retrieved');

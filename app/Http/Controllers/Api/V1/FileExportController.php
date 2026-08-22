@@ -5,22 +5,32 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Jobs\GenerateReportExportJob;
 use App\Models\PosShift;
 use App\Models\ProductVariant;
 use App\Models\SaleHeader;
 use App\Models\StockMovement;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileExportController extends BaseApiController
 {
     /**
-     * GET /api/v1/exports/inventory/excel (or CSV)
-     * Stream high-speed inventory valuation spreadsheet.
+     * GET /api/v1/exports/inventory/excel?async=1
+     *
+     * Default: synchronous stream (backward compatible).
+     * ?async=1: accepted for background generation (202 + export_id) so a
+     * full-catalog export never holds an HTTP worker for minutes.
      */
-    public function exportInventory(): StreamedResponse
+    public function exportInventory(Request $request): StreamedResponse|JsonResponse
     {
+        if ($request->boolean('async')) {
+            return $this->dispatchAsyncExport('inventory_valuation', $request);
+        }
+
         $fileName = 'inventory_valuation_'.now()->format('Ymd_His').'.csv';
 
         return response()->streamDownload(function () {
@@ -221,5 +231,26 @@ class FileExportController extends BaseApiController
         return response($receipt, 200, [
             'Content-Type' => 'text/plain; charset=UTF-8',
         ]);
+    }
+
+    /**
+     * Queue an export job and return 202 with a tracking id (H5 wiring).
+     */
+    private function dispatchAsyncExport(string $reportType, Request $request): JsonResponse
+    {
+        $exportId = 'exp-'.now()->format('YmdHis').'-'.strtoupper(Str::random(6));
+
+        GenerateReportExportJob::dispatch(
+            $reportType,
+            $request->only(['date_from', 'date_to', 'from_date', 'to_date', 'status', 'category_id', 'brand_id']),
+            $request->user()->employee_id ?? $request->user()->id ?? 0,
+            $exportId
+        );
+
+        return $this->acceptedResponse([
+            'export_id' => $exportId,
+            'report_type' => $reportType,
+            'status' => 'QUEUED',
+        ], 'Export accepted and queued for background generation');
     }
 }

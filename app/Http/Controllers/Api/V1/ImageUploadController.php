@@ -93,6 +93,35 @@ class ImageUploadController extends BaseApiController
     }
 
     /**
+     * DELETE /uploads/image/{publicId} - RESTful path-parameterized delete
+     * (the query/body-parameter destroy() remains as a deprecated alias).
+     */
+    public function destroyByPublicId(Request $request, string $publicId): JsonResponse
+    {
+        try {
+            $deleted = $this->cloudinary->delete($publicId);
+
+            if (! $deleted) {
+                return $this->notFoundResponse('CloudinaryAsset', $publicId, 'Image could not be deleted from Cloudinary or was not found.');
+            }
+
+            if ($request->user()) {
+                AuditLogService::log(
+                    action: 'DELETE_IMAGE',
+                    entity: 'CloudinaryAsset',
+                    entityId: 0,
+                    oldValues: ['target' => $publicId],
+                    userId: $request->user()->employee_id ?? $request->user()->id ?? null
+                );
+            }
+
+            return $this->deletedResponse('Image deleted successfully from Cloudinary');
+        } catch (Exception $e) {
+            return $this->serverErrorResponse('Image deletion failed. Please try again.');
+        }
+    }
+
+    /**
      * Upload and directly attach an image to a Product.
      */
     public function uploadForProduct(Request $request, int $productId): JsonResponse
