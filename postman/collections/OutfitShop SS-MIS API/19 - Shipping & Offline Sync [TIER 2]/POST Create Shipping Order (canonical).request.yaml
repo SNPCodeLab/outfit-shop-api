@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/shipping-orders"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "order_id": 25,
+      "carrier": "KHN Express",
+      "tracking_number": "KH000001",
+      "recipient_name": "Sovan Sophea",
+      "recipient_phone": "012345678",
+      "address": "Phnom Penh"
+    }
+order: 2000

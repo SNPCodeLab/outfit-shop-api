@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Size
+url: "{{base_url}}/clothing-sizes/{{size_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "size_name": "XXL"
+    }
+order: 2000

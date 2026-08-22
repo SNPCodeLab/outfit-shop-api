@@ -1,0 +1,8 @@
+$kind: http-request
+description: Deprecated alias.
+url: "{{base_url}}/compliance/customers/{{customer_id}}/export-data"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 3000

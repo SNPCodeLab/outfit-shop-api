@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/shipping-orders/{{shipping_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "SHIPPED"
+    }
+order: 3000

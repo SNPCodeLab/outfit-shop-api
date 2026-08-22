@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/stock-transfers/{{transfer_id}}/cancel"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "reason": "Not needed"
+    }
+order: 8000

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/branches"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_name": "Toul Kork Branch",
+      "branch_code": "BR002",
+      "phone": "012345678",
+      "address": "Toul Kork, Phnom Penh",
+      "city": "Phnom Penh"
+    }
+order: 2000

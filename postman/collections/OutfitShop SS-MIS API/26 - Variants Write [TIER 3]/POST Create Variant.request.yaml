@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/variants"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "product_id": 182,
+      "size_id": 2,
+      "color_id": 2,
+      "sku": "SKU-NEW-0001",
+      "barcode": "0000000000001",
+      "cost_price": 5.0,
+      "sale_price": 10.0,
+      "quantity": 50
+    }
+order: 1000

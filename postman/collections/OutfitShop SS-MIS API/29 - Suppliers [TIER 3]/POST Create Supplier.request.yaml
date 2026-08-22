@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/suppliers"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "supplier_name": "Global Textiles Co",
+      "contact_person": "Jane Smith",
+      "phone": "012345678",
+      "email": "sales@globaltextiles.com",
+      "address": "Singapore"
+    }
+order: 3000

@@ -1,0 +1,11 @@
+$kind: http-request
+description: Returns a Base32 secret + otpauth URL for authenticator apps.
+url: "{{base_url}}/auth/2fa/setup"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+order: 6000

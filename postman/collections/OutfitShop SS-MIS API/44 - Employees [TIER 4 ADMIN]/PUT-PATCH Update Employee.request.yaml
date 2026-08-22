@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Employee
+url: "{{base_url}}/employees/{{employee_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "position": "Senior Associate"
+    }
+order: 4000

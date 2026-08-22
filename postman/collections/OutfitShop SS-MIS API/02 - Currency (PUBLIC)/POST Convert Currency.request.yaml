@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/currencies/convert"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 100,
+      "from": "USD",
+      "to": "KHR"
+    }
+order: 2000

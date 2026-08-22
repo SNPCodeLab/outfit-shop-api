@@ -1,0 +1,56 @@
+$kind: collection
+description: |-
+  OutfitShop-Backend-API - Monolithic Headless TPS/OLTP REST API.
+  Base URL: https://api.kesararamwithdigital.tech/api/v1
+
+  Access tiers: TIER 1 public (no token), TIER 2 authenticated (Bearer), TIER 3 manager/admin, TIER 4 admin only.
+
+  Run folder 00 Login first - each login captures {{token}} plus its role variable. Requests marked [legacy] are deprecated aliases (Sunset 2027-12-31); prefer the canonical route shown alongside.
+
+  Rebuilt 2026-08-22 from the live route surface after the full endpoint audit; real production IDs are pre-filled.
+
+  Security: login requests reference password variables ({{admin_password}} etc.) - set them locally after obtaining credentials; no passwords are stored in this file.
+variables:
+  base_url: https://api.kesararamwithdigital.tech/api/v1
+  token: ""
+  admin_token: ""
+  manager_token: ""
+  cashier_token: ""
+  staff_token: ""
+  product_id: "182"
+  variant_id: "180"
+  barcode: SKU-GUC-0182
+  brand_id: "6"
+  category_id: "14"
+  size_id: "2"
+  color_id: "2"
+  employee_id: "8"
+  customer_id: "6"
+  supplier_id: "5"
+  order_id: "25"
+  sale_id: "25"
+  purchase_id: "4"
+  transfer_id: "8"
+  shift_id: "1"
+  bundle_id: "1"
+  promotion_id: "1"
+  webhook_id: "1"
+  banner_id: "1"
+  audit_id: "407"
+  estimate_id: "1"
+  shipping_id: "1"
+  gift_card_code: KM-TEST-CODE
+  cart_item_id: "1"
+  wishlist_id: "1"
+  review_id: "1"
+  image_id: "1"
+  admin_password: ""
+  manager_password: ""
+  cashier_password: ""
+  staff_password: ""
+auth:
+  - id: bbcac754-a01f-4fce-b076-55f862a8c050
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"

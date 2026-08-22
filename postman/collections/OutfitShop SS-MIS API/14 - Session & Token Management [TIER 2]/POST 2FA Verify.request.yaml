@@ -1,0 +1,14 @@
+$kind: http-request
+description: RFC 6238 TOTP, +/- 1 step window, constant-time compare.
+url: "{{base_url}}/auth/2fa/verify"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "code": "123456"
+    }
+order: 7000

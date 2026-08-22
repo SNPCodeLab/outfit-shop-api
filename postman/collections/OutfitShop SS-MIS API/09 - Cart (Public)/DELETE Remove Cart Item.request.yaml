@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/cart/items/{cart_item_id}"
+method: DELETE
+headers:
+  Accept: application/json
+order: 4000

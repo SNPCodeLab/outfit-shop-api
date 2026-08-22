@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Cart Item
+description: Partial update; PUT also accepted.
+url: "{{base_url}}/cart/items/{cart_item_id}"
+method: PATCH
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantity": 2
+    }
+order: 3000

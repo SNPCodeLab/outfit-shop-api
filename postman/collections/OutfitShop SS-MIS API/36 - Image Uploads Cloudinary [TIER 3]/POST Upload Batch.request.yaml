@@ -1,0 +1,20 @@
+$kind: http-request
+description: Multipart multiple files.
+url: "{{base_url}}/uploads/batch"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "items": [
+        {
+          "url": "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=800",
+          "product_id": 182,
+          "folder": "khmeriel/products"
+        }
+      ]
+    }
+order: 3000

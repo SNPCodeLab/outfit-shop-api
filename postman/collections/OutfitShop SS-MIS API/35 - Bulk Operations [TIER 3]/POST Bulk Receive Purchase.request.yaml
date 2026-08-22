@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/purchases/bulk-receive"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "receipts": [
+        {
+          "purchase_id": 4,
+          "received_items": []
+        }
+      ]
+    }
+order: 4000

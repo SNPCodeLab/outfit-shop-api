@@ -1,0 +1,12 @@
+$kind: http-request
+name: POST POS Checkout /sales [legacy]
+description: Deprecated alias. Sunset 2027-12-31.
+url: "{{base_url}}/sales/checkout"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: '{"customer_id":null,"items":[{"variant_id":174,"quantity":1,"discount":0}],"payment_method":"CARD","payment_amount":120.00,"notes":"Walk-in card"}'
+order: 4000

@@ -1,0 +1,20 @@
+$kind: http-request
+description: Dispatches BulkStockOpnameJob; returns 202 with audit trail.
+url: "{{base_url}}/inventory/stock-opname"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_id": 1,
+      "counts": [
+        {
+          "variant_id": 180,
+          "counted_quantity": 49
+        }
+      ]
+    }
+order: 3000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/colors"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "color_name": "Navy Blue",
+      "hex_code": "#1B2A4A"
+    }
+order: 4000

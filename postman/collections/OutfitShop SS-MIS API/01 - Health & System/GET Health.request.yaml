@@ -1,0 +1,7 @@
+$kind: http-request
+description: Canonical health probe (uptime monitors).
+url: "{{base_url}}/health"
+method: GET
+headers:
+  Accept: application/json
+order: 1000

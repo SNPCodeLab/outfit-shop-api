@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/payments/khqr"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 10.0,
+      "currency": "USD",
+      "merchant_name": "KhmeRiel Boutique"
+    }
+order: 1000

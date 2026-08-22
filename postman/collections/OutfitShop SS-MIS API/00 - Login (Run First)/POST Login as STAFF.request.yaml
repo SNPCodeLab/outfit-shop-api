@@ -1,0 +1,24 @@
+$kind: http-request
+description: Set the staff_password collection variable before running. Credentials are never embedded in the tracked collection.
+url: "{{base_url}}/auth/login"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "staff",
+      "password": "{{staff_password}}",
+      "device_name": "Postman Runner"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const r = pm.response.json();
+      if (r.success && r.data && r.data.access_token) {
+          pm.collectionVariables.set('staff_token', r.data.access_token);
+          pm.collectionVariables.set('token', r.data.access_token);
+      }
+    language: text/javascript
+order: 4000

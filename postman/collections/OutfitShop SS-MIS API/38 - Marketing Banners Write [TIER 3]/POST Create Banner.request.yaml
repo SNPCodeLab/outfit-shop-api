@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/marketing/banners"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Summer Sale",
+      "image_url": "https://res.cloudinary.com/demo/image/upload/banner.png",
+      "placement": "HOME_TOP",
+      "is_active": "true"
+    }
+order: 1000

@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/stock-transfers"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "from_branch_id": 1,
+      "to_branch_id": 2,
+      "items": [
+        {
+          "variant_id": 180,
+          "quantity": 5
+        }
+      ],
+      "notes": "Rebalance"
+    }
+order: 3000

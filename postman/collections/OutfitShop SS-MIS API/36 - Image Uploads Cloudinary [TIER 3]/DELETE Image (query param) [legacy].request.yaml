@@ -1,0 +1,14 @@
+$kind: http-request
+description: Deprecated alias. Sunset 2027-12-31.
+url: "{{base_url}}/uploads/image"
+method: DELETE
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "public_id": "khmeriel/products/sample"
+    }
+order: 5000

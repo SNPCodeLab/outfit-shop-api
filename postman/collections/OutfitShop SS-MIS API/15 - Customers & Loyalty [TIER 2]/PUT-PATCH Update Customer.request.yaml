@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Customer
+url: "{{base_url}}/customers/{{customer_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "phone": "013456789"
+    }
+order: 4000

@@ -1,0 +1,19 @@
+$kind: http-request
+description: Revokes the presented token; the replacement keeps role-scoped abilities.
+url: "{{base_url}}/auth/refresh"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+scripts:
+  - type: afterResponse
+    code: |-
+      const r = pm.response.json();
+      if (r.success && r.data && r.data.access_token) {
+          pm.collectionVariables.set('token', r.data.access_token);
+      }
+    language: text/javascript
+order: 3000

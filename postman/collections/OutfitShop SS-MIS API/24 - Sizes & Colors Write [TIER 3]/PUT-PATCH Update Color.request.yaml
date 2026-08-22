@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Color
+url: "{{base_url}}/colors/{{color_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "color_name": "Deep Navy"
+    }
+order: 5000

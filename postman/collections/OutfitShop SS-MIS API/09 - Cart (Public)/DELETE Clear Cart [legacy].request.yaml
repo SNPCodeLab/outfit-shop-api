@@ -1,0 +1,7 @@
+$kind: http-request
+description: Deprecated alias. Sunset 2027-12-31.
+url: "{{base_url}}/cart/clear"
+method: DELETE
+headers:
+  Accept: application/json
+order: 6000

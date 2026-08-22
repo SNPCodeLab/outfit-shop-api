@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/gift-cards"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 10.0,
+      "initial_balance": 10.0
+    }
+order: 4000

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/cart/items"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "variant_id": 180,
+      "quantity": 1
+    }
+order: 2000

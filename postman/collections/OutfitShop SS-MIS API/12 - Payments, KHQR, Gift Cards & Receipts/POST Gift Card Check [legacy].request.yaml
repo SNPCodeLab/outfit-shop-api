@@ -1,0 +1,13 @@
+$kind: http-request
+description: Deprecated alias of GET /gift-cards/{code}.
+url: "{{base_url}}/gift-cards/check"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "code": "KM-TEST-CODE"
+    }
+order: 4000

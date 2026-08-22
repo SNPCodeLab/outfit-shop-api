@@ -1,0 +1,16 @@
+$kind: http-request
+description: "Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED, ALL."
+url: "{{base_url}}/webhooks/subscribe"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "url": "https://example.com/webhook",
+      "event_type": "LOW_STOCK_ALERT",
+      "secret": "whsec_example"
+    }
+order: 2000

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/customers/{{customer_id}}/redeem-points"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "points": 10
+    }
+order: 6000

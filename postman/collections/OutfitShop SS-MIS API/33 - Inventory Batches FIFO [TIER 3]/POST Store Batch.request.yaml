@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/variants/{{variant_id}}/batches"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "batch_number": "B2026-001",
+      "quantity": 30,
+      "received_date": "2026-08-01",
+      "expires_date": "2027-08-01"
+    }
+order: 3000

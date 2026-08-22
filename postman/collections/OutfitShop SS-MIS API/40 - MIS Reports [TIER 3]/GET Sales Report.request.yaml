@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/reports/sales?from=2026-08-01&to=2026-08-31?from=2026-08-01&to=2026-08-31"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+queryParams:
+  from: 2026-08-01
+  to: 2026-08-31
+order: 1000

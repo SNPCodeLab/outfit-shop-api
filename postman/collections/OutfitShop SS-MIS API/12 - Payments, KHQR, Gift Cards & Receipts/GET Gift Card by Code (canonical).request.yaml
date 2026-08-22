@@ -1,0 +1,7 @@
+$kind: http-request
+description: RESTful balance check.
+url: "{{base_url}}/gift-cards/{{gift_card_code}}"
+method: GET
+headers:
+  Accept: application/json
+order: 3000

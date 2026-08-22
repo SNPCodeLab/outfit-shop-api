@@ -1,0 +1,8 @@
+$kind: http-request
+description: Requires purchase verification for customer accounts; employees exempt.
+url: "{{base_url}}/products/{{product_id}}/download"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 8000

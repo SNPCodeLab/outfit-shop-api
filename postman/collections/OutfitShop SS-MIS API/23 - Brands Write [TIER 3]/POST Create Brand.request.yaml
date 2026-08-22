@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/brands"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brand_name": "New Luxury Brand",
+      "description": "Brand description"
+    }
+order: 1000

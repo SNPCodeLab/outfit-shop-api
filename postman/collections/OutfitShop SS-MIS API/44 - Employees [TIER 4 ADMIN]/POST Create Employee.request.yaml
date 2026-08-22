@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/employees"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "employee_name": "New Employee",
+      "email": "new.employee@company.com",
+      "username": "newemployee01",
+      "password": "SecurePass123!",
+      "role": "STAFF",
+      "position": "Sales Associate",
+      "avatar_url": "https://api.dicebear.com/9.x/initials/svg?seed=New%20Employee"
+    }
+order: 3000

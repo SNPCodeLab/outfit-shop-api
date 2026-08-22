@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Brand
+url: "{{base_url}}/brands/{{brand_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brand_name": "Renamed Brand"
+    }
+order: 2000

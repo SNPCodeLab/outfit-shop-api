@@ -1,0 +1,11 @@
+$kind: http-request
+description: Deprecated alias. Sunset 2027-12-31.
+url: "{{base_url}}/gift-cards/issue"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: '{"initial_balance":50.00,"purchaser_customer_id":null,"expiry_date":"2027-12-31"}'
+order: 5000

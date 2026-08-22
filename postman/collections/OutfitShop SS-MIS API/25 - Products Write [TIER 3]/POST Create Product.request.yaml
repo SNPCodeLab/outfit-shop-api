@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/products"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "product_name": "New Luxury Item",
+      "category_id": 14,
+      "description": "Product description",
+      "gender": "UNISEX",
+      "material_fabric": "Premium Quality"
+    }
+order: 1000

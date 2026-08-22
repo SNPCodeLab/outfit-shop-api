@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/products/bulk-import"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "products": []
+    }
+order: 3000
