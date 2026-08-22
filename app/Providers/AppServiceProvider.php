@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Database\Connections\PostgresBooleanConnection;
+use App\Hashing\FallbackHasher;
 use App\Http\Response\ApiResponse;
 use App\Models\Category;
 use App\Models\Employee;
@@ -18,6 +19,7 @@ use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -46,6 +48,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Runtime-adaptive password hashing (the Vercel PHP runtime cannot
+        // create bcrypt hashes although it can verify them). Registered in
+        // boot() so the hash manager exists first.
+        Hash::extend('fallback', fn () => new FallbackHasher(['cost' => (int) config('hashing.bcrypt.rounds', 12)]));
+
         // ── Deterministic names for every route (error tracing, route()) ────
         // Routes without an explicit name receive a computed one so the whole
         // surface is addressable; explicit names (login, products.show, ...)
