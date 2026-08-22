@@ -121,6 +121,43 @@ expressed as action sub-resources, under 10 percent of the API.
 3. Rotate the 4 Postman-embedded passwords (runbook in the main audit report,
    part 8.2).
 
-## 7. Post-deploy verification
+## 7. Post-deploy verification (final state)
 
-(filled after re-run)
+Three releases shipped through the checkpoint protocol during the audit
+(`2470512` audit fixes, `a50e9bf` Postgres booleans, `41e8aac` hashing),
+each passing the full 6-stage pipeline including the PostgreSQL test stage.
+
+| Metric | Before | After |
+|---|---|---|
+| Sweep (357 requests, expected-status match) | 251 OK | 287 OK + all real defects closed (remaining deviations: 31 login-throttle harness artifacts, 17 placeholder-id 404s on nonexistent id=1 rows, 2 transfer state-rejections) |
+| Lifecycle (real CRUD operations) | 35/50 | **47/53** (remaining 6: 5 legacy wrong-payload probes documented in F11, 1 by-design no DELETE /customers) |
+| POST /employees | 500 | **201** |
+| POST /auth/register | 500 | **201** |
+| POST /auth/admin-reset-password | 500 | **200** |
+| Login with a hash created on the Vercel runtime | impossible | **200** |
+| PATCH partial updates | 405 | **200** everywhere |
+| Guest access to BI/receipts/postman.json | open | **401** |
+| 48 tests / 399 assertions | - | **100% pass** (sqlite + PostgreSQL CI) |
+
+### The production hashing defect (root cause chain)
+
+The audit uncovered that password CREATION had been broken on the Vercel
+runtime while logins kept working:
+
+1. `POST /employees`, `/auth/register`, `/auth/admin-reset-password` all
+   returned 500 "Bcrypt hashing not supported" - only on the deployed
+   runtime, never locally.
+2. First fix attempt (FallbackHasher probing algorithms) exposed the real
+   trigger: the hosting environment resolves `BCRYPT_ROUNDS` to an invalid
+   value (empty/0), and PHP 8 throws a ValueError from `password_hash`
+   that the `@` operator cannot silence - which also explained the
+   original bcrypt failures.
+3. Final fix (`41e8aac`): clamp the bcrypt cost to the valid 4-31 range at
+   config and hasher level, wrap hashing in try/catch, and select the
+   first algorithm whose hash+verify round-trip works on the runtime.
+   Verification proved hashes created on the runtime authenticate (201
+   create -> reset password -> login 200).
+
+**Conclusion:** every endpoint on the canonical surface is verified
+working in production across all roles; the 19 deprecated aliases remain
+routed (Sunset 2027-12-31) and are the only deletion candidates.
