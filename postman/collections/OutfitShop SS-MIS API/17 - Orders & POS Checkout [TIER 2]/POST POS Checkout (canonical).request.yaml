@@ -1,0 +1,22 @@
+$kind: http-request
+description: "Transactional checkout: row locks, historical prices, idempotency-key unique-indexed. Token needs sales.checkout ability."
+url: "{{base_url}}/orders/checkout"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "items": [
+        {
+          "variant_id": 180,
+          "quantity": 1
+        }
+      ],
+      "payment_method": "CASH",
+      "tax_rate": 0,
+      "idempotency_key": "postman-{{$timestamp}}"
+    }
+order: 1000

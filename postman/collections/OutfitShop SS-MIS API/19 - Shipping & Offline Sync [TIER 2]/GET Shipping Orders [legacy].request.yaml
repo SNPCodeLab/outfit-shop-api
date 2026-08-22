@@ -1,0 +1,8 @@
+$kind: http-request
+description: Deprecated alias. Sunset 2027-12-31.
+url: "{{base_url}}/shipping/orders"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 4000

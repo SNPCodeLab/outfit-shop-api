@@ -1,0 +1,14 @@
+$kind: http-request
+description: Computation action; POST by the Stripe-style action exception.
+url: "{{base_url}}/promotions/verify-coupon"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "promo_code": "WELCOME10",
+      "subtotal": 100.0
+    }
+order: 4000

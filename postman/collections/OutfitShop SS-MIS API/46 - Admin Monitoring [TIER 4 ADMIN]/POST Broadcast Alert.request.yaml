@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/admin/broadcast-alert"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "System Maintenance",
+      "message": "POS restart at 22:00",
+      "severity": "INFO"
+    }
+order: 4000

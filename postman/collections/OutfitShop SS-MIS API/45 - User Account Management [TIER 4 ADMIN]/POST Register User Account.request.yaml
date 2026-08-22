@@ -1,0 +1,18 @@
+$kind: http-request
+description: Creates the account only (no token issued); login separately. is_admin is not mass-assignable.
+url: "{{base_url}}/auth/register"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Frontend Developer",
+      "email": "dev@frontend.com",
+      "password": "SecurePass123!",
+      "password_confirmation": "SecurePass123!",
+      "role": "staff"
+    }
+order: 1000

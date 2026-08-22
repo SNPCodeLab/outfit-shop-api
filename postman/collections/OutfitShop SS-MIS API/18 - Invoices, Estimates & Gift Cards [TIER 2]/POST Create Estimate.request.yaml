@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/estimates"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customer_id": 6,
+      "items": [
+        {
+          "variant_id": 180,
+          "quantity": 1
+        }
+      ]
+    }
+order: 2000

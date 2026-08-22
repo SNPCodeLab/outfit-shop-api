@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/stock-transfers/{{transfer_id}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 2000

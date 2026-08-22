@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{base_url}}/variants?page=1&per_page=15?page=1&per_page=15"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  page: "1"
+  per_page: "15"
+order: 1000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/variants/{{variant_id}}/tiers"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "min_quantity": 10,
+      "discount_percent": 5
+    }
+order: 4000

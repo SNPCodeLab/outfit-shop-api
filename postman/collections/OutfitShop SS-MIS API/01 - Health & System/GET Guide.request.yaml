@@ -1,0 +1,7 @@
+$kind: http-request
+description: Developer knowledge base (canonical).
+url: "{{base_url}}/guide"
+method: GET
+headers:
+  Accept: application/json
+order: 3000

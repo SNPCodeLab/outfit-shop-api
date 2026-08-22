@@ -1,0 +1,16 @@
+$kind: http-request
+description: STAFF is read-only on customers (permission map enforced server-side).
+url: "{{base_url}}/customers"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customer_name": "Sovan Sophea",
+      "phone": "012345678",
+      "email": "sovan@example.com"
+    }
+order: 3000

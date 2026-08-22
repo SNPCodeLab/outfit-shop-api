@@ -1,0 +1,11 @@
+$kind: http-request
+description: Deprecated alias.
+url: "{{base_url}}/shipping/{{shipping_id}}/status"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: '{"status":"DISPATCHED"}'
+order: 6000

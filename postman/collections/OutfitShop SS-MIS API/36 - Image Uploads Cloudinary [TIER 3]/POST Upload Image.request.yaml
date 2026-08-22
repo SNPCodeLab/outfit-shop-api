@@ -1,0 +1,24 @@
+$kind: http-request
+description: "Multipart: image file or image_url + optional folder."
+url: "{{base_url}}/uploads/image"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: formdata
+  content:
+    - type: text
+      key: image_url
+      value: https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=800
+      description: Remote image URL — used when no file is attached in automated runner
+    - type: text
+      key: folder
+      value: khmeriel/products
+    - type: file
+      key: image
+      src:
+        - ""
+      description: Attach a local file here for manual testing
+      disabled: true
+order: 2000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/colors/{{color_id}}"
+method: GET
+headers:
+  Accept: application/json
+order: 4000

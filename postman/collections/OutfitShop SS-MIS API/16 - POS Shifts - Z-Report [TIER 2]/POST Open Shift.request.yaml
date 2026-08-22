@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/shifts/open"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "opening_float_usd": 100.0,
+      "opening_float_khr": 0
+    }
+order: 2000

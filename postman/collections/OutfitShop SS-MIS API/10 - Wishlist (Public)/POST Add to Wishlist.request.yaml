@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/wishlist"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customer_id": 6,
+      "product_id": 182
+    }
+order: 2000

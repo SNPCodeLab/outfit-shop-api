@@ -1,0 +1,22 @@
+$kind: http-request
+description: Deprecated alias.
+url: "{{base_url}}/shipping/create"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sale_id": "{{sale_id}}",
+      "branch_id": 1,
+      "fulfillment_type": "COURIER_DELIVERY",
+      "courier_name": "J_AND_T",
+      "recipient_name": "Dara Sok",
+      "recipient_phone": "0123456789",
+      "shipping_address": "St.271, BKK1, Phnom Penh",
+      "shipping_city": "Phnom Penh",
+      "shipping_cost": 3.5
+    }
+order: 5000

@@ -1,0 +1,9 @@
+$kind: http-request
+name: GET My Profile (/auth/me)
+description: Full profile incl. username, phone, avatar_url, joined_at, last_login_at, permissions.
+url: "{{base_url}}/auth/me"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 1000

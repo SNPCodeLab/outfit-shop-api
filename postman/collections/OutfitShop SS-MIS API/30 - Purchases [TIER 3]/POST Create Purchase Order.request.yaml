@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{base_url}}/purchases"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "supplier_id": 5,
+      "items": [
+        {
+          "variant_id": 180,
+          "quantity": 20,
+          "unit_cost": 5.0
+        }
+      ],
+      "expected_date": "2026-09-15",
+      "notes": "Restock"
+    }
+order: 3000

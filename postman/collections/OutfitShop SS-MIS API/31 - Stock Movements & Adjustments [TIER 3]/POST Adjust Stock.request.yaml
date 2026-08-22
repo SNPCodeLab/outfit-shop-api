@@ -1,0 +1,17 @@
+$kind: http-request
+description: quantity is signed; movement_type from the allowed list.
+url: "{{base_url}}/stock-movements/adjust"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "variant_id": 180,
+      "quantity": -1,
+      "movement_type": "ADJUSTMENT",
+      "note": "Damaged item"
+    }
+order: 2000

@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{base_url}}/reports/customer-purchase-history?customer_id=6?customer_id=6"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+queryParams:
+  customer_id: "6"
+order: 4000

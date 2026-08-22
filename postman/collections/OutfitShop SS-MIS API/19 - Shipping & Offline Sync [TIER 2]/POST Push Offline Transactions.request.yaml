@@ -1,0 +1,14 @@
+$kind: http-request
+description: Offline POS sync with conflict resolution.
+url: "{{base_url}}/offline/push-transactions"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "transactions": []
+    }
+order: 8000

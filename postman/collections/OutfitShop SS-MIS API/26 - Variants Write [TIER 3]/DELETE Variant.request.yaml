@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/variants/{{variant_id}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 3000

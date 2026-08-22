@@ -1,0 +1,14 @@
+$kind: http-request
+description: Or send multipart form-data with an image file (stored on Cloudinary). Works for every role.
+url: "{{base_url}}/auth/avatar"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "avatar_url": "https://api.dicebear.com/9.x/initials/svg?seed=Postman"
+    }
+order: 2000

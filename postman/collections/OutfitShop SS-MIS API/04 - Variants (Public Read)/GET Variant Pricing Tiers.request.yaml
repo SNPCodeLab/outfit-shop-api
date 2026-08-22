@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/variants/{{variant_id}}/tiers"
+method: GET
+headers:
+  Accept: application/json
+order: 4000

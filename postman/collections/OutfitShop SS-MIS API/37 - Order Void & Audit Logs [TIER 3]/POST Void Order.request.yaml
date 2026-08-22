@@ -1,0 +1,14 @@
+$kind: http-request
+description: Restores stock; double-void returns 422. Token needs sales.void.
+url: "{{base_url}}/orders/{{order_id}}/void"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "reason": "Customer return"
+    }
+order: 1000

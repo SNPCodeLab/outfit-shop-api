@@ -25,10 +25,12 @@ Route::get('/', function () {
         'status' => 'online',
         'frontend_url' => 'https://app.kesararamwithdigital.tech',
         'endpoints' => [
+            'developers' => "{$base}/developers",
             'guide' => "{$base}/guide",
             'health' => "{$base}/api/v1/health",
             'status' => "{$base}/api/v1/status",
             'postman' => "{$base}/api/v1/postman.json",
+            'llms_txt' => "{$base}/llms.txt",
         ],
         'public_catalog' => [
             'products' => "{$base}/api/v1/products",
@@ -72,6 +74,9 @@ Route::get('/', function () {
         ],
     ], 'OutfitShop-Backend-API gateway is operational');
 });
+
+// Developer Documentation (frontend-facing Stripe-style reference page)
+Route::view('/developers', 'developers')->name('developers');
 
 // Help Centre and Interactive Knowledge Base
 Route::get('/guide', [HelpCentreGuideController::class, 'index']);

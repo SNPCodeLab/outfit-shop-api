@@ -1,0 +1,17 @@
+$kind: http-request
+description: Authenticated review write (reads stay public).
+url: "{{base_url}}/products/{{product_id}}/reviews"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customer_id": 6,
+      "rating": 5,
+      "review_title": "Great fit",
+      "review_text": "Excellent quality."
+    }
+order: 7000

@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT|PATCH Update Category
+url: "{{base_url}}/categories/{{category_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "description": "Updated description"
+    }
+order: 2000

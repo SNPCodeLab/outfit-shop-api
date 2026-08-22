@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/promotions/{{promotion_id}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 3000

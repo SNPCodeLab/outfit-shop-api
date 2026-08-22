@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/exports/z-report/{shift_id}/thermal"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 4000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/products/{{product_id}}/matrix"
+method: GET
+headers:
+  Accept: application/json
+order: 4000

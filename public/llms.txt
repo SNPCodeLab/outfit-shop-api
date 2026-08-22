@@ -1,0 +1,122 @@
+# OutfitShop API
+
+> Monolithic headless TPS/OLTP REST API for the OutfitShop MIS & POS platform.
+> Laravel 11, Laravel Sanctum Bearer tokens, 4-tier RBAC, PostgreSQL on Neon Cloud.
+> Human-readable developer docs: https://api.kesararamwithdigital.tech/developers
+
+BASE URL: https://api.kesararamwithdigital.tech/api/v1
+API VERSION: Version: 1.2.0
+FORMAT: JSON only (Accept: application/json, Content-Type: application/json), HTTPS only.
+POSTMAN: GET /api/v1/postman.json with a MANAGER or ADMIN Bearer token returns 200 and the
+full collection: 47 folders, 207 ready-to-run requests (401 without a token, 403 for
+CASHIER/STAFF). Folder 00 login auto-captures the token into {{token}}.
+
+## Response envelope
+
+Every endpoint (success or error) returns one envelope:
+- success (bool): true on 2xx, false on 4xx/5xx
+- status_code (int): mirrors the HTTP status line
+- request_id (uuid): echoes the client X-Request-Id header when provided
+- timestamp (iso 8601 utc), message (human-readable summary)
+- data: the payload (object/array/null)
+- meta: { system, api_version, processing_time_ms, pagination? }
+- links: { self, next, previous } on paginated collections
+Errors add: error { code, type, message, detail, debug(null in production) } plus
+meta { documentation, retry_allowed, retry_after_seconds }.
+
+## Authentication
+
+1. POST /auth/login { "username" OR "email", "password", "device_name" }
+   -> data.access_token, data.token_type "Bearer", data.role, data.employee, data.permissions
+2. Attach "Authorization: Bearer <token>" to every protected request.
+3. GET /auth/me hydrates the session. POST /auth/refresh rotates the token.
+   POST /auth/logout revokes it. POST /auth/revoke-all revokes every token.
+4. On 401: clear token and redirect to login. On 403: show access denied, keep session.
+5. Login throttled to 5 attempts/min per IP. 10 failed attempts lock the account for
+   15 minutes and return 423 ACCOUNT_LOCKED.
+
+## RBAC tiers (enforced server-side by role middleware)
+
+- TIER 1 PUBLIC (no token): health, guide, currencies, catalog reads (products, variants,
+  categories, brands, clothing-sizes, colors, bundles, promotions/active, verify-coupon),
+  cart, wishlist, branches, marketing/banners, settings/audio-cues, payments/khqr,
+  gift-cards/{code}, variants/barcode/{barcode}, products/{id}/matrix|colorways|reviews(read).
+- TIER 2 AUTHENTICATED (CASHIER, STAFF, MANAGER, ADMIN): auth session endpoints, customers
+  CRUD + loyalty + redeem-points, inventory/statistics, variants/low-stock, shifts
+  (open/drop-cash/close/current), orders (checkout, list, show, khqr, receipt-thermal,
+  invoice-pdf), products/{id}/download, reviews(write), invoices, estimates(+convert),
+  gift-cards(issue), shipping-orders, offline manifest + push-transactions,
+  dashboard/role-pulse, alerts/active.
+- TIER 3 MANAGER (+ADMIN): dashboard/stats, restock-recommendations, purchases/auto-generate,
+  catalog writes (categories, brands, clothing-sizes, colors, products(+images), variants
+  (+tiers, batches), bundles, promotions), branches write, suppliers CRUD, purchases,
+  stock-movements (adjust, stock-opname), stock-transfers 5-stage (approve/pick/ship/receive/
+  cancel), uploads (image, batch, gallery), orders/{id}/void, audit-logs, bulk operations
+  (bulk-adjust, bulk-price-update, bulk-import, bulk-receive), exports (excel, csv, pdf,
+  z-report thermal), reports (sales, inventory-valuation, stock-aging,
+  customer-purchase-history, supplier-performance, profit-margin, cash-flow), ai (sales-
+  forecast, anomaly-detection, smart-restock, customer-segmentation, dynamic-pricing),
+  GDPR (data-exports, erasure-requests, retention policy), webhooks (subscribe, test).
+- TIER 4 ADMIN: employees CRUD, auth/register, auth/admin-reset-password,
+  admin/master-pulse, admin/performance, admin/api-analytics, admin/broadcast-alert.
+
+Roles: STAFF (read-only) < CASHIER (POS, customers) < MANAGER (back office) < ADMIN (all).
+
+## Pagination
+
+Query params: ?page=N&per_page=N. Response meta.pagination = { current_page, per_page,
+total_items, total_pages, from, to }. Follow links.next instead of building URLs.
+
+## HTTP status codes
+
+200 OK (reads, updates, deletions keep the envelope), 201 Created (Location header),
+202 Accepted (async queued), 400 Bad Request (malformed transport), 401 Unauthorized
+(AUTHENTICATION_FAILED), 403 Forbidden (FORBIDDEN_ACCESS), 404 Not Found
+(RESOURCE_NOT_FOUND), 405 Method Not Allowed, 409 Conflict (duplicate or idempotency
+replay), 422 Unprocessable Entity (VALIDATION_ERROR, per-field detail in
+error.detail.fields[] = [{ field, rule, message }]), 423 Locked (ACCOUNT_LOCKED),
+429 Too Many Requests (RATE_LIMIT_EXCEEDED, honor Retry-After), 500 Server Error
+(log request_id), 503 Service Unavailable (retry after indicated seconds).
+
+## Rate limits (per rolling minute)
+
+PUBLIC 30 per IP; STAFF 50; CASHIER 100; MANAGER 200; ADMIN 300 (per token owner).
+GET /health is unthrottled. Login: 5 attempts/min per IP.
+
+## POS checkout (transactional core)
+
+POST /orders/checkout (TIER 2, token needs sales.checkout ability)
+Body: { customer_id?, items: [{ variant_id, quantity, discount? }],
+payment_method?: CASH|CARD|QR|ABA|BAKONG|GIFT_CARD (default CASH), payment_amount?,
+overall_discount?, tax_rate? (default 10.00), idempotency_key? (or X-Idempotency-Key
+header, max 64 chars) }. Atomic: validates stock, deducts with row locks, applies
+discounts and VAT, returns the invoice. Replaying the same idempotency key returns the
+original order instead of double-charging.
+
+## Frontend integration rules
+
+- Parse success first; read payloads only from data; log request_id on failures.
+- Map 422 error.detail.fields[] onto form inputs. Back off on 429/503 using Retry-After.
+- One object per request; no bulk updates on single resources (explicit bulk endpoints
+  exist for inventory).
+- Prefer canonical routes over deprecated aliases (sunset 2027-12-31):
+  /orders/* not /sales/*; POST /payments/khqr not GET; GET /gift-cards/{code} not
+  POST /gift-cards/check; POST /gift-cards not /gift-cards/issue; DELETE /cart not
+  /cart/clear; /shipping-orders not /shipping/*; /customers/{id}/data-exports and
+  /customers/{id}/erasure-requests not /compliance/*; GET /health and /guide not
+  /status and /docs.
+- CORS allowed origins: api.kesararamwithdigital.tech, kesararamwithdigital.tech,
+  app.kesararamwithdigital.tech, ss-mis.vercel.app, ss-mis.pages.dev (+localhost in
+  non-production). Others require CORS_ALLOWED_ORIGINS.
+- Collection variables in postman.json preload real production IDs: product_id 182,
+  variant_id 180, barcode SKU-GUC-0182, brand_id 6, category_id 14, customer_id 6,
+  order_id 25, supplier_id 5.
+
+## Key links
+
+- Developer documentation: https://api.kesararamwithdigital.tech/developers
+- Health: https://api.kesararamwithdigital.tech/api/v1/health
+- Operations guide: https://api.kesararamwithdigital.tech/guide
+- Postman collection (manager token): https://api.kesararamwithdigital.tech/api/v1/postman.json
+- Root index: https://api.kesararamwithdigital.tech/
+- Web app: https://app.kesararamwithdigital.tech

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/shifts/close"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "closing_cash_usd": 90.0
+    }
+order: 4000

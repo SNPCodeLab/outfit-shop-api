@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/inventory/bulk-adjust"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "adjustments": [
+        {
+          "variant_id": 180,
+          "quantity": -2,
+          "movement_type": "ADJUSTMENT"
+        }
+      ]
+    }
+order: 1000

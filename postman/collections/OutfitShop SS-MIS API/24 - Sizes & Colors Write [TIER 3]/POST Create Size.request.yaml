@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/clothing-sizes"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "size_name": "XL",
+      "size_order": 5
+    }
+order: 1000

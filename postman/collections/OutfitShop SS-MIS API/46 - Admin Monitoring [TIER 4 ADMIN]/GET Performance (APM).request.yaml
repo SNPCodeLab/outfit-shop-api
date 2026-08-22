@@ -1,0 +1,8 @@
+$kind: http-request
+description: "Honest telemetry: metrics are measured values or null with telemetry_available=false."
+url: "{{base_url}}/admin/performance"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 2000

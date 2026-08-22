@@ -1,0 +1,15 @@
+$kind: http-request
+name: PUT|PATCH Update Variant (partial OK)
+description: Partial updates accepted since the endpoint audit fix.
+url: "{{base_url}}/variants/{{variant_id}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sale_price": 12.0
+    }
+order: 2000

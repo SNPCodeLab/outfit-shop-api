@@ -1,143 +1,96 @@
-# OutfitShop-Backend-API
+# DEVELOPER API
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue)
-![Status](https://img.shields.io/badge/status-operational-success)
-![Framework](https://img.shields.io/badge/framework-Laravel_12-red)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-OutfitShop-Backend-API is an enterprise-grade backend infrastructure designed for fashion retail management. Built on the **Laravel 12** framework, it provides a unified platform for multi-channel product cataloging, persistent shopping cart management, and point-of-sale (POS) operations.
+REST API specification for retail inventory management, point-of-sale transactional checkout, and financial reporting.
 
 ---
 
-## 1. System Classification
+## 1. Core Architecture
 
-The system is architected as a **Monolithic, Headless REST API Backend** implementing a:
-- **TPS / OLTP**: Real-time Transaction Processing System for POS checkouts and inventory mutations.
-- **MIS Reporting**: Management Information System for dashboard analytics and audit ledgers.
-
----
-
-## 2. Core Capabilities
-
-- **Access Control (RBAC)**: 4-tier Role-Based Access Control (Public, Staff, Manager, Admin) via Laravel Sanctum and Spatie Permissions.
-- **Transactional Integrity**: Idempotent request handling and pessimistic row-level locking for high-concurrency checkouts.
-- **Inventory Matrix**: Dynamic variants tracking stock across dimensions (Size $\times$ Color) with immutable audit ledgers.
-- **Financial Auditing**: Real-time asset valuation, multi-currency support (USD/KHR), and automated Z-Report generation.
-- **Omnichannel Logistics**: Bakong KHQR integration, thermal receipt engine, and sales velocity forecasting.
+- **POS Transactions**: High-concurrency checkout with pessimistic row locking and idempotency key protection.
+- **Inventory Matrix**: 2D variant tracking (Size x Color) with 4-tier quantity lifecycle (On Hand, Reserved, Available, Incoming).
+- **Payments**: Dynamic EMVCo KHQR and Bakong payment payloads.
+- **Financial Valuation**: Purchased cost versus resale retail valuation and shift Z-Reports.
+- **Access Control**: 4-tier RBAC (Guest, Cashier, Manager, Admin) via Bearer tokens.
 
 ---
 
-## 3. Technical Architecture
+## 2. API Conventions
 
-- **Framework**: Laravel 12 (Hardened for Serverless/Vercel)
-- **Primary Database**: PostgreSQL 17 (Neon Cloud Managed)
-- **Alternative Database**: Oracle SQL (Enterprise on-premise)
-- **Media Management**: Cloudinary Edge CDN
-- **API Standard**: RESTful JSON with standardized `ApiResponse` envelopes
-
-Detailed documentation is available in the `docs/` folder:
-- [Architecture & Responsibilities](docs/ARCHITECTURE.md)
-- [API Conventions & Endpoints](docs/API.md)
-- [Agent-AI Blueprint & Standards](docs/AGENT_BLUEPRINT.md)
-- [Frontend Integration Guide](docs/frontend_integration_guide.md)
+- **Protocol**: JSON REST over HTTPS
+- **Payload Format**: application/json
+- **Idempotency**: X-Idempotency-Key header on mutations
+- **Authentication**: Authorization: Bearer <token>
 
 ---
 
-## 5. AI Agent & Developer Protocol
+## 3. Response Envelope
 
-This repository is hardened for **AI-Driven Development**. Any AI model interacting with this codebase is bound by the rules defined in the `.agents/` directory.
-
-- **Mandatory First Step**: Load the `agent-ai-core-conventions` skill.
-- **Strict Rule**: No emojis in any project asset.
-- **Workflow**: All changes must follow the **Double-Checkpoint PM/MP Protocol**.
-
----
-
-## 4. Quick Start
-
-### 4.1 Requirements
-- PHP 8.2+ (8.3+ recommended)
-- Composer 2
-- PostgreSQL 16+ (or SQLite for local testing)
-
-### 4.2 Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/SNPCodeLab/outfit-shop-api.git
-cd "OutfitShop MIS and POS API"
-
-# 2. Install dependencies
-composer install
-
-# 3. Setup environment
-cp .env.example .env
-php artisan key:generate
+### Success
+```json
+{
+  "success": true,
+  "status_code": 200,
+  "request_id": "req_uuid",
+  "data": {}
+}
 ```
 
-### 4.3 Database Setup
-
-```bash
-php artisan migrate
-php artisan db:seed              # Seed roles + demo catalog
-php artisan serve
-```
-
-API root: `http://127.0.0.1:8000/api/v1`
-
----
-
-## 5. Environment Configuration
-
-| Variable | Purpose | Default / Example |
-|---|---|---|
-| `APP_KEY` | Encryption key (`php artisan key:generate`) | `base64:...` |
-| `DB_CONNECTION` | Database driver | `pgsql` (Primary) or `oracle` |
-| `DATABASE_URL` | Neon Database connection string | `postgresql://...` |
-| `CACHE_STORE` | Cache driver (use `database` for serverless) | `database` |
-| `SESSION_DRIVER` | Session persistence | `database` |
-| `CLOUDINARY_URL` | Media CDN credentials | `cloudinary://...` |
-
----
-
-## 6. Public API Usage
-
-The API is versioned under `/api/v1`. Public endpoints for storefront integration do not require authentication.
-
-### Core Public Endpoints
-- `GET /api/v1/health` — System health check.
-- `GET /api/v1/products` — Browse product catalog.
-- `GET /api/v1/categories` — List categories.
-- `GET /api/v1/cart` — Manage session-based shopping cart.
-
-```bash
-# Example: Fetch Products
-curl -s -X GET https://api.kesararamwithdigital.tech/api/v1/products \
-  -H "Accept: application/json"
+### Error
+```json
+{
+  "success": false,
+  "status_code": 422,
+  "request_id": "req_uuid",
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "detail": {
+      "fields": []
+    }
+  }
+}
 ```
 
 ---
 
-## 7. Testing & Quality
+## 4. RBAC Matrix
 
-We use PHPUnit for feature and unit testing.
-
-```bash
-# Run tests
-php artisan test
-
-# Run linting (Laravel Pint)
-vendor/bin/pint --test
-```
+| Role | Scope | Rate Limit |
+| :--- | :--- | :--- |
+| **Guest** | Public catalog, variants matrix, cart, wishlist | 30 req/min |
+| **Cashier / Staff** | POS checkout, customer profiles, order history, receipts, KHQR | 100 req/min |
+| **Manager** | Catalog mutations, stock adjustments, purchase orders, valuation | 200 req/min |
+| **Admin** | Employee management, system pulse telemetry, security logs | 300 req/min |
 
 ---
-Copyright 2024–2026 SNPCodeLab. All rights reserved.
 
+## 5. Endpoints
 
+### Catalog & Cart
+- `GET /health` — Uptime and database connectivity
+- `GET /products` — Product catalog with filtering and pagination
+- `GET /products/{id}/matrix` — 2D variant stock matrix
+- `GET /cart` — Active cart session
+- `POST /cart` — Add item to cart
 
+### POS & Operations
+- `POST /auth/login` — Exchange credentials for Bearer token
+- `POST /orders/checkout` — Atomic POS checkout with stock deduction
+- `POST /payments/khqr` — Generate dynamic KHQR payment payload
+- `GET /reports/inventory-valuation` — Cost versus retail inventory valuation
+- `POST /stock-movements/adjust` — Stock adjustment with audit ledger
+- `GET /admin/master-pulse` — APM telemetry and error tracking
 
+---
 
+## 6. Agent Skills & Automation Protocols
 
-
-
-
+- **agent-ai-core-conventions**: Authoritative governance, coding standards, and double-checkpoint workflow.
+- **api-endpoint-audit-protocol**: Automated endpoint validation and CRUD lifecycle tests across all RBAC tiers.
+- **checkpoint-push-protocol**: Pre-push verification of schema integrity, authentication, and style compliance.
+- **csms-backend-enterprise-delivery**: Enterprise API design, transactional locking, and frontend packaging.
+- **neon-primary-connection**: Database connection configuration and pooling rules.
+- **postman-collection-protocol**: Postman collection builder and synchronization rules.
+- **salesbinder-pos-architecture**: 4-tier stock lifecycle and inventory asset valuation formulas.
+- **ssmis-architecture-docs**: Academic and system architecture reporting standards.
+- **ssmis-db-schema**: Authoritative database schema and relational constraints.

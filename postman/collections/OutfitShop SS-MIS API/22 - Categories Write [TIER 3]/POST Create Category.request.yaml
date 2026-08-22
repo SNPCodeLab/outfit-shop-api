@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/categories"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category_name": "New Season Collection",
+      "description": "2026 arrivals"
+    }
+order: 1000

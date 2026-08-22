@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/stock-transfers/{{transfer_id}}/approve"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+order: 4000

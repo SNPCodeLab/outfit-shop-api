@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/estimates/{{estimate_id}}/convert"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "payment_method": "CASH"
+    }
+order: 3000

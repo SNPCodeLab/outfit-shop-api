@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/promotions"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "New Year Sale",
+      "promo_code": "NEWYEAR26",
+      "discount_type": "PERCENTAGE",
+      "discount_value": 15,
+      "start_date": "2026-01-01",
+      "end_date": "2026-01-31"
+    }
+order: 2000
