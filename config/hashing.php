@@ -34,7 +34,7 @@ return [
     */
 
     'bcrypt' => [
-        'rounds' => (int) env('BCRYPT_ROUNDS', 12),
+        'rounds' => max(4, min(31, (int) (env('BCRYPT_ROUNDS', 12) ?: 12))),
         'verify' => env('HASH_VERIFY', true),
     ],
 

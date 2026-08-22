@@ -57,11 +57,15 @@ class FallbackHasher implements Hasher
             );
         }
 
-        $hash = password_hash(
-            (string) $value,
-            $this->algorithm,
-            $this->optionsFor($this->algorithm, $options)
-        );
+        try {
+            $hash = password_hash(
+                (string) $value,
+                $this->algorithm,
+                $this->optionsFor($this->algorithm, $options)
+            );
+        } catch (\Throwable $e) {
+            throw new RuntimeException('Password hashing failed: '.$e->getMessage(), 0, $e);
+        }
 
         if ($hash === false || ! $this->check($value, $hash)) {
             throw new RuntimeException('Password hashing failed on this runtime.');
@@ -100,7 +104,11 @@ class FallbackHasher implements Hasher
     private function probeAlgorithm(): ?string
     {
         foreach ($this->candidates() as $algorithm) {
-            $hash = @password_hash('fallback-hasher-probe', $algorithm, $this->optionsFor($algorithm, []));
+            try {
+                $hash = @password_hash('fallback-hasher-probe', $algorithm, $this->optionsFor($algorithm, []));
+            } catch (\Throwable) {
+                continue;
+            }
 
             if ($hash !== false && password_verify('fallback-hasher-probe', $hash)) {
                 return $algorithm;
@@ -116,6 +124,13 @@ class FallbackHasher implements Hasher
             return $options;
         }
 
-        return array_merge(['cost' => (int) ($options['cost'] ?? $this->options['cost'] ?? 12)], $options);
+        // Clamp defensively: an invalid BCRYPT_ROUNDS in the hosting env
+        // (empty or 0) makes password_hash fail with a fatal cost error -
+        // this was the production breakage behind "Bcrypt hashing not
+        // supported".
+        $cost = (int) ($options['cost'] ?? $this->options['cost'] ?? 12);
+        $cost = ($cost >= 4 && $cost <= 31) ? $cost : 12;
+
+        return array_merge(['cost' => $cost], $options);
     }
 }
