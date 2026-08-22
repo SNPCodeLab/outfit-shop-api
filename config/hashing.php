@@ -9,19 +9,18 @@ return [
     | Default Hash Driver
     |--------------------------------------------------------------------------
     |
-    | This option controls the default hash driver that will be used to hash
-    | passwords for your application. By default, the bcrypt algorithm is
-    | used; however, you remain free to modify this option if you wish.
+    | The "fallback" driver probes the runtime at construction and uses the
+    | first algorithm (bcrypt, argon2id, argon2i) whose hash AND verify
+    | round-trip works - required because the Vercel PHP runtime can verify
+    | bcrypt but cannot create it ("Bcrypt hashing not supported").
+    | Verification is format-agnostic, so existing bcrypt accounts keep
+    | logging in whichever algorithm is selected.
     |
-    | Supported: "bcrypt", "argon", "argon2id"
-    |
-    | Note: On AWS Lambda (Bref PHP runtime), bcrypt may not be available.
-    | The driver is resolved from HASH_DRIVER env var, falling back to bcrypt.
-    | Set HASH_DRIVER=argon2id in Lambda environment variables if bcrypt fails.
+    | Supported: "fallback", "bcrypt", "argon", "argon2id"
     |
     */
 
-    'driver' => env('HASH_DRIVER', 'bcrypt'),
+    'driver' => env('HASH_DRIVER', 'fallback'),
 
     /*
     |--------------------------------------------------------------------------
