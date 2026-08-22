@@ -28,6 +28,7 @@ class StoreEmployeeRequest extends FormRequest
             'password' => 'required|string|min:8',
             'role' => 'required|string|in:ADMIN,MANAGER,CASHIER,STAFF',
             'status' => 'nullable|string|in:ACTIVE,INACTIVE',
+            'avatar_url' => 'nullable|url|max:500',
         ];
     }
 

@@ -17,6 +17,10 @@ class Product extends Model
 
     protected $primaryKey = 'product_id';
 
+    protected $casts = [
+        'image_url' => 'string',
+    ];
+
     protected $fillable = [
         'category_id',
         'brand_id',
@@ -46,15 +50,10 @@ class Product extends Model
         return $value;
     }
 
-    public function getImageUrlAttribute($value): string
+    public function getImageUrlAttribute($value): ?string
     {
         if (empty($value)) {
-            // Priority Cloudinary fallback for KhmeRiel brand
-            if ($this->brand === 'KhmeRiel' || $this->brand === 'KhmeRiel Signature') {
-                return 'https://res.cloudinary.com/od8t271n/image/upload/v1786898754/KhmerRiel.png';
-            }
-
-            return 'https://res.cloudinary.com/od8t271n/image/upload/v1787064621/bleu-SNPCodeLab.png';
+            return null;
         }
 
         return $value;

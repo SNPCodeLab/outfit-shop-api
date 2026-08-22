@@ -7,31 +7,47 @@ namespace App\Http\Middleware;
 use App\Http\Response\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminIpWhitelistMiddleware
 {
     /**
-     * Handle an incoming request and enforce IP whitelisting for high-privilege administrative endpoints.
+     * Enforce IP allow-listing (single IPs or CIDR ranges) on high-privilege
+     * administrative endpoints. Configured via ADMIN_IP_WHITELIST (comma
+     * separated, e.g. "203.0.113.7,10.0.0.0/8"). When unset the feature is
+     * disabled and all IPs pass - once set, enforcement is strict with no
+     * built-in bypasses.
+     *
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $whitelist = config('auth.admin_ip_whitelist', env('ADMIN_IP_WHITELIST'));
 
-        // If no whitelist is configured, allow all
         if (empty($whitelist)) {
             return $next($request);
         }
 
-        $allowedIps = array_map('trim', explode(',', $whitelist));
-        $clientIp = $request->ip();
+        $allowed = array_map('trim', explode(',', (string) $whitelist));
+        $clientIp = (string) $request->ip();
 
-        if (! in_array($clientIp, $allowedIps) && ! in_array('127.0.0.1', $allowedIps) && ! app()->isLocal()) {
-            return ApiResponse::forbidden(
-                'Access restricted: Your IP address is not authorized for administrative operations.'
-            );
+        foreach ($allowed as $entry) {
+            if ($entry === '') {
+                continue;
+            }
+
+            $matches = str_contains($entry, '/')
+                ? IpUtils::checkIp($clientIp, $entry)
+                : hash_equals($entry, $clientIp);
+
+            if ($matches) {
+                return $next($request);
+            }
         }
 
-        return $next($request);
+        return ApiResponse::forbidden(
+            'Access restricted: Your IP address is not authorized for administrative operations.'
+        );
     }
 }

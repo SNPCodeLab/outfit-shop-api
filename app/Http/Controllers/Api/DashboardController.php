@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Response\ApiResponse;
 use App\Models\ApiLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -304,5 +305,19 @@ class DashboardController extends BaseApiController
                 'store_branches' => 2,
             ],
         ];
+    }
+
+    /**
+     * GET /api/v1/alerts/active - active broadcast alerts feed for all
+     * logged-in staff (moved out of the routes file; was an inline closure).
+     */
+    public function activeAlerts(): JsonResponse
+    {
+        $alerts = DB::table('system_broadcast_alerts')
+            ->whereRaw('is_active is true')
+            ->orderBy('alert_id', 'DESC')
+            ->get();
+
+        return ApiResponse::success($alerts, 'Active broadcast alerts retrieved');
     }
 }

@@ -123,7 +123,7 @@ class POSCheckoutApiTest extends TestCase
                 'payment_method' => 'CASH',
             ]);
 
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJsonPath('success', false);
 
         // Verify stock remains untouched at 2

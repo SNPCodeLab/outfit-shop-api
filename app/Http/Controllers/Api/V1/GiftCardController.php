@@ -15,10 +15,14 @@ class GiftCardController extends BaseApiController
 {
     /**
      * Check gift card balance and validity.
-     * Public - no authentication required.
+     * GET /gift-cards/{code} (RESTful) or legacy POST /gift-cards/check.
      */
-    public function check(Request $request): JsonResponse
+    public function check(Request $request, ?string $code = null): JsonResponse
     {
+        if ($code !== null) {
+            $request->merge(['card_code' => $code]);
+        }
+
         $request->validate([
             'card_code' => 'required|string',
         ]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Jobs\ProcessImageUploadJob;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\CloudinaryService;
@@ -71,6 +72,13 @@ class ProductImageController extends BaseApiController
         }
 
         $image = ProductImage::create($validated);
+
+        // Offload WebP optimization / derivative processing to the queue
+        ProcessImageUploadJob::dispatch(
+            $image->image_id,
+            (string) ($validated['image_public_id'] ?? ''),
+            (string) $validated['image_url']
+        );
 
         return $this->createdResponse(
             $image,

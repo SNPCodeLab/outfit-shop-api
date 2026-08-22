@@ -55,9 +55,9 @@ class AuthApiTest extends TestCase
             'password' => 'WrongPassword',
         ]);
 
-        $response->assertStatus(422)
+        $response->assertStatus(401)
             ->assertJsonPath('success', false)
-            ->assertJsonPath('error.code', 'VALIDATION_ERROR');
+            ->assertJsonPath('error.code', 'AUTHENTICATION_FAILED');
     }
 
     public function test_authenticated_employee_can_fetch_profile_and_logout(): void

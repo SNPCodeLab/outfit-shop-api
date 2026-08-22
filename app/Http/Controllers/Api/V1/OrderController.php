@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\PosRuleException;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\SaleHeader;
 use App\Services\POSService;
-use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseApiController
 {
@@ -58,7 +60,7 @@ class OrderController extends BaseApiController
             $query->where('customer_id', $customerId);
         }
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = $this->perPage($request);
         $orders = $query->orderBy('sale_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($orders, 'Orders history retrieved successfully');
@@ -109,8 +111,15 @@ class OrderController extends BaseApiController
                 : 'Idempotent request: Existing order returned';
 
             return $this->successResponse($order, $msg, $httpCode);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ERR_CHECKOUT_FAILED');
+        } catch (PosRuleException $e) {
+            return $this->errorResponse($e->getMessage(), 422, 'ERR_CHECKOUT_RULE_VIOLATION');
+        } catch (\Throwable $e) {
+            Log::error('Checkout failed unexpectedly', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->serverErrorResponse('Checkout failed due to an unexpected server error.');
         }
     }
 
@@ -137,6 +146,12 @@ class OrderController extends BaseApiController
      */
     public function void(Request $request, int $id): JsonResponse
     {
+        // Token-ability defense in depth on top of the role gate: the token
+        // itself must carry sales.void (legacy '*' tokens still satisfy this).
+        if (! $request->user()?->tokenCan('sales.void')) {
+            return $this->forbiddenResponse('This token is not authorized to void sales.');
+        }
+
         $request->validate([
             'reason' => 'nullable|string|max:255',
         ]);
@@ -146,8 +161,18 @@ class OrderController extends BaseApiController
             $order = $this->posService->voidSale($id, $employeeId, $request->reason);
 
             return $this->successResponse($order, "Order #{$id} voided successfully and inventory restored");
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'ORDER_VOID_FAILED');
+        } catch (PosRuleException $e) {
+            return $this->errorResponse($e->getMessage(), 422, 'ERR_ORDER_VOID_RULE_VIOLATION');
+        } catch (ModelNotFoundException $e) {
+            throw $e; // rendered as the standard 404 envelope by the exception handler
+        } catch (\Throwable $e) {
+            Log::error('Order void failed unexpectedly', [
+                'order_id' => $id,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->serverErrorResponse("Voiding order #{$id} failed due to an unexpected server error.");
         }
     }
 }

@@ -49,7 +49,7 @@ class InvoiceEstimateController extends BaseApiController
             $query->whereDate('sale_date', '<=', $toDate);
         }
 
-        $records = $query->orderBy('sale_id', 'desc')->paginate((int) ($request->input('per_page', 20)));
+        $records = $query->orderBy('sale_id', 'desc')->paginate($this->perPage($request));
 
         // Financial Totals Summary
         $totalInvoiced = (float) SaleHeader::where('status', '!=', 'VOIDED')->sum('grand_total');
@@ -288,6 +288,7 @@ class InvoiceEstimateController extends BaseApiController
             $productName = htmlspecialchars($variant->product->product_name ?? 'Apparel Item');
             $size = htmlspecialchars($variant->size->size_name ?? 'STD');
             $color = htmlspecialchars($variant->color->color_name ?? 'Standard');
+            $sku = htmlspecialchars($variant->sku ?? '');
             $qty = $detail->quantity;
             $unitPrice = number_format($detail->unit_price, 2);
             $lineTotal = number_format($detail->sub_total, 2);
@@ -296,7 +297,7 @@ class InvoiceEstimateController extends BaseApiController
             <tr>
                 <td style='padding: 10px 14px; border-bottom: 1px solid #e4e4e7;'>
                     <div style='font-weight: 700; color: #09090b; font-size: 13px;'>{$productName}</div>
-                    <div style='font-size: 11px; color: #71717a;'>Size: {$size} • Color: {$color} • SKU: {$variant->sku}</div>
+                    <div style='font-size: 11px; color: #71717a;'>Size: {$size} • Color: {$color} • SKU: {$sku}</div>
                 </td>
                 <td style='padding: 10px 14px; text-align: center; border-bottom: 1px solid #e4e4e7; font-weight: 600;'>{$qty}</td>
                 <td style='padding: 10px 14px; text-align: right; border-bottom: 1px solid #e4e4e7; font-family: ui-monospace, monospace;'>\${$unitPrice}</td>

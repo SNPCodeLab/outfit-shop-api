@@ -17,6 +17,7 @@ class CustomerController extends BaseApiController
         $query = Customer::query();
 
         if ($search = $request->input('q') ?? $request->input('search')) {
+            $search = $this->escapeLike((string) $search);
             $query->where(function ($q) use ($search) {
                 $q->where('customer_name', 'ILIKE', "%{$search}%")
                     ->orWhere('phone', 'ILIKE', "%{$search}%")
@@ -24,7 +25,7 @@ class CustomerController extends BaseApiController
             });
         }
 
-        $perPage = (int) $request->input('per_page', 50);
+        $perPage = $this->perPage($request, 50);
         $customers = $query->orderBy('customer_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($customers, 'Customers retrieved successfully');
@@ -33,7 +34,7 @@ class CustomerController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:150',
+            'customer_name' => 'sometimes|required|string|max:150',
             'gender' => 'nullable|string',
             'phone' => 'nullable|string',
             'email' => 'nullable|email',
@@ -60,7 +61,7 @@ class CustomerController extends BaseApiController
         $old = $customer->toArray();
 
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:150',
+            'customer_name' => 'sometimes|required|string|max:150',
             'gender' => 'nullable|string',
             'phone' => 'nullable|string',
             'email' => 'nullable|email',

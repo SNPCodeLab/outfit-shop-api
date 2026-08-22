@@ -28,7 +28,7 @@ class ShippingOrderController extends BaseApiController
             $query->where('fulfillment_type', strtoupper($type));
         }
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = $this->perPage($request);
         $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return $this->successResponse($orders, 'Fulfillment and shipping orders retrieved successfully');

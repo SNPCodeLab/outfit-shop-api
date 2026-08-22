@@ -36,3 +36,29 @@ All error responses return standard HTTP status codes along with a specific mach
 | `422` | `ERR_VALIDATION_FAILED` | Laravel request validation failed on payload fields | Highlight specific input fields in red using the `errors` dictionary |
 | `429` | `ERR_TOO_MANY_REQUESTS` | Rate limit exceeded (e.g. > 10 login attempts/min) | Display exponential backoff timer countdown |
 | `500` | `ERR_INTERNAL_SERVER` | Unhandled database or server exception | Prompt user to retry; log `request_id` to error reporting system |
+
+---
+
+## v1.2 Standards Hardening — New Error Codes (2026-08-22)
+
+Codes introduced by the REST-standards, security, and identity rounds. All use
+the standard envelope (`success:false`, `error.code`, `error.detail`).
+
+| HTTP Status | `error.code` | Trigger Condition | Recommended Frontend Action |
+| :---: | :--- | :--- | :--- |
+| `401` | `AUTHENTICATION_FAILED` | Bad credentials at login (generic message - no field hints), missing/invalid Bearer token, or invalid 2FA code context | Clear token, redirect to login; do not reveal which field failed |
+| `401` | `INVALID_TWO_FACTOR_CODE` | Submitted 2FA code does not match the TOTP secret (real RFC 6238 verification, ±30s window) | Keep user on 2FA screen, allow retry; code rotates every 30s |
+| `401` | `INVALID_RESET_TOKEN` | Password-reset token wrong, expired, or already used (single-use) | Restart the forgot-password flow |
+| `403` | `FORBIDDEN_ACCESS` | Role/permission/ability gate rejected the request (e.g. STAFF writing customers, token lacking `sales.void`) | Hide the action; surface "insufficient permission" |
+| `409` | `DUPLICATE_BRANCH_CODE` | Store branch create with an existing `branch_code` | Offer to open the existing branch record |
+| `409` | `TWO_FACTOR_NOT_CONFIGURED` | Verify-2FA called before setup-2FA | Direct user to POST `/auth/2fa/setup` first |
+| `422` | `ERR_CHECKOUT_RULE_VIOLATION` | POS business rule at checkout: insufficient stock, invalid quantity, unknown variant, voiding an already-voided sale/estimate | Show the business message (e.g. "Insufficient stock for SKU [...]"), correct and retry |
+| `422` | `VALIDATION_ERROR` | Request validation failed; `error.detail.fields[]` lists each field, rule, and message | Inline field errors next to inputs |
+| `423` | `ACCOUNT_LOCKED` | 10 failed logins; 15-minute lockout | Show lockout countdown; do not allow retry until release |
+| `429` | `TOO_MANY_REQUESTS` | Rate limit exceeded (PUBLIC 30 / STAFF 50 / CASHIER 100 / MANAGER 200 / ADMIN 300 per minute); `Retry-After` header present | Back off for `Retry-After` seconds; queue retries |
+| `500` | `INTERNAL_SERVER_ERROR` | Unexpected server fault (generic message in production; debug detail only when APP_DEBUG) | Retry once, then report `request_id` to ops |
+
+Legacy aliases (`/sales/*`, `/shipping/*`, `/cart/clear`, `/gift-cards/check`,
+`/gift-cards/issue`, `GET /payments/khqr`, `/status`, `/docs`,
+`/compliance/*`) now respond with `Deprecation: true` and `Sunset` headers
+(sunset date 2027-12-31) — migrate clients to the canonical routes.

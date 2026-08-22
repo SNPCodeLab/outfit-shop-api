@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Jobs\BulkStockOpnameJob;
 use App\Models\StockMovement;
+use App\Services\AuditLogService;
 use App\Services\InventoryService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -51,7 +53,7 @@ class StockMovementController extends BaseApiController
             $query->whereDate('movement_date', '<=', $toDate);
         }
 
-        $perPage = (int) $request->input('per_page', 50);
+        $perPage = $this->perPage($request, 50);
         $movements = $query->orderBy('movement_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($movements, 'Stock movement audit ledger retrieved');
@@ -98,5 +100,48 @@ class StockMovementController extends BaseApiController
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), 400, 'STOCK_ADJUSTMENT_FAILED');
         }
+    }
+
+    /**
+     * POST /api/v1/inventory/stock-opname
+     *
+     * Queue a full physical stock count (opname) for background execution:
+     * each variant's system quantity is reconciled against the counted
+     * physical quantity. Returns 202 immediately; large counts never block
+     * the POS terminal.
+     */
+    public function stockOpname(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'session_reference' => 'required|string|max:100',
+            'audit_items' => 'required|array|min:1|max:1000',
+            'audit_items.*.variant_id' => 'required|integer|exists:product_variants,variant_id',
+            'audit_items.*.physical_count' => 'required|integer|min:0',
+        ]);
+
+        $employeeId = $request->user()->employee_id ?? $request->user()->id;
+
+        BulkStockOpnameJob::dispatch(
+            $validated['audit_items'],
+            $employeeId,
+            $validated['session_reference']
+        );
+
+        if (class_exists(AuditLogService::class)) {
+            AuditLogService::log(
+                'STOCK_OPNAME_QUEUED',
+                'InventorySession',
+                $validated['session_reference'],
+                null,
+                ['items' => count($validated['audit_items'])],
+                $employeeId
+            );
+        }
+
+        return $this->acceptedResponse([
+            'session_reference' => $validated['session_reference'],
+            'items_submitted' => count($validated['audit_items']),
+            'status' => 'QUEUED',
+        ], 'Stock opname accepted and queued for background reconciliation');
     }
 }

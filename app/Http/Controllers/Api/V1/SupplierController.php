@@ -27,7 +27,7 @@ class SupplierController extends BaseApiController
             $query->where('status', strtoupper($status));
         }
 
-        $perPage = (int) $request->input('per_page', 50);
+        $perPage = $this->perPage($request, 50);
         $suppliers = $query->orderBy('supplier_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($suppliers, 'Suppliers retrieved successfully');
@@ -36,7 +36,7 @@ class SupplierController extends BaseApiController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'supplier_name' => 'required|string|max:150',
+            'supplier_name' => 'sometimes|required|string|max:150',
             'phone' => 'nullable|string',
             'email' => 'nullable|email',
             'address' => 'nullable|string',
@@ -63,7 +63,7 @@ class SupplierController extends BaseApiController
         $old = $supplier->toArray();
 
         $validated = $request->validate([
-            'supplier_name' => 'required|string|max:150',
+            'supplier_name' => 'sometimes|required|string|max:150',
             'phone' => 'nullable|string',
             'email' => 'nullable|email',
             'address' => 'nullable|string',

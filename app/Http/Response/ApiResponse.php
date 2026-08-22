@@ -170,6 +170,13 @@ class ApiResponse
         $requestId = self::resolveRequestId();
         $processingTime = self::processingTimeMs();
 
+        // Debug payloads (stack traces, file paths) are stripped unless the
+        // app runs with APP_DEBUG=true - enforced here so no caller can leak
+        // internals by accident regardless of where the error is raised.
+        if ($debug !== null && ! config('app.debug')) {
+            $debug = null;
+        }
+
         $envelope = [
             'success' => false,
             'status_code' => $statusCode,
@@ -180,7 +187,7 @@ class ApiResponse
                 'type' => self::errorType($statusCode, $errorCode),
                 'message' => $message,
                 'detail' => $detail,
-                'debug' => $debug, // Temporarily forced for live troubleshooting
+                'debug' => $debug,
             ],
             'meta' => [
                 'system' => config('api.system_name', 'OutfitShop-Backend-API'),

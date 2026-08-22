@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\PosRuleException;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\Sale\CheckoutRequest;
 use App\Models\SaleHeader;
 use App\Services\POSService;
-use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SaleController extends BaseApiController
 {
@@ -59,7 +61,7 @@ class SaleController extends BaseApiController
             $query->where('customer_id', $customerId);
         }
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = $this->perPage($request);
         $sales = $query->orderBy('sale_id', 'desc')->paginate($perPage);
 
         return $this->successResponse($sales, 'Sales history retrieved');
@@ -98,8 +100,15 @@ class SaleController extends BaseApiController
                 : 'Idempotent request: Existing transaction returned';
 
             return $this->successResponse($sale, $msg, $httpCode);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'CHECKOUT_FAILED');
+        } catch (PosRuleException $e) {
+            return $this->errorResponse($e->getMessage(), 422, 'ERR_CHECKOUT_RULE_VIOLATION');
+        } catch (\Throwable $e) {
+            Log::error('Checkout failed unexpectedly', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->serverErrorResponse('Checkout failed due to an unexpected server error.');
         }
     }
 
@@ -135,8 +144,18 @@ class SaleController extends BaseApiController
             $sale = $this->posService->voidSale($id, $employeeId, $request->reason);
 
             return $this->successResponse($sale, "Sale #{$id} voided successfully and inventory restored");
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400, 'SALE_VOID_FAILED');
+        } catch (PosRuleException $e) {
+            return $this->errorResponse($e->getMessage(), 422, 'ERR_SALE_VOID_RULE_VIOLATION');
+        } catch (ModelNotFoundException $e) {
+            throw $e; // rendered as the standard 404 envelope by the exception handler
+        } catch (\Throwable $e) {
+            Log::error('Sale void failed unexpectedly', [
+                'sale_id' => $id,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->serverErrorResponse("Voiding sale #{$id} failed due to an unexpected server error.");
         }
     }
 }

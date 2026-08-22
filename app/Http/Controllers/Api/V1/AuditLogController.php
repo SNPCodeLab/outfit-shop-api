@@ -7,12 +7,14 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\AuditLog;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AuditLogController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $logs = AuditLog::orderBy('created_at', 'desc')->paginate(50);
+        $logs = AuditLog::orderBy('created_at', 'desc')
+            ->paginate($this->perPage($request, 50));
 
         return $this->successResponse($logs, 'System audit logs');
     }
