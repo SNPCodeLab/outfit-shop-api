@@ -11,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\PurchaseHeader;
 use App\Models\SaleHeader;
 use App\Models\Supplier;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -261,5 +262,99 @@ class ReportController extends BaseApiController
             'net_cash_flow_usd' => $netCashFlow,
             'inflows_by_method' => $inflowsByMethod,
         ], 'Store cash flow report retrieved');
+    }
+
+    /**
+     * 8. GET /api/v1/reports/sales-performance
+     * Compute total sales, order count, average order value (AOV), and daily chart points for a given timeframe.
+     *
+     * Query params:
+     *   ?timeframe=30d   — 7d, 14d, 30d, 90d, 1y, today, this_month (default: 30d)
+     *   ?start_date=YYYY-MM-DD
+     *   ?end_date=YYYY-MM-DD
+     */
+    public function salesPerformance(Request $request): JsonResponse
+    {
+        $timeframe = strtolower((string) $request->input('timeframe', '30d'));
+        $now = now();
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+            $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+        } else {
+            $endDate = $now->copy()->endOfDay();
+            $startDate = match ($timeframe) {
+                'today', '1d', '1' => $now->copy()->startOfDay(),
+                'yesterday' => $now->copy()->subDay()->startOfDay(),
+                '7d', '7' => $now->copy()->subDays(6)->startOfDay(),
+                '14d', '14' => $now->copy()->subDays(13)->startOfDay(),
+                '90d', '90' => $now->copy()->subDays(89)->startOfDay(),
+                '1y', '365d', '365' => $now->copy()->subYear()->startOfDay(),
+                'this_month', 'month' => $now->copy()->startOfMonth(),
+                default => (is_numeric($timeframe) && (int) $timeframe > 0)
+                    ? $now->copy()->subDays((int) $timeframe - 1)->startOfDay()
+                    : $now->copy()->subDays(29)->startOfDay(),
+            };
+        }
+
+        $driver = DB::connection()->getDriverName();
+        $dateExpr = $driver === 'pgsql'
+            ? "TO_CHAR(sale_date, 'YYYY-MM-DD')"
+            : 'DATE(sale_date)';
+
+        // Fetch completed sales grouped by day within date range
+        $sales = SaleHeader::where('status', 'COMPLETED')
+            ->whereBetween('sale_date', [$startDate, $endDate])
+            ->select(
+                DB::raw("{$dateExpr} as date"),
+                DB::raw('COUNT(sale_id) as orders'),
+                DB::raw('SUM(grand_total) as revenue')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get()
+            ->keyBy('date');
+
+        // Build continuous daily chart points
+        $chartPoints = [];
+        $current = $startDate->copy()->startOfDay();
+        $end = $endDate->copy()->startOfDay();
+        $totalSales = 0.0;
+        $totalOrders = 0;
+
+        while ($current->lte($end)) {
+            $dateKey = $current->toDateString();
+            $dayData = $sales->get($dateKey);
+            $dayRevenue = $dayData ? (float) $dayData->revenue : 0.0;
+            $dayOrders = $dayData ? (int) $dayData->orders : 0;
+
+            $chartPoints[] = [
+                'date' => $dateKey,
+                'revenue' => round($dayRevenue, 2),
+                'orders' => $dayOrders,
+            ];
+
+            $totalSales += $dayRevenue;
+            $totalOrders += $dayOrders;
+
+            $current->addDay();
+        }
+
+        $totalSales = round($totalSales, 2);
+        $aov = $totalOrders > 0 ? round($totalSales / $totalOrders, 2) : 0.0;
+
+        return $this->successResponse([
+            'timeframe' => $timeframe,
+            'start_date' => $startDate->toDateString(),
+            'end_date' => $endDate->toDateString(),
+            'total_sales' => $totalSales,
+            'total_revenue' => $totalSales,
+            'order_count' => $totalOrders,
+            'total_orders' => $totalOrders,
+            'average_order_value' => $aov,
+            'aov' => $aov,
+            'daily_chart_points' => $chartPoints,
+            'chart_points' => $chartPoints,
+        ], 'Sales performance report retrieved');
     }
 }

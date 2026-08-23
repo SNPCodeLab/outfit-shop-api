@@ -394,6 +394,7 @@ Route::prefix('v1')->group(function () {
 
             // Advanced MIS Financial & Operational Reports
             Route::get('/reports/sales', [ReportController::class, 'sales']);
+            Route::get('/reports/sales-performance', [ReportController::class, 'salesPerformance']);
             Route::get('/reports/inventory-valuation', [ReportController::class, 'inventoryValuation']);
             Route::get('/reports/stock-aging', [ReportController::class, 'stockAging']);
             Route::get('/reports/customer-purchase-history', [ReportController::class, 'customerPurchaseHistory']);

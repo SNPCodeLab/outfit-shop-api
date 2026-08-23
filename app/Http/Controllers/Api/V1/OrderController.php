@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\PosRuleException;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\V1\OrderResource;
 use App\Models\SaleHeader;
 use App\Services\POSService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -34,6 +35,8 @@ class OrderController extends BaseApiController
             'customer',
             'employee',
             'details.variant.product',
+            'details.variant.size',
+            'details.variant.color',
             'payments',
         ]);
 
@@ -62,6 +65,7 @@ class OrderController extends BaseApiController
 
         $perPage = $this->perPage($request);
         $orders = $query->orderBy('sale_id', 'desc')->paginate($perPage);
+        $orders->through(fn ($order) => new OrderResource($order));
 
         return $this->successResponse($orders, 'Orders history retrieved successfully');
     }
@@ -110,7 +114,18 @@ class OrderController extends BaseApiController
                 ? 'Order checkout completed successfully'
                 : 'Idempotent request: Existing order returned';
 
-            return $this->successResponse($order, $msg, $httpCode);
+            return $this->successResponse(
+                new OrderResource($order->loadMissing([
+                    'customer',
+                    'employee',
+                    'details.variant.product',
+                    'details.variant.size',
+                    'details.variant.color',
+                    'payments',
+                ])),
+                $msg,
+                $httpCode
+            );
         } catch (PosRuleException $e) {
             return $this->errorResponse($e->getMessage(), 422, 'ERR_CHECKOUT_RULE_VIOLATION');
         } catch (\Throwable $e) {
@@ -137,7 +152,7 @@ class OrderController extends BaseApiController
             'payments',
         ])->findOrFail($id);
 
-        return $this->successResponse($order, 'Order invoice receipt details');
+        return $this->successResponse(new OrderResource($order), 'Order invoice receipt details');
     }
 
     /**
@@ -160,7 +175,17 @@ class OrderController extends BaseApiController
             $employeeId = $request->user()->employee_id ?? $request->user()->id;
             $order = $this->posService->voidSale($id, $employeeId, $request->reason);
 
-            return $this->successResponse($order, "Order #{$id} voided successfully and inventory restored");
+            return $this->successResponse(
+                new OrderResource($order->loadMissing([
+                    'customer',
+                    'employee',
+                    'details.variant.product',
+                    'details.variant.size',
+                    'details.variant.color',
+                    'payments',
+                ])),
+                "Order #{$id} voided successfully and inventory restored"
+            );
         } catch (PosRuleException $e) {
             return $this->errorResponse($e->getMessage(), 422, 'ERR_ORDER_VOID_RULE_VIOLATION');
         } catch (ModelNotFoundException $e) {

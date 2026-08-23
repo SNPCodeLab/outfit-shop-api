@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\V1\StockMovementResource;
 use App\Jobs\BulkStockOpnameJob;
 use App\Models\StockMovement;
 use App\Services\AuditLogService;
@@ -33,6 +34,7 @@ class StockMovementController extends BaseApiController
             'variant.product',
             'variant.size',
             'variant.color',
+            'employee',
         ]);
 
         // Filter by variant
@@ -55,6 +57,7 @@ class StockMovementController extends BaseApiController
 
         $perPage = $this->perPage($request, 50);
         $movements = $query->orderBy('movement_id', 'desc')->paginate($perPage);
+        $movements->through(fn ($item) => new StockMovementResource($item));
 
         return $this->successResponse($movements, 'Stock movement audit ledger retrieved');
     }
@@ -94,7 +97,7 @@ class StockMovementController extends BaseApiController
             );
 
             return $this->successResponse(
-                $movement->load(['variant.product', 'variant.size', 'variant.color']),
+                new StockMovementResource($movement->load(['variant.product', 'variant.size', 'variant.color', 'employee'])),
                 'Inventory stock adjusted successfully'
             );
         } catch (Exception $e) {
