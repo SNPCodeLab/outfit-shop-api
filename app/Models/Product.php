@@ -40,17 +40,32 @@ class Product extends Model
     ];
 
     /**
-     * Truncate product name to 4 words automatically.
+     * Truncate product name to 3 words, strip alphanumeric codes, and ensure a valid name.
      */
     public function setProductNameAttribute($value): void
     {
         if ($value) {
+            // 1. Strip alphanumeric codes (words containing digits)
+            // e.g., "Shearling Track Top Hul10wcx1858" -> "Shearling Track Top"
             $words = explode(' ', $value);
-            if (count($words) > 4) {
-                $value = implode(' ', array_slice($words, 0, 4));
+            $cleanWords = array_filter($words, function ($word) {
+                return ! preg_match('/\d/', $word);
+            });
+
+            // 2. Truncate to 3 words
+            if (count($cleanWords) > 3) {
+                $cleanWords = array_slice($cleanWords, 0, 3);
             }
+
+            $value = implode(' ', $cleanWords);
         }
-        $this->attributes['product_name'] = $value;
+
+        // 3. Fallback for empty or all-code names
+        if (empty(trim($value))) {
+            $value = 'Premium Product Item';
+        }
+
+        $this->attributes['product_name'] = trim($value);
     }
 
     /**
