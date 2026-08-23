@@ -14,6 +14,13 @@ class Color extends Model
 
     protected $primaryKey = 'color_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->color_id;
+    }
+
     protected $fillable = [
         'color_name',
         'hex_code',

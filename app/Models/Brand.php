@@ -18,6 +18,13 @@ class Brand extends Model
 
     protected $primaryKey = 'brand_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->brand_id;
+    }
+
     protected $fillable = [
         'brand_name',
         'slug',

@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // 1. Raw SQL Clean (Remove words with digits and truncate to 3 words)
         DB::statement("UPDATE products SET product_name = trim(regexp_replace(product_name, '\S*\d\S*', '', 'g'))");
         DB::statement("UPDATE products SET product_name = array_to_string((string_to_array(trim(regexp_replace(product_name, '\s+', ' ', 'g')), ' '))[1:3], ' ')");

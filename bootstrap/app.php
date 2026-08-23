@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\AdminIpWhitelistMiddleware;
 use App\Http\Middleware\ApiDeprecationHeaderMiddleware;
+use App\Http\Middleware\CambodiaOnlyMiddleware;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\LogApiRequests;
 use App\Http\Middleware\SecurityHeadersMiddleware;
@@ -39,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'deprecated' => ApiDeprecationHeaderMiddleware::class,
             'admin.ip' => AdminIpWhitelistMiddleware::class,
+            'cambodia.only' => CambodiaOnlyMiddleware::class,
             'ability' => CheckForAnyAbility::class,
             'abilities' => CheckAbilities::class,
         ]);

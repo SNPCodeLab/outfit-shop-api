@@ -18,6 +18,13 @@ class GiftCard extends Model
 
     protected $primaryKey = 'card_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->card_id;
+    }
+
     protected $fillable = [
         'card_code',
         'pin_hash',

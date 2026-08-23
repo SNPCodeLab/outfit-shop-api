@@ -15,6 +15,13 @@ class Category extends Model
 
     protected $primaryKey = 'category_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->category_id;
+    }
+
     protected $fillable = [
         'parent_id',
         'category_name',

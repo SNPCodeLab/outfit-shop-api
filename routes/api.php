@@ -102,8 +102,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/currencies/convert', [CurrencyController::class, 'convert']);
 
         // Authentication — rate-limited to prevent brute-force (5 attempts / min)
+        // cambodia.only: login is restricted to Cambodian IP space only.
         Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
-            Route::post('/login', [AuthController::class, 'login'])->name('login');
+            Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('cambodia.only');
             Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot-password');
             Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset-password');
         });
@@ -280,6 +281,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/dashboard/stats', [DashboardController::class,     'stats']);
             Route::get('/inventory/restock-recommendations', [InventoryForecastingController::class, 'restockRecommendations']);
             Route::post('/purchases/auto-generate', [InventoryForecastingController::class, 'autoGeneratePurchaseOrder']);
+
+            // Gift Card Management
+            Route::get('/gift-cards', [GiftCardController::class, 'index']);
 
             // Catalog Write Access
             Route::post('/categories', [CategoryController::class,      'store']);

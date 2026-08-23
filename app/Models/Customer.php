@@ -15,6 +15,13 @@ class Customer extends Model
 
     protected $primaryKey = 'customer_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->customer_id;
+    }
+
     protected $fillable = [
         'customer_name',
         'gender',

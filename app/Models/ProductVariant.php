@@ -16,6 +16,13 @@ class ProductVariant extends Model
 
     protected $primaryKey = 'variant_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->variant_id;
+    }
+
     protected $fillable = [
         'product_id',
         'size_id',

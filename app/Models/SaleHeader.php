@@ -15,6 +15,13 @@ class SaleHeader extends Model
 
     protected $primaryKey = 'sale_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->sale_id;
+    }
+
     protected $fillable = [
         'invoice_no',
         'store_id',

@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Use direct PostgreSQL array operations to truncate to 4 words
         // split_part or array_to_string(string_to_array(...)[1:4])
         DB::statement("

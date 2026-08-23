@@ -18,6 +18,13 @@ class Employee extends Authenticatable
 
     protected $primaryKey = 'employee_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->employee_id;
+    }
+
     protected $fillable = [
         'employee_name',
         'gender',

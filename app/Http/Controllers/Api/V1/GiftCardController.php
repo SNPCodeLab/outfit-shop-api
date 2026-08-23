@@ -14,6 +14,29 @@ use Illuminate\Support\Str;
 class GiftCardController extends BaseApiController
 {
     /**
+     * List all gift cards with pagination and basic filtering.
+     * Restricted to MANAGER / ADMIN via routes.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = GiftCard::query()->with('purchaser');
+
+        if ($search = $request->input('search')) {
+            $query->where('card_code', 'LIKE', '%'.strtoupper($search).'%');
+        }
+
+        if ($status = $request->input('status')) {
+            $isActive = strtoupper($status) === 'ACTIVE';
+            $query->where('is_active', $isActive);
+        }
+
+        $perPage = $this->perPage($request);
+        $cards = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        return $this->successResponse($cards, 'Gift card directory retrieved successfully');
+    }
+
+    /**
      * Check gift card balance and validity.
      * GET /gift-cards/{code} (RESTful) or legacy POST /gift-cards/check.
      */

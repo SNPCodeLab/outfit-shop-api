@@ -10,12 +10,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'product_id';
+
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->product_id;
+    }
 
     protected $casts = [
         'image_url' => 'string',
@@ -73,6 +81,10 @@ class Product extends Model
      */
     public function scopeWithBrandPriority($query)
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return $query->orderBy('brand', 'asc');
+        }
+
         return $query->orderByRaw("
             CASE
                 WHEN brand ILIKE '%Louis Vuitton%' OR brand ILIKE '%LV%' THEN 1

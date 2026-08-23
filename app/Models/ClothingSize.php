@@ -14,6 +14,13 @@ class ClothingSize extends Model
 
     protected $primaryKey = 'size_id';
 
+    protected $appends = ['id'];
+
+    public function getIdAttribute(): int
+    {
+        return (int) $this->size_id;
+    }
+
     protected $fillable = [
         'size_name',
         'size_code',

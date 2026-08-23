@@ -100,16 +100,8 @@ class DashboardController extends BaseApiController
     public function rolePulse(Request $request): JsonResponse
     {
         $user = $request->user();
-        $role = 'admin';
-
-        if ($user) {
-            $userRoles = DB::table('model_has_roles')
-                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-                ->where('model_has_roles.model_id', $user->id)
-                ->pluck('roles.name');
-
-            $role = $userRoles->first() ?? ($user->is_admin ? 'admin' : 'cashier');
-        }
+        // Use the role string directly from the employee model
+        $role = strtolower($user->role ?? 'admin');
 
         $today = Carbon::today();
 
