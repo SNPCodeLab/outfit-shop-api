@@ -39,6 +39,35 @@ class Product extends Model
         'status',
     ];
 
+    /**
+     * Truncate product name to 4 words automatically.
+     */
+    public function setProductNameAttribute($value): void
+    {
+        if ($value) {
+            $words = explode(' ', $value);
+            if (count($words) > 4) {
+                $value = implode(' ', array_slice($words, 0, 4));
+            }
+        }
+        $this->attributes['product_name'] = $value;
+    }
+
+    /**
+     * Priority scope for brands: LV > Puma > Gucci > Others.
+     */
+    public function scopeWithBrandPriority($query)
+    {
+        return $query->orderByRaw("
+            CASE
+                WHEN brand ILIKE '%Louis Vuitton%' OR brand ILIKE '%LV%' THEN 1
+                WHEN brand ILIKE '%Puma%' THEN 2
+                WHEN brand ILIKE '%Gucci%' THEN 3
+                ELSE 4
+            END ASC
+        ");
+    }
+
     public function getDescriptionAttribute($value): string
     {
         if (empty($value)) {

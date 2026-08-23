@@ -1,0 +1,15 @@
+workspace:
+  id: cdc247b9-91b1-4b28-89be-186641c734ea
+
+localResources:
+  collections:
+    - ../postman_collection.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/OutfitShop-Backend-API — Master Collection: 41829261-2bbb925b-8233-4078-adb3-d9b4dfdc7b66
+    ../postman/collections/OutfitShop SS-MIS API: ebab415e-ef53-488a-a49e-f108e9fe5e6f
+  globals:
+    ../postman/globals/workspace.globals.yaml: 552478f8-8ce9-467a-88d4-81d594a06d39

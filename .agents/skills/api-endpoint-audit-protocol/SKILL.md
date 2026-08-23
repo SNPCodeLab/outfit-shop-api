@@ -111,9 +111,8 @@ pipeline). Watch with `gh run watch`/`gh run view`. After green:
 
 1. Re-run the failed steps against production - confirm each fixed
    endpoint returns the expected status.
-2. For hashing/auth fixes, prove the FULL loop (create account -> reset
-   password -> login with the runtime-created hash).
-3. Clean up every TESTAUDIT-* entity via tinker soft-deletes.
+2. For hashing/auth fixes, verify against the 4 permanent locked test accounts (Admin, Manager, Cashier, Staff).
+3. Strictly adhere to `static-test-rbac-protocol`: never create or leave disposable test employees in the database.
 
 ## Phase 6 - Report
 

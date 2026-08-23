@@ -146,7 +146,7 @@ class ProductController extends BaseApiController
                 }
             }
         } else {
-            $query->orderBy('product_id', 'desc');
+            $query->withBrandPriority()->orderBy('product_id', 'desc');
         }
 
         // ── 4. Pagination (capped at 100 per page; the unpaginated

@@ -19,6 +19,8 @@ When working on this project, the agent SHOULD prioritize loading these authorit
 | `ssmis-api-master-guide` | Infrastructure, endpoints, and transactional logic. |
 | `checkpoint-push-protocol` | Pre-push integrity and health checks. |
 | `db-entity-audit-protocol` | Database footprint and catalog richness metrics. |
+| `static-test-rbac-protocol` | Strict locked static test accounts policy (no ephemeral staff). |
+| `product-catalog-asset-curation` | De-duplication, orientation, renaming, and brand taxonomy protocol for product-items. |
 | `laravel-api-production-audit` | Enterprise readiness and gap analysis. |
 | `postman-collection-protocol` | Postman synchronization and naming conventions. |
 
@@ -48,3 +50,9 @@ When working on this project, the agent SHOULD prioritize loading these authorit
 Refer to `.agents/rules/standard-git-workflow.md` for shorthand definitions:
 - **`pm`**: Push current changes to `docs` and mirror to `main`.
 - **`mp`**: Push current branch to origin for a Pull Request to `docs`.
+
+## 6. Strict Database Seeding Rules (No Unauthorized Seeding)
+
+Refer to `.agents/rules/no-unauthorized-seeding.md`:
+- **NEVER** run `php artisan db:seed`, SQL insert scripts, or bulk population routines without explicit user request and approval.
+- When asked to "prepare a seeder", only create/edit the seeder code and present the plan. Always ask and wait for user confirmation before executing it against the database.
