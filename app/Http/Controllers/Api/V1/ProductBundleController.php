@@ -20,13 +20,23 @@ class ProductBundleController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $bundles = ProductBundle::with([
+        $query = ProductBundle::with([
             'items.variant.product',
             'items.variant.size',
             'items.variant.color',
-        ])
-            ->where('is_active', true)
-            ->get();
+        ]);
+
+        if (DB::getDriverName() === 'sqlite') {
+            $query->where(function ($q) {
+                $q->where('is_active', true)
+                    ->orWhere('is_active', 1)
+                    ->orWhere('is_active', 'true');
+            });
+        } else {
+            $query->whereRaw('is_active is true');
+        }
+
+        $bundles = $query->get();
 
         return $this->successResponse($bundles, 'Product bundles retrieved successfully');
     }

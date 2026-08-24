@@ -8,6 +8,7 @@ use App\Models\Concerns\CastsBooleanForPostgres;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Promotion extends Model
 {
@@ -44,11 +45,17 @@ class Promotion extends Model
     {
         $now = Carbon::now();
 
-        return $query->where(function ($q) {
-            $q->where('is_active', true)
-                ->orWhere('is_active', 1)
-                ->orWhere('is_active', 'true');
-        })
+        if (DB::getDriverName() === 'sqlite') {
+            return $query->where(function ($q) {
+                $q->where('is_active', true)
+                    ->orWhere('is_active', 1)
+                    ->orWhere('is_active', 'true');
+            })
+                ->where('start_date', '<=', $now)
+                ->where('end_date', '>=', $now);
+        }
+
+        return $query->whereRaw('is_active is true')
             ->where('start_date', '<=', $now)
             ->where('end_date', '>=', $now);
     }
