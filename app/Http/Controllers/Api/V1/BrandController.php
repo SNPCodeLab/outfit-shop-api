@@ -55,11 +55,11 @@ class BrandController extends BaseApiController
         $validated = $request->validate([
             'brand_name' => 'required|string|max:100|unique:brands,brand_name',
             'slug' => 'nullable|string|max:120|unique:brands,slug',
-            'logo_url' => 'nullable|url|max:500',
-            'banner_url' => 'nullable|url|max:500',
+            'logo_url' => 'nullable|url|max:2048',
+            'banner_url' => 'nullable|url|max:2048',
             'country_of_origin' => 'nullable|string|max:100',
             'description' => 'nullable|string',
-            'website_url' => 'nullable|url|max:255',
+            'website_url' => 'nullable|url|max:2048',
             'is_featured' => 'nullable|boolean',
         ]);
 
@@ -89,15 +89,16 @@ class BrandController extends BaseApiController
 
         $validated = $request->validate([
             'brand_name' => 'sometimes|required|string|max:100|unique:brands,brand_name,'.$id.',brand_id',
-            'logo_url' => 'nullable|url|max:500',
-            'banner_url' => 'nullable|url|max:500',
-            'country_of_origin' => 'nullable|string|max:50',
+            'slug' => 'nullable|string|max:120|unique:brands,slug,'.$id.',brand_id',
+            'logo_url' => 'nullable|url|max:2048',
+            'banner_url' => 'nullable|url|max:2048',
+            'country_of_origin' => 'nullable|string|max:100',
             'description' => 'nullable|string',
-            'website_url' => 'nullable|url|max:255',
+            'website_url' => 'nullable|url|max:2048',
             'is_featured' => 'nullable|boolean',
         ]);
 
-        if (isset($validated['brand_name'])) {
+        if (isset($validated['brand_name']) && empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['brand_name']);
         }
 

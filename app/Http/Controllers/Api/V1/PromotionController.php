@@ -118,6 +118,50 @@ class PromotionController extends BaseApiController
     }
 
     /**
+     * Get single promotion details.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function show(int $id): JsonResponse
+    {
+        $promo = Promotion::findOrFail($id);
+
+        return $this->successResponse($promo, 'Promotion details retrieved successfully');
+    }
+
+    /**
+     * Update a promotion campaign.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $promo = Promotion::findOrFail($id);
+        $old = $promo->toArray();
+
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:150',
+            'promo_code' => 'nullable|string|max:50|unique:promotions,promo_code,'.$id.',promotion_id',
+            'discount_type' => 'sometimes|required|string|in:PERCENTAGE,FIXED_AMOUNT,BUY_X_GET_Y',
+            'discount_value' => 'sometimes|required|numeric|min:0',
+            'min_spend' => 'nullable|numeric|min:0',
+            'target_department' => 'nullable|string|max:50',
+            'start_date' => 'sometimes|required|date',
+            'end_date' => 'sometimes|required|date',
+            'max_usage_count' => 'nullable|integer',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        if (isset($validated['promo_code'])) {
+            $validated['promo_code'] = strtoupper($validated['promo_code']);
+        }
+
+        $promo->update($validated);
+
+        AuditLogService::log('UPDATE', 'Promotion', $id, $old, $promo->toArray());
+
+        return $this->successResponse($promo, 'Promotion updated successfully');
+    }
+
+    /**
      * Delete a promotion campaign.
      * Restricted to MANAGER or ADMIN.
      */

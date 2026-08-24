@@ -322,10 +322,13 @@ Route::prefix('v1')->group(function () {
 
             // Bundles & Promotions
             Route::post('/bundles', [ProductBundleController::class, 'store']);
+            Route::match(['put', 'patch'], '/bundles/{id}', [ProductBundleController::class, 'update']);
             Route::delete('/bundles/{id}', [ProductBundleController::class, 'destroy']);
 
             Route::get('/promotions', [PromotionController::class, 'index']);
+            Route::get('/promotions/{id}', [PromotionController::class, 'show']);
             Route::post('/promotions', [PromotionController::class, 'store']);
+            Route::match(['put', 'patch'], '/promotions/{id}', [PromotionController::class, 'update']);
             Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
 
             // Multi-Branch Management

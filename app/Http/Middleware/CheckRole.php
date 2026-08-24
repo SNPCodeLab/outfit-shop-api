@@ -34,7 +34,15 @@ class CheckRole
             );
         }
 
-        $allowedRoles = array_map('strtoupper', $roles);
+        $allowedRoles = [];
+        foreach ($roles as $r) {
+            foreach (explode(',', $r) as $subRole) {
+                $trimmed = trim($subRole);
+                if ($trimmed !== '') {
+                    $allowedRoles[] = strtoupper($trimmed);
+                }
+            }
+        }
         $userRole = strtoupper($user->role ?? '');
 
         // 1. Admin is always allowed everywhere

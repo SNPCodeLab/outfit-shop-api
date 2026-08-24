@@ -25,7 +25,7 @@ class ProductBundleController extends BaseApiController
             'items.variant.size',
             'items.variant.color',
         ])
-            ->whereRaw('is_active is true')
+            ->where('is_active', true)
             ->get();
 
         return $this->successResponse($bundles, 'Product bundles retrieved successfully');
@@ -59,7 +59,7 @@ class ProductBundleController extends BaseApiController
             'bundle_price' => 'required|numeric|min:0',
             'original_total_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|url|max:500',
+            'image_url' => 'nullable|url|max:2048',
             'is_active' => 'nullable|boolean',
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,variant_id',
@@ -92,10 +92,62 @@ class ProductBundleController extends BaseApiController
                 'items_count' => count($validated['items']),
             ]);
 
-            return $bundle->load(['items.variant.product']);
+            return $bundle->load(['items.variant.product', 'items.variant.size', 'items.variant.color']);
         });
 
         return $this->createdResponse($bundle, 'Product bundle created successfully', '/api/v1/bundles/'.$bundle->bundle_id);
+    }
+
+    /**
+     * Update a product bundle.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $bundle = ProductBundle::findOrFail($id);
+        $old = $bundle->load('items')->toArray();
+
+        $validated = $request->validate([
+            'bundle_name' => 'sometimes|required|string|max:150',
+            'sku' => 'sometimes|required|string|max:50|unique:product_bundles,sku,'.$id.',bundle_id',
+            'barcode' => 'nullable|string|max:50|unique:product_bundles,barcode,'.$id.',bundle_id',
+            'bundle_price' => 'sometimes|required|numeric|min:0',
+            'original_total_price' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string',
+            'image_url' => 'nullable|url|max:2048',
+            'is_active' => 'nullable|boolean',
+            'items' => 'nullable|array',
+            'items.*.variant_id' => 'required_with:items|exists:product_variants,variant_id',
+            'items.*.quantity' => 'required_with:items|integer|min:1',
+        ]);
+
+        $updatedBundle = DB::transaction(function () use ($bundle, $validated) {
+            $bundleFields = collect($validated)->except('items')->toArray();
+            if (! empty($bundleFields)) {
+                $bundle->update($bundleFields);
+            }
+
+            if (array_key_exists('items', $validated) && is_array($validated['items'])) {
+                BundleItem::where('bundle_id', $bundle->bundle_id)->delete();
+                foreach ($validated['items'] as $item) {
+                    BundleItem::create([
+                        'bundle_id' => $bundle->bundle_id,
+                        'variant_id' => $item['variant_id'],
+                        'quantity' => $item['quantity'],
+                    ]);
+                }
+            }
+
+            return $bundle->fresh([
+                'items.variant.product',
+                'items.variant.size',
+                'items.variant.color',
+            ]);
+        });
+
+        AuditLogService::log('UPDATE', 'ProductBundle', $id, $old, $updatedBundle->toArray());
+
+        return $this->successResponse($updatedBundle, 'Product bundle updated successfully');
     }
 
     /**
