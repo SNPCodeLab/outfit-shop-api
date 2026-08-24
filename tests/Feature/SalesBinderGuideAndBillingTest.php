@@ -24,7 +24,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $response = $this->getJson('/guide');
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.total_topics', 10);
+            ->assertJsonPath('data.total_topics', 11);
     }
 
     public function test_help_centre_json_api_returns_structured_topics(): void
@@ -32,7 +32,7 @@ class SalesBinderGuideAndBillingTest extends TestCase
         $response = $this->getJson('/api/v1/guide');
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.total_topics', 10)
+            ->assertJsonPath('data.total_topics', 11)
             ->assertJsonStructure([
                 'success',
                 'data' => [
