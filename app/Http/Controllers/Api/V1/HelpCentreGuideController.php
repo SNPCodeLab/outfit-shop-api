@@ -224,6 +224,26 @@ class HelpCentreGuideController extends BaseApiController
                     'Always count cash in private before shift sign-off.',
                 ],
             ],
+            [
+                'id' => 'cloudinary-media-manager',
+                'title' => 'Cloudinary Assets & Folders',
+                'tagline' => '24 Folders & 1,843 Product Photos',
+                'icon' => 'fa-photo-film',
+                'description' => 'Browse all 24 brand and category folders and search through 1,843 high-resolution Cloudinary assets via secure proxy.',
+                'sections' => [
+                    [
+                        'title' => '1. List All Brand Folders',
+                        'content' => "• Endpoint: GET /api/v1/cloudinary/folders\n• Returns all 24 organized root directories (Nike, Adidas, Jordan, Market, etc.).",
+                    ],
+                    [
+                        'title' => '2. Search & Filter Assets',
+                        'content' => "• Endpoint: GET /api/v1/cloudinary/assets?folder={folder}&search={keyword}\n• Uses Lucene full-text and prefix search with cursor pagination across all 1,843 media assets.",
+                    ],
+                ],
+                'tips' => [
+                    'Frontend never needs to store secret API signing keys—all media queries proxy securely through the Laravel backend.',
+                ],
+            ],
         ];
 
         $popularTopics = [
@@ -231,6 +251,7 @@ class HelpCentreGuideController extends BaseApiController
             'Gross Profit Margin', 'Barcode Scanning', 'Opening Cash Float', 'Closing Z-Report',
             'Estimate to Invoice', 'Stock Transfers', 'Combo Bundles', 'Safe Cash Drops',
             'Role Permissions', 'Customer Phone Search', 'Audit Trail', 'Tax Invoices',
+            'Cloudinary 24 Folders', 'Cloudinary Asset Search',
         ];
 
         return $this->successResponse([

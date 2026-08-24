@@ -77,6 +77,8 @@ REST API specification for retail inventory management, point-of-sale transactio
 - `POST /auth/login` — Exchange credentials for Bearer token
 - `POST /orders/checkout` — Atomic POS checkout with stock deduction
 - `POST /payments/khqr` — Generate dynamic KHQR payment payload
+- `GET /cloudinary/folders` — List all 24 root brand/catalog Cloudinary folders
+- `GET /cloudinary/assets` — Query and stream 1,843 Cloudinary image assets with cursor pagination
 - `GET /reports/inventory-valuation` — Cost versus retail inventory valuation
 - `POST /stock-movements/adjust` — Stock adjustment with audit ledger
 - `GET /admin/master-pulse` — APM telemetry and error tracking

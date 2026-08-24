@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\CloudinaryMediaController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\V1\AdminAnalyticsController;
 use App\Http\Controllers\Api\V1\AdminMasterController;
@@ -171,6 +172,12 @@ Route::prefix('v1')->group(function () {
         // Storefront CMS Banners & System Audio Settings
         Route::get('/marketing/banners', [MarketingBannerController::class, 'index']);
         Route::get('/settings/audio-cues', [SystemSettingController::class, 'audioCues']);
+
+        // Cloudinary Media Browse & Search API (24 Folders & 1,843 Assets Proxy)
+        Route::prefix('cloudinary')->group(function () {
+            Route::get('/folders', [CloudinaryMediaController::class, 'getFolders']);
+            Route::get('/assets', [CloudinaryMediaController::class, 'getAssets']);
+        });
 
     }); // end throttled public content group
 

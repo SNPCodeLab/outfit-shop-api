@@ -100,6 +100,58 @@ Clients should handle these machine-readable error codes:
 
 ---
 
+## Cloudinary Media Proxy API (24 Folders & 1,843 Assets)
+
+Because Cloudinary Admin Search API requires secret signing keys, the backend acts as a secure proxy for the frontend media picker and asset browser.
+
+### 1. List All Folders
+`GET /api/v1/cloudinary/folders`
+
+**Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": [
+    { "name": "Adidas", "path": "Adidas" },
+    { "name": "Nike", "path": "Nike" },
+    { "name": "Market", "path": "Market" }
+  ],
+  "total": 24
+}
+```
+
+### 2. Search & Stream Assets
+`GET /api/v1/cloudinary/assets`
+
+**Query Parameters:**
+- `folder` *(string, optional)*: Filter by brand/category folder (e.g. `Nike`, `Market`, `jackets`).
+- `search` *(string, optional)*: Keyword search across `public_id`, `filename`, `tags` (e.g. `hoodie`, `eagle`, `jordan`).
+- `max_results` *(int, optional, default: 60)*: Page size limit (1 to 500).
+- `next_cursor` *(string, optional)*: Cursor token for pagination.
+
+**Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "public_id": "Market/T-Shirts-and-Tops/Eagle-T-Shirt-Black",
+      "url": "https://res.cloudinary.com/od8t271n/image/upload/v1787452451/Market/T-Shirts-and-Tops/Eagle-T-Shirt-Black.jpg",
+      "format": "jpg",
+      "width": 600,
+      "height": 600,
+      "bytes": 38932,
+      "folder": "Market/T-Shirts-and-Tops",
+      "created_at": "2026-08-23T02:34:11+00:00"
+    }
+  ],
+  "total_count": 1843,
+  "next_cursor": "0ad016cccad79037cd1da6df94d9ad6348b8a7432fe22ee31e5ec345f1ebfa51b49dc6ebf8d06fc4f95380a28f7694c2"
+}
+```
+
+---
+
 ## Best Practices
 
 1. **Accept Header**: Always send `Accept: application/json`.

@@ -305,3 +305,32 @@ if (user.role === 'ADMIN') {
   // Show Product Lookup & Inventory View Only
 }
 ```
+
+---
+
+## 🖼️ Step 6: Cloudinary Media Picker & Asset Browser (24 Folders & 1,843 Assets)
+
+Frontend components can securely browse all Cloudinary assets via backend proxy endpoints without exposing secret signing keys.
+
+### 1. Fetch Folders & Browse Assets
+```javascript
+// Fetch all 24 brand & merchandise folders
+export const fetchCloudinaryFolders = async () => {
+  const response = await api.get('/cloudinary/folders');
+  return response.data.data; // [{ name: "Nike", path: "Nike" }, ...]
+};
+
+// Search & stream assets with pagination
+export const searchCloudinaryAssets = async ({ folder, search, nextCursor, maxResults = 60 }) => {
+  const response = await api.get('/cloudinary/assets', {
+    params: {
+      folder,
+      search,
+      next_cursor: nextCursor,
+      max_results: maxResults,
+    },
+  });
+  return response.data; // { success: true, data: [...], total_count: 1843, next_cursor: "..." }
+};
+```
+

@@ -87,6 +87,15 @@
 
 ---
 
+### 2.4 Cloudinary Media Browser & Asset Picker (24 Folders & 1,843 Assets)
+
+| Method | Endpoint Path | Role Guard | Permission | Frontend Client Action |
+| :--- | :--- | :---: | :--- | :--- |
+| `GET` | `/cloudinary/folders` | **PUBLIC / AUTH** | `media.view` | List all 24 root brand/merchandise folders |
+| `GET` | `/cloudinary/assets` | **PUBLIC / AUTH** | `media.view` | Search & paginate through all 1,843 assets (`folder`, `search`, `next_cursor`) |
+
+---
+
 ## 3. Sample Order Checkout Request Payload (`POST /api/v1/orders/checkout`)
 
 ```json
