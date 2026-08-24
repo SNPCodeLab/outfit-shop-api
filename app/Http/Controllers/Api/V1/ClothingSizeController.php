@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\UpdateSizeRequest;
 use App\Models\ClothingSize;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
@@ -14,14 +15,17 @@ class ClothingSizeController extends BaseApiController
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(ClothingSize::all(), 'Clothing sizes retrieved');
+        $sizes = ClothingSize::orderBy('size_order', 'asc')->get();
+
+        return $this->successResponse($sizes, 'Clothing sizes retrieved successfully.');
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'size_name' => 'required|string|unique:clothing_sizes,size_name',
-            'size_code' => 'nullable|string|max:20',
+            'size_name' => 'required|string|max:20|unique:clothing_sizes,size_name',
+            'size_order' => 'required|integer|min:0',
+            'size_code' => 'nullable|string|max:30',
             'description' => 'nullable|string',
         ]);
 
@@ -29,7 +33,7 @@ class ClothingSizeController extends BaseApiController
 
         AuditLogService::log('CREATE', 'ClothingSize', $size->size_id, null, $size->toArray());
 
-        return $this->createdResponse($size, 'Clothing size created successfully', '/api/v1/clothing-sizes/'.$size->size_id);
+        return $this->createdResponse($size, 'Size created successfully.', '/api/v1/clothing-sizes/'.$size->size_id);
     }
 
     public function show(int $id): JsonResponse
@@ -39,21 +43,16 @@ class ClothingSizeController extends BaseApiController
         return $this->successResponse($size, 'Clothing size details');
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateSizeRequest $request, int $id): JsonResponse
     {
         $size = ClothingSize::findOrFail($id);
         $old = $size->toArray();
 
-        $validated = $request->validate([
-            'size_name' => 'sometimes|required|string|unique:clothing_sizes,size_name,'.$id.',size_id',
-            'description' => 'nullable|string',
-        ]);
-
-        $size->update($validated);
+        $size->update($request->validated());
 
         AuditLogService::log('UPDATE', 'ClothingSize', $id, $old, $size->toArray());
 
-        return $this->successResponse($size, 'Clothing size updated');
+        return $this->successResponse($size, 'Size updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -72,6 +71,6 @@ class ClothingSizeController extends BaseApiController
 
         AuditLogService::log('DELETE', 'ClothingSize', $id, $old, null);
 
-        return $this->successResponse(null, 'Clothing size deleted');
+        return $this->successResponse(null, 'Size deleted successfully.');
     }
 }

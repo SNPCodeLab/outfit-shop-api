@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CloudinaryMediaController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\V1\AdminAnalyticsController;
 use App\Http\Controllers\Api\V1\AdminMasterController;
+use App\Http\Controllers\Api\V1\AdminMonitoringController;
 use App\Http\Controllers\Api\V1\AdminPerformanceController;
 use App\Http\Controllers\Api\V1\AiIntelligenceController;
 use App\Http\Controllers\Api\V1\AuditLogController;
@@ -57,79 +58,45 @@ use App\Http\Controllers\Api\V1\VariantPricingTierController;
 use App\Http\Controllers\Api\V1\WebhookSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| OutfitShop-Backend-APIRESTful API — v1
-|--------------------------------------------------------------------------
-|
-| Access Tiers:
-|   TIER 1 (PUBLIC)        — No token required. Read-only storefront, catalog, cart, wishlist.
-|   TIER 2 (AUTHENTICATED) — Requires valid Bearer token (CASHIER, STAFF, MANAGER, ADMIN).
-|   TIER 3 (MANAGER)       — Requires token + role MANAGER or ADMIN.
-|   TIER 4 (ADMIN)         — Requires token + role ADMIN only.
-|
-| Base URL: https://api.kesararamwithdigital.tech/api/v1
-|
-*/
-
 Route::prefix('v1')->group(function () {
 
     // =========================================================================
-    // TIER 1 — PUBLIC (No authentication required)
+    // ── 1. PUBLIC TIER (Unauthenticated) ──
     // =========================================================================
-
-    // Health, Status & Developer Knowledge Base — always open
-    Route::get('/health', [StatusController::class, 'index'])->name('health');
+    Route::get('/health', [StatusController::class, 'index']);
     Route::get('/status', [StatusController::class, 'index'])->middleware('deprecated:2027-12-31');
-    Route::get('/guide', [HelpCentreGuideController::class, 'index'])->name('guide');
+    Route::get('/guide', [HelpCentreGuideController::class, 'index']);
     Route::get('/docs', [HelpCentreGuideController::class, 'index'])->middleware('deprecated:2027-12-31');
-    // The collection JSON embeds working login credentials for testing - it
-    // must never be served publicly. Managers/Admins fetch it after login.
-    Route::get('/postman.json', function () {
-        $path = base_path('postman/OutfitShop_Master_Collection.json');
 
-        return response()->file($path, ['Content-Type' => 'application/json']);
-    })->middleware(['auth:sanctum', 'role:MANAGER,ADMIN', 'throttle:role-based']);
-
-    // -------------------------------------------------------------------------
-    // PUBLIC CONTENT (throttled via the guest branch of the role-based
-    // limiter: 30 requests/min per IP). The health/docs endpoints above stay
-    // unthrottled so uptime monitors are never blocked.
-    // -------------------------------------------------------------------------
     Route::middleware('throttle:role-based')->group(function () {
-
-        // Multi-Currency (USD Primary + KHR Secondary with NBC Official Benchmarks)
+        // Multi-Currency
         Route::get('/currencies/rates', [CurrencyController::class, 'rates']);
         Route::post('/currencies/convert', [CurrencyController::class, 'convert']);
 
-        // Authentication — rate-limited to prevent brute-force (5 attempts / min)
-        // cambodia.only: login is restricted to Cambodian IP space only.
+        // Auth (Public)
         Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
             Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('cambodia.only');
-            Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot-password');
-            Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset-password');
+            Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('/reset-password', [AuthController::class, 'resetPassword']);
         });
 
-        // Public Product Catalog — read-only, no token needed
-        Route::get('/categories', [CategoryController::class,      'index']);
-        Route::get('/categories/{id}', [CategoryController::class,      'show']);
+        // Catalog (Public Read)
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::get('/categories/{id}', [CategoryController::class, 'show']);
+        Route::get('/clothing-sizes', [ClothingSizeController::class, 'index']);
+        Route::get('/clothing-sizes/{id}', [ClothingSizeController::class, 'show']);
+        Route::get('/colors', [ColorController::class, 'index']);
+        Route::get('/colors/{id}', [ColorController::class, 'show']);
 
-        Route::get('/clothing-sizes', [ClothingSizeController::class,  'index']);
-        Route::get('/clothing-sizes/{id}', [ClothingSizeController::class,  'show']);
-
-        Route::get('/colors', [ColorController::class,         'index']);
-        Route::get('/colors/{id}', [ColorController::class,         'show']);
-
-        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-        Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-        Route::get('/products/{id}/images', [ProductImageController::class, 'index'])->name('products.images.index');
+        Route::get('/products', [ProductController::class, 'index']);
+        Route::get('/products/{id}', [ProductController::class, 'show']);
+        Route::get('/products/{id}/images', [ProductImageController::class, 'index']);
         Route::get('/products/{id}/matrix', [ProductMatrixController::class, 'matrix']);
         Route::get('/products/{id}/colorways', [ProductMatrixController::class, 'colorways']);
         Route::get('/products/{id}/reviews', [ProductReviewController::class, 'index']);
 
         Route::get('/brands', [BrandController::class, 'index']);
         Route::get('/brands/{id}', [BrandController::class, 'show']);
-
         Route::get('/bundles', [ProductBundleController::class, 'index']);
         Route::get('/bundles/{id}', [ProductBundleController::class, 'show']);
 
@@ -138,186 +105,147 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/branches', [StoreBranchController::class, 'index']);
 
-        // Shopping Cart Endpoints (Guest Session & Customer Cart)
+        // Cart & Wishlist (Guest/Public)
         Route::get('/cart', [CartController::class, 'index']);
         Route::post('/cart/items', [CartController::class, 'addItem']);
         Route::match(['put', 'patch'], '/cart/items/{id}', [CartController::class, 'updateItem']);
         Route::delete('/cart/items/{id}', [CartController::class, 'removeItem']);
-        // RESTful collection delete is canonical; /cart/clear deprecated alias
         Route::delete('/cart', [CartController::class, 'clear']);
         Route::delete('/cart/clear', [CartController::class, 'clear'])->middleware('deprecated:2027-12-31');
 
-        // Customer Wishlist Endpoints
         Route::get('/wishlist', [CustomerWishlistController::class, 'index']);
         Route::post('/wishlist', [CustomerWishlistController::class, 'store']);
         Route::post('/wishlist/toggle', [CustomerWishlistController::class, 'toggle']);
         Route::delete('/wishlist/{id}', [CustomerWishlistController::class, 'destroy']);
 
+        // Variants (Public)
         Route::get('/variants', [ProductVariantController::class, 'index']);
         Route::get('/variants/barcode/{barcode}', [ProductVariantController::class, 'lookupBarcode']);
         Route::get('/variants/{id}', [ProductVariantController::class, 'show'])->whereNumber('id');
         Route::get('/variants/{id}/tiers', [VariantPricingTierController::class, 'index']);
         Route::get('/variants/{id}/barcode-label', [BarcodePrintController::class, 'barcodeLabel']);
 
-        // Payments & KHQR (POST is the correct verb for an operation accepting
-        // input and generating a payload; GET kept as a legacy alias)
-        Route::get('/payments/khqr', [KhqrPaymentController::class, 'generateCustom'])->middleware('deprecated:2027-12-31');
+        // Payments & CMS (Public)
+        Route::get('/payments/khqr', [KhqrPaymentController::class, 'generateCustom']);
         Route::post('/payments/khqr', [KhqrPaymentController::class, 'generateCustom']);
-
-        // Gift card balance check (RESTful read: GET /gift-cards/{code};
-        // POST /gift-cards/check kept as a legacy alias)
         Route::get('/gift-cards/{code}', [GiftCardController::class, 'check']);
         Route::post('/gift-cards/check', [GiftCardController::class, 'check'])->middleware('deprecated:2027-12-31');
 
-        // Storefront CMS Banners & System Audio Settings
         Route::get('/marketing/banners', [MarketingBannerController::class, 'index']);
         Route::get('/settings/audio-cues', [SystemSettingController::class, 'audioCues']);
 
-        // Cloudinary Media Browse & Search API (24 Folders & 1,843 Assets Proxy)
+        // Cloudinary Media Browse
         Route::prefix('cloudinary')->group(function () {
             Route::get('/folders', [CloudinaryMediaController::class, 'getFolders']);
             Route::get('/assets', [CloudinaryMediaController::class, 'getAssets']);
         });
-
-    }); // end throttled public content group
+    });
 
     // =========================================================================
-    // TIER 2 — AUTHENTICATED (CASHIER, STAFF, MANAGER, ADMIN)
+    // ── 2. AUTHENTICATED TIER (STAFF, CASHIER, MANAGER, ADMIN) ──
     // =========================================================================
     Route::middleware(['auth:sanctum', 'throttle:role-based'])->group(function () {
 
-        // -- Session Management & Token Rotation --
+        // Session
         Route::prefix('auth')->group(function () {
-            Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
-            Route::post('/avatar', [AuthController::class, 'uploadAvatar'])->name('auth.avatar');
-            Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-            Route::post('/refresh', [AuthController::class, 'refresh'])->name('auth.refresh');
-            Route::post('/revoke-all', [AuthController::class, 'revokeAll'])->name('auth.revoke-all');
-            Route::post('/2fa/setup', [AuthController::class, 'setup2FA'])->name('auth.2fa.setup');
-            Route::post('/2fa/verify', [AuthController::class, 'verify2FA'])->name('auth.2fa.verify');
+            Route::get('/me', [AuthController::class, 'me']);
+            Route::post('/avatar', [AuthController::class, 'uploadAvatar']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/refresh', [AuthController::class, 'refresh']);
+            Route::post('/revoke-all', [AuthController::class, 'revokeAll']);
+            Route::post('/2fa/setup', [AuthController::class, 'setup2FA']);
+            Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
         });
 
-        // -- Customer Management & Loyalty Points --
-        // Writes require CASHIER or above: the STAFF permission map grants
-        // customers.read only, and routes now enforce that server-side.
-        Route::get('/customers', [CustomerController::class, 'index']);
-        Route::get('/customers/{id}', [CustomerController::class, 'show']);
-        Route::middleware('role:CASHIER,MANAGER,ADMIN')->group(function () {
-            Route::post('/customers', [CustomerController::class, 'store']);
-            Route::match(['put', 'patch'], '/customers/{id}', [CustomerController::class, 'update']);
-        });
-        Route::get('/customers/{id}/loyalty', [CustomerLoyaltyController::class, 'show']);
-        Route::post('/customers/{id}/redeem-points', [CustomerLoyaltyController::class, 'redeem']);
+        // Dashboard & Alerts
+        Route::get('/dashboard/role-pulse', [DashboardController::class, 'rolePulse']);
+        Route::get('/alerts/active', [DashboardController::class, 'activeAlerts']);
 
-        // -- Inventory Business Intelligence (formerly public: cost/resale
-        //    valuation and stock levels are competitive data, not storefront) --
+        // Business Intel (Auth required)
         Route::get('/inventory/statistics', [InventoryValuationController::class, 'statistics']);
         Route::get('/variants/low-stock', [ProductVariantController::class, 'lowStock']);
 
-        // -- POS Cash Register Shifts (Z-Report) --
-        Route::get('/shifts/current', [PosShiftController::class, 'current']);
-        Route::post('/shifts/open', [PosShiftController::class, 'open']);
-        Route::post('/shifts/drop-cash', [PosShiftController::class, 'dropCash']);
-        Route::post('/shifts/close', [PosShiftController::class, 'close']);
+        // Postman (Manager/Admin only)
+        Route::get('/postman.json', function () {
+            $path = base_path('postman/OutfitShop_Master_Collection.json');
 
-        // -- Orders & Checkouts (First-class endpoints) --
-        // Token-ability enforcement (defense in depth on top of role checks):
-        // the token itself must carry sales.checkout / sales.void.
-        Route::post('/orders', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout');
-        Route::post('/orders/checkout', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout')->name('orders.checkout');
-        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+            return response()->file($path, ['Content-Type' => 'application/json']);
+        })->middleware('role:MANAGER,ADMIN');
 
-        // -- Legacy POS Sales Aliases (deprecated; sunset 2027-12-31) --
-        Route::middleware('deprecated:2027-12-31')->group(function () {
-            Route::post('/sales/checkout', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout');
-            Route::get('/sales', [OrderController::class, 'index']);
-            Route::get('/sales/{id}', [OrderController::class, 'show']);
+        // -- CASHIER, MANAGER, ADMIN --
+        Route::middleware(['role:CASHIER,MANAGER,ADMIN'])->group(function () {
+            // Customer CRM
+            Route::get('/customers', [CustomerController::class, 'index']);
+            Route::get('/customers/{id}', [CustomerController::class, 'show']);
+            Route::post('/customers', [CustomerController::class, 'store']);
+            Route::match(['put', 'patch'], '/customers/{id}', [CustomerController::class, 'update']);
+            Route::get('/customers/{id}/loyalty', [CustomerLoyaltyController::class, 'show']);
+            Route::post('/customers/{id}/redeem-points', [CustomerLoyaltyController::class, 'redeem']);
+
+            // POS Operations
+            Route::get('/shifts/current', [PosShiftController::class, 'current']);
+            Route::post('/shifts/open', [PosShiftController::class, 'open']);
+            Route::post('/shifts/drop-cash', [PosShiftController::class, 'dropCash']);
+            Route::post('/shifts/close', [PosShiftController::class, 'close']);
+
+            Route::post('/orders', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout');
+            Route::post('/orders/checkout', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout');
+
+            Route::get('/orders', [OrderController::class, 'index']);
+            Route::get('/orders/{id}', [OrderController::class, 'show']);
+            Route::get('/orders/{id}/khqr', [KhqrPaymentController::class, 'generateForSale']);
+            Route::get('/orders/{id}/receipt-thermal', [BarcodePrintController::class, 'receiptThermal']);
+            Route::get('/orders/{id}/invoice-pdf', [InvoiceEstimateController::class, 'renderInvoiceHtml']);
+
+            // Billing
+            Route::get('/invoices', [InvoiceEstimateController::class, 'index']);
+            Route::post('/estimates', [InvoiceEstimateController::class, 'createEstimate']);
+            Route::post('/estimates/{id}/convert', [InvoiceEstimateController::class, 'convertEstimateToInvoice']);
+            Route::post('/gift-cards', [GiftCardController::class, 'issue']);
+
+            // Shipping
+            Route::get('/shipping-orders', [ShippingOrderController::class, 'index']);
+            Route::post('/shipping-orders', [ShippingOrderController::class, 'create']);
+            Route::patch('/shipping-orders/{id}', [ShippingOrderController::class, 'updateStatus']);
+
+            // Offline Sync
+            Route::get('/offline/manifest', [OfflineSyncController::class, 'manifest']);
+            Route::post('/offline/push-transactions', [OfflineSyncController::class, 'pushTransactions']);
+
+            // Review writes
+            Route::post('/products/{id}/reviews', [ProductReviewController::class, 'store']);
+            Route::get('/products/{id}/download', [DigitalAssetController::class, 'download']);
         });
-
-        // -- Receipts, Invoices & KHQR (authenticated: customer PII protection;
-        //    previously public and reachable by sequential ID) --
-        Route::get('/orders/{id}/khqr', [KhqrPaymentController::class, 'generateForSale']);
-        Route::get('/orders/{id}/receipt-thermal', [BarcodePrintController::class, 'receiptThermal']);
-        Route::get('/orders/{id}/invoice-pdf', [InvoiceEstimateController::class, 'renderInvoiceHtml']);
-        Route::get('/sales/{id}/khqr', [KhqrPaymentController::class, 'generateForSale']);
-        Route::get('/sales/{id}/receipt-thermal', [BarcodePrintController::class, 'receiptThermal']);
-        Route::get('/sales/{id}/invoice-pdf', [InvoiceEstimateController::class, 'renderInvoiceHtml']);
-
-        // -- Digital Asset Downloads (authenticated + purchase-verified) --
-        Route::get('/products/{id}/download', [DigitalAssetController::class, 'download']);
-
-        // -- Product Review writes (authenticated; reads stay public) --
-        Route::post('/products/{id}/reviews', [ProductReviewController::class, 'store']);
-
-        Route::get('/invoices', [InvoiceEstimateController::class, 'index']);
-        Route::post('/estimates', [InvoiceEstimateController::class, 'createEstimate']);
-        Route::post('/estimates/{id}/convert', [InvoiceEstimateController::class, 'convertEstimateToInvoice']);
-        // RESTful create is canonical; /gift-cards/issue deprecated alias
-        Route::post('/gift-cards', [GiftCardController::class, 'issue']);
-        Route::post('/gift-cards/issue', [GiftCardController::class, 'issue'])->middleware('deprecated:2027-12-31');
-
-        // -- Omnichannel Shipping & Click-and-Collect --
-        // RESTful resource names are canonical; /shipping/* aliases are
-        // deprecated (sunset 2027-12-31) and kept for backward compatibility.
-        Route::middleware('deprecated:2027-12-31')->group(function () {
-            Route::get('/shipping/orders', [ShippingOrderController::class, 'index']);
-            Route::post('/shipping/create', [ShippingOrderController::class, 'create']);
-            Route::post('/shipping/{id}/status', [ShippingOrderController::class, 'updateStatus']);
-        });
-
-        Route::get('/shipping-orders', [ShippingOrderController::class, 'index']);
-        Route::post('/shipping-orders', [ShippingOrderController::class, 'create']);
-        Route::patch('/shipping-orders/{id}', [ShippingOrderController::class, 'updateStatus']);
-
-        // -- Offline POS Mode Synchronization & Conflict Resolution --
-        Route::get('/offline/manifest', [OfflineSyncController::class, 'manifest']);
-        Route::post('/offline/push-transactions', [OfflineSyncController::class, 'pushTransactions']);
-
-        // -- Live Role-Pulse Analytics (Pie & Agile Graph tracking per role) --
-        Route::get('/dashboard/role-pulse', [DashboardController::class, 'rolePulse'])->name('dashboard.role-pulse');
-
-        // Active Broadcast Alerts feed for all logged-in staff
-        Route::get('/alerts/active', [DashboardController::class, 'activeAlerts'])->name('alerts.active');
 
         // =====================================================================
-        // TIER 3 — MANAGER (role: MANAGER or ADMIN)
+        // ── 3. MANAGER TIER (MANAGER, ADMIN) ──
         // =====================================================================
         Route::middleware('role:MANAGER,ADMIN')->group(function () {
-
-            // Analytics, Dashboard & Restock Forecasting
-            Route::get('/dashboard/stats', [DashboardController::class,     'stats']);
-            Route::get('/inventory/restock-recommendations', [InventoryForecastingController::class, 'restockRecommendations']);
-            Route::post('/purchases/auto-generate', [InventoryForecastingController::class, 'autoGeneratePurchaseOrder']);
-
-            // Gift Card Management
-            Route::get('/gift-cards', [GiftCardController::class, 'index']);
-
-            // Customer Deletion (Restricted to Manager and Admin)
+            // Customer Delete
             Route::delete('/customers/{id}', [CustomerController::class, 'destroy']);
 
-            // Catalog Write Access
-            Route::post('/categories', [CategoryController::class,      'store']);
-            Route::match(['put', 'patch'], '/categories/{id}', [CategoryController::class,      'update']);
-            Route::delete('/categories/{id}', [CategoryController::class,      'destroy']);
+            // Catalog Write
+            Route::post('/products', [ProductController::class, 'store']);
+            Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'update']);
+            Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+            Route::post('/products/{id}/images', [ProductImageController::class, 'store']);
+            Route::delete('/products/{id}/images/{imageId}', [ProductImageController::class, 'destroy']);
+
+            Route::post('/categories', [CategoryController::class, 'store']);
+            Route::match(['put', 'patch'], '/categories/{id}', [CategoryController::class, 'update']);
+            Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
             Route::post('/brands', [BrandController::class, 'store']);
             Route::match(['put', 'patch'], '/brands/{id}', [BrandController::class, 'update']);
             Route::delete('/brands/{id}', [BrandController::class, 'destroy']);
 
-            Route::post('/clothing-sizes', [ClothingSizeController::class,  'store']);
-            Route::match(['put', 'patch'], '/clothing-sizes/{id}', [ClothingSizeController::class,  'update']);
-            Route::delete('/clothing-sizes/{id}', [ClothingSizeController::class,  'destroy']);
+            Route::post('/clothing-sizes', [ClothingSizeController::class, 'store']);
+            Route::match(['put', 'patch'], '/clothing-sizes/{id}', [ClothingSizeController::class, 'update']);
+            Route::delete('/clothing-sizes/{id}', [ClothingSizeController::class, 'destroy']);
 
-            Route::post('/colors', [ColorController::class,         'store']);
-            Route::match(['put', 'patch'], '/colors/{id}', [ColorController::class,         'update']);
-            Route::delete('/colors/{id}', [ColorController::class,         'destroy']);
-
-            Route::post('/products', [ProductController::class,       'store']);
-            Route::match(['put', 'patch'], '/products/{id}', [ProductController::class,       'update']);
-            Route::delete('/products/{id}', [ProductController::class,       'destroy']);
-            Route::post('/products/{id}/images', [ProductImageController::class, 'store']);
-            Route::delete('/products/{id}/images/{imageId}', [ProductImageController::class, 'destroy']);
+            Route::post('/colors', [ColorController::class, 'store']);
+            Route::match(['put', 'patch'], '/colors/{id}', [ColorController::class, 'update']);
+            Route::delete('/colors/{id}', [ColorController::class, 'destroy']);
 
             Route::post('/variants', [ProductVariantController::class, 'store']);
             Route::match(['put', 'patch'], '/variants/{id}', [ProductVariantController::class, 'update']);
@@ -335,80 +263,25 @@ Route::prefix('v1')->group(function () {
             Route::match(['put', 'patch'], '/promotions/{id}', [PromotionController::class, 'update']);
             Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
 
-            // Multi-Branch Management
-            Route::get('/branches/{id}', [StoreBranchController::class, 'show'])->whereNumber('id');
-            Route::get('/branches/{id}/stock', [StoreBranchController::class, 'branchStock']);
-            Route::post('/branches', [StoreBranchController::class, 'store']);
-            Route::match(['put', 'patch'], '/branches/{id}', [StoreBranchController::class, 'update'])->whereNumber('id');
-            Route::delete('/branches/{id}', [StoreBranchController::class, 'destroy'])->whereNumber('id');
+            // Inventory & Procurement
+            Route::apiResource('suppliers', SupplierController::class);
+            Route::get('/purchases', [PurchaseController::class, 'index']);
+            Route::get('/purchases/{id}', [PurchaseController::class, 'show']);
+            Route::post('/purchases', [PurchaseController::class, 'store']);
+            Route::match(['put', 'patch'], '/purchases/{id}', [PurchaseController::class, 'update'])->whereNumber('id');
+            Route::delete('/purchases/{id}', [PurchaseController::class, 'destroy'])->whereNumber('id');
+            Route::post('/purchases/{id}/receive', [PurchaseController::class, 'receive']);
+            Route::post('/purchases/auto-generate', [InventoryForecastingController::class, 'autoGeneratePurchaseOrder']);
 
-            // FMCG FIFO & Batch Tracking
-            Route::get('/inventory-batches', [InventoryBatchController::class, 'index']);
-            Route::post('/inventory-batches', [InventoryBatchController::class, 'store']);
-            Route::get('/inventory/expiring-soon', [InventoryBatchController::class, 'expiringSoon']);
-            Route::get('/variants/{id}/batches', [InventoryBatchController::class, 'listBatches']);
-            Route::post('/variants/{id}/batches', [InventoryBatchController::class, 'storeBatch']);
-
-            // Storefront CMS Marketing Banners
-            Route::post('/marketing/banners', [MarketingBannerController::class, 'store']);
-            Route::delete('/marketing/banners/{id}', [MarketingBannerController::class, 'destroy']);
-
-            // Suppliers & Purchasing
-            Route::get('/suppliers', [SupplierController::class,      'index']);
-            Route::get('/suppliers/{id}', [SupplierController::class,      'show']);
-            Route::post('/suppliers', [SupplierController::class,      'store']);
-            Route::match(['put', 'patch'], '/suppliers/{id}', [SupplierController::class,      'update']);
-            Route::delete('/suppliers/{id}', [SupplierController::class,      'destroy']);
-
-            Route::get('/purchases', [PurchaseController::class,      'index']);
-            Route::get('/purchases/{id}', [PurchaseController::class,      'show']);
-            Route::post('/purchases', [PurchaseController::class,      'store']);
-            Route::match(['put', 'patch'], '/purchases/{id}', [PurchaseController::class,      'update'])->whereNumber('id');
-            Route::delete('/purchases/{id}', [PurchaseController::class,      'destroy'])->whereNumber('id');
-
-            // Inventory Stock Ledger & Adjustments
+            // Stock
             Route::get('/stock-movements', [StockMovementController::class, 'index']);
-            Route::post('/stock-movements', [StockMovementController::class, 'adjust']);
             Route::post('/stock-movements/adjust', [StockMovementController::class, 'adjust']);
             Route::post('/inventory/stock-opname', [StockMovementController::class, 'stockOpname']);
-
-            // Cloudinary Image Media Management
-            Route::get('/uploads/gallery', [ImageUploadController::class,   'gallery']);
-            Route::post('/uploads/image', [ImageUploadController::class,   'upload']);
-            Route::post('/uploads/batch', [ImageUploadController::class,   'uploadBatch']);
-            // Path-parameterized delete is canonical (rule N6); the
-            // query/body-parameter delete remains as a deprecated alias.
-            Route::delete('/uploads/image/{publicId}', [ImageUploadController::class, 'destroyByPublicId']);
-            Route::delete('/uploads/image', [ImageUploadController::class,   'destroy'])->middleware('deprecated:2027-12-31');
-            Route::post('/products/{id}/image', [ImageUploadController::class,   'uploadForProduct']);
-            Route::post('/variants/{id}/image', [ImageUploadController::class,   'uploadForVariant']);
-
-            // Orders & Sales Voiding (role-gated; token-ability enforcement
-            // kept on checkout only - see M11 note in audit report)
-            Route::post('/orders/{id}/void', [OrderController::class, 'void']);
-            Route::post('/sales/{id}/void', [OrderController::class, 'void']);
-
-            // Audit Logs (Accessible by Manager and Admin)
-            Route::get('/audit-logs', [AuditLogController::class,      'index']);
-            Route::get('/audit-logs/{id}', [AuditLogController::class,      'show']);
-
-            // Bulk / Batch Operations (1 Request vs 100)
             Route::post('/inventory/bulk-adjust', [BulkOperationController::class, 'bulkAdjust']);
-            Route::post('/variants/bulk-price-update', [BulkOperationController::class, 'bulkPriceUpdate']);
-            Route::post('/products/bulk-import', [BulkOperationController::class, 'bulkImport']);
-            Route::post('/purchases/bulk-receive', [BulkOperationController::class, 'bulkReceive']);
 
-            // File Exports (PDF, Excel, CSV, Thermal POS format)
-            Route::get('/exports/inventory/excel', [FileExportController::class, 'exportInventory']);
-            Route::get('/exports/stock-movements/csv', [FileExportController::class, 'exportStockMovements']);
-            Route::get('/exports/sales-report/pdf', [FileExportController::class, 'exportSalesReport']);
-            Route::get('/exports/z-report/{id}/thermal', [FileExportController::class, 'exportZReportThermal']);
-
-            // Multi-Store Stock Transfers (5-Stage Lifecycle: Request -> Approve -> Pick -> Ship -> Receive)
             Route::get('/stock-transfers', [StockTransferController::class, 'index']);
             Route::get('/stock-transfers/{id}', [StockTransferController::class, 'show'])->whereNumber('id');
             Route::post('/stock-transfers', [StockTransferController::class, 'store']);
-            Route::post('/stock-transfers/{id}/{action}', [StockTransferController::class, 'updateStatus'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/approve', [StockTransferController::class, 'approve'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/pick', [StockTransferController::class, 'pick'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/ship', [StockTransferController::class, 'ship'])->whereNumber('id');
@@ -416,66 +289,97 @@ Route::prefix('v1')->group(function () {
             Route::post('/stock-transfers/{id}/cancel', [StockTransferController::class, 'cancel'])->whereNumber('id');
             Route::delete('/stock-transfers/{id}', [StockTransferController::class, 'destroy'])->whereNumber('id');
 
-            // Advanced MIS Financial & Operational Reports
+            Route::get('/inventory-batches', [InventoryBatchController::class, 'index']);
+            Route::post('/inventory-batches', [InventoryBatchController::class, 'store']);
+            Route::get('/inventory/expiring-soon', [InventoryBatchController::class, 'expiringSoon']);
+            Route::get('/variants/{id}/batches', [InventoryBatchController::class, 'listBatches']);
+            Route::post('/variants/{id}/batches', [InventoryBatchController::class, 'storeBatch']);
+
+            // Void
+            Route::post('/orders/{id}/void', [OrderController::class, 'voidOrder'])->middleware('ability:sales.void');
+
+            // Reports & AI
+            Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+            Route::get('/inventory/restock-recommendations', [InventoryForecastingController::class, 'restockRecommendations']);
             Route::get('/reports/sales', [ReportController::class, 'sales']);
             Route::get('/reports/sales-performance', [ReportController::class, 'salesPerformance']);
             Route::get('/reports/inventory-valuation', [ReportController::class, 'inventoryValuation']);
             Route::get('/reports/stock-aging', [ReportController::class, 'stockAging']);
-            Route::get('/reports/customer-purchase-history', [ReportController::class, 'customerPurchaseHistory']);
-            Route::get('/reports/supplier-performance', [ReportController::class, 'supplierPerformance']);
             Route::get('/reports/profit-margin', [ReportController::class, 'profitMargin']);
             Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow']);
+            Route::get('/reports/supplier-performance', [ReportController::class, 'supplierPerformance']);
 
-            // AI Predictive Retail Intelligence & Fraud Anomaly Detection
             Route::get('/ai/sales-forecast', [AiIntelligenceController::class, 'salesForecast']);
             Route::get('/ai/anomaly-detection', [AiIntelligenceController::class, 'anomalyDetection']);
             Route::get('/ai/smart-restock', [AiIntelligenceController::class, 'smartRestock']);
             Route::get('/ai/customer-segmentation', [AiIntelligenceController::class, 'customerSegmentation']);
             Route::get('/ai/dynamic-pricing', [AiIntelligenceController::class, 'dynamicPricing']);
 
-            // GDPR & PCI-DSS Compliance & Data Portability
-            // Two-level resource paths are canonical (rule N4); the deep
-            // /compliance/* paths are deprecated aliases.
+            // Exports
+            Route::get('/exports/inventory/excel', [FileExportController::class, 'exportInventory']);
+            Route::get('/exports/stock-movements/csv', [FileExportController::class, 'exportStockMovements']);
+            Route::get('/exports/sales-report/pdf', [FileExportController::class, 'exportSalesReport']);
+            Route::get('/exports/z-report/{id}/thermal', [FileExportController::class, 'exportZReportThermal']);
+
+            // Media
+            Route::get('/uploads/gallery', [ImageUploadController::class, 'gallery']);
+            Route::post('/uploads/image', [ImageUploadController::class, 'upload']);
+            Route::post('/uploads/batch', [ImageUploadController::class, 'uploadBatch']);
+            Route::delete('/uploads/image/{publicId}', [ImageUploadController::class, 'destroyByPublicId']);
+            Route::post('/products/{id}/image', [ImageUploadController::class, 'uploadForProduct']);
+            Route::post('/variants/{id}/image', [ImageUploadController::class, 'uploadForVariant']);
+
+            // Branches
+            Route::get('/branches/{id}', [StoreBranchController::class, 'show'])->whereNumber('id');
+            Route::get('/branches/{id}/stock', [StoreBranchController::class, 'branchStock']);
+            Route::post('/branches', [StoreBranchController::class, 'store']);
+            Route::match(['put', 'patch'], '/branches/{id}', [StoreBranchController::class, 'update'])->whereNumber('id');
+            Route::delete('/branches/{id}', [StoreBranchController::class, 'destroy'])->whereNumber('id');
+
+            // Compliance
             Route::post('/customers/{id}/data-exports', [PrivacyComplianceController::class, 'exportData']);
             Route::post('/customers/{id}/erasure-requests', [PrivacyComplianceController::class, 'forgetMe']);
-            Route::middleware('deprecated:2027-12-31')->group(function () {
-                Route::post('/compliance/customers/{id}/export-data', [PrivacyComplianceController::class, 'exportData']);
-                Route::post('/compliance/customers/{id}/forget-me', [PrivacyComplianceController::class, 'forgetMe']);
-            });
             Route::get('/compliance/audit-retention-policy', [PrivacyComplianceController::class, 'policy']);
+            Route::get('/audit-logs', [AuditLogController::class, 'index']);
+            Route::get('/audit-logs/{id}', [AuditLogController::class, 'show']);
+        });
 
-            // Webhook Subscription Management (Events: LOW_STOCK_ALERT, PO_RECEIVED, SHIFT_DISCREPANCY, REFUND_REQUESTED, STOCK_TRANSFER_COMPLETED)
+        // =====================================================================
+        // ── 4. ADMIN TIER (ADMIN Only) ──
+        // =====================================================================
+        Route::middleware(['role:ADMIN', 'admin.ip'])->group(function () {
+            Route::apiResource('employees', EmployeeController::class);
+            Route::post('/auth/register', [AuthController::class, 'register']);
+            Route::post('/auth/admin-reset-password', [AuthController::class, 'adminResetPassword']);
+
+            Route::get('/admin/master-pulse', [AdminMonitoringController::class, 'masterPulse']);
+            Route::get('/admin/performance', [AdminMonitoringController::class, 'performance']);
+            Route::get('/admin/api-analytics', [AdminMonitoringController::class, 'apiAnalytics']);
+            Route::post('/admin/broadcast-alert', [AdminMonitoringController::class, 'broadcastAlert']);
+
             Route::get('/webhooks', [WebhookSubscriptionController::class, 'index']);
             Route::post('/webhooks/subscribe', [WebhookSubscriptionController::class, 'subscribe']);
             Route::post('/webhooks/test', [WebhookSubscriptionController::class, 'test']);
             Route::delete('/webhooks/{id}', [WebhookSubscriptionController::class, 'destroy']);
         });
+    });
 
-        // =====================================================================
-        // TIER 4 — ADMIN (role: ADMIN only). Optional IP allow-list
-        // (ADMIN_IP_WHITELIST env) adds defense in depth once configured;
-        // it is disabled while the variable is unset.
-        // =====================================================================
-        Route::middleware(['role:ADMIN', 'admin.ip'])->group(function () {
+    // ── 5. LEGACY ALIASES (Deprecated) ──
+    Route::middleware(['auth:sanctum', 'deprecated:2027-12-31'])->group(function () {
+        Route::post('/sales/checkout', [OrderController::class, 'checkout']);
+        Route::get('/sales', [OrderController::class, 'index']);
+        Route::get('/sales/{id}', [OrderController::class, 'show']);
+        Route::post('/sales/{id}/void', [OrderController::class, 'voidOrder']);
+        Route::get('/sales/{id}/khqr', [KhqrPaymentController::class, 'generateForSale']);
+        Route::get('/sales/{id}/receipt-thermal', [BarcodePrintController::class, 'receiptThermal']);
+        Route::get('/sales/{id}/invoice-pdf', [InvoiceEstimateController::class, 'renderInvoiceHtml']);
+        Route::post('/gift-cards/issue', [GiftCardController::class, 'issue']);
+        Route::delete('/cart/clear', [CartController::class, 'clear']);
+        Route::delete('/wishlist/{id}', [CustomerWishlistController::class, 'destroy']);
+        Route::post('/gift-cards/check', [GiftCardController::class, 'check']);
 
-            // Employee Management — full CRUD
-            Route::get('/employees', [EmployeeController::class,      'index']);
-            Route::get('/employees/{id}', [EmployeeController::class,      'show']);
-            Route::post('/employees', [EmployeeController::class,      'store']);
-            Route::match(['put', 'patch'], '/employees/{id}', [EmployeeController::class,      'update']);
-            Route::delete('/employees/{id}', [EmployeeController::class,      'destroy']);
-
-            // User Account Management
-            Route::prefix('auth')->group(function () {
-                Route::post('/register', [AuthController::class, 'register']);
-                Route::post('/admin-reset-password', [AuthController::class, 'adminResetPassword']);
-            });
-
-            // Admin Master Tracking Pulse, APM Performance & API Traffic Analytics
-            Route::get('/admin/master-pulse', [AdminMasterController::class, 'masterPulse']);
-            Route::get('/admin/performance', [AdminPerformanceController::class, 'performance']);
-            Route::get('/admin/api-analytics', [AdminAnalyticsController::class, 'analytics']);
-            Route::post('/admin/broadcast-alert', [AdminMasterController::class, 'broadcastAlert']);
-        });
+        Route::get('/shipping/orders', [ShippingOrderController::class, 'index']);
+        Route::post('/shipping/create', [ShippingOrderController::class, 'create']);
+        Route::post('/shipping/{id}/status', [ShippingOrderController::class, 'updateStatus']);
     });
 });

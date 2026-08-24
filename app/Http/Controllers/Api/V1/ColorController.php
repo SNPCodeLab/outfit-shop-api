@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\UpdateColorRequest;
 use App\Models\Color;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
@@ -14,14 +15,17 @@ class ColorController extends BaseApiController
 {
     public function index(): JsonResponse
     {
-        return $this->successResponse(Color::all(), 'Colors retrieved');
+        $colors = Color::orderBy('color_name', 'asc')->get();
+
+        return $this->successResponse($colors, 'Colors retrieved successfully.');
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'color_name' => 'required|string|unique:colors,color_name',
-            'hex_code' => 'nullable|string|max:20',
+            'color_name' => 'required|string|max:50|unique:colors,color_name',
+            'hex_code' => ['required', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'pantone' => 'nullable|string|max:50',
             'description' => 'nullable|string',
         ]);
 
@@ -29,7 +33,7 @@ class ColorController extends BaseApiController
 
         AuditLogService::log('CREATE', 'Color', $color->color_id, null, $color->toArray());
 
-        return $this->createdResponse($color, 'Color created successfully', '/api/v1/colors/'.$color->color_id);
+        return $this->createdResponse($color, 'Color created successfully.', '/api/v1/colors/'.$color->color_id);
     }
 
     public function show(int $id): JsonResponse
@@ -39,21 +43,16 @@ class ColorController extends BaseApiController
         return $this->successResponse($color, 'Color details');
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateColorRequest $request, int $id): JsonResponse
     {
         $color = Color::findOrFail($id);
         $old = $color->toArray();
 
-        $validated = $request->validate([
-            'color_name' => 'sometimes|required|string|unique:colors,color_name,'.$id.',color_id',
-            'description' => 'nullable|string',
-        ]);
-
-        $color->update($validated);
+        $color->update($request->validated());
 
         AuditLogService::log('UPDATE', 'Color', $id, $old, $color->toArray());
 
-        return $this->successResponse($color, 'Color updated');
+        return $this->successResponse($color, 'Color updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -72,6 +71,6 @@ class ColorController extends BaseApiController
 
         AuditLogService::log('DELETE', 'Color', $id, $old, null);
 
-        return $this->successResponse(null, 'Color deleted');
+        return $this->successResponse(null, 'Color deleted successfully.');
     }
 }

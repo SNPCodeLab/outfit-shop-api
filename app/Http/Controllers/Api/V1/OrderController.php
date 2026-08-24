@@ -200,4 +200,12 @@ class OrderController extends BaseApiController
             return $this->serverErrorResponse("Voiding order #{$id} failed due to an unexpected server error.");
         }
     }
+
+    /**
+     * Alias for void() to match requested naming in the master prompt.
+     */
+    public function voidOrder(Request $request, int $id): JsonResponse
+    {
+        return $this->void($request, $id);
+    }
 }

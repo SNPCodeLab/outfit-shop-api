@@ -7,10 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClothingSize extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'size_id';
 
@@ -24,6 +25,7 @@ class ClothingSize extends Model
     protected $fillable = [
         'size_name',
         'size_code',
+        'size_order',
         'description',
     ];
 
