@@ -1,0 +1,25 @@
+# Task List - Master Backend API & Role Permission Synchronisation
+
+- `[x]` Database Schema Alignment
+    - `[x]` Create migration `2026_08_24_220000_complete_outfit_schema_alignment.php`
+    - `[x]` Run migration
+- `[x]` Form Requests & Validation
+    - `[x]` Create `app/Http/Requests/UpdateSizeRequest.php`
+    - `[x]` Create `app/Http/Requests/UpdateColorRequest.php`
+    - `[x]` Create `app/Http/Requests/AdminResetPasswordRequest.php`
+- `[x]` Models & Business Logic
+    - `[x]` Create `app/Models/BroadcastAlert.php` (linked to `system_broadcast_alerts`)
+    - `[x]` Update `ClothingSize` and `Color` models for soft deletes and fillable fields
+- `[x]` Controller Updates
+    - `[x]` Update `ClothingSizeController.php`
+    - `[x]` Update `ColorController.php`
+    - `[x]` Update `OrderController.php` (Void with Stock Reversion)
+    - `[x]` Update `AiIntelligenceController.php`
+    - `[x]` Update `AdminMonitoringController.php`
+- `[x]` Route Synchronization
+    - `[x]` Complete overhaul of `routes/api.php`
+- `[x]` Final Verification & Push
+    - `[x]` Code Style (`pint`)
+    - `[x]` Database & Auth Integrity Check
+    - `[x]` PHPUnit Test Parity
+    - `[x]` Tri-Branch Sync (`docs` -> `main` -> `main-product`)
