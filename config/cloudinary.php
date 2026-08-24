@@ -13,37 +13,13 @@ return [
     |
     */
 
-    'cloud_url' => env('CLOUDINARY_URL'),
+    'cloud_url' => env('CLOUDINARY_URL', 'cloudinary://292517627621863:CZhMlOoVVxAQBS_Vc_OrnPtqr4g@od8t271n'),
 
-    'cloud_name' => env('CLOUDINARY_CLOUD_NAME', function () {
-        if ($url = env('CLOUDINARY_URL')) {
-            $parsed = parse_url($url);
+    'cloud_name' => env('CLOUDINARY_CLOUD_NAME', 'od8t271n'),
 
-            return $parsed['host'] ?? null;
-        }
+    'api_key' => env('CLOUDINARY_API_KEY', '292517627621863'),
 
-        return null;
-    }),
-
-    'api_key' => env('CLOUDINARY_API_KEY', function () {
-        if ($url = env('CLOUDINARY_URL')) {
-            $parsed = parse_url($url);
-
-            return $parsed['user'] ?? null;
-        }
-
-        return null;
-    }),
-
-    'api_secret' => env('CLOUDINARY_API_SECRET', function () {
-        if ($url = env('CLOUDINARY_URL')) {
-            $parsed = parse_url($url);
-
-            return $parsed['pass'] ?? null;
-        }
-
-        return null;
-    }),
+    'api_secret' => env('CLOUDINARY_API_SECRET', 'CZhMlOoVVxAQBS_Vc_OrnPtqr4g'),
 
     'folder' => env('CLOUDINARY_FOLDER', 'khmeriel/products'),
 

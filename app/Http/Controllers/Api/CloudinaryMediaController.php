@@ -77,16 +77,18 @@ class CloudinaryMediaController extends Controller
     {
         try {
             $folder = trim((string) $request->query('folder', ''));
+            $isAll = empty($folder) || strtoupper($folder) === 'ALL';
+            $defaultMax = $isAll ? 100 : 60;
+            $maxResults = max(1, min(500, (int) $request->query('max_results', $defaultMax)));
             $query = trim((string) $request->query('search', ''));
-            $maxResults = max(1, min(500, (int) $request->query('max_results', 60)));
             $nextCursor = $request->query('next_cursor');
 
             $expression = 'resource_type:image';
 
-            if (! empty($folder)) {
+            if (! $isAll) {
                 // Escape special characters in folder query
                 $cleanFolder = preg_replace('/[^\w\-\/\s]/', '', $folder);
-                $expression .= ' AND (folder:'.$cleanFolder.' OR folder:'.$cleanFolder.'/*)';
+                $expression .= ' AND (folder:'.$cleanFolder.' OR folder:'.$cleanFolder.'*)';
             }
 
             if (! empty($query)) {
@@ -113,25 +115,26 @@ class CloudinaryMediaController extends Controller
                 $assetFolder = $res['asset_folder'] ?? ($res['folder'] ?? null);
                 if (! $assetFolder) {
                     $dir = dirname($res['public_id'] ?? '');
-                    $assetFolder = ($dir !== '.' && $dir !== '') ? $dir : ($folder ?: 'root');
+                    $assetFolder = ($dir !== '.' && $dir !== '') ? $dir : ($isAll ? 'root' : $folder);
                 }
 
                 $assets[] = [
                     'public_id' => $res['public_id'],
+                    'name' => $res['filename'] ?? ($res['display_name'] ?? basename($res['public_id'] ?? '')),
+                    'folder' => $assetFolder,
                     'url' => $res['secure_url'] ?? ($res['url'] ?? ''),
                     'format' => $res['format'] ?? 'webp',
                     'width' => $res['width'] ?? 0,
                     'height' => $res['height'] ?? 0,
                     'bytes' => $res['bytes'] ?? 0,
-                    'folder' => $assetFolder,
                     'created_at' => $res['created_at'] ?? null,
                 ];
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $assets,
                 'total_count' => $searchResponse['total_count'] ?? count($assets),
+                'data' => $assets,
                 'next_cursor' => $searchResponse['next_cursor'] ?? null,
             ], 200);
         } catch (Exception $e) {
