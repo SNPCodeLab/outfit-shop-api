@@ -6,23 +6,30 @@ Any AI Model, Agent, or Assistant interacting with this repository MUST follow t
 Before performing ANY task, read the following files to understand the project architecture and development protocols:
 - `.agents/skills/agent-ai-core-conventions/SKILL.md`
 - `.agents/rules/standard-git-workflow.md`
+- `.agents/skills/checkpoint-push-protocol/SKILL.md`
 - `docs/AGENT_BLUEPRINT.md`
 
-## 2. Mandatory Coding Rules
-- **No Emojis**: Strictly prohibited in code, comments, UI, and commits.
+## 2. Mandatory Pre-Push Verification Checklist
+Before ANY `git push` or deployment operation, execute all 4 checks in order:
+1. **DB Integrity**: `php artisan tinker --execute="echo 'Products: '.App\Models\Product::count().' | Active Employees: '.App\Models\Employee::where('status','ACTIVE')->count();"`
+2. **Security & Auth**: `php artisan tinker --execute="\$a=App\Models\Employee::where('username','admin')->first(); echo Hash::check('Admin#Secure#2026', \$a->password_hash) ? 'AUTH_OK' : 'AUTH_FAIL';"`
+3. **Pint Lint**: `./vendor/bin/pint --test`
+4. **PHPUnit Tests**: `php artisan test` (must be 100% pass)
+
+## 3. Tri-Branch Git Push Protocol
+- **`pm` / `push`**: Trigger Push Merge across all 3 branches in sequence:
+  1. Commit on `docs`
+  2. Push `origin/docs`
+  3. Fast-forward merge `docs` to `main` ──► Push `origin/main`
+  4. Fast-forward merge `main` to `main-product` ──► Push `origin/main-product`
+  5. Return to `docs` branch
+- Always monitor GitHub Actions until all jobs complete green and report status.
+
+## 4. Mandatory Coding Rules
+- **No Emojis**: Strictly prohibited in code, comments, UI, documentation, and commits.
 - **Strict Typing**: All PHP files must use `declare(strict_types=1);`.
 - **Formatting**: Run `vendor/bin/pint` before every commit.
 
-## 3. Git Protocol
-- **`pm`**: Trigger "Push Merge" (sync `docs` and `main`).
-- **`mp`**: Trigger "Make PR" (push for Pull Request to `docs`).
-- Multi-branch sync: `docs` (Default) -> `main` (Production Mirror).
-- Double-checkpoint verification (Local Lint/Test + Remote CI).
-
-## 4. Documentation
+## 5. Documentation & Response Structure
 - Always use the `App\Http\Response\ApiResponse` envelope.
-- Maintain Postman synchronization across all 5 copy targets.
-
-## 5. System Identity
-- Primary name: `OutfitShop-Backend-API`.
-- Classification: Monolithic Headless TPS/OLTP REST API.
+- Maintain Postman synchronization across all targets.
