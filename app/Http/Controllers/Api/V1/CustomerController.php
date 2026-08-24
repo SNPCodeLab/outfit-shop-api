@@ -36,9 +36,14 @@ class CustomerController extends BaseApiController
         $validated = $request->validate([
             'customer_name' => 'sometimes|required|string|max:150',
             'gender' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:150',
             'address' => 'nullable|string',
+            'loyalty_points' => 'nullable|integer|min:0',
+            'loyalty_tier' => 'nullable|string|max:50',
+            'vip_tier' => 'nullable|string|max:50',
+            'total_spent_lifetime' => 'nullable|numeric|min:0',
+            'store_credit_balance' => 'nullable|numeric|min:0',
         ]);
 
         $customer = Customer::create($validated);
@@ -63,9 +68,14 @@ class CustomerController extends BaseApiController
         $validated = $request->validate([
             'customer_name' => 'sometimes|required|string|max:150',
             'gender' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:150',
             'address' => 'nullable|string',
+            'loyalty_points' => 'nullable|integer|min:0',
+            'loyalty_tier' => 'nullable|string|max:50',
+            'vip_tier' => 'nullable|string|max:50',
+            'total_spent_lifetime' => 'nullable|numeric|min:0',
+            'store_credit_balance' => 'nullable|numeric|min:0',
         ]);
 
         $customer->update($validated);

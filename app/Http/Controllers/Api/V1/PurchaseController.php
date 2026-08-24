@@ -109,4 +109,41 @@ class PurchaseController extends BaseApiController
 
         return $this->successResponse($purchase, 'Purchase order details retrieved');
     }
+
+    /**
+     * Update purchase order status or metadata.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $purchase = PurchaseHeader::findOrFail($id);
+        $old = $purchase->toArray();
+
+        $validated = $request->validate([
+            'status' => 'sometimes|required|string|in:RECEIVED,PENDING,CANCELLED',
+            'supplier_id' => 'nullable|exists:suppliers,supplier_id',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $purchase->update($validated);
+
+        AuditLogService::log('UPDATE', 'PurchaseHeader', $id, $old, $purchase->toArray());
+
+        return $this->successResponse($purchase->fresh(['supplier', 'employee', 'details']), 'Purchase order updated successfully');
+    }
+
+    /**
+     * Delete / Cancel a purchase order.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $purchase = PurchaseHeader::findOrFail($id);
+        $old = $purchase->toArray();
+        $purchase->delete();
+
+        AuditLogService::log('DELETE', 'PurchaseHeader', $id, $old, null);
+
+        return $this->deletedResponse('Purchase order deleted successfully');
+    }
 }

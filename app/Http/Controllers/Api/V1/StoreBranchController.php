@@ -78,4 +78,56 @@ class StoreBranchController extends BaseApiController
 
         return $this->createdResponse($branch, 'Store branch created successfully', '/api/v1/branches/'.$branch->branch_id);
     }
+
+    /**
+     * Get single store branch details.
+     */
+    public function show(int $id): JsonResponse
+    {
+        $branch = StoreBranch::findOrFail($id);
+
+        return $this->successResponse($branch, 'Store branch details retrieved successfully');
+    }
+
+    /**
+     * Update a store branch.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $branch = StoreBranch::findOrFail($id);
+        $old = $branch->toArray();
+
+        $validated = $request->validate([
+            'branch_name' => 'sometimes|required|string|max:100',
+            'branch_code' => 'sometimes|required|string|max:30|unique:store_branches,branch_code,'.$id.',branch_id',
+            'phone' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:100',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:50',
+            'is_warehouse' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $branch->update($validated);
+
+        AuditLogService::log('UPDATE', 'StoreBranch', $id, $old, $branch->toArray());
+
+        return $this->successResponse($branch, 'Store branch updated successfully');
+    }
+
+    /**
+     * Delete a store branch.
+     * Restricted to MANAGER or ADMIN.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $branch = StoreBranch::findOrFail($id);
+        $old = $branch->toArray();
+        $branch->delete();
+
+        AuditLogService::log('DELETE', 'StoreBranch', $id, $old, null);
+
+        return $this->deletedResponse('Store branch deleted successfully');
+    }
 }

@@ -223,6 +223,7 @@ Route::prefix('v1')->group(function () {
         // -- Orders & Checkouts (First-class endpoints) --
         // Token-ability enforcement (defense in depth on top of role checks):
         // the token itself must carry sales.checkout / sales.void.
+        Route::post('/orders', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout');
         Route::post('/orders/checkout', [OrderController::class, 'checkout'])->middleware('ability:sales.checkout')->name('orders.checkout');
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
@@ -292,6 +293,9 @@ Route::prefix('v1')->group(function () {
             // Gift Card Management
             Route::get('/gift-cards', [GiftCardController::class, 'index']);
 
+            // Customer Deletion (Restricted to Manager and Admin)
+            Route::delete('/customers/{id}', [CustomerController::class, 'destroy']);
+
             // Catalog Write Access
             Route::post('/categories', [CategoryController::class,      'store']);
             Route::match(['put', 'patch'], '/categories/{id}', [CategoryController::class,      'update']);
@@ -332,10 +336,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
 
             // Multi-Branch Management
+            Route::get('/branches/{id}', [StoreBranchController::class, 'show'])->whereNumber('id');
             Route::get('/branches/{id}/stock', [StoreBranchController::class, 'branchStock']);
             Route::post('/branches', [StoreBranchController::class, 'store']);
+            Route::match(['put', 'patch'], '/branches/{id}', [StoreBranchController::class, 'update'])->whereNumber('id');
+            Route::delete('/branches/{id}', [StoreBranchController::class, 'destroy'])->whereNumber('id');
 
             // FMCG FIFO & Batch Tracking
+            Route::get('/inventory-batches', [InventoryBatchController::class, 'index']);
+            Route::post('/inventory-batches', [InventoryBatchController::class, 'store']);
             Route::get('/inventory/expiring-soon', [InventoryBatchController::class, 'expiringSoon']);
             Route::get('/variants/{id}/batches', [InventoryBatchController::class, 'listBatches']);
             Route::post('/variants/{id}/batches', [InventoryBatchController::class, 'storeBatch']);
@@ -354,9 +363,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/purchases', [PurchaseController::class,      'index']);
             Route::get('/purchases/{id}', [PurchaseController::class,      'show']);
             Route::post('/purchases', [PurchaseController::class,      'store']);
+            Route::match(['put', 'patch'], '/purchases/{id}', [PurchaseController::class,      'update'])->whereNumber('id');
+            Route::delete('/purchases/{id}', [PurchaseController::class,      'destroy'])->whereNumber('id');
 
             // Inventory Stock Ledger & Adjustments
             Route::get('/stock-movements', [StockMovementController::class, 'index']);
+            Route::post('/stock-movements', [StockMovementController::class, 'adjust']);
             Route::post('/stock-movements/adjust', [StockMovementController::class, 'adjust']);
             Route::post('/inventory/stock-opname', [StockMovementController::class, 'stockOpname']);
 
@@ -396,11 +408,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/stock-transfers', [StockTransferController::class, 'index']);
             Route::get('/stock-transfers/{id}', [StockTransferController::class, 'show'])->whereNumber('id');
             Route::post('/stock-transfers', [StockTransferController::class, 'store']);
+            Route::post('/stock-transfers/{id}/{action}', [StockTransferController::class, 'updateStatus'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/approve', [StockTransferController::class, 'approve'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/pick', [StockTransferController::class, 'pick'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/ship', [StockTransferController::class, 'ship'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/receive', [StockTransferController::class, 'receive'])->whereNumber('id');
             Route::post('/stock-transfers/{id}/cancel', [StockTransferController::class, 'cancel'])->whereNumber('id');
+            Route::delete('/stock-transfers/{id}', [StockTransferController::class, 'destroy'])->whereNumber('id');
 
             // Advanced MIS Financial & Operational Reports
             Route::get('/reports/sales', [ReportController::class, 'sales']);

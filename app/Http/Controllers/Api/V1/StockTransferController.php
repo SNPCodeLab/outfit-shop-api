@@ -311,4 +311,28 @@ class StockTransferController extends BaseApiController
 
         return $this->successResponse($transfer->fresh(), 'Stock transfer cancelled successfully');
     }
+
+    /**
+     * Update transfer status via dynamic action routing:
+     * POST /api/v1/stock-transfers/{id}/{action}
+     */
+    public function updateStatus(Request $request, int $id, string $action): JsonResponse
+    {
+        return match (strtolower($action)) {
+            'approve' => $this->approve($request, $id),
+            'pick' => $this->pick($request, $id),
+            'ship' => $this->ship($request, $id),
+            'receive' => $this->receive($request, $id),
+            'cancel' => $this->cancel($request, $id),
+            default => $this->errorResponse("Invalid transfer action '{$action}'. Valid actions: approve, pick, ship, receive, cancel.", 400),
+        };
+    }
+
+    /**
+     * Delete / Cancel transfer.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        return $this->cancel($request, $id);
+    }
 }

@@ -7,10 +7,13 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends BaseApiController
 {
@@ -160,12 +163,35 @@ class ProductController extends BaseApiController
     {
         $validated = $request->validated();
 
-        $product = Product::create($validated);
+        $productData = collect($validated)->except([
+            'sku', 'price', 'sale_price', 'cost_price', 'quantity', 'stock_quantity', 'size_id', 'color_id',
+        ])->toArray();
+
+        $product = DB::transaction(function () use ($validated, $productData) {
+            $product = Product::create($productData);
+
+            $sku = $validated['sku'] ?? null;
+            $salePrice = $validated['sale_price'] ?? $validated['price'] ?? null;
+
+            if ($sku !== null || $salePrice !== null) {
+                ProductVariant::create([
+                    'product_id' => $product->product_id,
+                    'sku' => $sku ?? ('SKU-'.$product->product_id.'-'.strtoupper(Str::random(4))),
+                    'sale_price' => (float) ($salePrice ?? 0),
+                    'cost_price' => (float) ($validated['cost_price'] ?? 0),
+                    'quantity' => (int) ($validated['quantity'] ?? $validated['stock_quantity'] ?? 0),
+                    'size_id' => $validated['size_id'] ?? null,
+                    'color_id' => $validated['color_id'] ?? null,
+                ]);
+            }
+
+            return $product->load(['category', 'variants.size', 'variants.color']);
+        });
 
         AuditLogService::log('CREATE', 'Product', $product->product_id, null, $product->toArray());
 
         return $this->createdResponse(
-            $product->load('category'),
+            $product,
             'Product created successfully',
             '/api/v1/products/'.$product->product_id
         );
@@ -192,12 +218,15 @@ class ProductController extends BaseApiController
         $validated = $request->validate([
             'category_id' => 'sometimes|required|exists:categories,category_id',
             'product_name' => 'sometimes|required|string|max:150',
-            'brand' => 'nullable|string',
+            'brand' => 'nullable|string|max:100',
             'brand_id' => 'nullable|exists:brands,brand_id',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|string|max:500',
+            'image_url' => 'nullable|string|max:2048',
             'image_public_id' => 'nullable|string|max:255',
             'featured_badge' => 'nullable|string|max:50',
+            'material_fabric' => 'nullable|string|max:200',
+            'gender' => 'nullable|string|max:50',
+            'season_collection' => 'nullable|string|max:100',
             'status' => 'nullable|string|in:ACTIVE,INACTIVE,DRAFT',
         ]);
 
@@ -209,7 +238,7 @@ class ProductController extends BaseApiController
 
         AuditLogService::log('UPDATE', 'Product', $id, $old, $product->toArray());
 
-        return $this->successResponse($product->load('category'), 'Product updated');
+        return $this->successResponse($product->load(['category', 'variants']), 'Product updated');
     }
 
     public function destroy(int $id): JsonResponse

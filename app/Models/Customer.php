@@ -15,11 +15,21 @@ class Customer extends Model
 
     protected $primaryKey = 'customer_id';
 
-    protected $appends = ['id'];
+    protected $appends = ['id', 'loyalty_tier'];
 
     public function getIdAttribute(): int
     {
         return (int) $this->customer_id;
+    }
+
+    public function getLoyaltyTierAttribute(): string
+    {
+        return $this->vip_tier ?? 'Classic';
+    }
+
+    public function setLoyaltyTierAttribute($value): void
+    {
+        $this->attributes['vip_tier'] = $value;
     }
 
     protected $fillable = [
@@ -29,6 +39,7 @@ class Customer extends Model
         'email',
         'address',
         'loyalty_points',
+        'loyalty_tier',
         'vip_tier',
         'total_spent_lifetime',
         'store_credit_balance',

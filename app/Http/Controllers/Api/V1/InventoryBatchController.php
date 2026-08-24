@@ -15,6 +15,41 @@ use Illuminate\Http\Request;
 class InventoryBatchController extends BaseApiController
 {
     /**
+     * List all inventory batches across all variants.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = ProductBatch::with(['variant.product', 'variant.size', 'variant.color'])
+            ->orderBy('batch_id', 'desc');
+
+        if ($variantId = $request->input('variant_id')) {
+            $query->where('variant_id', $variantId);
+        }
+
+        $perPage = $this->perPage($request);
+        $batches = $query->paginate($perPage);
+
+        return $this->successResponse($batches, 'Inventory batches retrieved successfully');
+    }
+
+    /**
+     * Create / Receive a new inventory batch.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'variant_id' => 'required|exists:product_variants,variant_id',
+            'batch_number' => 'required|string|max:100',
+            'manufacturing_date' => 'nullable|date',
+            'expiry_date' => 'required|date',
+            'quantity_received' => 'required|integer|min:1',
+            'quantity_remaining' => 'nullable|integer|min:0',
+        ]);
+
+        return $this->storeBatch($request, (int) $validated['variant_id']);
+    }
+
+    /**
      * List batches expiring within a configurable threshold (default 60 days).
      * Supports FMCG and beverage FIFO management.
      * Restricted to MANAGER or ADMIN.
