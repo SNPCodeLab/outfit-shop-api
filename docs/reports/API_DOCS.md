@@ -56,8 +56,8 @@ All errors (401, 403, 404, 422) return a consistent JSON structure:
 {
   "name": "Admin User",
   "email": "admin@example.com",
-  "password": "Password123!",
-  "password_confirmation": "Password123!",
+  "password": "your_password",
+  "password_confirmation": "your_password",
   "role": "admin"
 }
 ```
@@ -89,7 +89,7 @@ All errors (401, 403, 404, 422) return a consistent JSON structure:
 ```json
 {
   "username": "admin@example.com",
-  "password": "Password123!"
+  "password": "your_password"
 }
 ```
 - **Response `200 OK`**:
@@ -308,7 +308,7 @@ async function apiRequest(endpoint, options = {}) {
 async function demoUsage() {
   try {
     // 1. Login
-    await login('admin@example.com', 'Password123!');
+    await login('admin@example.com', 'your_password');
 
     // 2. Fetch User Profile
     const profile = await apiRequest('/user');

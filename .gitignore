@@ -6,6 +6,15 @@
 !.env.example
 /auth.json
 LOCAL_CREDENTIALS.md
+*credentials*
+*test_credentials*
+*credentials*.md
+*credentials*.sql
+*test_credentials*.sql
+*.dump.sql
+*dump*.sql
+*backup*.sql
+tests/Feature/AdminPersistenceAndRbacCrudTest.php
 
 # Postman, API Collections & Client Environments
 /postman_collections/

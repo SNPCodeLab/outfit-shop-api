@@ -66,7 +66,7 @@ $publicItems = [
     // Auth & Login
     makeRequestItem('1.3 Employee Login (Get Sanctum Token)', 'POST', 'api/v1/auth/login', 'Public', 'none', [
         'username' => 'admin',
-        'password' => 'Admin@123456',
+        'password' => '{{admin_password}}',
     ], 'Authenticate and receive Bearer access token + assigned RBAC roles'),
 
     // Public Product Catalog
@@ -301,7 +301,7 @@ $adminItems = [
     makeRequestItem('4.3 Create New Staff Account with RBAC Role', 'POST', 'api/v1/employees', 'Admin', 'bearer', [
         'employee_name' => 'Dara Sam',
         'username' => 'dara.sam',
-        'password' => 'Dara@123456',
+        'password' => '{{new_employee_password}}',
         'position' => 'Senior Cashier',
         'phone' => '098112233',
         'email' => 'dara.sam@kesararamwithdigital.tech',

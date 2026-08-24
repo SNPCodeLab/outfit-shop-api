@@ -653,7 +653,7 @@
 
 {
   <span class="token-key">"username"</span>: <span class="token-str">"manager"</span>,
-  <span class="token-key">"password"</span>: <span class="token-str">"Manager@123456"</span>
+  <span class="token-key">"password"</span>: <span class="token-str">"your_password"</span>
 }</pre>
             </div>
           </div>
@@ -1082,7 +1082,7 @@ localStorage.setItem(<span class="token-str">'role'</span>,        data.user.rol
   <span class="token-key">"email"</span>:         <span class="token-str">"dara@store.local"</span>,
   <span class="token-key">"position"</span>:      <span class="token-str">"Sales Associate"</span>,
   <span class="token-key">"username"</span>:      <span class="token-str">"dara"</span>,
-  <span class="token-key">"password"</span>:      <span class="token-str">"Dara@123456"</span>,
+  <span class="token-key">"password"</span>:      <span class="token-str">"your_password"</span>,
   <span class="token-key">"role"</span>:          <span class="token-str">"CASHIER"</span>,       <span class="token-comment">// ADMIN | MANAGER | CASHIER | STAFF</span>
   <span class="token-key">"status"</span>:        <span class="token-str">"ACTIVE"</span>
 }</pre>
@@ -1094,8 +1094,8 @@ localStorage.setItem(<span class="token-str">'role'</span>,        data.user.rol
         <pre>{
   <span class="token-key">"name"</span>:                  <span class="token-str">"New Developer"</span>,
   <span class="token-key">"email"</span>:                 <span class="token-str">"dev@yourteam.com"</span>,
-  <span class="token-key">"password"</span>:              <span class="token-str">"Dev@123456"</span>,
-  <span class="token-key">"password_confirmation"</span>: <span class="token-str">"Dev@123456"</span>,
+  <span class="token-key">"password"</span>:              <span class="token-str">"your_password"</span>,
+  <span class="token-key">"password_confirmation"</span>: <span class="token-str">"your_password"</span>,
   <span class="token-key">"role"</span>:                  <span class="token-str">"manager"</span>        <span class="token-comment">// admin | manager | cashier | staff</span>
 }</pre>
       </div>
@@ -1165,7 +1165,7 @@ docs/SS-MIS-Local.postman_environment.json</pre>
         <div class="code-header"><span class="code-label">Shell (bash)</span><button class="copy-btn" onclick="copyCode(this,'curl-login')">Copy</button></div>
         <pre id="curl-login">TOKEN=$(curl -s -X POST https://api.kesararamwithdigital.tech/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"manager","password":"Manager@123456"}' \
+  -d '{"username":"manager","password":"your_password"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['access_token'])")
 
 echo "Token: $TOKEN"</pre>

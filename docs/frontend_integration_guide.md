@@ -87,8 +87,8 @@ import React, { useState } from 'react';
 import api from '../services/api';
 
 export default function Login({ onLoginSuccess }) {
-  const [username, setUsername] = useState('cashier');
-  const [password, setPassword] = useState('Cashier@123456');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {

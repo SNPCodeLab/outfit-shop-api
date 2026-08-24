@@ -40,7 +40,7 @@ The system uses **Laravel Sanctum Bearer Tokens** with **Spatie Role-Based Acces
 ```json
 {
   "username": "cashier1",
-  "password": "Password123!"
+  "password": "your_password"
 }
 ```
 
