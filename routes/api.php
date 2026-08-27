@@ -23,7 +23,6 @@ use App\Http\Controllers\Api\V1\DigitalAssetController;
 use App\Http\Controllers\Api\V1\EmployeeController;
 use App\Http\Controllers\Api\V1\FileExportController;
 use App\Http\Controllers\Api\V1\GiftCardController;
-use App\Http\Controllers\Api\V1\HelpCentreGuideController;
 use App\Http\Controllers\Api\V1\ImageUploadController;
 use App\Http\Controllers\Api\V1\InventoryBatchController;
 use App\Http\Controllers\Api\V1\InventoryForecastingController;
@@ -45,7 +44,6 @@ use App\Http\Controllers\Api\V1\PromotionController;
 use App\Http\Controllers\Api\V1\PurchaseController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\ShippingOrderController;
-use App\Http\Controllers\Api\V1\StatusController;
 use App\Http\Controllers\Api\V1\StockMovementController;
 use App\Http\Controllers\Api\V1\StockTransferController;
 use App\Http\Controllers\Api\V1\StoreBranchController;
@@ -60,11 +58,6 @@ Route::prefix('v1')->group(function () {
     // =========================================================================
     // ── 1. PUBLIC TIER (Unauthenticated) ──
     // =========================================================================
-    Route::get('/health', [StatusController::class, 'index']);
-    Route::get('/status', [StatusController::class, 'index'])->middleware('deprecated:2027-12-31');
-    Route::get('/guide', [HelpCentreGuideController::class, 'index']);
-    Route::get('/docs', [HelpCentreGuideController::class, 'index'])->middleware('deprecated:2027-12-31');
-
     Route::middleware('throttle:role-based')->group(function () {
         // Multi-Currency
         Route::get('/currencies/rates', [CurrencyController::class, 'rates']);
@@ -161,13 +154,6 @@ Route::prefix('v1')->group(function () {
         // Business Intel (Auth required)
         Route::get('/inventory/statistics', [InventoryValuationController::class, 'statistics']);
         Route::get('/variants/low-stock', [ProductVariantController::class, 'lowStock']);
-
-        // Postman (Manager/Admin only)
-        Route::get('/postman.json', function () {
-            $path = base_path('postman/OutfitShop_Master_Collection.json');
-
-            return response()->file($path, ['Content-Type' => 'application/json']);
-        })->middleware('role:MANAGER,ADMIN');
 
         // -- CASHIER, MANAGER, ADMIN --
         Route::middleware(['role:CASHIER,MANAGER,ADMIN'])->group(function () {
@@ -361,22 +347,4 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    // ── 5. LEGACY ALIASES (Deprecated) ──
-    Route::middleware(['auth:sanctum', 'deprecated:2027-12-31'])->group(function () {
-        Route::post('/sales/checkout', [OrderController::class, 'checkout']);
-        Route::get('/sales', [OrderController::class, 'index']);
-        Route::get('/sales/{id}', [OrderController::class, 'show']);
-        Route::post('/sales/{id}/void', [OrderController::class, 'voidOrder']);
-        Route::get('/sales/{id}/khqr', [KhqrPaymentController::class, 'generateForSale']);
-        Route::get('/sales/{id}/receipt-thermal', [BarcodePrintController::class, 'receiptThermal']);
-        Route::get('/sales/{id}/invoice-pdf', [InvoiceEstimateController::class, 'renderInvoiceHtml']);
-        Route::post('/gift-cards/issue', [GiftCardController::class, 'issue']);
-        Route::delete('/cart/clear', [CartController::class, 'clear']);
-        Route::delete('/wishlist/{id}', [CustomerWishlistController::class, 'destroy']);
-        Route::post('/gift-cards/check', [GiftCardController::class, 'check']);
-
-        Route::get('/shipping/orders', [ShippingOrderController::class, 'index']);
-        Route::post('/shipping/create', [ShippingOrderController::class, 'create']);
-        Route::post('/shipping/{id}/status', [ShippingOrderController::class, 'updateStatus']);
-    });
 });

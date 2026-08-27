@@ -140,7 +140,7 @@ jobs:
 
       - name: Ping Live Production Gateway Health
         run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kesararamwithdigital.tech/api/v1/health)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kesararamwithdigital.tech/up)
           echo "Health Endpoint Status: HTTP $HTTP_STATUS"
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "❌ Smoke test failed: Live health endpoint returned HTTP $HTTP_STATUS"
@@ -215,7 +215,7 @@ jobs:
       - name: Verify Health After Rollback
         run: |
           sleep 20
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kesararamwithdigital.tech/api/v1/health)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kesararamwithdigital.tech/up)
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "Rollback health check failed (HTTP $HTTP_STATUS). Manual intervention required."
             exit 1

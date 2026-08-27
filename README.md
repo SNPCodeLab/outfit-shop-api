@@ -67,7 +67,6 @@ REST API specification for retail inventory management, point-of-sale transactio
 ## 5. Endpoints
 
 ### Catalog & Cart
-- `GET /health` — Uptime and database connectivity
 - `GET /products` — Product catalog with filtering and pagination
 - `GET /products/{id}/matrix` — 2D variant stock matrix
 - `GET /cart` — Active cart session

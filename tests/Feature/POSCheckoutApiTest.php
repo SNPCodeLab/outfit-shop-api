@@ -50,7 +50,7 @@ class POSCheckoutApiTest extends TestCase
         $token = $cashier->createToken('pos-token')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/v1/sales/checkout', [
+            ->postJson('/api/v1/orders/checkout', [
                 'items' => [
                     [
                         'variant_id' => $variant->variant_id,
@@ -113,7 +113,7 @@ class POSCheckoutApiTest extends TestCase
 
         // Try to buy 5 items when stock is 2
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/v1/sales/checkout', [
+            ->postJson('/api/v1/orders/checkout', [
                 'items' => [
                     [
                         'variant_id' => $variant->variant_id,

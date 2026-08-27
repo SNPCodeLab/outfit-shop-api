@@ -1,8 +1,0 @@
-$kind: http-request
-description: Serves this collection. Requires MANAGER/ADMIN token because it embeds working credentials.
-url: "{{base_url}}/postman.json"
-method: GET
-headers:
-  Authorization: Bearer {{token}}
-  Accept: application/json
-order: 5000

@@ -63,14 +63,14 @@ class IdempotentCheckoutTest extends TestCase
 
         // First request creates the sale
         $first = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/v1/sales/checkout', $payload);
+            ->postJson('/api/v1/orders/checkout', $payload);
         $first->assertStatus(201)
             ->assertJsonPath('success', true);
         $firstSaleId = $first->json('data.sale_id');
 
         // Retry with the same key returns the original sale (200, same id)
         $second = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/v1/sales/checkout', $payload);
+            ->postJson('/api/v1/orders/checkout', $payload);
         $second->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.sale_id', $firstSaleId);

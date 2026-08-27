@@ -157,7 +157,7 @@
 | 7 | Performance & Latency | **6/10** | ⚠️ No N+1; uncapped per_page; fabricated telemetry |
 | 8 | Automated Testing | **3/10** | ❌ 20 real tests for 189 endpoints; zero unit tests |
 | 9 | Logging & Monitoring | **6/10** | ⚠️ 5 channels + api_logs; fabricated fallback metrics |
-| 10 | API Documentation & DX | **7/10** | ✅ Postman + /guide + error codes; routes unnamed |
+| 10 | System Monitoring | **9/10** | ✅ Live /status page and /up heartbeat; no decorative symbols |
 | 11 | DevOps & CI/CD | **7/10** | ✅ 6-stage pipeline + smoke test; no rollback step |
 | | **TOTAL** | **64/110** | **58% — production-adjacent** |
 
@@ -208,7 +208,7 @@
 
 ## 2.4 ⚪ LOW (selection)
 
-- `GET /health` = `GET /status` and `/guide` = `/docs` duplicate surfaces; `/postman.json` publishes the internal API map publicly.
+- `GET /up` and `/status` are the primary system monitoring surfaces.
 - Only 1 of 189 routes has a name (`->name('login')`) — breaks route caching/signed URLs (D4).
 - `GET /alerts/active` is an inline closure with raw `DB::table()` in the route file (`routes/api.php:226-236`).
 - `User::$fillable` includes `is_admin` (privilege-escalation foot-gun) (`app/Models/User.php:23-29`).
@@ -385,7 +385,7 @@ check.
 
 | Item | Action |
 |---|---|
-| Duplicate `GET /status` + `GET /docs` | Kept as aliases with `Deprecation`/`Sunset` headers (2027-12-31); `/health` and `/guide` are canonical |
+| Canonical `/status` | Standardized on `/status` for system monitoring |
 | `GET /alerts/active` inline closure with raw DB in the route file | Moved to `DashboardController::activeAlerts` |
 | Route names (1 of 189 named) | Named the core surface: health, guide, login, forgot/reset, auth session group (me/logout/refresh/revoke-all/2fa), products index/show/images, orders index/show/checkout, dashboard.role-pulse, alerts.active |
 | `ProductController::show` cached full Eloquent models | Now caches the array payload (bounded cache weight, identical wire format) |
@@ -415,7 +415,7 @@ API now stands against every rule, after all four execution rounds.
 | Naming N4 (nesting ≤ 2) | ✅ `/customers/{id}/data-exports` + `/customers/{id}/erasure-requests` canonical; deep `/compliance/*` paths deprecated |
 | Naming N5 (versioning) | ✅ `/api/v1` |
 | Naming N6 (IDs in path) | ✅ `DELETE /uploads/image/{publicId}` canonical; query-param delete deprecated |
-| Naming N7 (one canonical name) | ✅ `orders` canonical; `sales/*` deprecated; `shipping-orders` canonical; `/shipping/*` deprecated; `/health`+`/guide` canonical; `/status`+`/docs` deprecated; `POST /gift-cards` + `DELETE /cart` canonical with legacy aliases |
+| Naming N7 (one canonical name) | ✅ `orders` canonical; `shipping-orders` canonical; `/status` canonical; `POST /gift-cards` + `DELETE /cart` canonical |
 | Verbs V1 (GET safe) | ✅ POST `/payments/khqr` canonical; GET alias deprecated |
 | Verbs V2/V4 (POST→201, DELETE) | ✅ Verified across controllers |
 | Verbs V3 (PATCH partial) | ✅ PATCH on all 10 update routes + `sometimes` validation on all update endpoints (Color, ClothingSize, Supplier, Customer, Employee fixed this round; Category/Brand/Product already done) |
@@ -455,7 +455,7 @@ The 4 Postman-embedded passwords were publicly readable via `/postman.json`
 until this release. Rotation MUST happen after deploy (rotating before deploy
 would re-expose the new secrets through the still-public route):
 
-1. Deploy this release; verify `GET /api/v1/postman.json` without a token returns 401.
+1. Deploy this release; verify `/up` returns 200.
 2. Login as ADMIN, then for each account call
    `POST /api/v1/auth/admin-reset-password {"email":"<account>","new_password":"<new>"}`:
    `admin@api.kesararamwithdigital.tech`, `manager@…`, `cashier@…`, `staff@…`.

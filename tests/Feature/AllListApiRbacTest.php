@@ -131,8 +131,6 @@ class AllListApiRbacTest extends TestCase
     public function test_public_catalog_list_endpoints_accessible_without_auth(): void
     {
         $publicEndpoints = [
-            '/api/v1/health',
-            '/api/v1/status',
             '/api/v1/categories',
             '/api/v1/clothing-sizes',
             '/api/v1/colors',
@@ -165,8 +163,8 @@ class AllListApiRbacTest extends TestCase
     {
         $authEndpoints = [
             '/api/v1/customers',
-            '/api/v1/sales',
-            '/api/v1/shipping/orders',
+            '/api/v1/orders',
+            '/api/v1/shipping-orders',
         ];
 
         foreach ($authEndpoints as $endpoint) {
@@ -180,8 +178,8 @@ class AllListApiRbacTest extends TestCase
     {
         $authEndpoints = [
             '/api/v1/customers',
-            '/api/v1/sales',
-            '/api/v1/shipping/orders',
+            '/api/v1/orders',
+            '/api/v1/shipping-orders',
         ];
 
         foreach ($authEndpoints as $endpoint) {

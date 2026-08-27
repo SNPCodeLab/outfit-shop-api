@@ -101,20 +101,20 @@ async function testApiEndpoints() {
     console.log('   ⚠️ Stats test error:', err.message);
   }
 
-  // 5. Test GET /api/v1/status
-  console.log('\n[5/5] Testing GET /api/v1/status...');
+  // 5. Test GET /api/v1/products (Public Catalog)
+  console.log('\n[5/5] Testing GET /api/v1/products...');
   try {
-    const statusRes = await fetch(`${BASE_URL}/v1/status`, {
-      headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authToken}` }
+    const productsRes = await fetch(`${BASE_URL}/v1/products`, {
+      headers: { 'Accept': 'application/json' }
     });
-    const statusData = await statusRes.json();
-    if (statusRes.ok) {
-      console.log('   ✅ GET STATUS SUCCESS:', statusData.message || JSON.stringify(statusData));
+    const productsData = await productsRes.json();
+    if (productsRes.ok) {
+      console.log('   ✅ GET PRODUCTS SUCCESS:', JSON.stringify(productsData).slice(0, 120));
     } else {
-      console.log('   ℹ️ STATUS RESPONSE:', statusData.message || JSON.stringify(statusData));
+      console.log('   ℹ️ PRODUCTS RESPONSE:', productsData.message || JSON.stringify(productsData));
     }
   } catch (err) {
-    console.log('   ⚠️ Status test error:', err.message);
+    console.log('   ⚠️ Products test error:', err.message);
   }
 
   console.log('\n================================================================');

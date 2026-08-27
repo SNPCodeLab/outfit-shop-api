@@ -259,7 +259,8 @@ GET /api/v1/products                → Full catalog
 GET /api/v1/variants                → All SKUs with stock levels
 GET /api/v1/variants/barcode/{code} → Barcode scanner lookup
 GET /api/v1/variants/low-stock      → Items needing restock
-GET /api/v1/health                  → System status check
+GET /up                          → System heartbeat
+GET /status                      → Live status dashboard
 ```
 
 ### 8.5 POS Checkout Request Shape

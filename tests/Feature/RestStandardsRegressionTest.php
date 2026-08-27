@@ -35,16 +35,14 @@ class RestStandardsRegressionTest extends TestCase
         return 'Bearer '.$employee->createToken('test-token')->plainTextToken;
     }
 
-    public function test_guest_is_rejected_from_formerly_public_pii_and_bi_endpoints(): void
+    public function test_guest_is_rejected_from_protected_endpoints(): void
     {
         $this->getJson('/api/v1/orders/1/receipt-thermal')->assertStatus(401);
-        $this->getJson('/api/v1/sales/1/invoice-pdf')->assertStatus(401);
+        $this->getJson('/api/v1/orders/1/invoice-pdf')->assertStatus(401);
         $this->getJson('/api/v1/products/1/download')->assertStatus(401);
         $this->postJson('/api/v1/products/1/reviews', ['rating' => 5])->assertStatus(401);
         $this->getJson('/api/v1/inventory/statistics')->assertStatus(401);
         $this->getJson('/api/v1/variants/low-stock')->assertStatus(401);
-        // The Postman collection embeds working credentials - never public.
-        $this->getJson('/api/v1/postman.json')->assertStatus(401);
     }
 
     public function test_registration_does_not_issue_token_or_mass_assign_admin_flag(): void

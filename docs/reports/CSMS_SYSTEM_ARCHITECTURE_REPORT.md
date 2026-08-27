@@ -406,7 +406,7 @@ Michael Porter's **Value Chain** framework identifies the activities through whi
 #### Infrastructure — Technology & Administration
 | Activity | SS-MIS Implementation |
 | :--- | :--- |
-| System monitoring | `GET /api/v1/health` — live database connectivity status |
+| System monitoring | `GET /status` — live endpoint status dashboard with real-time probing |
 | API traffic oversight | `GET /api/v1/dashboard/stats` — requests/day, top endpoints, error rates |
 | Role-based governance | 4-tier RBAC (ADMIN → MANAGER → CASHIER → STAFF) |
 | Serverless auto-scaling | Vercel serverless functions scale to demand with zero manual provisioning |
@@ -447,7 +447,7 @@ SS-MIS handles sensitive personal and financial data. This section documents the
 | `employees` | `employee_name`, `email`, `phone`, `gender`, `position` | Store employees | 🟡 Internal — restricted to ADMIN |
 | `employees` | `password_hash`, `salary` | Store employees | 🔴 Confidential — hidden from all API responses |
 | `customers` | `customer_name`, `email`, `phone`, `address`, `gender` | Retail customers | 🟡 Personal — requires consent for collection |
-| `users` | `name`, `email`, `password` | System users/developers | 🟡 Internal — Admin-created accounts |
+| `users` | `name`, `email`, `password` | System users/staff | 🟡 Internal — Admin-created accounts |
 | `audit_logs` | `ip_address`, `user_agent` | All users | 🟡 Behavioral — supports security monitoring |
 | `api_logs` | `ip_address`, `user_id` | All users | 🟡 Behavioral — request audit trail |
 
@@ -616,7 +616,7 @@ GET    /api/v1/audit-logs ..................... System audit trail (Manager+)
 GET    /api/v1/employees ...................... List all employees (Admin only)
 POST   /api/v1/employees ..................... Create employee account (Admin only)
 
-GET    /api/v1/health ......................... System & database connectivity check (Public)
+GET    /status ................................ System status dashboard, live endpoint probing (Public)
 ```
 
 ---

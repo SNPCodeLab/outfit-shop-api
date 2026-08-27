@@ -58,7 +58,7 @@ moves stock between branches). Nothing is split across services.
 | Domain | Canonical endpoints |
 |---|---|
 | Auth & session | `POST /auth/login`, `GET /auth/me`, `POST /auth/avatar`, `logout`, `refresh`, `revoke-all`, `2fa/setup`, `2fa/verify`, `forgot-password`, `reset-password`, `admin-reset-password`, `register` |
-| System | `GET /health`, `GET /guide`, `GET /postman.json` (manager/admin gated) |
+| System | `GET /up`, `GET /status` (manager/admin gated) |
 | Catalog | `categories`, `clothing-sizes`, `colors`, `brands`, `bundles` CRUD; `products` CRUD + `images`, `matrix`, `colorways`, `reviews`, `download`; `variants` CRUD + `barcode/{barcode}`, `tiers`, `batches`, `barcode-label`, `low-stock` |
 | Storefront | `cart` (GET, `POST /cart/items`, PATCH/DELETE `/cart/items/{id}`, `DELETE /cart`), `wishlist` (GET/POST/DELETE + `toggle`), `promotions` (+`active`, `verify-coupon`), `marketing/banners`, `settings/audio-cues`, `currencies` |
 | Sales | `POST /orders/checkout`, `GET /orders`, `GET /orders/{id}`, receipts/invoice/khqr sub-resources, `POST /orders/{id}/void`, `estimates` + convert, `invoices`, `gift-cards` create + `GET /gift-cards/{code}`, `POST /payments/khqr` |
@@ -78,7 +78,7 @@ compatibility. They emit `Deprecation: true` + `Sunset: 2027-12-31` headers.
 | Delete | Replaced by |
 |---|---|
 | `GET /status` | `GET /health` |
-| `GET /docs` | `GET /guide` |
+| `GET /status` | `GET /status` |
 | `POST /sales/checkout` | `POST /orders/checkout` |
 | `GET /sales` | `GET /orders` |
 | `GET /sales/{id}` | `GET /orders/{id}` |

@@ -103,7 +103,7 @@
 
         <div class="actions">
             <a href="{{ url('/') }}" class="btn">API Root</a>
-            <a href="{{ url('/guide') }}" class="btn btn-outline">Documentation</a>
+            <a href="{{ url('/status') }}" class="btn btn-outline">System Status</a>
         </div>
 
         <div class="footer-tag">

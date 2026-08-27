@@ -58,7 +58,7 @@
 2. **Container Re-hydration**: Trigger automated Vercel/Docker redeploy from `main` branch.
 3. **Health Verification**:
    ```bash
-   curl -I https://api.kesararamwithdigital.tech/api/v1/health
+   curl -I https://api.kesararamwithdigital.tech/up
    # Expected: HTTP 200 OK
    ```
 

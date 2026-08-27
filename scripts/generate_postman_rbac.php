@@ -59,12 +59,8 @@ function makeRequestItem($name, $method, $path, $folder, $authType = 'bearer', $
 // LEVEL 1: PUBLIC / STOREFRONT (No Auth Required)
 // ─────────────────────────────────────────────────────────────────────────────
 $publicItems = [
-    // Health & System
-    makeRequestItem('1.1 Health & Engine Status', 'GET', 'api/v1/health', 'Public', 'none', null, 'System heartbeat and database connectivity check'),
-    makeRequestItem('1.2 Engine Status Metadata', 'GET', 'api/v1/status', 'Public', 'none', null, 'Detailed engine statistics, runtime, and version information'),
-
     // Auth & Login
-    makeRequestItem('1.3 Employee Login (Get Sanctum Token)', 'POST', 'api/v1/auth/login', 'Public', 'none', [
+    makeRequestItem('1.1 Employee Login (Get Sanctum Token)', 'POST', 'api/v1/auth/login', 'Public', 'none', [
         'username' => 'admin',
         'password' => '{{admin_password}}',
     ], 'Authenticate and receive Bearer access token + assigned RBAC roles'),
@@ -128,7 +124,7 @@ $cashierItems = [
     ], 'Close register, calculate cash over/short discrepancy, and lock Z-report'),
 
     // POS Checkout & Sales Transactions
-    makeRequestItem('2.5 Complete Point-of-Sale Checkout', 'POST', 'api/v1/sales/checkout', 'Cashier', 'bearer', [
+    makeRequestItem('2.5 Complete Point-of-Sale Checkout', 'POST', 'api/v1/orders/checkout', 'Cashier', 'bearer', [
         'customer_id' => 1,
         'payment_method' => 'KHQR_BAKONG',
         'items' => [
@@ -139,11 +135,11 @@ $cashierItems = [
         'tax_amount' => 0.00,
         'notes' => 'In-store POS retail purchase.',
     ], 'ACID-compliant sales transaction deducting inventory and generating invoice receipt'),
-    makeRequestItem('2.6 List Sales Invoices & Receipts', 'GET', 'api/v1/sales?page=1&per_page=15', 'Cashier', 'bearer', null, 'List transaction history with customer names and payment status'),
-    makeRequestItem('2.7 Get Single Sale Invoice Details', 'GET', 'api/v1/sales/1', 'Cashier', 'bearer', null, 'Get breakdown of sold items, applied discounts, tax, and payments'),
-    makeRequestItem('2.8 Generate KHQR Payment for Sale', 'GET', 'api/v1/sales/1/khqr', 'Cashier', 'bearer', null, 'Generate dynamic KHQR Bakong barcode for a specific pending invoice'),
-    makeRequestItem('2.9 Generate 80mm ESC/POS Thermal Receipt', 'GET', 'api/v1/sales/1/receipt-thermal', 'Cashier', 'bearer', null, 'Render 80mm thermal receipt payload for receipt printers'),
-    makeRequestItem('2.10 Void / Cancel Sale & Restock Inventory', 'POST', 'api/v1/sales/1/void', 'Cashier', 'bearer', [
+    makeRequestItem('2.6 List Sales Invoices & Receipts', 'GET', 'api/v1/orders?page=1&per_page=15', 'Cashier', 'bearer', null, 'List transaction history with customer names and payment status'),
+    makeRequestItem('2.7 Get Single Sale Invoice Details', 'GET', 'api/v1/orders/1', 'Cashier', 'bearer', null, 'Get breakdown of sold items, applied discounts, tax, and payments'),
+    makeRequestItem('2.8 Generate KHQR Payment for Sale', 'GET', 'api/v1/orders/1/khqr', 'Cashier', 'bearer', null, 'Generate dynamic KHQR Bakong barcode for a specific pending invoice'),
+    makeRequestItem('2.9 Generate 80mm ESC/POS Thermal Receipt', 'GET', 'api/v1/orders/1/receipt-thermal', 'Cashier', 'bearer', null, 'Render 80mm thermal receipt payload for receipt printers'),
+    makeRequestItem('2.10 Void / Cancel Sale & Restock Inventory', 'POST', 'api/v1/orders/1/void', 'Cashier', 'bearer', [
         'reason' => 'Customer requested immediate exchange before leaving counter.',
     ], 'Void transaction and automatically return items to stock'),
 
@@ -163,7 +159,7 @@ $cashierItems = [
     ], 'Convert 100 points into a $5.00 discount voucher'),
 
     // Shipping & Delivery Booking
-    makeRequestItem('2.16 Create Courier Delivery / Click-and-Collect Order', 'POST', 'api/v1/shipping/create', 'Cashier', 'bearer', [
+    makeRequestItem('2.16 Create Courier Delivery / Click-and-Collect Order', 'POST', 'api/v1/shipping-orders', 'Cashier', 'bearer', [
         'sale_id' => 1,
         'courier_name' => 'VIRAK_BUNTHAM',
         'recipient_name' => 'Chenda Pich',
@@ -171,8 +167,8 @@ $cashierItems = [
         'delivery_address' => 'Siem Reap Branch Office, Wat Bo Road',
         'shipping_fee' => 2.50,
     ], 'Dispatch order via Virak Buntham, J&T, Grab, or Store Pickup'),
-    makeRequestItem('2.17 List Shipping & Courier Orders', 'GET', 'api/v1/shipping/orders', 'Cashier', 'bearer', null, 'Track status of dispatched packages'),
-    makeRequestItem('2.18 Update Shipping Dispatch Status', 'POST', 'api/v1/shipping/1/status', 'Cashier', 'bearer', [
+    makeRequestItem('2.17 List Shipping & Courier Orders', 'GET', 'api/v1/shipping-orders', 'Cashier', 'bearer', null, 'Track status of dispatched packages'),
+    makeRequestItem('2.18 Update Shipping Dispatch Status', 'PATCH', 'api/v1/shipping-orders/1', 'Cashier', 'bearer', [
         'status' => 'IN_TRANSIT',
         'tracking_number' => 'VBT-88992211',
         'courier_notes' => 'Package handed over to driver.',

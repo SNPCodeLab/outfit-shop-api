@@ -1,7 +1,0 @@
-$kind: http-request
-description: Deprecated alias of /health. Sunset 2027-12-31.
-url: "{{base_url}}/status"
-method: GET
-headers:
-  Accept: application/json
-order: 2000

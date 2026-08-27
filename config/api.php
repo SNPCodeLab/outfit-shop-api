@@ -33,15 +33,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Documentation Base Path
-    |--------------------------------------------------------------------------
-    | Used to build meta.documentation links in error responses.
-    */
-
-    'docs_base' => env('API_DOCS_BASE', '/api/v1/guide'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Brand Assets
     |--------------------------------------------------------------------------
     | Cloudinary-hosted official brand logos, icons, vectors, and video assets.

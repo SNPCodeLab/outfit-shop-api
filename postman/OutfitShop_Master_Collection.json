@@ -289,146 +289,6 @@
       "description": ""
     },
     {
-      "name": "01 - Health & System",
-      "item": [
-        {
-          "name": "GET Health",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "health"
-              ],
-              "query": []
-            },
-            "description": "Canonical health probe (uptime monitors)."
-          },
-          "response": []
-        },
-        {
-          "name": "GET Status [legacy]",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/status",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "status"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias of /health. Sunset 2027-12-31."
-          },
-          "response": []
-        },
-        {
-          "name": "GET Guide",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/guide",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "guide"
-              ],
-              "query": []
-            },
-            "description": "Developer knowledge base (canonical)."
-          },
-          "response": []
-        },
-        {
-          "name": "GET Docs [legacy]",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/docs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "docs"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias of /guide. Sunset 2027-12-31."
-          },
-          "response": []
-        },
-        {
-          "name": "GET Postman Collection (auth-gated)",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/postman.json",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "postman.json"
-              ],
-              "query": []
-            },
-            "description": "Serves this collection. Requires MANAGER/ADMIN token because it embeds working credentials."
-          },
-          "response": []
-        }
-      ],
-      "description": ""
-    },
-    {
       "name": "02 - Currency (PUBLIC)",
       "item": [
         {
@@ -1902,12 +1762,12 @@
             ],
             "body": null,
             "url": {
-              "raw": "/sales/{{sale_id}}/khqr",
+              "raw": "/orders/{{sale_id}}/khqr",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "sales",
+                "orders",
                 "{{sale_id}}",
                 "khqr"
               ],
@@ -1934,12 +1794,12 @@
             ],
             "body": null,
             "url": {
-              "raw": "/sales/{{sale_id}}/receipt-thermal",
+              "raw": "/orders/{{sale_id}}/receipt-thermal",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "sales",
+                "orders",
                 "{{sale_id}}",
                 "receipt-thermal"
               ],
@@ -1966,12 +1826,12 @@
             ],
             "body": null,
             "url": {
-              "raw": "/sales/{{sale_id}}/invoice-pdf",
+              "raw": "/orders/{{sale_id}}/invoice-pdf",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "sales",
+                "orders",
                 "{{sale_id}}",
                 "invoice-pdf"
               ],
@@ -2820,106 +2680,6 @@
             "description": ""
           },
           "response": []
-        },
-        {
-          "name": "POST POS Checkout /sales [legacy]",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"customer_id\":null,\"items\":[{\"variant_id\":174,\"quantity\":1,\"discount\":0}],\"payment_method\":\"CARD\",\"payment_amount\":120.00,\"notes\":\"Walk-in card\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "/sales/checkout",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "sales",
-                "checkout"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias. Sunset 2027-12-31."
-          },
-          "response": []
-        },
-        {
-          "name": "GET All Sales [legacy]",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/sales",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "sales"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias. Sunset 2027-12-31."
-          },
-          "response": []
-        },
-        {
-          "name": "GET Sale by ID [legacy]",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/sales/{{sale_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "sales",
-                "{{sale_id}}"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias. Sunset 2027-12-31."
-          },
-          "response": []
         }
       ],
       "description": ""
@@ -3222,116 +2982,6 @@
               "query": []
             },
             "description": ""
-          },
-          "response": []
-        },
-        {
-          "name": "GET Shipping Orders [legacy]",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": null,
-            "url": {
-              "raw": "/shipping/orders",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "shipping",
-                "orders"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias. Sunset 2027-12-31."
-          },
-          "response": []
-        },
-        {
-          "name": "POST Create Shipment [legacy]",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sale_id\": \"{{sale_id}}\",\n  \"branch_id\": 1,\n  \"fulfillment_type\": \"COURIER_DELIVERY\",\n  \"courier_name\": \"J_AND_T\",\n  \"recipient_name\": \"Dara Sok\",\n  \"recipient_phone\": \"0123456789\",\n  \"shipping_address\": \"St.271, BKK1, Phnom Penh\",\n  \"shipping_city\": \"Phnom Penh\",\n  \"shipping_cost\": 3.5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "/shipping/create",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "shipping",
-                "create"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias."
-          },
-          "response": []
-        },
-        {
-          "name": "POST Update Shipment Status [legacy]",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"status\":\"DISPATCHED\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "/shipping/{{shipping_id}}/status",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "shipping",
-                "{{shipping_id}}",
-                "status"
-              ],
-              "query": []
-            },
-            "description": "Deprecated alias."
           },
           "response": []
         },
@@ -5893,12 +5543,12 @@
             ],
             "body": null,
             "url": {
-              "raw": "/sales/{{sale_id}}/void",
+              "raw": "/orders/{{sale_id}}/void",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "sales",
+                "orders",
                 "{{sale_id}}",
                 "void"
               ],

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$kernel = $app->make(Kernel::class);
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\Employee;
@@ -67,8 +67,8 @@ echo "------------------------------------------------------------------------\n
 
 $testScenarios = [
     // 1. PUBLIC ENDPOINTS (No Token)
-    ['name' => 'Public: GET /api/v1/health', 'method' => 'GET', 'uri' => '/api/v1/health', 'token' => null, 'expected' => 200],
-    ['name' => 'Public: GET /api/v1/status', 'method' => 'GET', 'uri' => '/api/v1/status', 'token' => null, 'expected' => 200],
+    ['name' => 'Public: GET /up', 'method' => 'GET', 'uri' => '/up', 'token' => null, 'expected' => 200],
+    ['name' => 'Public: GET /status', 'method' => 'GET', 'uri' => '/status', 'token' => null, 'expected' => 200],
     ['name' => 'Public: GET /api/v1/products', 'method' => 'GET', 'uri' => '/api/v1/products', 'token' => null, 'expected' => 200],
     ['name' => 'Public: GET /api/v1/products/1', 'method' => 'GET', 'uri' => '/api/v1/products/1', 'token' => null, 'expected' => 200],
     ['name' => 'Public: GET /api/v1/categories', 'method' => 'GET', 'uri' => '/api/v1/categories', 'token' => null, 'expected' => 200],
@@ -81,9 +81,9 @@ $testScenarios = [
 
     // 2. CASHIER ACCESS TESTS
     ['name' => 'Cashier: GET /api/v1/customers (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/customers', 'token' => $cashierToken, 'expected' => 200],
-    ['name' => 'Cashier: GET /api/v1/sales (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/sales', 'token' => $cashierToken, 'expected' => 200],
+    ['name' => 'Cashier: GET /api/v1/orders (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/orders', 'token' => $cashierToken, 'expected' => 200],
     ['name' => 'Cashier: GET /api/v1/shifts/current (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/shifts/current', 'token' => $cashierToken, 'expected' => 200],
-    ['name' => 'Cashier: GET /api/v1/shipping/orders (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/shipping/orders', 'token' => $cashierToken, 'expected' => 200],
+    ['name' => 'Cashier: GET /api/v1/shipping-orders (Auth required)', 'method' => 'GET', 'uri' => '/api/v1/shipping-orders', 'token' => $cashierToken, 'expected' => 200],
 
     // 3. RBAC GUARDS: CASHIER BLOCKED FROM MANAGER ENDPOINTS (Expect 403)
     ['name' => 'Guard Test: Cashier trying GET /api/v1/stock-movements (Must Block: 403)', 'method' => 'GET', 'uri' => '/api/v1/stock-movements', 'token' => $cashierToken, 'expected' => 403],

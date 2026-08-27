@@ -193,7 +193,6 @@ class ApiResponse
                 'system' => config('api.system_name', 'OutfitShop-Backend-API'),
                 'api_version' => config('api.version', 'Version: 1.2.0'),
                 'processing_time_ms' => $processingTime,
-                'documentation' => config('api.docs_base', '/api/v1/guide').'#'.strtolower($errorCode),
                 'retry_allowed' => $retryAllowed,
                 'retry_after_seconds' => $retryAfterSeconds,
                 'support_contact' => config('api.support_email', ''),

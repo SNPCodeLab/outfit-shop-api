@@ -13,7 +13,7 @@ export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 - **Live Base URL**: `http://127.0.0.1:8000/api/v1`
-- **Health Check**: `GET http://127.0.0.1:8000/api/v1/status`
+- **Status Page**: `http://127.0.0.1:8000/status`
 
 ---
 

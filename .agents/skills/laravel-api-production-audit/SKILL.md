@@ -71,7 +71,7 @@ Activate this skill whenever the user asks:
 
 ### 9. Monitoring & Observability
 - **Structured Domain Logging**: 5 separated log channels (`pos.log`, `inventory.log`, `purchasing.log`, `security.log`, `admin.log`).
-- **Live Health Endpoint**: Zero-dependency `GET /api/v1/health` verifying database and storage connectivity.
+- **Live Health Endpoint**: Zero-dependency `GET /up` verifying database and storage connectivity.
 - **API Analytics**: Tracking peak traffic hours, top endpoints, and role activity distribution.
 
 - **API Documentation & Developer Experience (DX)**: Standardized error codes and Postman collections.
@@ -186,8 +186,8 @@ Deliver the final handoff checklist:
 - **Week 4**: Final Hardening & Frontend Handover
 
 ## 5. Frontend Integration & Handover Checklist
-- [x] Postman Collection: `GET /api/v1/postman.json`
-- [x] Interactive Guide: `GET /guide`
+- [x] Versioned API: `GET /api/v1/*`
+- [x] Status Dashboard: `GET /status`
 
 ## 6. Target Production KPIs
 - Latency: <50ms cached | <200ms uncached

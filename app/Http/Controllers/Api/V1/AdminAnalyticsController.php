@@ -62,7 +62,7 @@ class AdminAnalyticsController extends BaseApiController
         $activityPerRole = [
             'CASHIER' => ['percentage' => '48%', 'total_api_calls' => 24000, 'primary_routes' => ['/sales/checkout', '/variants/barcode', '/shifts']],
             'STAFF' => ['percentage' => '22%', 'total_api_calls' => 11000, 'primary_routes' => ['/products', '/variants/low-stock', '/inventory']],
-            'PUBLIC' => ['percentage' => '18%', 'total_api_calls' => 9000,  'primary_routes' => ['/products', '/categories', '/guide']],
+            'PUBLIC' => ['percentage' => '18%', 'total_api_calls' => 9000,  'primary_routes' => ['/products', '/categories', '/kb']],
             'MANAGER' => ['percentage' => '9%',  'total_api_calls' => 4500,  'primary_routes' => ['/purchases', '/reports/sales', '/stock-transfers']],
             'ADMIN' => ['percentage' => '3%',  'total_api_calls' => 1500,  'primary_routes' => ['/employees', '/admin/performance', '/audit-logs']],
         ];

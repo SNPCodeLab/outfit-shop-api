@@ -124,4 +124,4 @@ Whenever handing off this API to frontend teams, provide the standardized 7-docu
 1. `git reset --hard <STABLE_COMMIT_HASH>`
 2. `php artisan migrate:rollback --step=1 --force` (if schema was altered)
 3. `php artisan optimize:clear && php artisan config:cache && php artisan route:cache`
-4. `curl -I https://api.kesararamwithdigital.tech/api/v1/health` (must return `HTTP 200 OK`)
+4. `curl -I https://api.kesararamwithdigital.tech/up` (must return `HTTP 200 OK`)

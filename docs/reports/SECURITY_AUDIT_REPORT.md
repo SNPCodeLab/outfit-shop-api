@@ -101,5 +101,5 @@ Granular access control is enforced via custom middleware:
 
 The production gateway was validated post-audit:
 * **Root Endpoint**: `GET https://api.kesararamwithdigital.tech/` -> `HTTP 200 OK`
-* **Health Check**: `GET https://api.kesararamwithdigital.tech/api/v1/health` -> `HTTP 200 OK` (Database: Connected)
+* **Health Check**: `GET https://api.kesararamwithdigital.tech/up` -> `HTTP 200 OK` (Database: Connected)
 * **Auth Guard**: `GET https://api.kesararamwithdigital.tech/api/v1/dashboard/stats` -> `HTTP 401 Unauthorized` (Properly blocked without token)

@@ -5,7 +5,7 @@ description: >
   Covers the 4-tier quantity lifecycle (On Hand, Reserved, Available, Incoming),
   financial asset valuation formulas (Purchased Cost Value vs Resale Retail Value, Gross Margin),
   estimates to invoice 1-click billing workflow, A4 printable PDF invoice rendering,
-  and the Help Centre Knowledge Base standards (/guide, /api/v1/guide).
+  and the System Status standard (/status).
 ---
 
 # SalesBinder-Inspired MIS & POS Architecture Specification
@@ -96,8 +96,7 @@ The system tracks real-time balance sheet inventory valuations and potential rev
 ## 4. Help Centre & Developer Knowledge Base
 
 Accessible at:
-* **Web UI**: `https://api.kesararamwithdigital.tech/guide` *(or `/kb`)*
-* **JSON API**: `https://api.kesararamwithdigital.tech/api/v1/guide` *(or `/api/v1/docs`)*
+* **Status Page**: `https://api.kesararamwithdigital.tech/status`
 
 ### 4.1 UI Design Guidelines
 * **No Mixed / Rainbow Colors**: Single-tone neutral slate and deep navy monochrome palette (`#0f172a`, `#1e293b`, `#f8fafc`, `#ffffff`).

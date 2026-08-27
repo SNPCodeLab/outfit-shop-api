@@ -829,12 +829,12 @@ localStorage.setItem(<span class="token-str">'role'</span>,        data.user.rol
           </div>
           <div class="endpoint-row">
             <span class="method post">POST</span>
-            <span class="endpoint-path">/api/v1/sales/checkout</span>
+            <span class="endpoint-path">/api/v1/orders/checkout</span>
             <span class="endpoint-auth auth-bearer">Bearer</span>
           </div>
           <div class="endpoint-row">
             <span class="method get">GET</span>
-            <span class="endpoint-path">/api/v1/sales</span>
+            <span class="endpoint-path">/api/v1/orders</span>
             <span class="endpoint-auth auth-bearer">Bearer</span>
           </div>
         </div>
@@ -985,8 +985,8 @@ localStorage.setItem(<span class="token-str">'role'</span>,        data.user.rol
           </div>
           <div class="endpoint-row" style="grid-template-columns:72px 1fr 1fr">
             <span class="method get">GET</span>
-            <span class="endpoint-path">/api/v1/health</span>
-            <span class="endpoint-desc">API health check / status</span>
+            <span class="endpoint-path">/up</span>
+            <span class="endpoint-desc">System heartbeat</span>
           </div>
         </div>
       </div>
@@ -1270,8 +1270,7 @@ php artisan key:generate</pre>
   <span class="token-key">"message"</span>:           <span class="token-str">"Forbidden. You do not have permission to perform this action."</span>,
   <span class="token-key">"error_code"</span>:        <span class="token-str">"ERR_FORBIDDEN"</span>,
   <span class="token-key">"your_role"</span>:         <span class="token-str">"CASHIER"</span>,
-  <span class="token-key">"required_role"</span>:     <span class="token-str">"MANAGER or ADMIN"</span>,
-  <span class="token-key">"documentation_url"</span>: <span class="token-str">"https://api.kesararamwithdigital.tech/guide"</span>
+  <span class="token-key">"required_role"</span>:     <span class="token-str">"MANAGER or ADMIN"</span>
 }</pre>
       </div>
     </section>
